@@ -1,0 +1,30 @@
+####List number of PDBs you want analysed.
+##All = All PDBs in the PDB folder.
+PDBs:10;
+
+####List number of FASTA files you want analysed.
+##All = All FASTA files in the FASTA folder.
+FASTAfiles:10;
+
+####Operations you want to run
+##Mutate = generate FASTA files of every possible point mutant for a given FASTA file.
+##Agadir = run Agadirwrapper. The Options.txt file specifies which of Agadirwrapper algorithms to perform.
+##FoldXRepair = repair pdb with FoldX repair algorithm
+##FoldXBuildModel = mutate sequence, remodel and determine DDG of mutated pdb with FoldX BuildModel algorithm
+##FoldXStability = determine DDG of pdb with FoldX Stability algorithm
+##FoldXAnalyseComplex = determine DDG of pdb with FoldX Stability algorithm
+Mutate = TRUE
+Agadir = FALSE
+FoldXRepair = FALSE
+FoldXBuildModel = FALSE
+FoldXStability = FALSE
+FoldXAnalyseComplex = FALSE
+
+####Path to necessary tools. Don't change on the cluster.
+R_Path:/software/shared/apps/general/R/3.1.2/bin/Rscript;
+FoldX_Path:/switchlab/group/tools/FoldX_2015/FoldX;
+Agadir_Path:/switchlab/group/tools/agadir_10042012/agadirwrapper;
+Qsub_Path:/opt/sge/bin/lx-amd64/;
+
+
+
