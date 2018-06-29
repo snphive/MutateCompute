@@ -1,15 +1,18 @@
 ROOT:
-    path_R: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
-    path_FoldX: '/switchlab/group/tools/FoldX_2015/FoldX'
-    path_Agadir: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
-    path_Qsub: '/opt/sge/bin/lx-amd64/'
-    path_local_FoldX: '/Users/u0120577/PycharmProjects'
-    path_local_Agadir: '/Users/u0120577/PycharmProjects'
-    path_local_R: '/usr/local/Cellar/r/3.5.0'
+    path_R_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
+    path_FoldX_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
+    path_Agadir_exe: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
+    path_Qsub_exe: '/opt/sge/bin/lx-amd64/'
+    path_local_FoldX_exe: '/Users/u0120577/PycharmProjects'
+    path_local_Agadir_exe: '/Users/u0120577/PycharmProjects'
+    path_local_R_exe: '/usr/local/Cellar/r/3.5.0'
 
-    path_start: '/switchlab/group/shazib/OptimizeProteinShazibCopy'
-    path_scripts: '/switchlab/group/shazib/OptimizeProteinShazibCopy/SourceFiles/Scripts'
-    path_results: '/switchlab/group/shazib/OptimizeProteinShazibCopy/Results'
+    path_SnpEffect_dir: '/switchlab/group/shazib/SnpEffect'
+    path_SE_SourceFiles_Scripts_dir: '/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts'
+    path_SE_PDBs_Inputs_dir: '/switchlab/group/shazib/SnpEffect/PDBs/Inputs'
+    path_SE_Outputs_dir: '/switchlab/group/shazib/SnpEffect/Outputs'
+    path_SE_Outputs_Agadir_dir: '/switchlab/group/shazib/SnpEffect/Outputs/Agadir'
+    path_SE_Outputs_FoldX_dir: '/switchlab/group/shazib/SnpEffect/Outputs/FoldX'
 
     aa_dict_1to3:
         A: ALA
@@ -32,6 +35,7 @@ ROOT:
         V: VAL
         W: TRP
         Y: TYR
+
     aa_dict_3to1:
         ALA: A
         CYS: C
@@ -56,7 +60,7 @@ ROOT:
         TRP: W
         TYR: Y
 
-    all_20_residues:
+    list_all_20_aa:
         - A
         - C
         - D
