@@ -2,12 +2,12 @@ Feature: Main
   Read input data files, perform computations, write output result files
 
 
-  Scenario: Provide FASTA files and MutateCompute_Options.txt file
-    Given FASTA input files
+  Scenario: Provide fasta files and MutateCompute_Options.txt file
+    Given fasta input files
     When MutateCompute_Options file specifies to perform the Mutate operation
-    Then result should be FASTA files for every possible amino acid substitution
+    Then result should be fasta files for every possible amino acid substitution
 
-    Given FASTA input files
+    Given fasta input files
     When MutateCompute_Options file specifies to perform the Agadir operation
     And Agadir/Options.txt specifies to perform Tango
     Then result should be Agadir PSX output files
