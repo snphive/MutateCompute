@@ -1,12 +1,20 @@
-from src.MutateFasta import MutateFasta
-from src.Agadir import Agadir
-from src.FoldX import FoldX
-from src.Scheduler import Scheduler
-
 import glob
 import yaml
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+
+from src.GeneralUtilityMethods import GUM
+from src.Scheduler import Scheduler
+
+# The following 4 lines of code successfully connectt to
+import mysql.connector
+cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
+cur = cnx.cursor()
+# cur.execute("CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
+
+
+
+
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 
 mutateFasta = None
@@ -14,8 +22,8 @@ agadir = None
 foldx = None
 scheduler = None
 
-number_of_pdbs_to_process = 0
-number_of_FASTA_files_to_process = 0
+number_of_pdbs_to_analyse = 0
+number_of_fastas_to_analyse = 0
 input_pdbs = []
 input_fastas = []
 do_mutate = False
@@ -26,18 +34,18 @@ do_foldx_stability = False
 do_foldx_analysecomplex = False
 
 
-with open("/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts/pathsAndDictionaries.yaml",
-          'r') as stream:
+with open("/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml", 'r') as stream:
+
     try:
 
         paths_and_dictionaries = yaml.load(stream)
         path_R_exe = paths_and_dictionaries['ROOT']['path_R_exe']
         path_FoldX_exe = paths_and_dictionaries['ROOT']['path_FoldX_exe']
         path_Agadir_exe = paths_and_dictionaries['ROOT']['path_Agadir_exe']
-        path_QSub_exe = paths_and_dictionaries['ROOT']['path_QSub_exe']
+        path_Qsub_exe = paths_and_dictionaries['ROOT']['path_Qsub_exe']
 
         path_SnpEffect_dir = paths_and_dictionaries['ROOT']['path_SnpEffect_dir']
-        path_SE_SourceFiles_Scripts_dir = paths_and_dictionaries['ROOT'][' path_SourceFiles_Scripts_dir']
+        path_SE_SourceFiles_Scripts_dir = paths_and_dictionaries['ROOT']['path_SE_SourceFiles_Scripts_dir']
         path_SE_Inputs_PDBs_dir = paths_and_dictionaries['ROOT']['path_SE_Inputs_PDBs_dir']
         path_SE_Inputs_FASTAs_dir = paths_and_dictionaries['ROOT']['path_SE_Inputs_FASTAs_dir']
         path_SE_Outputs_dir = paths_and_dictionaries['ROOT']['path_SE_Outputs_dir']
@@ -109,4 +117,7 @@ if do_mutate_fasta or do_agadir or do_foldx_repair or do_foldx_buildmodel or do_
     scheduler = Scheduler(operations, input_pdbs, input_fastas, list_all_20_aa)
     scheduler.start()
 else:
-    print('All of the operations are set to FALSE in MutateCompute_Options.txt file - nothing to do')
+    print('All of the operations are set to FALSE in MutateCompute_Options.txt file - hence nothing to do')
+
+
+cnx.close()
