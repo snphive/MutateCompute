@@ -8,16 +8,19 @@ import os
 
 class GUM(object):
 
-    aa_dict_3to1 = {}
-    foldx_path = ''
+    dict_aa_3to1 = {}
+    path_foldx_exe = ''
 
-    with open("/switchlab/group/shazib/OptimizeProteinShazibCopy/SourceFiles/Scripts/pathsAndDictionaries.yaml",
-              'r') as stream:
+    with open("/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml", 'r') as stream:
+
         try:
+
             paths_and_dictionaries = yaml.load(stream)
-            aa_dict_3to1 = paths_and_dictionaries['ROOT']['aa_dict_3to1']
-            foldx_path = paths_and_dictionaries['ROOT']['FoldX_path']
+            dict_aa_3to1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
+            path_foldx_exe = paths_and_dictionaries['ROOT']['path_FoldX_exe']
+
         except yaml.YAMLError as exc:
+
             print(exc)
 
     @staticmethod
@@ -32,9 +35,9 @@ class GUM(object):
 
     # The runscript.txt is an input file for FoldX that informs the which pdbs to analyse and which programs to run
     @staticmethod
-    def build_runscript_for_pdbs(path_to_runscript, pdbs, show_sequence_detail, action, print_networks,
+    def write_runscript_for_pdbs(path_runscript, pdbs, show_sequence_detail, action, print_networks,
                                  calculate_stability):
-        runscript_file = open(path_to_runscript + 'runscript.txt', 'w')
+        runscript_file = open(path_runscript + 'runscript.txt', 'w')
         runscript_file.write('<TITLE>FOLDX_runscript;\n')
         runscript_file.write('<JOBSTART>#;\n')
         runscript_file.write('<PDBS>' + pdbs + ';\n')
@@ -64,7 +67,7 @@ class GUM(object):
     # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
     # to perform as well as how to run these computations
     @staticmethod
-    def build_job_q_bash(grid_engine_job_name, queue, max_memory, cluster, using_runscript, foldx_path,
+    def build_job_q_bash(grid_engine_job_name, queue, max_memory, cluster, using_runscript, path_foldx_exe,
                          python_script_with_path):
         g = open('./job.q', 'w')
         g.write('#!/bin/bash\n')
@@ -79,10 +82,80 @@ class GUM(object):
         g.write('#$ -cwd\n')
         g.write('source ~/.bash_profile\n')
         if using_runscript:
-            g.write(foldx_path + ' -runfile runscript.txt\n')
+            g.write(path_foldx_exe + ' -runfile runscript.txt\n')
         if python_script_with_path != '':
             g.write('python ' + python_script_with_path + '\n')
         g.close()
+
+    # Extracts and writes a FASTA file for each chain described in the pdb.
+    # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
+    # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
+    # if these very specific aspects are not exactly matching, the method will fail.
+    @staticmethod
+    def extract_pdb_name_fasta_chains_from_pdb(pdbs, absolute_path_inputs, absolute_path_outputs, write_wt_fasta_files):
+        pdb_name_chain_fasta_dict = {}
+        if isinstance(pdbs, str):
+            pdbs = [pdbs]
+        for pdb in pdbs:
+            pdb_file = open(absolute_path_inputs + '/PDBs/' + pdb).readlines()
+            atom_lines = []
+            protein_chains = []
+            for line in pdb_file:
+                if 'ATOM' == line[0:4]:
+                    protein_chain = line[21]
+                    atom_lines.append(line)
+                    if protein_chain not in protein_chains:
+                        protein_chains.append(protein_chain)
+            for protein_chain in protein_chains:
+                fasta_list = []
+                resnum = '0'
+                for line in atom_lines:
+                    if line[21] == protein_chain and resnum != line[22:26].strip(' '):
+                        resnum = line[22:26].strip(' ')
+                        amino_acid = line[17:20]
+                        if amino_acid in GUM.dict_aa_3to1.keys():  # else throw some kind of exception or error message?
+                            fasta_list.append(GUM.dict_aa_3to1[amino_acid])
+                        else:
+                            print('This 3-letter word is not recognised as 1 of the 20 amino acids! '
+                                  'Cannot extract FASTA from ' + pdb + ' !')
+                fasta_sequence = "".join(fasta_list)
+                pdb_name = GUM._remove_prefix_suffix('RepairPDB_', '_1_0', pdb.split('/')[-1].split('.')[0])
+                pdb_name_chain = pdb_name + '_' + protein_chain
+                print(pdb_name_chain + ' : ' + fasta_sequence)
+                pdb_name_chain_fasta_dict[pdb_name_chain] = fasta_sequence
+                if write_wt_fasta_files:
+                    GUM.write_fasta(pdb_name_chain_fasta_dict, absolute_path_outputs)
+        return pdb_name_chain_fasta_dict
+
+    @staticmethod
+    def write_fasta(pdb_name_chain_fasta_dict, absolute_path_outputs):
+        for pdb_name_chain, fasta_sequence in pdb_name_chain_fasta_dict.iteritems():
+            fasta_file = open(absolute_path_outputs + 'Fasta/' + pdb_name_chain + '.fasta', 'w')
+            fasta_file.write('>' + pdb_name_chain + '\n')
+            fasta_file.write(fasta_sequence)
+            fasta_file.close()
+
+    # Extracts All chains that are included in a pdb
+    # returns them in a list
+    @staticmethod
+    def extract_all_chains_from_pdb(pdb, relative_path_to_pdb):
+        cwd = os.getcwd()  # for debugging
+        pdb_file = open(relative_path_to_pdb + pdb).readlines()
+        protein_chains = []
+        for line in pdb_file:
+            if 'ATOM' == line[0:4]:
+                protein_chain = line[21]
+                if protein_chain not in protein_chains:
+                    protein_chains.append(protein_chain)
+        return protein_chains
+
+    @staticmethod
+    def _remove_prefix_suffix(prefix, suffix, pdb_name):
+        if prefix in pdb_name:
+            str.replace(pdb_name, prefix, '')
+        if suffix in pdb_name:
+            str.replace(pdb_name, suffix, '')
+        return pdb_name
 
     # Originally used in solubis.py but removed as it was not necessary.
     # Keeping this code for now should it be needed in near future
@@ -100,51 +173,4 @@ class GUM(object):
         fasta = "".join(fasta_list)
         return fasta
 
-    # Extracts and writes a FASTA file for each chain described in the pdb.
-    # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
-    # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
-    # if these very specific aspects are not exactly matching, the method will fail.
-    @staticmethod
-    def extract_fasta_from_pdb_and_write_to_fasta_folder(pdbs, dest_to_output_relative_to_start_path):
-        if isinstance(pdbs, str):
-            pdbs = [pdbs]
-        for pdb in pdbs:
-            pdb_file = open(pdb).readlines()
-            atom_lines = []
-            protein_chains = []
-            for line in pdb_file:
-                if 'ATOM' == line[0:4]:
-                    protein_chain = line[21]
-                    atom_lines.append(line)
-                    if protein_chain not in protein_chains:
-                        protein_chains.append(protein_chain)
-            for protein_chain in protein_chains:
-                fasta_list = []
-                resnum = '0'
-                for line in atom_lines:
-                    if line[21] == protein_chain and resnum != line[22:26].strip(' '):
-                        resnum = line[22:26].strip(' ')
-                        amino_acid = line[17:20]
-                        if amino_acid in GUM.aa_dict_3to1.keys():  # else throw some kind of exception or error message?
-                            fasta_list.append(GUM.aa_dict_3to1[amino_acid])
-                        else:
-                            print('This 3-letter word is not recognised as 1 of the 20 amino acids! '
-                                   'Cannot extract FASTA from ' + pdb + ' !')
-                fasta_sequence = "".join(fasta_list)
-                pdb_name = GUM._remove_prefix_suffix('RepairPDB_', '_1_0', pdb.split('/')[-1].split('.')[0])
-                print(pdb_name + '_' + protein_chain)
-                print(fasta_sequence)
-                fasta_file = open(dest_to_output_relative_to_start_path + 'Fasta/' + pdb_name + '_' +
-                                  protein_chain + '.fasta', 'w')
-                fasta_file.write('>' + pdb_name + '_' + protein_chain + '\n')
-                fasta_file.write(fasta_sequence)
-                fasta_file.close()
-
-    @staticmethod
-    def _remove_prefix_suffix(prefix, suffix, pdb_name):
-        if prefix in pdb_name:
-            str.replace(pdb_name, prefix, '')
-        if suffix in pdb_name:
-            str.replace(pdb_name, suffix, '')
-        return pdb_name
 
