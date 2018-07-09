@@ -7,10 +7,11 @@ from time import sleep
 
 class Scheduler(object):
 
-    def __init__(self):
-        print('hello world')
+    def __init__(self, absolute_path_inputs, absolute_path_outputs):
+        self.abs_path_inputs = absolute_path_inputs
+        self.abs_path_outputs = absolute_path_outputs
 
-    def start(self, operations,input_pdbs, input_fastas, list_of_all_20_aa):
+    def start(self, operations, input_pdbs, input_fastas, list_of_all_20_aa):
 
         for input_fasta in input_fastas:
             if operations['do_mutate_fasta']:
@@ -28,12 +29,18 @@ class Scheduler(object):
 
         for input_pdb in input_pdbs:
             if operations['do_foldx_repair']:
-                foldX_repair = FoldX().Repair(input_pdb)
+                FoldX().Repair(input_pdb)
 
             if operations['do_foldx_buildmodel']:
-                foldX_buildmodel = FoldX().BuildModel(input_pdb)
+                # Code will be adapted so user can mutate to specific residues to, (rather than all or none)
+                mutate_all_residues = True
+                if mutate_all_residues:
+                    mutate_to_residues = list_of_all_20_aa
+                write_wt_fasta_files = True
+                FoldX().BuildModel().mutate_residues_of_pdb(self.abs_path_inputs, self.abs_path_outputs, input_pdb,
+                                                            mutate_to_residues, write_wt_fasta_files)
             if operations['do_foldx_stability']:
-                foldX_stability = FoldX().Stability(input_pdb)
+                FoldX().Stability(input_pdb)
             if operations['do_foldx_analysecomplex']:
-                foldX_analysecomplex = FoldX().AnalyseComplex(input_pdb)
+                FoldX().AnalyseComplex(input_pdb)
 
