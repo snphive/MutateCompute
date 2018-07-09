@@ -3,18 +3,16 @@ ROOT:
     path_FoldX_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
     path_Agadir_exe: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
     path_Qsub_exe: '/opt/sge/bin/lx-amd64/'
-    path_local_FoldX_exe: '/Users/u0120577/PycharmProjects'
-    path_local_Agadir_exe: '/Users/u0120577/PycharmProjects'
-    path_local_R_exe: '/usr/local/Cellar/r/3.5.0'
 
     path_SnpEffect_dir: '/switchlab/group/shazib/SnpEffect'
     path_SE_SourceFiles_Scripts_dir: '/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts'
-    path_SE_PDBs_Inputs_dir: '/switchlab/group/shazib/SnpEffect/PDBs/Inputs'
+    path_SE_Inputs_PDBs_dir: '/switchlab/group/shazib/SnpEffect/Inputs/PDBs'
+    path_SE_Inputs_FASTAs_dir: '/switchlab/group/shazib/SnpEffect/Inputs/FASTAs'
     path_SE_Outputs_dir: '/switchlab/group/shazib/SnpEffect/Outputs'
     path_SE_Outputs_Agadir_dir: '/switchlab/group/shazib/SnpEffect/Outputs/Agadir'
     path_SE_Outputs_FoldX_dir: '/switchlab/group/shazib/SnpEffect/Outputs/FoldX'
 
-    aa_dict_1to3:
+    dict_aa_1to3:
         A: ALA
         C: CYS
         D: ASP
@@ -36,7 +34,7 @@ ROOT:
         W: TRP
         Y: TYR
 
-    aa_dict_3to1:
+    dict_aa_3to1:
         ALA: A
         CYS: C
         ASP: D
