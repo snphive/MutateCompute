@@ -1,0 +1,93 @@
+ROOT:
+    path_R_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
+    path_FoldX_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
+    path_Agadir_exe: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
+    path_Qsub_exe: '/opt/sge/bin/lx-amd64/'
+
+    path_SnpEffect_dir: '/switchlab/group/shazib/SnpEffect'
+    path_SE_SourceFiles_Scripts_dir: '/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts'
+    path_SE_Inputs_PDBs_dir: '/switchlab/group/shazib/SnpEffect/Inputs/PDBs'
+    path_SE_Inputs_FASTAs_dir: '/switchlab/group/shazib/SnpEffect/Inputs/FASTAs'
+    path_SE_Outputs_dir: '/switchlab/group/shazib/SnpEffect/Outputs'
+    path_SE_Outputs_Agadir_dir: '/switchlab/group/shazib/SnpEffect/Outputs/Agadir'
+    path_SE_Outputs_FoldX_dir: '/switchlab/group/shazib/SnpEffect/Outputs/FoldX'
+
+    path_local_R_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
+    path_local_FoldX_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
+    path_local_Agadir_exe: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
+
+    path_local_MutateCompute_dir: '/switchlab/group/shazib/SnpEffect'
+    path_local_MC_SourceFiles_Scripts_dir: '/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts'
+    path_local_SE_Inputs_PDBs_dir: '/switchlab/group/shazib/SnpEffect/Inputs/PDBs'
+    path_local_SE_Inputs_FASTAs_dir: '/switchlab/group/shazib/SnpEffect/Inputs/FASTAs'
+    path_local_SE_Outputs_dir: '/switchlab/group/shazib/SnpEffect/Outputs'
+    path_local_SE_Outputs_Agadir_dir: '/switchlab/group/shazib/SnpEffect/Outputs/Agadir'
+    path_local_SE_Outputs_FoldX_dir: '/switchlab/group/shazib/SnpEffect/Outputs/FoldX'
+
+    dict_aa_1to3:
+        A: ALA
+        C: CYS
+        D: ASP
+        E: GLU
+        F: PHE
+        G: GLY
+        H: HIS
+        I: ILE
+        K: LYS
+        L: LEU
+        M: MET
+        N: ASN
+        P: PRO
+        Q: GLN
+        R: ARG
+        S: SER
+        T: THR
+        V: VAL
+        W: TRP
+        Y: TYR
+
+    dict_aa_3to1:
+        ALA: A
+        CYS: C
+        ASP: D
+        GLU: E
+        PHE: F
+        GLY: G
+        HIS: H
+        H1S: H
+        H2S: H
+        ILE: I
+        LYS: K
+        LEU: L
+        MET: M
+        ASN: N
+        PRO: P
+        GLN: Q
+        ARG: R
+        SER: S
+        THR: T
+        VAL: V
+        TRP: W
+        TYR: Y
+
+    list_all_20_aa:
+        - A
+        - C
+        - D
+        - E
+        - F
+        - G
+        - H
+        - I
+        - K
+        - L
+        - M
+        - N
+        - P
+        - Q
+        - R
+        - S
+        - T
+        - V
+        - W
+        - Y
