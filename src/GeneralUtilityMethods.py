@@ -64,40 +64,17 @@ class GUM(object):
         runscript_file.write('<ENDFILE>#;\n')
         runscript_file.close()
 
-    # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
-    # to perform as well as how to run these computations
-    @staticmethod
-    def build_job_q_bash(grid_engine_job_name, queue, max_memory, cluster, using_runscript, path_foldx_exe,
-                         python_script_with_path):
-        g = open('./job.q', 'w')
-        g.write('#!/bin/bash\n')
-        g.write('#$ -N ' + grid_engine_job_name + '\n')
-        g.write('#$ -V\n')
-        if queue != '':
-            g.write('#$ -q ' + queue + '\n')
-        if max_memory != '':
-            g.write('#$ -l ' + max_memory + '\n')
-        if cluster != '':
-            g.write('#$ -l ' + cluster + '\n')
-        g.write('#$ -cwd\n')
-        g.write('source ~/.bash_profile\n')
-        if using_runscript:
-            g.write(path_foldx_exe + ' -runfile runscript.txt\n')
-        if python_script_with_path != '':
-            g.write('python ' + python_script_with_path + '\n')
-        g.close()
-
     # Extracts and writes a FASTA file for each chain described in the pdb.
     # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
     # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
     # if these very specific aspects are not exactly matching, the method will fail.
     @staticmethod
-    def extract_pdb_name_fasta_chains_from_pdb(pdbs, absolute_path_inputs, absolute_path_outputs, write_wt_fasta_files):
+    def extract_pdb_name_fasta_chains_from_pdb(pdbs, abs_path_inputs, abs_path_outputs, write_wt_fasta_files):
         pdb_name_chain_fasta_dict = {}
         if isinstance(pdbs, str):
             pdbs = [pdbs]
         for pdb in pdbs:
-            pdb_file = open(absolute_path_inputs + '/PDBs/' + pdb).readlines()
+            pdb_file = open(abs_path_inputs + '/PDBs/' + pdb).readlines()
             atom_lines = []
             protein_chains = []
             for line in pdb_file:
@@ -124,13 +101,13 @@ class GUM(object):
                 print(pdb_name_chain + ' : ' + fasta_sequence)
                 pdb_name_chain_fasta_dict[pdb_name_chain] = fasta_sequence
                 if write_wt_fasta_files:
-                    GUM.write_fasta(pdb_name_chain_fasta_dict, absolute_path_outputs)
+                    GUM.write_fasta(pdb_name_chain_fasta_dict, abs_path_outputs)
         return pdb_name_chain_fasta_dict
 
     @staticmethod
-    def write_fasta(pdb_name_chain_fasta_dict, absolute_path_outputs):
+    def write_fasta(pdb_name_chain_fasta_dict, abs_path_outputs):
         for pdb_name_chain, fasta_sequence in pdb_name_chain_fasta_dict.iteritems():
-            fasta_file = open(absolute_path_outputs + 'Fasta/' + pdb_name_chain + '.fasta', 'w')
+            fasta_file = open(abs_path_outputs + 'Fasta/' + pdb_name_chain + '.fasta', 'w')
             fasta_file.write('>' + pdb_name_chain + '\n')
             fasta_file.write(fasta_sequence)
             fasta_file.close()
@@ -173,4 +150,14 @@ class GUM(object):
         fasta = "".join(fasta_list)
         return fasta
 
-
+    # Build a directory tree composed of absolute path of the root and any number of child nodes.
+    @staticmethod
+    def create_directory_tree(absolute_path_root, *args):
+        if not os.path.exists(absolute_path_root):
+            os.mkdir(absolute_path_root)
+        os.chdir(absolute_path_root)
+        for child_path in args:
+            if not os.path.exists(child_path):
+                os.mkdir(child_path)
+            os.chdir(child_path)
+        return os.getcwd()
