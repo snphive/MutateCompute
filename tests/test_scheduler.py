@@ -9,13 +9,13 @@ class TestScheduler(TestCase):
     global path_FoldX_exe
     global path_Agadir_exe
     global path_QSub_exe
-    global path_SnpEffect_dir
-    global path_SE_SourceFiles_Scripts_dir
-    global path_SE_Inputs_PDBs_dir
-    global path_SE_Inputs_FASTAs_dir
-    global path_SE_Outputs_dir
-    global path_SE_Outputs_Agadir_dir
-    global path_SE_Outputs_FoldX_dir
+    global path_SnpEffect
+    global path_SE_SourceFiles_Scripts
+    global path_SE_Inputs_PDBs
+    global path_SE_Inputs_FASTAs
+    global path_SE_Outputs
+    global path_SE_Outputs_Agadir
+    global path_SE_Outputs_FoldX
     global dict_aa_1to3
     global dict_aa_3to1
     global list_all_20_aa
@@ -29,13 +29,13 @@ class TestScheduler(TestCase):
             path_Agadir_exe = paths_and_dictionaries['ROOT']['path_Agadir_exe']
             path_QSub_exe = paths_and_dictionaries['ROOT']['path_QSub_exe']
 
-            path_SnpEffect_dir = paths_and_dictionaries['ROOT']['path_SnpEffect_dir']
-            path_SE_SourceFiles_Scripts_dir = paths_and_dictionaries['ROOT'][' path_SourceFiles_Scripts_dir']
-            path_SE_Inputs_PDBs_dir = paths_and_dictionaries['ROOT']['path_SE_Inputs_PDBs_dir']
-            path_SE_Inputs_FASTAs_dir = paths_and_dictionaries['ROOT']['path_SE_Inputs_FASTAs_dir']
-            path_SE_Outputs_dir = paths_and_dictionaries['ROOT']['path_SE_Outputs_dir']
-            path_SE_Outputs_Agadir_dir = paths_and_dictionaries['ROOT']['path_SE_Outputs_Agadir_dir']
-            path_SE_Outputs_FoldX_dir = paths_and_dictionaries['ROOT']['path_SE_Outputs_FoldX_dir']
+            path_SnpEffect = paths_and_dictionaries['ROOT']['path_SnpEffect']
+            path_SE_SourceFiles_Scripts = paths_and_dictionaries['ROOT'][' path_SourceFiles_Scripts']
+            path_SE_Inputs_PDBs = paths_and_dictionaries['ROOT']['path_SE_Inputs_PDBs']
+            path_SE_Inputs_FASTAs = paths_and_dictionaries['ROOT']['path_SE_Inputs_FASTAs']
+            path_SE_Outputs = paths_and_dictionaries['ROOT']['path_SE_Outputs']
+            path_SE_Outputs_Agadir = paths_and_dictionaries['ROOT']['path_SE_Outputs_Agadir']
+            path_SE_Outputs_FoldX = paths_and_dictionaries['ROOT']['path_SE_Outputs_FoldX']
 
             dict_aa_1to3 = paths_and_dictionaries['ROOT']['dict_aa_1to3']
             dict_aa_3to1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
@@ -62,13 +62,13 @@ class TestScheduler(TestCase):
         self.assertEqual(self, '/switchlab/group/tools/FoldX_2015/FoldX', path_FoldX_exe, 'FoldX exe' + msg)
         self.assertEqual(self, '/switchlab/group/tools/agadir_10042012/agadirwrapper', path_Agadir_exe, 'Agadirwrapper exe' + msg)
         self.assertEqual(self, '/opt/sge/bin/lx-amd64/', path_QSub_exe, 'QSub exe' + msg)
-        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect', path_SnpEffect_dir, 'SnpEffect directory' + msg)
-        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts', path_SE_SourceFiles_Scripts_dir, 'SourceFiles/Scripts directory' + msg)
-        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Inputs/PDBs', path_SE_Inputs_PDBs_dir, 'Inputs/PDBs directory' + msg)
-        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Inputs/FASTAs', path_SE_Inputs_FASTAs_dir, 'Inputs/Fastas directory' + msg)
-        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Outputs', path_SE_Outputs_dir, '/Outputs directory' + msg)
-        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Outputs/Agadir', path_SE_Outputs_Agadir_dir, '/Outputs/Agadir directory' + msg)
-        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Outputs/FoldX', path_SE_Outputs_FoldX_dir, '/Outputs/FoldX directory' + msg)
+        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect', path_SnpEffect, 'SnpEffect directory' + msg)
+        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts', path_SE_SourceFiles_Scripts, 'SourceFiles/Scripts directory' + msg)
+        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Inputs/PDBs', path_SE_Inputs_PDBs, 'Inputs/PDBs directory' + msg)
+        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Inputs/FASTAs', path_SE_Inputs_FASTAs, 'Inputs/Fastas directory' + msg)
+        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Outputs', path_SE_Outputs, '/Outputs directory' + msg)
+        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Outputs/Agadir', path_SE_Outputs_Agadir, '/Outputs/Agadir directory' + msg)
+        self.assertEqual(self, '/switchlab/group/shazib/SnpEffect/Outputs/FoldX', path_SE_Outputs_FoldX, '/Outputs/FoldX directory' + msg)
         self.assertEqual(self, {'A':'ALA','C':'CYS','D':'ASP','E':'GLU','F':'PHE','G':'GLY','H':'HIS','I':'ILE',
                                 'K':'LYS','L':'LEU','M':'MET','N':'ASN','P':'PRO','Q':'GLN','R':'ARG','S':'SER',
                                 'T':'THR','V':'VAL','W':'TRP','Y':'TYR'}, dict_aa_1to3, 'dict_aa_1to3 not as expected')
