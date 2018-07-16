@@ -1,16 +1,13 @@
 import glob
 import yaml
-
-from src.GeneralUtilityMethods import GUM
+import os
 from src.Scheduler import Scheduler
 
 # The following 4 lines of code successfully connectt to
-import mysql.connector
-cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
-cur = cnx.cursor()
+# import mysql.connector
+# cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
+# cur = cnx.cursor()
 # cur.execute("CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 
 mutateFasta = None
@@ -40,26 +37,25 @@ with open("/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictiona
         path_zeus_Agadir_exe = paths_and_dictionaries['ROOT']['path_zeus_Agadir_exe']
         path_zeus_Qsub_exe = paths_and_dictionaries['ROOT']['path_zeus_Qsub_exe']
 
-        path_local_R_exe = paths_and_dictionaries['ROOT']['path_zeus_R_exe']
-        path_local_FoldX_exe = paths_and_dictionaries['ROOT']['path_zeus_FoldX_exe']
-        path_local_Agadir_exe = paths_and_dictionaries['ROOT']['path_zeus_Agadir_exe']
-        path_local_Qsub_exe = paths_and_dictionaries['ROOT']['path_zeus_Qsub_exe']
+        path_local_R_exe = paths_and_dictionaries['ROOT']['path_local_R_exe']
+        path_local_FoldX_exe = paths_and_dictionaries['ROOT']['path_local_FoldX_exe']
+        path_local_Agadir_exe = paths_and_dictionaries['ROOT']['path_local_Agadir_exe']
 
-        path_zeus_SnpEffect_dir = paths_and_dictionaries['ROOT']['path_zeus_SnpEffect']
-        path_zeus_SE_SourceFiles_Scripts_dir = paths_and_dictionaries['ROOT']['path_zeus_SE_SourceFiles_Scripts']
-        path_zeus_SE_Inputs_PDBs_dir = paths_and_dictionaries['ROOT']['path_zeus_SE_Inputs_PDBs']
-        path_zeus_SE_Inputs_FASTAs_dir = paths_and_dictionaries['ROOT']['path_zeus_SE_Inputs_FASTAs']
-        path_zeus_SE_Outputs_dir = paths_and_dictionaries['ROOT']['path_zeus_SE_Outputs']
-        path_zeus_SE_Outputs_Agadir_dir = paths_and_dictionaries['ROOT']['path_zeus_SE_Outputs_Agadir']
-        path_zeus_SE_Outputs_FoldX_dir = paths_and_dictionaries['ROOT']['path_zeus_SE_Outputs_FoldX']
+        path_zeus_SnpEffect = paths_and_dictionaries['ROOT']['path_zeus_SnpEffect']
+        path_zeus_SE_SourceFiles_Scripts = paths_and_dictionaries['ROOT']['path_zeus_SE_SourceFiles_Scripts']
+        path_zeus_SE_Inputs_PDBs = paths_and_dictionaries['ROOT']['path_zeus_SE_Inputs_PDBs']
+        path_zeus_SE_Inputs_FASTAs = paths_and_dictionaries['ROOT']['path_zeus_SE_Inputs_FASTAs']
+        path_zeus_SE_Outputs = paths_and_dictionaries['ROOT']['path_zeus_SE_Outputs']
+        path_zeus_SE_Outputs_Agadir = paths_and_dictionaries['ROOT']['path_zeus_SE_Outputs_Agadir']
+        path_zeus_SE_Outputs_FoldX = paths_and_dictionaries['ROOT']['path_zeus_SE_Outputs_FoldX']
 
-        path_local_MutateCompute = paths_and_dictionaries['ROOT']['path_zeus_MutateComputer']
-        path_local_MC_src = paths_and_dictionaries['ROOT']['path_MC_src']
-        path_local_MC_Inputs_PDBs = paths_and_dictionaries['ROOT']['path_MC_Inputs_PDBs']
-        path_local_MC_Inputs_FASTA = paths_and_dictionaries['ROOT']['path_MC_Inputs_FASTA']
-        path_local_MC_Outputs = paths_and_dictionaries['ROOT']['path_MC_Outputs']
-        path_local_MC_Outputs_Agadir = paths_and_dictionaries['ROOT']['path_MC_Outputs_Agadir']
-        path_local_MC_Outputs_FoldX = paths_and_dictionaries['ROOT']['path_MC_Outputs_FoldX']
+        path_local_MutateCompute = paths_and_dictionaries['ROOT']['path_local_MutateCompute']
+        path_local_MC_src = paths_and_dictionaries['ROOT']['path_local_MC_src']
+        path_local_MC_Inputs_PDBs = paths_and_dictionaries['ROOT']['path_local_MC_Inputs_PDBs']
+        path_local_MC_Inputs_FASTA = paths_and_dictionaries['ROOT']['path_local_MC_Inputs_FASTA']
+        path_local_MC_Outputs = paths_and_dictionaries['ROOT']['path_local_MC_Outputs']
+        path_local_MC_Outputs_Agadir = paths_and_dictionaries['ROOT']['path_local_MC_Outputs_Agadir']
+        path_local_MC_Outputs_FoldX = paths_and_dictionaries['ROOT']['path_local_MC_Outputs_FoldX']
 
         dict_aa_1to3 = paths_and_dictionaries['ROOT']['dict_aa_1to3']
         dict_aa_3to1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
@@ -75,7 +71,7 @@ for line in mutate_compute_options_file:
     if 'PDBs:' in line:
         pdb_option = line.split(':')[-1].strip(';\n').strip()
         if pdb_option == 'All':
-            pdb_paths = glob.glob(path_SE_Inputs_PDBs_dir + '*.pdb')
+            pdb_paths = glob.glob(path_local_MC_Inputs_PDBs + '*.pdb')
             for pdb_path in pdb_paths:
                 input_pdbs.append(pdb_path.split('/')[-1])
         elif pdb_option == '':
@@ -89,7 +85,7 @@ for line in mutate_compute_options_file:
     if 'FASTAs:' in line:
         fasta_option = line.split(':')[-1].strip(';\n').strip()
         if fasta_option == 'All':
-            fasta_paths = glob.glob(path_SE_Inputs_FASTAs_dir + '*.fasta')
+            fasta_paths = glob.glob(path_local_MC_Inputs_FASTA + '*.fasta')
             for fasta_path in fasta_paths:
                 input_fastas.append(fasta_path.split('/')[-1])
         elif fasta_option == '':

@@ -9,7 +9,8 @@ import os
 class GUM(object):
 
     dict_aa_3to1 = {}
-    path_foldx_exe = ''
+    path_zeus_FoldX_exe: ''
+    path_local_FoldX_exe: ''
 
     with open("/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml", 'r') as stream:
 
@@ -17,7 +18,8 @@ class GUM(object):
 
             paths_and_dictionaries = yaml.load(stream)
             dict_aa_3to1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
-            path_foldx_exe = paths_and_dictionaries['ROOT']['path_FoldX_exe']
+            path_zeus_Foldx_exe = paths_and_dictionaries['ROOT']['path_zeus_FoldX_exe']
+            path_local_Foldx_exe = paths_and_dictionaries['ROOT']['path_local_FoldX_exe']
 
         except yaml.YAMLError as exc:
 
@@ -116,7 +118,6 @@ class GUM(object):
     # returns them in a list
     @staticmethod
     def extract_all_chains_from_pdb(pdb, relative_path_to_pdb):
-        cwd = os.getcwd()  # for debugging
         pdb_file = open(relative_path_to_pdb + pdb).readlines()
         protein_chains = []
         for line in pdb_file:
@@ -152,12 +153,13 @@ class GUM(object):
 
     # Build a directory tree composed of absolute path of the root and any number of child nodes.
     @staticmethod
-    def create_directory_tree(absolute_path_root, *args):
+    def create_dir_tree(absolute_path_root, *args):
+        abs_complete_path = absolute_path_root
         if not os.path.exists(absolute_path_root):
-            os.mkdir(absolute_path_root)
-        os.chdir(absolute_path_root)
+            os.makedirs(absolute_path_root)
         for child_path in args:
-            if not os.path.exists(child_path):
-                os.mkdir(child_path)
-            os.chdir(child_path)
-        return os.getcwd()
+            abs_complete_path += child_path
+            if not os.path.exists(absolute_path_root + '/' + child_path):
+                os.mkdir(absolute_path_root + '/' + child_path)
+        return abs_complete_path
+
