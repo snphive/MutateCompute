@@ -1,47 +1,69 @@
 from unittest import TestCase
 from src.FoldX import FoldX
-from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
 from unittest.mock import patch
-
+import shutil
+import os
 
 class TestBuildModel(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.absolute_path_tests = '/Users/u0120577/PycharmProjects/MutateCompute/tests'
-        cls.abs_path_tests_inputs = cls.absolute_path_tests + '/Inputs'
-        cls.abs_path_tests_inputs_foldx = cls.abs_path_tests_inputs + '/FoldX'
-        cls.abs_path_tests_inputs_fasta = cls.abs_path_tests_inputs + '/Fasta'
-        cls.abs_path_tests_inputs_pdbs = cls.abs_path_tests_inputs + '/PDBs'
-        cls.abs_path_tests_outputs = cls.absolute_path_tests + '/Outputs'
-        cls.abs_path_tests_outputs_agadir = cls.abs_path_tests_outputs + '/Agadir'
-        cls.abs_path_tests_outputs_fasta = cls.abs_path_tests_outputs + '/Fasta'
-        cls.abs_path_tests_outputs_foldx = cls.abs_path_tests_outputs + '/FoldX'
-        cls.abs_path_tests_outputs_foldx_buildmodel = cls.abs_path_tests_outputs_foldx + '/BuildModel'
+        cls.abs_path_local = '/Users/u0120577/PycharmProjects/MutateCompute'
+        cls.rel_path_tests_inputs = 'tests/Inputs'
+        cls.rel_path_tests_outputs = 'tests/Outputs'
+        cls.abs_path_local_tests = '/Users/u0120577/PycharmProjects/MutateCompute/tests'
+        cls.abs_path_local_tests_inputs = cls.abs_path_local_tests + '/Inputs'
+        cls.abs_path_local_tests_inputs_foldx = cls.abs_path_local_tests_inputs + '/FoldX'
+        cls.abs_path_local_tests_inputs_fasta = cls.abs_path_local_tests_inputs + '/Fasta'
+        cls.abs_path_local_tests_inputs_pdbs = cls.abs_path_local_tests_inputs + '/PDBs'
+        cls.abs_path_local_tests_outputs = cls.abs_path_local_tests + '/Outputs'
+        cls.abs_path_local_tests_outputs_agadir = cls.abs_path_local_tests_outputs + '/Agadir'
+        cls.abs_path_local_tests_outputs_fasta = cls.abs_path_local_tests_outputs + '/Fasta'
+        cls.abs_path_local_tests_outputs_foldx = cls.abs_path_local_tests_outputs + '/FoldX'
+        cls.abs_path_local_tests_outputs_foldx_buildmodel = cls.abs_path_local_tests_outputs_foldx + '/BuildModel'
 
     @classmethod
     def tearDownClass(cls):
-        cls.absolute_path_tests = ''
-        cls.abs_path_tests_inputs = ''
-        cls.abs_path_tests_inputs_foldx = ''
-        cls.abs_path_tests_inputs_fasta = ''
-        cls.abs_path_tests_inputs_pdbs = ''
-        cls.abs_path_tests_outputs = ''
-        cls.abs_path_tests_outputs_agadir = ''
-        cls.abs_path_tests_outputs_fasta = ''
-        cls.abs_path_tests_outputs_foldx = ''
-        cls.abs_path_tests_outputs_foldx_buildmodel = ''
+        cls.abs_local_path_tests = ''
+        cls.abs_path_local_tests_inputs = ''
+        cls.abs_path_local_tests_inputs_foldx = ''
+        cls.abs_path_local_tests_inputs_fasta = ''
+        cls.abs_path_local_tests_inputs_pdbs = ''
+        cls.abs_path_local_tests_outputs = ''
+        cls.abs_path_local_tests_outputs_agadir = ''
+        cls.abs_path_local_tests_outputs_fasta = ''
+        cls.abs_path_local_tests_outputs_foldx = ''
+        cls.abs_path_local_tests_outputs_foldx_buildmodel = ''
 
     def setUp(self):
         self.path_zeus_foldx_exe = '/switchlab/group/tools/FoldX_2015/FoldX'
         self.path_local_foldx_exe = '/Users/u0120577/SNPEFFECT/executables/FoldX'
-        # foldx = FoldX(path_zeus_foldx_exe, path_local_foldx_exe)
         foldx = FoldX()
         self.buildModel = foldx.BuildModel(self.path_zeus_foldx_exe, self.path_local_foldx_exe)
 
     def tearDown(self):
         self.buildModel = None
+        self._remove_tests_inputs_outputs_folders()
+
+    def _remove_tests_inputs_outputs_folders(self):
+        if os.path.exists(self.abs_path_local_tests):
+            if os.path.exists(self.abs_path_local_tests_inputs):
+                TestBuildModel.__delete_directory_tree_of_tests_inputs_outputs(self.rel_path_tests_inputs)
+            if os.path.exists(self.abs_path_local_tests_outputs):
+                TestBuildModel.__delete_directory_tree_of_tests_inputs_outputs(self.rel_path_tests_outputs)
+
+    @staticmethod
+    def __delete_directory_tree_of_tests_inputs_outputs(tests_inputs_outputs):
+        os.chdir(TestBuildModel.abs_path_local)
+        print(os.getcwd())
+        if not os.getcwd() == '/Users/u0120577/PycharmProjects/MutateCompute':
+            raise ValueError('Current working directory is not /MutateCompute. Not proceeding with deletion of folder')
+        else:
+            try:
+                shutil.rmtree(tests_inputs_outputs)
+            except OSError as e:
+                print("Error removing: %s - %s." % (e.filename, e.strerror))
 
     @patch.object(FoldX.BuildModel, '_write_job_q_bash_to_run_on_cluster_using_runscript')
     @patch.object(FoldX.BuildModel, '_write_individual_list_for_mutant')
@@ -63,13 +85,13 @@ class TestBuildModel(TestCase):
         mock_make_list_of_mutant_names_for_foldx.return_value = ['RA1A', 'RA1C', 'RA1D', 'RB1A', 'RB1C', 'RB1D']
         input_pdb = 'RepairPDB_Test1Residue.pdb'
         input_pdb_name = input_pdb.split('_')[-1].split('.')[0]
-        mock_create_foldx_buildmodel_pdb_dir_tree.return_value = self.abs_path_tests_outputs_foldx_buildmodel + '/' + \
+        mock_create_foldx_buildmodel_pdb_dir_tree.return_value = self.abs_path_local_tests_outputs_foldx_buildmodel + '/' + \
                                                                  input_pdb_name
         mock_os_chdir.return_value = None
         write_wt_fasta_files = False
         mutant_aa_list = ['A', 'C', 'D']
         # action
-        self.buildModel.mutate_residues_of_pdb(self.abs_path_tests_inputs, self.abs_path_tests_outputs, input_pdb,
+        self.buildModel.mutate_residues_of_pdb(self.abs_path_local_tests_inputs, self.abs_path_local_tests_outputs, input_pdb,
                                                mutant_aa_list, write_wt_fasta_files)
         # assert
         expected_call_count_1 = 1
@@ -96,7 +118,7 @@ class TestBuildModel(TestCase):
         mutant_name_fx = 'RA1A'
         job_name = foldx_buildmodel_job_prefix + mutant_name_fx
         python_script_with_path = '/somepath/to/python/script.py'
-        abs_path_job_q_file = self.abs_path_tests_inputs_foldx
+        abs_path_job_q_file = self.abs_path_local_tests_inputs_foldx
         expected_job_q = '#!/bin/bash\n' + '#$ -N ' + job_name + '\n' + '#$ -V\n' + '#$ -cwd\n' + \
                               'source ~/.bash_profile\n' + self.path_zeus_foldx_exe + ' -runfile runscript.txt\n' + \
                               'python ' + python_script_with_path + '\n'
@@ -115,6 +137,14 @@ class TestBuildModel(TestCase):
         self.assertEqual(actual_job_q, expected_job_q)
         self.assertNotEqual(actual_job_q, not_expected_job_q)
         self.assertNotEqual(actual_job_q, not_expected_job_q_2)
+        self._test_job_q_bash_file_created(abs_path_job_q_file)
+
+    def _test_job_q_bash_file_created(self, abs_path_job_q):
+        self.assertTrue(os.path.exists(abs_path_job_q), 'path to job.q path does not exist: ' + abs_path_job_q)
+        if os.path.exists(abs_path_job_q):
+            self.assertTrue(os.path.isfile('job.q'))
+
+
 
     # def test_write_job_q_filenames_check(self):
         # job_q_file = open('./job.q', 'w') - how to assert filenames are same?
