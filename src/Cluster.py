@@ -48,7 +48,7 @@ class Cluster(object):
 
     path_zeus_FoldX_exe = ''
 
-    with open("/Users/u0120577/PycharmProjects/MutateCompute/config/test_pathsAndDictionaries.yaml", 'r') as stream:
+    with open("/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml", 'r') as stream:
 
         try:
             paths_and_dictionaries = yaml.load(stream)
@@ -113,7 +113,7 @@ class Cluster(object):
 
 
     @staticmethod
-    def write_job_q_bash(job_name, using_runscript, python_script_with_path, abs_path_job_q_file='.', queue='',
+    def write_job_q_bash(job_name, using_runscript, python_script_with_paths, abs_path_job_q_file='.', queue='',
                          n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
         job_q = []
         job_q.append('#!/bin/bash\n'+'#$ -N '+job_name+'\n'+'#$ -V\n')
@@ -144,8 +144,8 @@ class Cluster(object):
         if using_runscript:
             job_q.append(Cluster.path_zeus_FoldX_exe + ' -runfile runscript.txt\n')
 
-        if python_script_with_path != '':
-            job_q.append('python ' + python_script_with_path + '\n')
+        if python_script_with_paths != '':
+            job_q.append('python ' + python_script_with_paths + '\n')
 
         job_q_file = open(abs_path_job_q_file + '/job.q', 'w')
         job_q_str = ''.join(job_q)
