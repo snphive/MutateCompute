@@ -32,9 +32,12 @@ class FoldX(object):
         # input_pdb                Input pdb to be mutated.
         # mutate_to_aa_list        List of amino acids that you want to mutate your pdb to.
         # write_wt_fasta_files     True/False is you want to write the wild-type sequence of the input pdb out.
-        def mutate_residues_of_pdb(self, abs_path_inputs, abs_path_outputs, input_pdb, mutate_to_aa_list, write_wt_fasta_files):
-            pdb_name_chain_fasta_dict = GUM.extract_pdb_name_fasta_chains_from_pdb(input_pdb, abs_path_inputs, abs_path_outputs, write_wt_fasta_files)
-            mutant_name_fx_list = self._make_list_of_mutant_names_for_foldx(mutate_to_aa_list, pdb_name_chain_fasta_dict)
+        def mutate_residues_of_pdb(self, abs_path_inputs, abs_path_outputs, input_pdb, mutate_to_aa_list,
+                                   write_wt_fasta_files):
+            pdb_name_chain_fasta_dict = GUM.extract_pdb_name_fasta_chains_from_pdb(input_pdb, abs_path_inputs,
+                                                                            abs_path_outputs, write_wt_fasta_files)
+            mutant_name_fx_list = self._make_list_of_mutant_names_for_foldx(mutate_to_aa_list,
+                                                                            pdb_name_chain_fasta_dict)
             runscript_dest_folder = GUM.create_dir_tree(abs_path_inputs + '/FoldX/BuildModel')
             self._write_runscript_for_FoldX_BuildModel(input_pdb, runscript_dest_folder)
             abs_path_outputs_FX_BM_pdb = self._create_foldx_buildmodel_pdb_dir_tree(abs_path_outputs, input_pdb)
@@ -60,10 +63,16 @@ class FoldX(object):
         def _create_foldx_buildmodel_pdb_dir_tree(self, abs_path_outputs, pdb):
             return GUM.create_dir_tree(abs_path_outputs, 'FoldX', 'BuildModel', pdb.split('.')[0])
 
-        def _write_job_q_bash_to_run_on_cluster_using_runscript(self, mutant_name_fx, python_script_with_path, abs_path_job_q_file):
+        # mutant_name_fx            FoldX-specific format for a mutant:  wtaa_chain_position_mutantaa.
+        # python_script_with_paths  python script (including .py extension) to run, preceded by path to script
+        #                           This can be followed by any paths that the script will receive via sys.argv.
+        # abs_path_job_q_file       Destination folder for the job.q file being written here. Typically this will be
+        #                           in Inputs/Options/Agadir folder or Inputs/PDBs/<pdb>/<mutant_fx>/Cluster folder
+        def _write_job_q_bash_to_run_on_cluster_using_runscript(self, mutant_name_fx, python_script_with_paths,
+                                                                abs_path_job_q_file):
             job_name = self.foldx_buildmodel_job_prefix + mutant_name_fx
             using_runscript = True
-            return Cluster.write_job_q_bash(job_name, using_runscript, python_script_with_path, abs_path_job_q_file)
+            return Cluster.write_job_q_bash(job_name, using_runscript, python_script_with_paths, abs_path_job_q_file)
 
         # Note FoldX expects mutant names to have format wtaa_chain_position_mutantaa.
         # Variable names for values with this format are denoted with '_fx_'
