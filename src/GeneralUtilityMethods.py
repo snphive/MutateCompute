@@ -17,9 +17,27 @@ class GUM(object):
         try:
 
             paths_and_dictionaries = yaml.load(stream)
-            dict_aa_3to1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
             path_zeus_Foldx_exe = paths_and_dictionaries['ROOT']['path_zeus_FoldX_exe']
             path_local_Foldx_exe = paths_and_dictionaries['ROOT']['path_local_FoldX_exe']
+
+            path_zeus_SnpEffect = paths_and_dictionaries['ROOT']['path_zeus_SnpEffect']
+            path_local_MutateCompute = paths_and_dictionaries['ROOT']['path_local_MutateCompute']
+
+            path_rel_src = paths_and_dictionaries['ROOT']['path_rel_src']
+            path_rel_Inputs_PDBs = paths_and_dictionaries['ROOT']['path_rel_Inputs_PDBs']
+            path_rel_Inputs_Fasta = paths_and_dictionaries['ROOT']['path_rel_Inputs_Fasta']
+            path_rel_Inputs_Options = paths_and_dictionaries['ROOT']['path_rel_Inputs_Options']
+            path_rel_Outputs_PDBs = paths_and_dictionaries['ROOT']['path_rel_Outputs_PDBs']
+
+            path_rel = paths_and_dictionaries['ROOT']['path_rel']
+            path_rel_Cluster = paths_and_dictionaries['ROOT']['path_rel_Cluster']
+            path_rel_Agadir = paths_and_dictionaries['ROOT']['path_rel_Agadir']
+            path_rel_FoldX = paths_and_dictionaries['ROOT']['path_rel_FoldX']
+            path_rel_FoldX_BuildModel = paths_and_dictionaries['ROOT']['path_rel_FoldX_BuildModel']
+            path_rel_FoldX_Repair = paths_and_dictionaries['ROOT']['path_rel_FoldX_Repair']
+            path_rel_FoldX_AnalyseComplex = paths_and_dictionaries['ROOT']['path_rel_FoldX_AnalyseComplex']
+
+            dict_aa_3to1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
 
         except yaml.YAMLError as exc:
 
@@ -148,7 +166,7 @@ class GUM(object):
             for fasta_line in fasta_lines[1:]:
                 for amino_acid in fasta_line:
                     fasta_list.append(amino_acid)
-        fasta = "".join(fasta_list)
+        fasta = ''.join(fasta_list)
         return fasta
 
     # Build a directory tree composed of absolute path of the root and any number of child nodes.
@@ -162,4 +180,26 @@ class GUM(object):
             if not os.path.exists(absolute_path_root + '/' + child_path):
                 os.mkdir(absolute_path_root + '/' + child_path)
         return abs_complete_path
+
+    @staticmethod
+    def create_dir_tree_one_root(absolute_path_root, *args):
+        if not os.path.exists(absolute_path_root):
+            os.makedirs(absolute_path_root)
+        for leaf in args:
+            if not os.path.exists(absolute_path_root + '/' + leaf):
+                os.mkdir(absolute_path_root + '/' + leaf)
+
+    @staticmethod
+    def build_input_output_directory_trees(build_local_dir_tree, build_zeus_dir_tree):
+        rel_path_list = [GUM.path_rel_src, GUM.path_rel_Inputs_PDBs, GUM.path_rel_Inputs_Fasta,
+                         GUM.path_rel_Inputs_Options, GUM.path_rel_Outputs_PDBs]
+        if not build_local_dir_tree and not build_zeus_dir_tree:
+            raise ValueError('Both options false - neither local or cluster trees will be created')
+        else:
+            if build_local_dir_tree:
+                GUM.create_dir_tree(GUM.path_local_MutateCompute, rel_path_list)
+            if build_zeus_dir_tree:
+                GUM.create_dir_tree(GUM.path_zeus_SnpEffect, rel_path_list)
+
+
 
