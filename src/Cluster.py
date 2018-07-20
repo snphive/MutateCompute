@@ -1,5 +1,6 @@
 import yaml
-
+import os
+import traceback
 # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
 # to perform as well as how to run these computations
 
@@ -46,8 +47,6 @@ import yaml
 
 class Cluster(object):
 
-    path_zeus_FoldX_exe = ''
-
     with open("/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml", 'r') as stream:
 
         try:
@@ -69,52 +68,14 @@ class Cluster(object):
     # total_memory_GB          mem_free is the total amount of memory (here as GB) you expect your job will need
     # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use
     # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib
-    # @staticmethod
-    # def write_job_q_bash(job_name, using_runscript, python_script_with_path, abs_path_job_q_file='.', queue='',
-    #                      n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
-    #
-    #     job_q_file = open(abs_path_job_q_file + '/job.q', 'w')
-    #     job_q_file.write('#!/bin/bash\n')
-    #     job_q_file.write('#$ -N ' + job_name + '\n')
-    #     job_q_file.write('#$ -V\n')
-    #
-    #     if queue != '':
-    #         job_q_file.write('#$ -q ' + queue + '\n')
-    #
-    #     if n_slots != '' and total_memory_GB == '':
-    #         raise ValueError('n_slots was specified but no total memory was given.')
-    #     else:
-    #         multicore_memory_command = '#$ -pe serial ' + n_slots + ' '
-    #         multicore_memory_command += '-l mem_free=' + total_memory_GB + 'G'
-    #
-    #     if memory_limit_GB != '' and n_slots != '':
-    #         memory_limit_GB = int(memory_limit_GB) / int(n_slots)
-    #
-    #         if multicore_memory_command != '':
-    #             multicore_memory_command += ',h_vmem=' + memory_limit_GB + 'G\n'
-    #             job_q_file.write(multicore_memory_command)
-    #         else:
-    #             job_q_file.write('#$ -l h_vmem=' + memory_limit_GB + 'G\n')
-    #
-    #     if cluster_node != '':
-    #         job_q_file.write('#$ -l hostname=' + cluster_node + '\n')
-    #
-    #     job_q_file.write('#$ -cwd\n')
-    #     job_q_file.write('source ~/.bash_profile\n')
-    #
-    #     if using_runscript:
-    #         job_q_file.write(Cluster.path_zeus_FoldX_exe + ' -runfile runscript.txt\n')
-    #
-    #     if python_script_with_path != '':
-    #         job_q_file.write('python ' + python_script_with_path + '\n')
-    #
-    #     job_q_file.close()
-    #     return job_q_file
-
-
     @staticmethod
-    def write_job_q_bash(job_name, using_runscript, python_script_with_paths, abs_path_job_q_file='.', queue='',
+    def write_job_q_bash(job_name, path_job_q_dest, using_runscript=True, python_script_with_paths='', queue='',
                          n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
+        if not os.path.exists(path_job_q_dest):
+            traceback.print_exc()
+            raise ValueError('Destination path for job.q is missing. It must be created first')
+            return
+
         job_q = []
         job_q.append('#!/bin/bash\n'+'#$ -N '+job_name+'\n'+'#$ -V\n')
 
@@ -147,8 +108,8 @@ class Cluster(object):
         if python_script_with_paths != '':
             job_q.append('python ' + python_script_with_paths + '\n')
 
-        job_q_file = open(abs_path_job_q_file + '/job.q', 'w')
-        job_q_str = ''.join(job_q)
-        job_q_file.write(job_q_str)
-        job_q_file.close()
+        with open(path_job_q_dest + '/job.q', 'w') as job_q_file:
+            job_q_str = ''.join(job_q)
+            job_q_file.write(job_q_str)
+
         return job_q_str
