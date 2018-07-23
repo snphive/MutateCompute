@@ -70,32 +70,6 @@ class TestGUM(TestCase):
         self.assertEqual(actual_runscript, expected_runscript)
         self.assertNotEqual(actual_runscript, not_expected_runscript)
 
-    def test_extract_pdb_name_fasta_chains_from_pdb(self):
-        self.fail()
-        # action
-        # GUM.extract_pdbname_chain_fasta_from_pdb(pdbs, abs_path_inputs, abs_path_outputs, write_wt_fasta_files)
-
-    def test_write_fasta(self):
-        self.fail()
-
-    def test_extract_all_chains_from_pdb(self):
-        self.fail()
-
-    def test_remove_prefix_suffix(self):
-        self.fail()
-
-    def test_get_fasta_sequence(self):
-        self.fail()
-
-    def test_create_dir_tree(self):
-        self.fail()
-
-    def test_create_dir_tree_one_root(self):
-        self.fail()
-
-    def test_build_input_output_directory_trees(self):
-        self.fail()
-
     # @patch.object(GUM, '_make_subfoldername')
     def test_copy_and_move_files(self):
         # arrange
@@ -107,4 +81,3 @@ class TestGUM(TestCase):
         # assert
         # expected_call_count_1 = 1
         # self.assertEqual(expected_call_count_1, mock_make_subfoldername.call_count)
-
