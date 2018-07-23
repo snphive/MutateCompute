@@ -34,7 +34,7 @@ class TestBuildModel(TestCase):
         cls.rel_path_AnalyseComplex = '/AnalyseComplex'
 
     def setUp(self):
-        # THM.remove_tests_Inputs_Outputs_folders()
+        THM.remove_tests_Inputs_Outputs_folders()
         self.path_zeus_foldx_exe = '/switchlab/group/tools/FoldX_2015/FoldX'
         self.path_local_foldx_exe = '/Users/u0120577/SNPEFFECT/executables/FoldX'
         foldx = FoldX()
@@ -54,36 +54,35 @@ class TestBuildModel(TestCase):
     @patch.object(GUM, 'extract_pdbname_chain_fasta_from_pdb')
     def test_mutate_residues_of_pdb(self,
                                     mock_extract_pdbname_chain_fasta_from_pdb,
-                                    mock_make_fx_mutant_name_list,
+                                    mock__make_fx_mutant_name_list,
                                     mock_write_runscript_for_pdbs,
                                     mock_create_dir_tree,
                                     mock_os_chdir,
-                                    mock_write_individual_list_for_mutant,
+                                    mock__write_individual_list_for_mutant,
                                     mock_write_job_q_bash,
                                     mock_subprocess_call):
         # arrange
         mock_extract_pdbname_chain_fasta_from_pdb.return_value = {'RepairPDB_1_A': 'RVYLT', 'RepairPDB_1_B': 'RVYLT'}
         # Note FoldX expects mutant names to have format wtaa_chain_position_mutantaa.
-        mock_make_fx_mutant_name_list.return_value = ['RA1A', 'RA1C', 'VA2A', 'VA2C', 'YA3A', 'YA3C', 'LA4A',
+        mock__make_fx_mutant_name_list.return_value = ['RA1A', 'RA1C', 'VA2A', 'VA2C', 'YA3A', 'YA3C', 'LA4A',
                                                           'LA4C', 'TA5A', 'TA5C', 'RB1A', 'RB1C', 'VB2A', 'VB2C',
                                                           'YB3A', 'YB3C', 'LB4A', 'LB4C', 'TB5A', 'TB5C']
-        pdb = 'RepairPDB_1.pdb'
-
         mock_os_chdir.return_value = None
         write_wt_fasta_files = False
         mutant_aa_list = ['A', 'C']
+        pdb = 'RepairPDB_1.pdb'
         # action
         self.buildModel.mutate_residues_of_pdb(self.path_tests_Inputs, self.path_tests_Outputs, pdb, mutant_aa_list,
                                                write_wt_fasta_files)
         # assert
         expected_call_count_1 = 1
-        expected_call_count_20 = len(mock_make_fx_mutant_name_list.return_value)
+        expected_call_count_20 = len(mock__make_fx_mutant_name_list.return_value)
         expected_call_count_22 = 22
         self.assertEqual(expected_call_count_1, mock_extract_pdbname_chain_fasta_from_pdb.call_count)
-        self.assertEqual(expected_call_count_1, mock_make_fx_mutant_name_list.call_count)
+        self.assertEqual(expected_call_count_1, mock__make_fx_mutant_name_list.call_count)
         self.assertEqual(expected_call_count_1, mock_write_runscript_for_pdbs.call_count)
         self.assertEqual(expected_call_count_22, mock_create_dir_tree.call_count)
-        self.assertEqual(expected_call_count_20, mock_write_individual_list_for_mutant.call_count)
+        self.assertEqual(expected_call_count_20, mock__write_individual_list_for_mutant.call_count)
         self.assertEqual(expected_call_count_20, mock_write_job_q_bash.call_count)
         self.assertEqual(expected_call_count_20, mock_subprocess_call.call_count)
 
