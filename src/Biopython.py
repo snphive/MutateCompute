@@ -64,7 +64,7 @@ from src.GeneralUtilityMethods import GUM
 
 class Biopy(object):
 
-    PATH_OUTPUT_LEAF = "blastp_swissprot"
+    OUTPUT_LEAF = "blastp_swissprot"
     TWO_HUNDRED_KB = 200000
 
     @staticmethod
@@ -74,8 +74,8 @@ class Biopy(object):
         return fasta_str
 
     @staticmethod
-    def _write_qblast_xml_result(qblast_result, path_output_root, path_output_leaf, output_filename):
-        path_output = GUM.create_dir_tree(path_output_root, path_output_leaf)
+    def _write_qblast_xml_result(qblast_result, path_output_root, output_leaf, output_filename):
+        path_output = GUM.create_dir_tree(path_output_root, output_leaf)
         path_result_file = path_output + "/" + output_filename + ".xml"
         with open(path_result_file, 'w') as out_handle:
             out_handle.write(qblast_result.read())
@@ -87,13 +87,10 @@ class Biopy(object):
     @staticmethod
     def find_identical_blastp_hit_swissprot_for_fasta_input(path_fasta_input_query_seq, path_output_root):
         fasta_input_seq = Biopy._read_input_fasta_seq(path_fasta_input_query_seq)
-        start = time.time()
         qblast_result = Biopy._run_blastp(fasta_input_seq)
-        end = time.time()
-        print(end - start)
         filename = path_fasta_input_query_seq.split("/")[-1].split('.')[0]
-        path_qblast_result = Biopy._write_qblast_xml_result(qblast_result, path_output_root, Biopy.PATH_OUTPUT_LEAF,
-                                                              filename)
+        path_qblast_result = Biopy._write_qblast_xml_result(qblast_result, path_output_root, Biopy.OUTPUT_LEAF,
+                                                            filename)
         minimum_filesize_for_parsing = Biopy.TWO_HUNDRED_KB
         qblast_xml_size = os.stat(path_qblast_result).st_size
         if qblast_xml_size > minimum_filesize_for_parsing:
@@ -113,7 +110,6 @@ class Biopy(object):
                               'database_seqs_num': database_seqs_num,
                               'alignment_dict': Biopy._make_alignmentDict_zeroGaps_queryLen_equal_alignLen(query_length,
                                                                                                            alignments)}
-
         Biopy.__print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fasta_input_query_seq)
         return qblast_result_dict
 
@@ -123,21 +119,17 @@ class Biopy(object):
     # only looking for 100 % identity anyway.
     # NOTE: occasionally the qblast took over 4 minutes!
     @staticmethod
-    def _run_blastp(fasta_input_seq):
+    def _run_blastp(fasta_input_str):
         return NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
                               database=Biopy.BlastParam.SWSPRT.value,
-                              sequence=fasta_input_seq,
+                              sequence=fasta_input_str,
                               entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
                               alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
                               hitlist_size=Biopy.BlastParam.MAX_HIT_20.value)
 
-    # @staticmethod
-    # def _zero_gaps_query_length_equals_align_length(qblast_result_dict):
-    #     if qblast_result_dict['alignment']['hsp']['gaps'] == 0 and
-
     @staticmethod
     def _make_alignmentDict_zeroGaps_queryLen_equal_alignLen(query_length, alignments):
-        alignment_dict = {'hsp_dict': {}}
+        alignment_dict = {'accession_num': 0, 'length': 0, 'hit_def': '', 'hsp_dict': {}}
         for alignment in alignments:
             for hsp in alignment.hsps:
                 if hsp.expect == 0.0 and hsp.gaps == 0 and query_length == hsp.align_length:
@@ -151,10 +143,7 @@ class Biopy(object):
                     alignment_dict['hsp_dict']['query_start'] = hsp.query_start
                     alignment_dict['hsp_dict']['sbjct_end'] = hsp.sbjct_end
                     alignment_dict['hsp_dict']['sbjct_start'] = hsp.sbjct_start
-            for name, value in alignment_dict.items():
-                print(name + "  " + str(value))
         return alignment_dict
-
 
     @staticmethod
     def __print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fasta_input_query_seq):
