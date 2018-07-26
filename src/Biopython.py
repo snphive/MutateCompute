@@ -64,7 +64,7 @@ from src.GeneralUtilityMethods import GUM
 
 class Biopy(object):
 
-    OUTPUT_LEAF = "blastp_swissprot"
+    DIR_BLAST_SP_HS_20_20 = 'blastp_sp_hs_20_20'
     TWO_HUNDRED_KB = 200000
 
     @staticmethod
@@ -85,12 +85,12 @@ class Biopy(object):
     # NOTE: Time taken for this remote qblast for sequence 1_A.fasta was about 20 seconds.
     # NOTE: The query sequence id is also the filename and is used here for the name of the output xml.
     @staticmethod
-    def find_identical_blastp_hit_swissprot_for_fasta_input(path_fasta_input_query_seq, path_output_root):
+    def find_identical_blastp_hit_swissprot_to_fasta(path_fasta_input_query_seq, path_output_root):
         fasta_input_seq = Biopy._read_input_fasta_seq(path_fasta_input_query_seq)
         qblast_result = Biopy._run_blastp(fasta_input_seq)
         filename = path_fasta_input_query_seq.split("/")[-1].split('.')[0]
-        path_qblast_result = Biopy._write_qblast_xml_result(qblast_result, path_output_root, Biopy.OUTPUT_LEAF,
-                                                            filename)
+        path_qblast_result = Biopy._write_qblast_xml_result(qblast_result, path_output_root,
+                                                            Biopy.DIR_BLAST_SP_HS_20_20, filename)
         minimum_filesize_for_parsing = Biopy.TWO_HUNDRED_KB
         qblast_xml_size = os.stat(path_qblast_result).st_size
         if qblast_xml_size > minimum_filesize_for_parsing:
@@ -148,10 +148,10 @@ class Biopy(object):
     @staticmethod
     def __print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fasta_input_query_seq):
         if not query_length == query_letters:
-            print("query_length of blast_record is not same as query letters of blast_record")
+            print("warning: query_length of blast_record is not same as query letters of blast_record")
 
         if not query_length == len(SeqIO.read(path_fasta_input_query_seq, 'fasta').seq):
-            print("Length of fasta input sequence not same as query length of blast_record")
+            print("warning: length of fasta input sequence not same as query length of blast_record")
 
 # Note this enum class is created to hold constant values.
     from enum import Enum
