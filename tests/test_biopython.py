@@ -90,8 +90,8 @@ class TestBiopython(TestCase):
 
         cls.PATH_TESTS_FILES_BLASTRUN = cls.PATH_TESTS_FILES + '/' + cls.DIR_BLAST_SP_HS_20_20
         cls.PATH_TESTS_FILES_BLASTRUN_1_A_XML = cls.PATH_TESTS_FILES_BLASTRUN + '/' + cls.FASTA_1_A_XML
-        sequence_dict = {cls.FASTA_1_A_XML:cls.FASTA_1_A_STR, cls.FASTA_1_B_XML:cls.FASTA_1_B_STR,
-                         cls.FASTA_2_A_XML:cls.FASTA_2_A_STR, cls.FASTA_3_A_XML:cls.FASTA_3_A_STR,
+        sequence_dict = {cls.FASTA_1_A_XML: cls.FASTA_1_A_STR, cls.FASTA_1_B_XML: cls.FASTA_1_B_STR,
+                         cls.FASTA_2_A_XML: cls.FASTA_2_A_STR, cls.FASTA_3_A_XML: cls.FASTA_3_A_STR,
                          cls.FASTA_3_B_XML: cls.FASTA_3_B_STR, cls.FASTA_10_B_XML: cls.FASTA_10_B_STR}
         TestBiopython._build_reference_blastp_output_xml_files(sequence_dict)
 
@@ -114,16 +114,16 @@ class TestBiopython(TestCase):
 
     @staticmethod
     def _build_reference_blastp_output_xml_files(sequence_dict):
-        for fasta_xml, fasta_str in sequence_dict.items():
-            if not os.path.exists(TestBiopython.PATH_TESTS_FILES_BLASTRUN + '/' + fasta_xml):
+        for blast_out_xml, fasta_input in sequence_dict.items():
+            if not os.path.exists(TestBiopython.PATH_TESTS_FILES_BLASTRUN + '/' + blast_out_xml):
                 result_handle = NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
                                                database=Biopy.BlastParam.SWSPRT.value,
-                                               sequence=fasta_str,
+                                               sequence=fasta_input,
                                                entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
                                                alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
                                                hitlist_size=Biopy.BlastParam.MAX_HIT_20.value)
-                THM.write_blast_run_to_tests_dir(TestBiopython.PATH_TESTS_FILES, result_handle, fasta_xml,
-                                                  TestBiopython.DIR_BLAST_SP_HS_20_20)
+                THM.write_blast_run_to_tests_dir(TestBiopython.PATH_TESTS_FILES, TestBiopython.DIR_BLAST_SP_HS_20_20,
+                                                 result_handle, blast_out_xml)
 
     # This test is not ideal. It relies on running the actual qblast and writing the result to an xml
     # file, if only once. It then runs the qblast method in src.Biopython.Biopy but also has to write the
@@ -138,8 +138,9 @@ class TestBiopython(TestCase):
         path_expected = self.PATH_TESTS_FILES + '/' + self.DIR_BLAST_SP_HS_20_20 + '/' + self.FASTA_1_A_XML
         # action
         result_handle_1_A = Biopy._run_blastp(self.FASTA_1_A_STR)
-        THM.write_blast_run_to_tests_dir(self.PATH_TESTS_OUTPUTS, result_handle_1_A, self.FASTA_1_A_XML,
-                                          TestBiopython.DIR_BLAST_SP_HS_20_20)
+        blast_output_xml = self.FASTA_1_A_XML
+        THM.write_blast_run_to_tests_dir(self.PATH_TESTS_OUTPUTS, TestBiopython.DIR_BLAST_SP_HS_20_20,
+                                         result_handle_1_A, blast_output_xml)
         # assert
         with open(path_actual) as actual, open(path_expected) as expected:
             for actual_line, exp_line in zip(actual, expected):
@@ -207,8 +208,9 @@ class TestBiopython(TestCase):
         mock__write_qblast_xml_result.return_value = self.PATH_TESTS_FILES_BLASTRUN_1_A_XML
         # action
         result_dict = Biopy.find_identical_blastp_hit_swissprot_to_fasta(self.PATH_FASTA_1_A, self.PATH_TESTS_OUTPUTS)
-        with open('file.txt', 'w') as file:
-            file.write(json.dumps(result_dict))
+        textfile = self.PATH_TESTS_OUTPUTS + "/" + self.DIR_BLAST_SP_HS_20_20 + "/" + 'identical_hits.csv'
+        with open(textfile, 'w') as f:
+            f.write(json.dumps(result_dict))
             # assert
         self.assertEqual(expected_qblast_dict_1_A, result_dict)
 
