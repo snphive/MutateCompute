@@ -1,5 +1,6 @@
 import os
 import shutil
+from src.GeneralUtilityMethods import GUM
 
 
 class THM(object):
@@ -45,3 +46,13 @@ class THM(object):
             except OSError as e:
                 print("Error removing: %s - %s." % (e.filename, e.strerror))
 
+    # path_tests        tests/Outputs where actual test results are stored
+    #                   tests/Files where reference results are stored
+    # result_handle     the direct return object/handle of Biopython's qblast method
+    @staticmethod
+    def write_blast_run_to_tests_dir(path_tests, blast_dir, result_handle, blast_output_xml_file):
+        path_blast_run = GUM.create_dir_tree(path_tests, blast_dir)
+        path_blastrun_xml = path_blast_run + '/' + blast_output_xml_file
+        with open(path_blastrun_xml, 'w') as resx:
+            resx.write(result_handle.read())
+            result_handle.close()
