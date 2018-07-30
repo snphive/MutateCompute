@@ -1,6 +1,5 @@
 import subprocess
 import time
-import yaml
 import os
 import shutil
 import multiprocessing as mp
@@ -16,37 +15,6 @@ class GUM(object):
     path_zeus_FoldX_exe: ''
     path_local_FoldX_exe: ''
 
-    with open("/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml", 'r') as stream:
-
-        try:
-
-            paths_and_dictionaries = yaml.load(stream)
-            path_zeus_Foldx_exe = paths_and_dictionaries['ROOT']['path_zeus_FoldX_exe']
-            path_local_Foldx_exe = paths_and_dictionaries['ROOT']['path_local_FoldX_exe']
-
-            path_zeus_SnpEffect = paths_and_dictionaries['ROOT']['path_zeus_SnpEffect']
-            path_local_MutateCompute = paths_and_dictionaries['ROOT']['path_local_MutateCompute']
-
-            path_rel_src = paths_and_dictionaries['ROOT']['path_rel_src']
-            path_rel_Inputs_PDBs = paths_and_dictionaries['ROOT']['path_rel_Inputs_PDBs']
-            path_rel_Inputs_Fasta = paths_and_dictionaries['ROOT']['path_rel_Inputs_Fasta']
-            path_rel_Inputs_Options = paths_and_dictionaries['ROOT']['path_rel_Inputs_Options']
-            path_rel_Outputs_PDBs = paths_and_dictionaries['ROOT']['path_rel_Outputs_PDBs']
-
-            path_rel = paths_and_dictionaries['ROOT']['path_rel']
-            path_rel_Cluster = paths_and_dictionaries['ROOT']['path_rel_Cluster']
-            path_rel_Agadir = paths_and_dictionaries['ROOT']['path_rel_Agadir']
-            path_rel_FoldX = paths_and_dictionaries['ROOT']['path_rel_FoldX']
-            path_rel_FoldX_BuildModel = paths_and_dictionaries['ROOT']['path_rel_FoldX_BuildModel']
-            path_rel_FoldX_Repair = paths_and_dictionaries['ROOT']['path_rel_FoldX_Repair']
-            path_rel_FoldX_AnalyseComplex = paths_and_dictionaries['ROOT']['path_rel_FoldX_AnalyseComplex']
-
-            dict_aa_3to1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
-
-        except yaml.YAMLError as exc:
-
-            print(exc)
-
     @staticmethod
     def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix, message_to_print):
         check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
@@ -58,12 +26,15 @@ class GUM(object):
             output_qstat = check_qstat.stdout.read()
 
     # The runscript.txt is an input file for FoldX indicating which pdbs to analyse and which programs to run on them.
-    # abs_path_runscript    String      Absolute path for runscript.txt file being written.
+    # path_runscript    String          Absolute path for runscript.txt file being written.
     # pdbs                  String      pdb(s) (incl. .pdb extension) inputs for FoldX.
     # show_sequence_detail  Boolean     True will provide extra information in output.
     # action                String      FoldX computation to be performed (e.g. BuildModel, AnalyseComplex, etc).
     # print_networks        Boolean     True to output network data on .. ?
     # calculate_stability   Boolean     True include a stability calculation.
+    #
+    # 30.07.18 Have redesigned the directory structure such that runscripts will go in config/foldx/and maybe another
+    # level such as analyse_complex or build_model or stability etc.
     @staticmethod
     def write_runscript_for_pdbs(path_runscript, pdb, action, show_sequence_detail=False, print_networks=False,
                                  calculate_stability=False):
@@ -103,16 +74,21 @@ class GUM(object):
     # Extracts and writes a FASTA file for each chain described in the pdb.
     # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
     # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
-    # if these very specific aspects are not exactly matching, the method will fail.
+    # if these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
+    #
+    # pdbs          String or List of Strings   The pdb file (including ".pdb") or files
+    # path_input    String                      Path to where the pdbs can be found.
+    # path_output   String                      Absolute path of where to write sequence file (FASTA without >title).
+    # write_fasta   Boolean                     True to write out as a side effect of the method.
     @staticmethod
-    def extract_pdbname_chain_fasta_from_pdb(pdbs, path_Inputs, path_Outputs, write_wt_fasta_files):
+    def extract_pdbname_chain_fasta_from_pdb(pdbs, path_input, path_output, write_fasta_seq):
         pdbname_chain_fasta_dict = {}
 
         if isinstance(pdbs, str):
             pdbs = [pdbs]
 
         for pdb in pdbs:
-            pdb_file = open(path_Inputs + '/PDBs/' + pdb).readlines()
+            pdb_file = open(path_input + '/PDBs/' + pdb).readlines()  # /PDBs subfolder may no longer be used at all.
             atom_lines = []
             protein_chains = []
 
@@ -146,23 +122,26 @@ class GUM(object):
                 pdbname_chain = pdbname + '_' + protein_chain
                 print(pdbname_chain + ' : ' + fasta_sequence)
                 pdbname_chain_fasta_dict[pdbname_chain] = fasta_sequence
-                if write_wt_fasta_files:
-                    GUM.write_fasta(pdbname_chain_fasta_dict, path_Outputs)
+                if write_fasta_seq:
+                    GUM.write_fasta(pdbname_chain_fasta_dict, path_output)
         return pdbname_chain_fasta_dict
 
+    # pdbname_chain_fasta_dict  Dictionary  The pdbname_chain is the key, the amino acid sequence is the value.
+    # path_output               String      Absolute path of where to write fasta files (including >title) & ".fasta".
     @staticmethod
-    def write_fasta(pdbname_chain_fasta_dict, path_Outputs):
+    def write_fasta(pdbname_chain_fasta_dict, path_output):
         for pdbname_chain, fasta_sequence in pdbname_chain_fasta_dict.iteritems():
-            fasta_file = open(path_Outputs + 'Fasta/' + pdbname_chain + '.fasta', 'w')
+            fasta_file = open(path_output + 'Fasta/' + pdbname_chain + '.fasta', 'w')
             fasta_file.write('>' + pdbname_chain + '\n')
             fasta_file.write(fasta_sequence)
             fasta_file.close()
 
-    # Extracts All chains that are included in a pdb
-    # returns them in a list
+    # For the pdb passed here, all chains are read from the pdb file and returned as a list of chain character(s).
+    # pdb               pdb (io file?)      The pdb file (with ",pdb" extension).
+    # rel_path_to_pdb   String              The relative path to the pdb.
     @staticmethod
-    def extract_all_chains_from_pdb(pdb, relative_path_to_pdb):
-        pdb_file = open(relative_path_to_pdb + pdb).readlines()
+    def extract_all_chains_from_pdb(pdb, rel_path_to_pdb):
+        pdb_file = open(rel_path_to_pdb + pdb).readlines()
         protein_chains = []
 
         for line in pdb_file:
@@ -175,6 +154,9 @@ class GUM(object):
 
         return protein_chains
 
+    # prefix    String      The prefix to remove
+    # suffix    String      The suffix to remove
+    # pdbname   String      The pdb name (without ".pdb" extension)
     @staticmethod
     def _remove_prefix_and_suffix(prefix, suffix, pdbname):
 
@@ -188,6 +170,9 @@ class GUM(object):
 
     # Originally used in solubis.py but removed as it was not necessary.
     # Keeping this code for now should it be needed in near future
+    # Reads a FASTA file and returns the sequence only (not including the >title).
+    #
+    # path_to_fasta     String      The path to the fasta file.
     @staticmethod
     def get_fasta_sequence(path_to_fasta):
 
@@ -209,13 +194,18 @@ class GUM(object):
         fasta = ''.join(fasta_list)
         return fasta
 
-    # Build a directory tree composed of absolute path of the root and any number of child nodes.
-    # 3 leaves => root-leaf; root- leaf; root-leaf
+    ###################################################################################################################
+    # Builds a directory tree with any number of child nodes. Each new node is only ever one level down (siblings).
+    # Adding 3 child nodes produces root-leaf1; root-leaf2; root-leaf3
     #
     #     --------- root ----------
     #     |           |           |
     #   leaf1       leaf2       leaf3
     #
+    #####################################################################################################
+    #
+    # path_root     String                      The path to the root (ideally absolute), "/path/of/root"
+    # *args         String or list of Strings   Name or list of names of directory to add to root only.
     @staticmethod
     def create_dir_tree_one_level(path_root, *args):
         complete_paths = []
@@ -232,7 +222,10 @@ class GUM(object):
 
         return complete_paths
 
-    # Builds a directory tree with no branches. root-leaf-leaf-leaf
+    ###################################################################################################################
+    # Builds a directory tree with any number of child nodes. If more than 1 node is added, only the first is a direct
+    # child of the root. Subsequent child nodes are added to the last added node, so each is a child of the previous.
+    # Adding 3 leaves produces root-leaf1-leaf2-leaf3:
     #
     #    root
     #      |
@@ -242,9 +235,14 @@ class GUM(object):
     #      |
     #    leaf3
     #
-    # NOTE: os.makedirs(os.path.join(path, *paths)) already does this, but I found it annoying to mock, possibly
-    # some bug when combining mocking with the debugger.
-    # it does not create duplicates and does not raise any errors or exceptions.
+    ###################################################################################################################
+    #
+    # NOTE: os.makedirs(os.path.join(path, *paths)) already does this, but I found it problematic for mocking, possibly
+    # due to some bug when combining unittest.mock.patch with the pydevd debugger.
+    # It does not create duplicates and does not raise any errors or exceptions.
+    #
+    # path_root     String                      The path to the root (ideally absolute), "/path/of/root"
+    # *args         String or list of Strings   Name or list of names of directory to add to root, then root-leaf.
     @staticmethod
     def create_dir_tree(path_root, *args):
 
@@ -256,26 +254,20 @@ class GUM(object):
 
             if not os.path.exists(path_root_leaf):
                 os.mkdir(path_root_leaf)
+            path_root = path_root_leaf
 
         return path_root_leaf
 
-    @staticmethod
-    def build_input_output_directory_trees(build_local_dir_tree, build_zeus_dir_tree):
-        rel_path_list = [GUM.path_rel_src, GUM.path_rel_Inputs_PDBs, GUM.path_rel_Inputs_Fasta,
-                         GUM.path_rel_Inputs_Options, GUM.path_rel_Outputs_PDBs]
-
-        if not build_local_dir_tree and not build_zeus_dir_tree:
-            raise ValueError('Both options false - neither local or cluster trees will be created')
-
-        else:
-
-            if build_local_dir_tree:
-                GUM.create_dir_tree_one_level(GUM.path_local_MutateCompute, rel_path_list)
-
-            if build_zeus_dir_tree:
-                GUM.create_dir_tree_one_level(GUM.path_zeus_SnpEffect, rel_path_list)
-
-
+    # path_src_dir          String      The path of source for pdb files to copy from.
+    # path_dst_dir          String      The path of destination for pdb files to copy to.
+    # starting_num          int         The starting number part of name for destination directory.
+    # total_num_to_copy     int         The total number of pdbs to copy&move (also used to destination directory name).
+    #                                   It is given as a keyword argument so that a default of 100 can be set when no
+    #                                   argument is given.
+    #
+    # NB: I DON'T THINK I'VE COMPLETED THIS METHOD BECAUSE IT DOESN'T LOOK LIKE IT USES THE STARTING NUMBER TO DECIDE
+    # WHICH 100 PDBS TO COPY AND MOVE.***** *** **
+    #
     @staticmethod
     def copy_and_move_pdb_files(path_src_dir, path_dst_dir, starting_num, total_num_to_copy=100):
 
@@ -299,13 +291,23 @@ class GUM(object):
                 if file.endswith('.pdb') and file in target_file_list:
                     shutil.move(path_src_dir + GUM.fslash + file, path_src_dir_subfoldername + GUM.fslash + file)
 
-            copy_linux_cmd = 'cp' + GUM.space + '-r' + GUM.space + path_src_dir_subfoldername + GUM.space + \
-                             path_dst_dir_subfoldername
-            subprocess.call(copy_linux_cmd, shell=True)
+            # copy_linux_cmd = 'cp' + GUM.space + '-r' + GUM.space + path_src_dir_subfoldername + GUM.space + \
+            #                  path_dst_dir_subfoldername
+            # subprocess.call(copy_linux_cmd, shell=True)
+            GUM.linux_copy(path_src_dir_subfoldername, path_dst_dir_subfoldername, do_recursively=True)
 
+    # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
+    # Folder will be name "1...100". If starting_num is 20025, it will name it "20025...20125"
     @staticmethod
     def _make_subfoldername(starting_num, total_num_to_copy):
         return str(starting_num) + '...' + str(total_num_to_copy)
+
+
+    @staticmethod
+    def linux_copy(path_src, path_dst, do_recursively):
+        recurse = (GUM.space + '-r') if do_recursively else ''
+        cmd = 'cp' + recurse + GUM.space + path_src + GUM.space + path_dst
+        subprocess.call(cmd, shell=True)
 
     # @staticmethod
     # def perform_local_multithreading(process_method_name, file_to_process):
@@ -322,4 +324,3 @@ class GUM(object):
     #         job.get()
     #     # clean up
     #     pool.close()
-

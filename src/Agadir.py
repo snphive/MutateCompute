@@ -1,5 +1,6 @@
 from src.GeneralUtilityMethods import GUM
 
+
 class Agadir(object):
 
     def __init__(self):

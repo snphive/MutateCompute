@@ -3,7 +3,7 @@ import yaml
 import src.Main
 from src.MutateFasta import MutateFasta
 
-with open("/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts/pathsAndDictionaries.yaml",
+with open("/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts/test_pathsAndDictionaries.yaml",
           'r') as stream:
     try:
 
@@ -13,13 +13,13 @@ with open("/switchlab/group/shazib/SnpEffect/SourceFiles/Scripts/pathsAndDiction
         path_Agadir_exe = paths_and_dictionaries['ROOT']['path_Agadir_exe']
         path_QSub_exe = paths_and_dictionaries['ROOT']['path_QSub_exe']
 
-        path_SnpEffect_dir = paths_and_dictionaries['ROOT']['path_SnpEffect_dir']
-        path_SE_SourceFiles_Scripts_dir = paths_and_dictionaries['ROOT'][' path_SourceFiles_Scripts_dir']
-        path_SE_Inputs_PDBs_dir = paths_and_dictionaries['ROOT']['path_SE_Inputs_PDBs_dir']
-        path_SE_Inputs_FASTAs_dir = paths_and_dictionaries['ROOT']['path_SE_Inputs_FASTAs_dir']
-        path_SE_Outputs_dir = paths_and_dictionaries['ROOT']['path_SE_Outputs_dir']
-        path_SE_Outputs_Agadir_dir = paths_and_dictionaries['ROOT']['path_SE_Outputs_Agadir_dir']
-        path_SE_Outputs_FoldX_dir = paths_and_dictionaries['ROOT']['path_SE_Outputs_FoldX_dir']
+        path_SnpEffect = paths_and_dictionaries['ROOT']['path_SnpEffect']
+        path_SE_SourceFiles_Scripts = paths_and_dictionaries['ROOT'][' path_SourceFiles_Scripts']
+        path_SE_Inputs_PDBs = paths_and_dictionaries['ROOT']['path_SE_Inputs_PDBs']
+        path_SE_Inputs_FASTAs = paths_and_dictionaries['ROOT']['path_SE_Inputs_FASTAs']
+        path_SE_Outputs = paths_and_dictionaries['ROOT']['path_SE_Outputs']
+        path_SE_Outputs_Agadir = paths_and_dictionaries['ROOT']['path_SE_Outputs_Agadir']
+        path_SE_Outputs_FoldX = paths_and_dictionaries['ROOT']['path_SE_Outputs_FoldX']
 
         dict_aa_1to3 = paths_and_dictionaries['ROOT']['dict_aa_1to3']
         dict_aa_3to1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
