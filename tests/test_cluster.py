@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 from src.Cluster import Cluster
-from tests.testHelperMethods import THM
+from tests.HelperMethods import HM
 from src.GeneralUtilityMethods import GUM
 
 
@@ -36,7 +36,7 @@ class TestCluster(TestCase):
 
     def tearDown(self):
         self.cluster = None
-        THM.remove_tests_Inputs_Outputs_folders()
+        HM.remove_tests_Inputs_Outputs_folders()
 
     # The method has named keyword argument set to '' for following: python_script_with_paths, queue, n_slots,
     # total_memory_GB, memory_limit_GB, cluster_node. None of these values is given here so the default will be applied
