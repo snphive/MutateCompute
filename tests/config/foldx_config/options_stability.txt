@@ -1,0 +1,2 @@
+<TITLE>FOLDX_optionfile;
+<OutPDB>false;
