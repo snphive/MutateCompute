@@ -1,30 +1,33 @@
 ROOT:
     # path to executables on cluster and local
-    path_zeus_R_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
-    path_zeus_FoldX_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
-    path_zeus_Agadir_exe: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
-    path_zeus_Qsub_exe: '/opt/sge/bin/lx-amd64/'
-    path_local_R_exe: '/usr/local/bin/R'
-    path_local_FoldX_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX'
-    path_local_Agadir_exe: '/Users/u0120577/SNPEFFECT/executables/agadirwrapper'
+    path_zeus_r_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
+    path_zeus_fx_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
+    path_zeus_agad_exe: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
+    path_zeus_qsub_exe: '/opt/sge/bin/lx-amd64/'
+    path_local_r_exe: '/usr/local/bin/R'
+    path_local_fx_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX'
+    path_local_agad_exe: '/Users/u0120577/SNPEFFECT/executables/agadirwrapper'
 
     # root directories of cluster and local trees
-    path_zeus_SnpEffect: '/switchlab/group/shazib/SnpEffect'
-    path_local_MutateCompute: '/Users/u0120577/PycharmProjects/MutateCompute'
+    path_zeus_snpeffect: '/switchlab/group/shazib/SnpEffect'
+    path_local_mutatecompute: '/Users/u0120577/PycharmProjects/MutateCompute'
 
     # relative paths - common to both cluster and local trees
+    path_rel_config: '/config'
+    path_rel_config_agadconfig: '/config/agadir_config'
+    path_rel_config_fxconfig: '/config/foldx_config'
+    path_rel_config_globoptions: '/config/global_options'
+    path_rel_config_fxconf_acrunscript: '/config/foldx_config/ac_runscript'
+    path_rel_config_fxconf_bmrunscript: '/config/foldx_config/bm_runscript'
+    path_rel_config_fxconf_reprunscript: '/config/foldx_config/repair_runscript'
     path_rel_src: '/src'
-    path_rel_Inputs_PDBs: '/Inputs/PDBs'
-    path_rel_Inputs_Fasta: '/Inputs/Fasta'
-    path_rel_Inputs_Options: '/Inputs/Options'
-    path_rel_Outputs_PDBs: '/Outputs/PDBs'
-    path_rel: '/'
-    path_rel_Cluster: '/Cluster'
-    path_rel_Agadir: '/Agadir'
-    path_rel_FoldX: '/FoldX'
-    path_rel_FoldX_BuildModel: '/FoldX/BuildModel'
-    path_rel_FoldX_Repair: '/FoldX/Repair'
-    path_rel_FoldX_AnalyseComplex: '/FoldX/AnalyseComplex'
+    path_rel_input: '/input_data'
+    path_rel_allmutants: '/all_mutants'
+    path_rel_output: '/output_data/'
+    path_rel_fx_ac: '/foldx/analyse_complex'
+    path_rel_fx_bm: '/foldx/build_model'
+    path_rel_fx_rep: '/foldx/repair'
+    path_rel_mutatefasta: '/mutate_fasta'
 
     dict_aa_1to3:
         A: ALA

@@ -3,7 +3,7 @@ import shutil
 from src.GeneralUtilityMethods import GUM
 
 
-class THM(object):
+class HM(object):
 
     # paths common to both input & output
     path_tests = '/Users/u0120577/PycharmProjects/MutateCompute/tests'
@@ -27,15 +27,15 @@ class THM(object):
 
     @staticmethod
     def remove_tests_Inputs_Outputs_folders():
-        if os.path.exists(THM.path_tests):
-            if os.path.exists(THM.path_tests_Inputs):
-                THM.__delete_directory_tree_of_tests_InputsOutputs(THM.rel_path_Inputs.strip('/'))
-            if os.path.exists(THM.path_tests_Outputs):
-                THM.__delete_directory_tree_of_tests_InputsOutputs(THM.rel_path_Outputs.strip('/'))
+        if os.path.exists(HM.path_tests):
+            if os.path.exists(HM.path_tests_Inputs):
+                HM.__delete_directory_tree_of_tests_InputsOutputs(HM.rel_path_Inputs.strip('/'))
+            if os.path.exists(HM.path_tests_Outputs):
+                HM.__delete_directory_tree_of_tests_InputsOutputs(HM.rel_path_Outputs.strip('/'))
 
     @staticmethod
     def __delete_directory_tree_of_tests_InputsOutputs(rel_path_InputsOutputs):
-        os.chdir(THM.path_tests)
+        os.chdir(HM.path_tests)
         print(os.getcwd())
         if not os.getcwd() == '/Users/u0120577/PycharmProjects/MutateCompute/tests':
             raise ValueError('Current working directory is not MutateCompute/tests. Not proceeding with deletion of '

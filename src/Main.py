@@ -2,6 +2,7 @@ import glob
 import yaml
 from src.Scheduler import Scheduler
 from src.GeneralUtilityMethods import GUM
+from src.Paths import Paths
 
 # The following 4 lines of code successfully connect to
 # import mysql.connector
@@ -71,7 +72,7 @@ for line in mutate_compute_options_file:
     if 'PDBs:' in line:
         pdb_option = line.split(':')[-1].strip(';\n').strip()
         if pdb_option == 'All':
-            pdb_paths = glob.glob(path_local_MutateCompute + path_rel_Inputs_PDBs + '*.pdb')
+            pdb_paths = glob.glob(Paths.PATH_LOCAL_MUTATECOMPUTE + Paths.PATH_REL_INPUTS_PDBS + '*.pdb')
             for pdb_path in pdb_paths:
                 input_pdbs.append(pdb_path.split('/')[-1])
         elif pdb_option == '':
@@ -120,7 +121,22 @@ operations = {
 
 
 def _build_dir_trees():
-    GUM.build_input_output_directory_trees(build_local_dir_tree='True', build_zeus_dir_tree='False')
+    build_local_dir_tree = 'True'
+    build_zeus_dir_tree = 'False'
+
+    rel_path_list = [GUM.path_rel_src, GUM.path_rel_Inputs_PDBs, GUM.path_rel_Inputs_Fasta,
+                     GUM.path_rel_Inputs_Options, GUM.path_rel_Outputs_PDBs]
+
+    if not build_local_dir_tree and not build_zeus_dir_tree:
+        raise ValueError('Both options false - neither local or cluster trees will be created')
+
+    else:
+
+        if build_local_dir_tree:
+            GUM.create_dir_tree_one_level(GUM.path_local_MutateCompute, rel_path_list)
+
+        if build_zeus_dir_tree:
+            GUM.create_dir_tree_one_level(GUM.path_zeus_SnpEffect, rel_path_list)
 
 
 if do_mutate_fasta or do_agadir or do_foldx_repair or do_foldx_buildmodel or do_foldx_stability or do_foldx_analysecomplex:

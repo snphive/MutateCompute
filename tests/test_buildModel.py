@@ -3,7 +3,8 @@ from src.FoldX import FoldX
 from src.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 from unittest.mock import patch
-from tests.testHelperMethods import THM
+from tests.HelperMethods import HM
+from tests.PathsForTests import PFT
 
 
 # Note: A test pdb is used here which is taken from the RepairPDBs folder, but includes only the first 5 residues of
@@ -11,30 +12,8 @@ from tests.testHelperMethods import THM
 # Note: Wherever a path is indicated, it is the absolute path. Relative paths are always prefixed with rel_
 class TestBuildModel(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        # paths common to both input & output
-        cls.path_tests = '/Users/u0120577/PycharmProjects/MutateCompute/tests'
-        cls.rel_path_PDBs = '/PDBs'
-        cls.rel_path_FoldX = '/FoldX'
-        # input paths only
-        cls.rel_path_Inputs = '/Inputs'
-        cls.path_tests_Inputs = cls.path_tests + cls.rel_path_Inputs
-        cls.path_tests_Inputs_PDBs = cls.path_tests_Inputs + cls.rel_path_PDBs
-        cls.rel_path_Cluster = '/Cluster'
-        cls.rel_path_BuildModel = '/BuildModel'
-        cls.rel_path_Fasta = '/Fasta'
-        cls.rel_path_Options_Agadir = '/Options/Agadir'
-        cls.rel_path_Options_FoldX = '/Options/FoldX'
-        cls.rel_path_Options_Cluster = '/Options/Cluster'
-        # output paths only
-        cls.rel_path_Outputs = '/Outputs'
-        cls.path_tests_Outputs = cls.path_tests + cls.rel_path_Outputs
-        cls.rel_path_BuildModel = '/BuildModel'
-        cls.rel_path_AnalyseComplex = '/AnalyseComplex'
-
     def setUp(self):
-        THM.remove_tests_Inputs_Outputs_folders()
+        HM.remove_tests_Inputs_Outputs_folders()
         self.path_zeus_foldx_exe = '/switchlab/group/tools/FoldX_2015/FoldX'
         self.path_local_foldx_exe = '/Users/u0120577/SNPEFFECT/executables/FoldX'
         foldx = FoldX()
@@ -42,7 +21,7 @@ class TestBuildModel(TestCase):
 
     def tearDown(self):
         self.buildModel = None
-        # THM.remove_tests_Inputs_Outputs_folders()
+        # HM.remove_tests_Inputs_Outputs_folders()
 
     @patch('subprocess.call')
     @patch.object(Cluster, 'write_job_q_bash')
@@ -72,7 +51,7 @@ class TestBuildModel(TestCase):
         mutant_aa_list = ['A', 'C']
         pdb = 'RepairPDB_1.pdb'
         # action
-        self.buildModel.mutate_residues_of_pdb(self.path_tests_Inputs, self.path_tests_Outputs, pdb, mutant_aa_list,
+        self.buildModel.mutate_residues_of_pdb(PFT.PATH_TESTS_INPTS, PFT.PATH_TESTS_OUTPTS, pdb, mutant_aa_list,
                                                write_wt_fasta_files)
         # assert
         expected_call_count_1 = 1
@@ -95,23 +74,21 @@ class TestBuildModel(TestCase):
         expected_fx_mutant_name_list = ['RA1A', 'RA1C', 'RA1D', 'RB1A', 'RB1C', 'RB1D']
         self.assertEqual(fx_mutant_name_list, expected_fx_mutant_name_list)
 
-
-
     # def test_write_job_q_filenames_check(self):
         # job_q_file = open('./job.q', 'w') - how to assert filenames are same?
         # job_q_file.write('#!/bin/bash\n') - not sure what this  does
 
-    # unused file comparison which relies to some extent on the directory structure being in place which I didn't know how to mock
-    # so I made the write_job.. method return the string that it writes to job.q file.
-    #     with open(path_job_q_file + '/job.q') as f:
-    #         actual_job_q = f.read()
-    #         self.assertEqual(actual_job_q, expected_job_q)
-    #         self.assertNotEqual(actual_job_q, not_expected_job_q)
-    #         self.assertNotEqual(actual_job_q, not_expected_job_q_2)
+    # file comparison scripts, currently unused. It relies to some extent on the directory structure being in place
+    # which I didn't know how to mock so I made the write_job.. method return the string that it writes to job.q file.
+    # with open(path_job_q_file + '/job.q') as f:
+    #   actual_job_q = f.read()
+    #   self.assertEqual(actual_job_q, expected_job_q)
+    #   self.assertNotEqual(actual_job_q, not_expected_job_q)
+    #   self.assertNotEqual(actual_job_q, not_expected_job_q_2)
 
     # pdbname = pdb.split('.')[0]
-    # path_tests_Inputs_PDBs_pdbname = self.path_tests_Inputs_PDBs + '/' + pdbname
+    # path_tests_Inputs_PDBs_pdbname = PFT.PATH_TESTS_INPTS_PDBS + '/' + pdbname
     # path_tests_Inputs_PDBs_pdbname_FX_BM = path_tests_Inputs_PDBs_pdbname + '/FX_BuildModel'
-    # path_tests_Inputs_PDBs_pdbname_FXmutantname = path_tests_Inputs_PDBs_pdbname + '/RA1A'
+    # path_tests_Inputs_PDBs_pdbname_FXmutant = path_tests_Inputs_PDBs_pdbname + '/RA1A'
     # mock_os_path_join.side_effect = [path_tests_Inputs_PDBs_pdbname, path_tests_Inputs_PDBs_pdbname_FX_BM,
-    #                                  path_tests_Inputs_PDBs_pdbname_FXmutantname]
+    #                                  path_tests_Inputs_PDBs_pdbname_FXmutant]
