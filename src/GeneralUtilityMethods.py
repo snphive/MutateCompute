@@ -2,6 +2,8 @@ import subprocess
 import time
 import os
 import shutil
+from src.AminoAcids import AA
+import warnings
 import multiprocessing as mp
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
@@ -11,9 +13,6 @@ class GUM(object):
 
     space = ' '
     fslash = '/'
-    dict_aa_3to1 = {}
-    path_zeus_FoldX_exe: ''
-    path_local_FoldX_exe: ''
 
     @staticmethod
     def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix, message_to_print):
@@ -76,19 +75,19 @@ class GUM(object):
     # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
     # if these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
     #
-    # pdbs          String or List of Strings   The pdb file (including ".pdb") or files
-    # path_input    String                      Path to where the pdbs can be found.
-    # path_output   String                      Absolute path of where to write sequence file (FASTA without >title).
-    # write_fasta   Boolean                     True to write out as a side effect of the method.
+    # pdbs              String or List of Strings   The pdb file (including ".pdb") or files
+    # path_input        String                      Path to where the pdbs can be found.
+    # write_fasta       Boolean                     True to write out as a side effect of the method.
+    # path_fasta_root   String                      Absolute path of root for fasta sequence file (without >title).
     @staticmethod
-    def extract_pdbname_chain_fasta_from_pdb(pdbs, path_input, path_output, write_fasta_seq):
-        pdbname_chain_fasta_dict = {}
+    def extract_pdbname_chain_fasta_from_pdb(pdbs, path_input_pdbs, write_fasta_seq, path_fasta_root):
+        pdbname_chain_fasta_dict: dict = {}
 
         if isinstance(pdbs, str):
             pdbs = [pdbs]
 
         for pdb in pdbs:
-            pdb_file = open(path_input + '/PDBs/' + pdb).readlines()  # /PDBs subfolder may no longer be used at all.
+            pdb_file = open(path_input_pdbs + pdb).readlines()
             atom_lines = []
             protein_chains = []
 
@@ -111,8 +110,8 @@ class GUM(object):
                         resnum = line[22:26].strip(' ')
                         amino_acid = line[17:20]
 
-                        if amino_acid in GUM.dict_aa_3to1.keys():  # else throw some kind of exception or error message?
-                            fasta_list.append(GUM.dict_aa_3to1[amino_acid])
+                        if amino_acid in AA.DICT_AA_3TO1.value.keys():
+                            fasta_list.append(AA.DICT_AA_3TO1.value[amino_acid])
                         else:
                             print('This 3-letter word is not recognised as 1 of the 20 amino acids! '
                                   'Cannot extract FASTA from ' + pdb + ' !')
@@ -123,15 +122,16 @@ class GUM(object):
                 print(pdbname_chain + ' : ' + fasta_sequence)
                 pdbname_chain_fasta_dict[pdbname_chain] = fasta_sequence
                 if write_fasta_seq:
-                    GUM.write_fasta(pdbname_chain_fasta_dict, path_output)
+                    GUM.write_fasta(pdbname_chain_fasta_dict, path_fasta_root)
         return pdbname_chain_fasta_dict
 
     # pdbname_chain_fasta_dict  Dictionary  The pdbname_chain is the key, the amino acid sequence is the value.
-    # path_output               String      Absolute path of where to write fasta files (including >title) & ".fasta".
+    # path_fasta_root           String      Absolute path of root for fasta sequence file (without >title).
     @staticmethod
-    def write_fasta(pdbname_chain_fasta_dict, path_output):
-        for pdbname_chain, fasta_sequence in pdbname_chain_fasta_dict.iteritems():
-            fasta_file = open(path_output + 'Fasta/' + pdbname_chain + '.fasta', 'w')
+    def write_fasta(pdbname_chain_fasta_dict, path_fasta_root):
+        for pdbname_chain, fasta_sequence in pdbname_chain_fasta_dict.items():
+            path_output_pdb_pdbchain = GUM.create_dir_tree(path_fasta_root, pdbname_chain.split('_')[0], pdbname_chain)
+            fasta_file = open(path_output_pdb_pdbchain + pdbname_chain + '.fasta', 'w')
             fasta_file.write('>' + pdbname_chain + '\n')
             fasta_file.write(fasta_sequence)
             fasta_file.close()
@@ -245,6 +245,7 @@ class GUM(object):
     # *args         String or list of Strings   Name or list of names of directory to add to root, then root-leaf.
     @staticmethod
     def create_dir_tree(path_root, *args):
+        path_root_leaf = path_root
 
         if not os.path.exists(path_root):
             os.makedirs(path_root)
@@ -256,6 +257,9 @@ class GUM(object):
                 os.mkdir(path_root_leaf)
             path_root = path_root_leaf
 
+        if path_root_leaf == path_root:
+            warnings.warn_explicit(message='No new directory tree was created. Returning the unchanged root.',
+                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
         return path_root_leaf
 
     # path_src_dir          String      The path of source for pdb files to copy from.
