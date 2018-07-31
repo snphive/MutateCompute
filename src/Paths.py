@@ -10,7 +10,7 @@ class Paths(Enum):
 
     YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml'
 
-    with open(YAML_FILE.value, 'r') as stream:
+    with open(YAML_FILE, 'r') as stream:
 
         try:
 
@@ -42,30 +42,25 @@ class Paths(Enum):
             REL_FX_REP = paths_and_dictionaries['ROOT']['path_rel_fx_rep']
             REL_MUTATE_FASTA = paths_and_dictionaries['ROOT']['path_rel_mutatefasta']
 
-            DICT_AA_1TO3 = paths_and_dictionaries['ROOT']['dict_aa_1to3']
-            DICT_AA_3TO1 = paths_and_dictionaries['ROOT']['dict_aa_3to1']
-            LIST_ALL_20_AA = paths_and_dictionaries['ROOT']['list_all_20_aa']
-
             # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-            MC_CONFIG = LOCAL_MUTATECOMPUTE.value + REL_CONFIG.value
-            MC_CONFIG_AGAD = LOCAL_MUTATECOMPUTE.value + REL_CONFIG_AGAD.value
-            MC_CONFIG_JOBQ = LOCAL_MUTATECOMPUTE.value + REL_CONFIG_JOBQ.value
-            MC_CONFIG_FX = LOCAL_MUTATECOMPUTE.value + REL_CONFIG_FX.value
-            MC_CONFIG_GLOBAL_OPTIONS = LOCAL_MUTATECOMPUTE.value + REL_CONFIG_GLOBAL_OPTIONS.value
-            MC_CONFIG_FX_ACRUNSCRIPT = LOCAL_MUTATECOMPUTE.value + REL_CONFIG_FX_ACRUNSCRIPT.value
-            MC_CONFIG_FX_BMRUNSCRIPT = LOCAL_MUTATECOMPUTE.value + REL_CONFIG_FX_BMRUNSCRIPT.value
-            MC_INPUT = LOCAL_MUTATECOMPUTE.value + REL_INPUT.value
-            MC_OUTPUT = LOCAL_MUTATECOMPUTE.value + REL_OUTPUT.value
-
-            SE_CONFIG = ZEUS_SNPEFFECT.value + REL_CONFIG.value
-            SE_CONFIG_AGAD = ZEUS_SNPEFFECT.value + REL_CONFIG_AGAD.value
-            SE_CONFIG_JOBQ = ZEUS_SNPEFFECT.value + REL_CONFIG_JOBQ.value
-            SE_CONFIG_FX = ZEUS_SNPEFFECT.value + REL_CONFIG_FX.value
-            SE_CONFIG_GLOBAL_OPTIONS = ZEUS_SNPEFFECT.value + REL_CONFIG_GLOBAL_OPTIONS.value
-            SE_CONFIG_FX_ACRUNSCRIPT = ZEUS_SNPEFFECT.value + REL_CONFIG_FX_ACRUNSCRIPT.value
-            SE_CONFIG_FX_BMRUNSCRIPT = ZEUS_SNPEFFECT.value + REL_CONFIG_FX_BMRUNSCRIPT.value
-            SE_INPUT = ZEUS_SNPEFFECT.value + REL_INPUT.value
-            SE_OUTPUT = ZEUS_SNPEFFECT.value + REL_OUTPUT.value
+            MC_CONFIG = LOCAL_MUTATECOMPUTE + REL_CONFIG
+            MC_CONFIG_AGAD = LOCAL_MUTATECOMPUTE + REL_CONFIG_AGAD
+            MC_CONFIG_JOBQ = LOCAL_MUTATECOMPUTE + REL_CONFIG_JOBQ
+            MC_CONFIG_FX = LOCAL_MUTATECOMPUTE + REL_CONFIG_FX
+            MC_CONFIG_GLOBAL_OPTIONS = LOCAL_MUTATECOMPUTE + REL_CONFIG_GLOBAL_OPTIONS
+            MC_CONFIG_FX_ACRUNSCRIPT = LOCAL_MUTATECOMPUTE + REL_CONFIG_FX_ACRUNSCRIPT
+            MC_CONFIG_FX_BMRUNSCRIPT = LOCAL_MUTATECOMPUTE + REL_CONFIG_FX_BMRUNSCRIPT
+            MC_INPUT = LOCAL_MUTATECOMPUTE + REL_INPUT
+            MC_OUTPUT = LOCAL_MUTATECOMPUTE + REL_OUTPUT
+            SE_CONFIG = ZEUS_SNPEFFECT + REL_CONFIG
+            SE_CONFIG_AGAD = ZEUS_SNPEFFECT + REL_CONFIG_AGAD
+            SE_CONFIG_JOBQ = ZEUS_SNPEFFECT + REL_CONFIG_JOBQ
+            SE_CONFIG_FX = ZEUS_SNPEFFECT + REL_CONFIG_FX
+            SE_CONFIG_GLOBAL_OPTIONS = ZEUS_SNPEFFECT + REL_CONFIG_GLOBAL_OPTIONS
+            SE_CONFIG_FX_ACRUNSCRIPT = ZEUS_SNPEFFECT + REL_CONFIG_FX_ACRUNSCRIPT
+            SE_CONFIG_FX_BMRUNSCRIPT = ZEUS_SNPEFFECT + REL_CONFIG_FX_BMRUNSCRIPT
+            SE_INPUT = ZEUS_SNPEFFECT + REL_INPUT
+            SE_OUTPUT = ZEUS_SNPEFFECT + REL_OUTPUT
 
         except yaml.YAMLError as exc:
             print(exc)
