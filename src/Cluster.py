@@ -1,6 +1,7 @@
 import yaml
 import os
 import traceback
+from src.Paths import Paths
 # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
 # to perform as well as how to run these computations
 
@@ -82,6 +83,7 @@ class Cluster(object):
         if queue != '':
             job_q.append('#$ -q ' + queue + '\n')
 
+        multicore_memory_command = ''
         if n_slots != '' and total_memory_GB == '':
             raise ValueError('n_slots was specified but no total memory was given.')
         elif n_slots != '' and total_memory_GB != '':
@@ -92,10 +94,10 @@ class Cluster(object):
             memory_limit_GB = int(memory_limit_GB) / int(n_slots)
 
             if multicore_memory_command != '':
-                multicore_memory_command += ',h_vmem=' + memory_limit_GB + 'G\n'
+                multicore_memory_command += ',h_vmem=' + str(memory_limit_GB) + 'G\n'
                 job_q.append(multicore_memory_command)
             else:
-                job_q.append('#$ -l h_vmem=' + memory_limit_GB + 'G\n')
+                job_q.append('#$ -l h_vmem=' + str(memory_limit_GB) + 'G\n')
 
         if cluster_node != '':
             job_q.append('#$ -l hostname=' + cluster_node + '\n')
@@ -103,7 +105,7 @@ class Cluster(object):
         job_q.append('#$ -cwd\n' + 'source ~/.bash_profile\n')
 
         if using_runscript:
-            job_q.append(Cluster.path_zeus_FoldX_exe + ' -runfile runscript.txt\n')
+            job_q.append(Paths.PATH_ZEUS_FOLDX_EXE + ' -runfile runscript.txt\n')
 
         if python_script_with_paths != '':
             job_q.append('python ' + python_script_with_paths + '\n')
