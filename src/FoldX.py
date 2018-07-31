@@ -27,18 +27,18 @@ class FoldX(object):
 
         # Mutate specified amino acids in this pdb to all listed amino acids using FoldX BuildModel,
         # FoldX uses a runscript file, which must be written here.
-        # path_Inputs          String   Absolute path of Inputs folder. (Can be local or cluster).
-        # path_Outputs         String   Absolute path of Outputs folder. (Can be local or cluster).
+        # path_input           String   Absolute path of input folder. (Can be local or cluster).
+        # path_output         String   Absolute path of output folder. (Can be local or cluster).
         # input_pdb            String   Input pdb to be mutated.
         # mutate_to_aa_list    List     List of amino acids that you want to mutate your pdb to.
         # write_wt_fasta_files Boolean  True/False is you want to write the wild-type sequence of the input pdb out.
-        def mutate_residues_of_pdb(self, path_Inputs, path_Outputs, pdb, mutate_to_aa_list,
+        def mutate_residues_of_pdb(self, path_input, path_output, pdb, mutate_to_aa_list,
                                    write_wt_fasta_files):
             pdbname = pdb.split('.')[0]
-            path_Inputs_PDBs_pdbname = GUM.create_dir_tree(path_Inputs, 'PDBs', pdbname)
-            path_runscript_dest = GUM.create_dir_tree(path_Inputs_PDBs_pdbname, 'FX_BuildModel')
-            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdb(pdb, path_Inputs, write_wt_fasta_files,
-                                                                                path_Outputs)
+            path_input_PDBs_pdbname = GUM.create_dir_tree(path_input, 'PDBs', pdbname)
+            path_runscript_dest = GUM.create_dir_tree(path_input_PDBs_pdbname, 'FX_BuildModel')
+            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdb(pdb, path_input, write_wt_fasta_files,
+                                                                                path_output)
             fx_mutant_name_list = self._make_fx_mutant_name_list(mutate_to_aa_list, pdbname_chain_fasta_dict)
 
             if not os.path.exists(path_runscript_dest):
@@ -48,7 +48,7 @@ class FoldX(object):
             GUM.write_runscript_for_pdbs(path_runscript_dest, 'RepairPDB_' + pdb, action)
 
             for fx_mutant_name in fx_mutant_name_list:
-                path_jobq_indivlist_dest = GUM.create_dir_tree(path_Inputs_PDBs_pdbname, fx_mutant_name)
+                path_jobq_indivlist_dest = GUM.create_dir_tree(path_input_PDBs_pdbname, fx_mutant_name)
 
                 if not os.path.exists(path_jobq_indivlist_dest):
                     os.makedirs(path_jobq_indivlist_dest)

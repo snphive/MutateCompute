@@ -25,7 +25,7 @@ class GUM(object):
             output_qstat = check_qstat.stdout.read()
 
     # The runscript.txt is an input file for FoldX indicating which pdbs to analyse and which programs to run on them.
-    # path_runscript    String          Absolute path for runscript.txt file being written.
+    # path_runscript        String      Absolute path for runscript.txt file being written.
     # pdbs                  String      pdb(s) (incl. .pdb extension) inputs for FoldX.
     # show_sequence_detail  Boolean     True will provide extra information in output.
     # action                String      FoldX computation to be performed (e.g. BuildModel, AnalyseComplex, etc).
@@ -35,13 +35,13 @@ class GUM(object):
     # 30.07.18 Have redesigned the directory structure such that runscripts will go in config/foldx/and maybe another
     # level such as analyse_complex or build_model or stability etc.
     @staticmethod
-    def write_runscript_for_pdbs(path_runscript, pdb, action, show_sequence_detail=False, print_networks=False,
+    def write_runscript_for_pdbs(path_runscript, pdbs, action, show_sequence_detail=False, print_networks=False,
                                  calculate_stability=False):
         runscript = []
         runscript.append('<TITLE>FOLDX_runscript;\n')
         runscript.append('<JOBSTART>#;\n')
 
-        runscript.append('<PDBS>' + pdb + ';\n')
+        runscript.append('<PDBS>' + pdbs + ';\n')
         runscript.append('<BATCH>#;\n')
         runscript.append('<COMMANDS>FOLDX_commandfile;\n')
         if show_sequence_detail:
