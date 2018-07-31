@@ -2,9 +2,38 @@ from unittest import TestCase
 from src.Biopython import Biopy
 from unittest.mock import patch
 from tests.HelperMethods import HM
+from tests.TestPaths import TPaths
 
 
 class TestBiopython(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # constants related to input
+        cls.FASTA_FILE_1_A = '1_A.fasta'
+        cls.DIR_PDB_1_A = '1_A'
+        cls.PATH_FASTA_1_A = TPaths.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTA_FILE_1_A
+        cls.FASTA_SEQ_1_A = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
+                            'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
+                            'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
+                            'VCSVTDEDGPETHFDELEDVFLLETDNPRTTLVYGIFTTSSSVFKGSAVCVYHLSDIQTVFNGPFAHKEGPNHQLISYQGRIPYPRP' \
+                            'GTCPGGAFTPNMRTTKEFPDDVVTFIRNHPLMYNSIYPIHKRPLIVRIGTDYKYTKIAVDRVNAADGRYHVLFLGTDRGTVQKVVVL' \
+                            'PTNNSVSGELILEELEVFKNHAPITTMKISSKKQQLYVSSNEGVSQVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRR' \
+                            'SRRQDVRHGNPLTQCR'
+        cls.NAME_1_A = cls.FASTA_FILE_1_A.split('.')[0]
+        cls.XML_FILE_1_A = cls.NAME_1_A + '.xml'
+        cls.FASTA_STR_1_A = ">" + cls.NAME_1_A + "\n" + cls.FASTA_SEQ_1_A
+
+        # constants related to output
+        cls.DIR_BLASTP = 'blastp'
+        cls.REL_BLASTP = '/' + cls.DIR_BLASTP
+        cls.XML_1_A_BLASTP_OUTPUT_FILE = '1_A.xml'
+
+        # constants related to blastp parameters
+        cls.SWSPRT_DB = 'swissprot'
+        cls.SWSPRT_PROTS_NUM = 20341
+        cls.ZERO_GAP = 0
+        cls.QSTRT_1 = 1
 
     # This test is not ideal. It relies on running the actual qblast and writing the result to an xml
     # file, if only once. It then runs the qblast method in src.Biopython.Biopy but also has to write the
@@ -15,13 +44,12 @@ class TestBiopython(TestCase):
     def test_run_blastp_1_A(self):
         # arrange
         Hsp_eval = "Hsp_evalue"
-        path_actual = self.PATH_TESTS_OUTPUTS + '/' + self.DIR_BLAST_SP_HS_20_20 + '/' + self.FASTA_1_A_XML
-        path_expected = self.PATH_TESTS_FILES + '/' + self.DIR_BLAST_SP_HS_20_20 + '/' + self.FASTA_1_A_XML
+        path_actual = TPaths.MC_TESTS_OUTPUT.value + self.REL_BLASTP + '/' + self.XML_1_A_BLASTP_OUTPUT_FILE
+        path_expected = TPaths.MC_TESTS_REF_FILES.value + self.REL_BLASTP + '/' + self.XML_1_A_BLASTP_OUTPUT_FILE
         # action
-        result_handle_1_A = Biopy._run_blastp(self.FASTA_1_A_STR)
-        blast_output_xml = self.FASTA_1_A_XML
-        HM.write_blast_run_to_tests_dir(self.PATH_TESTS_OUTPUTS, TestBiopython.DIR_BLAST_SP_HS_20_20,
-                                         result_handle_1_A, blast_output_xml)
+        result_handle_1_A = Biopy.run_blastp(self.FASTA_STR_1_A)
+        blast_output_xml = self.XML_1_A_BLASTP_OUTPUT_FILE
+        HM.write_blast_run_to_tests_dir(TPaths.MC_TESTS_OUTPUT.value, self.DIR_BLASTP, result_handle_1_A, blast_output_xml)
         # assert
         with open(path_actual) as actual, open(path_expected) as expected:
             for actual_line, exp_line in zip(actual, expected):
@@ -52,4 +80,3 @@ class TestBiopython(TestCase):
         if value_end_index == -1:
             raise ValueError(end_tag + " not found in: " + line)
         return float(line[value_start_index:value_end_index])
-
