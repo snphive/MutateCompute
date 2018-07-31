@@ -2,6 +2,7 @@ import yaml
 import os
 import traceback
 from src.Paths import Paths
+from src.GeneralUtilityMethods import GUM
 # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
 # to perform as well as how to run these computations
 
@@ -61,21 +62,19 @@ class Cluster(object):
     # Named arguments are used here to allow default values to be set.
     # It means that the caller of this method must also pass named parameters to the method.
     #
-    # job_name                 N specifies job name, e.g. concatenation of mutant name + computation-specific prefix
-    # using_runscript          True/False using runscript (hence running FoldX)
-    # python_script_with_path  Which script to run with python command to run it
-    # queue                    q specifies which oge queue you want to use, e.g. 'all.q' for all queues
+    # job_name                 N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
+    # job_q_dest               Name of destination directory for this job.q file. Root is fixed to /config/cluster_jobq.
+    # using_runscript          True/False using runscript (hence running FoldX).
+    # python_script_with_path  Which script to run with python command to run it.
+    # queue                    q specifies which oge queue you want to use, e.g. 'all.q' for all queues.
     # n_slots                  serial is number of slots you want your job to use. There are 8 slots per cluster node.
-    # total_memory_GB          mem_free is the total amount of memory (here as GB) you expect your job will need
-    # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use
-    # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib
+    # total_memory_GB          mem_free is the total amount of memory (here as GB) you expect your job will need.
+    # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use.
+    # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
     @staticmethod
-    def write_job_q_bash(job_name, path_job_q_dest, using_runscript=True, python_script_with_paths='', queue='',
+    def write_job_q_bash(job_name, job_q_dest_dir, using_runscript=True, python_script_with_paths='', queue='',
                          n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
-        if not os.path.exists(path_job_q_dest):
-            traceback.print_exc()
-            raise ValueError('Destination path for job.q is missing. It must be created first')
-            return
+        path_job_q_dest = GUM.create_dir_tree(Paths.MC_CONFIG_JOBQ, job_q_dest_dir)
 
         job_q = []
         job_q.append('#!/bin/bash\n'+'#$ -N '+job_name+'\n'+'#$ -V\n')
