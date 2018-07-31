@@ -1,8 +1,6 @@
-import yaml
-import os
-import traceback
 from src.Paths import Paths
 from src.GeneralUtilityMethods import GUM
+
 # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
 # to perform as well as how to run these computations
 
@@ -49,16 +47,6 @@ from src.GeneralUtilityMethods import GUM
 
 class Cluster(object):
 
-    with open("/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml", 'r') as stream:
-
-        try:
-            paths_and_dictionaries = yaml.load(stream)
-            path_zeus_FoldX_exe = paths_and_dictionaries['ROOT']['path_zeus_FoldX_exe']
-            path_local_FoldX_exe = paths_and_dictionaries['ROOT']['path_local_FoldX_exe']
-
-        except yaml.YAMLError as exc:
-            print(exc)
-
     # Named arguments are used here to allow default values to be set.
     # It means that the caller of this method must also pass named parameters to the method.
     #
@@ -74,7 +62,7 @@ class Cluster(object):
     @staticmethod
     def write_job_q_bash(job_name, job_q_dest_dir, using_runscript=True, python_script_with_paths='', queue='',
                          n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
-        path_job_q_dest = GUM.create_dir_tree(Paths.MC_CONFIG_JOBQ, job_q_dest_dir)
+        path_job_q_dest = GUM.create_dir_tree(Paths.MC_CONFIG_JOBQ.value, job_q_dest_dir)
 
         job_q = []
         job_q.append('#!/bin/bash\n'+'#$ -N '+job_name+'\n'+'#$ -V\n')
@@ -104,7 +92,7 @@ class Cluster(object):
         job_q.append('#$ -cwd\n' + 'source ~/.bash_profile\n')
 
         if using_runscript:
-            job_q.append(Paths.PATH_ZEUS_FOLDX_EXE + ' -runfile runscript.txt\n')
+            job_q.append(Paths.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt\n')
 
         if python_script_with_paths != '':
             job_q.append('python ' + python_script_with_paths + '\n')
