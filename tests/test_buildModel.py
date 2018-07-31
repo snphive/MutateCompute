@@ -4,7 +4,7 @@ from src.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 from unittest.mock import patch
 from tests.HelperMethods import HM
-from tests.PathsForTests import PFT
+from tests.TestPaths import TPaths
 
 
 # Note: A test pdb is used here which is taken from the RepairPDBs folder, but includes only the first 5 residues of
@@ -13,15 +13,11 @@ from tests.PathsForTests import PFT
 class TestBuildModel(TestCase):
 
     def setUp(self):
-        HM.remove_tests_Inputs_Outputs_folders()
-        self.path_zeus_foldx_exe = '/switchlab/group/tools/FoldX_2015/FoldX'
-        self.path_local_foldx_exe = '/Users/u0120577/SNPEFFECT/executables/FoldX'
         foldx = FoldX()
-        self.buildModel = foldx.BuildModel(self.path_zeus_foldx_exe, self.path_local_foldx_exe)
+        self.buildModel = foldx.BuildModel(TPaths.ZEUS_FOLDX_EXE.value, TPaths.LOCAL_FOLDX_EXE.value)
 
     def tearDown(self):
         self.buildModel = None
-        # HM.remove_tests_Inputs_Outputs_folders()
 
     @patch('subprocess.call')
     @patch.object(Cluster, 'write_job_q_bash')
@@ -51,8 +47,8 @@ class TestBuildModel(TestCase):
         mutant_aa_list = ['A', 'C']
         pdb = 'RepairPDB_1.pdb'
         # action
-        self.buildModel.mutate_residues_of_pdb(PFT.PATH_TESTS_INPTS, PFT.PATH_TESTS_OUTPTS, pdb, mutant_aa_list,
-                                               write_wt_fasta_files)
+        self.buildModel.mutate_residues_of_pdb(TPaths.MC_TESTS_INPUT.value, TPaths.MC_TESTS_OUTPUT.value, pdb,
+                                               mutant_aa_list, write_wt_fasta_files)
         # assert
         expected_call_count_1 = 1
         expected_call_count_20 = len(mock__make_fx_mutant_name_list.return_value)
