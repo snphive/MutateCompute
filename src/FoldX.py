@@ -37,8 +37,8 @@ class FoldX(object):
             pdbname = pdb.split('.')[0]
             path_Inputs_PDBs_pdbname = GUM.create_dir_tree(path_Inputs, 'PDBs', pdbname)
             path_runscript_dest = GUM.create_dir_tree(path_Inputs_PDBs_pdbname, 'FX_BuildModel')
-            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdb(pdb, path_Inputs, path_Outputs,
-                                                                                  write_wt_fasta_files)
+            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdb(pdb, path_Inputs, write_wt_fasta_files,
+                                                                                path_Outputs)
             fx_mutant_name_list = self._make_fx_mutant_name_list(mutate_to_aa_list, pdbname_chain_fasta_dict)
 
             if not os.path.exists(path_runscript_dest):
