@@ -3,7 +3,7 @@ from src.GeneralUtilityMethods import GUM
 from tests.HelperMethods import HM
 import os
 from unittest.mock import patch
-from tests.PathsForTests import PFT
+from tests.TestPaths import TPaths
 import subprocess
 
 
@@ -14,21 +14,13 @@ class TestGUM(TestCase):
     # The data in those main folders will be programmatically generated but is currently manually transferred.
     @classmethod
     def setUpClass(cls):
-        if not os.path.exists(PFT.PATH_TESTS_CONFIG.value):
-            GUM.linux_copy(path_src=PFT.PATH_CONFIG_FOR_READ_ONLY.value, path_dst=PFT.PATH_TESTS_CONFIG.value,
+        if not os.path.exists(TPaths.MC_TESTS_CONFIG.value):
+            GUM.linux_copy(path_src=TPaths.CONFIG_FOR_READ_ONLY.value, path_dst=TPaths.MC_TESTS_CONFIG.value,
                            do_recursively=True)
 
-        if not os.path.exists(PFT.PATH_TESTS_INPUT.value):
-            GUM.linux_copy(path_src=PFT.PATH_INPUT_FOR_READ_ONLY.value, path_dst=PFT.PATH_TESTS_INPUT.value,
+        if not os.path.exists(TPaths.MC_TESTS_INPUT.value):
+            GUM.linux_copy(path_src=TPaths.INPUT_FOR_READ_ONLY.value, path_dst=TPaths.MC_TESTS_INPUT.value,
                            do_recursively=True)
-
-
-    # def setUp(self):
-    #     # HM.remove_tests_Inputs_Outputs_folders()
-    #
-    # def tearDown(self):
-    #     # HM.remove_tests_Inputs_Outputs_folders()
-
 
     # Write_runscript_for_pdbs() takes 6 arguments. The last 3 (namely show_sequence_detail, print_networks,
     # calculate_stability) are keyword (named) arguments. All have default values assigned in the method argument so
@@ -40,7 +32,7 @@ class TestGUM(TestCase):
     def test_write_runscript_for_pdbs(self):
         # arrange
         pdb = 'RepairPDB_1.pdb'
-        path_runscript = PFT.PATH_TESTS_CONFIG_FX
+        path_runscript = TPaths.MC_TESTS_CONFIG_FX
         if not os.path.exists(path_runscript):
             os.makedirs(path_runscript)
         action = '<BuildModel>#,individual_list.txt'
@@ -57,13 +49,12 @@ class TestGUM(TestCase):
         self.assertEqual(actual_runscript, expected_runscript)
         self.assertNotEqual(actual_runscript, not_expected_runscript)
 
-
     # CHECK WHAT HAPPENS IF THERE ARE FEWER FILES THAN SPECIFIED TO MOVE BY TOTAL_NUM_TO_COPY
     # @patch.object(GUM, '_make_subfoldername')
     def test_copy_and_move_pdb_files(self):
         # arrange
-        path_src_dir = PFT.PATH_TESTS_INPUT.value
-        path_dst_dir = PFT.PATH_TESTS_OUTPUT.value
+        path_src_dir = TPaths.MC_TESTS_INPUT.value
+        path_dst_dir = TPaths.MC_TESTS_OUTPUT.value
         starting_num = 1
         # action
         GUM.copy_and_move_pdb_files(path_src_dir, path_dst_dir, starting_num, total_num_to_copy=9)
