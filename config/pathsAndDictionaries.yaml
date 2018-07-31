@@ -15,6 +15,7 @@ ROOT:
     # relative paths - common to both cluster and local trees
     path_rel_config: '/config'
     path_rel_config_agadconfig: '/config/agadir_config'
+    path_rel_config_clustjobq: '/config/cluster_jobq'
     path_rel_config_fxconfig: '/config/foldx_config'
     path_rel_config_globoptions: '/config/global_options'
     path_rel_config_fxconf_acrunscript: '/config/foldx_config/ac_runscript'
