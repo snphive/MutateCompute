@@ -48,8 +48,9 @@ class TestBiopython(TestCase):
         path_expected = TPaths.MC_TESTS_REF_FILES.value + self.REL_BLASTP + '/' + self.XML_1_A_BLASTP_OUTPUT_FILE
         # action
         result_handle_1_A = Biopy.run_blastp(self.FASTA_STR_1_A)
-        blast_output_xml = self.XML_1_A_BLASTP_OUTPUT_FILE
-        HM.write_blast_run_to_tests_dir(TPaths.MC_TESTS_OUTPUT.value, self.DIR_BLASTP, result_handle_1_A, blast_output_xml)
+        blastp_output_xml = self.XML_1_A_BLASTP_OUTPUT_FILE
+        HM.write_blastp_to_tests_dir(TPaths.MC_TESTS_OUTPUT.value, self.DIR_BLASTP, result_handle_1_A,
+                                     blastp_output_xml)
         # assert
         with open(path_actual) as actual, open(path_expected) as expected:
             for actual_line, exp_line in zip(actual, expected):
