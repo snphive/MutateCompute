@@ -1,48 +1,35 @@
 import os
 import shutil
 from src.GeneralUtilityMethods import GUM
+from tests.TestPaths import TPaths
 
 
+# A collection of "helper" methods to be used by unit tests.
 class HM(object):
 
-    # paths common to both input & output
-    path_tests = '/Users/u0120577/PycharmProjects/MutateCompute/tests'
-    rel_path_PDBs = '/PDBs'
-    rel_path_FoldX = '/FoldX'
-    # input paths only
-    rel_path_Inputs = '/Inputs'
-    path_tests_Inputs = path_tests + rel_path_Inputs
-    path_tests_Inputs_PDBs = path_tests_Inputs + rel_path_PDBs
-    rel_path_Cluster = '/Cluster'
-    rel_path_BuildModel = '/BuildModel'
-    rel_path_Fasta = '/Fasta'
-    rel_path_Options_Agadir = '/Options/Agadir'
-    rel_path_Options_FoldX = '/Options/FoldX'
-    rel_path_Options_Cluster = '/Options/Cluster'
-    # output paths only
-    rel_path_Outputs = '/Outputs'
-    path_tests_Outputs = path_tests + rel_path_Outputs
-    rel_path_BuildModel = '/BuildModel'
-    rel_path_AnalyseComplex = '/AnalyseComplex'
+    @staticmethod
+    def remove_tests_input_output_dirs():
+        if os.path.exists(TPaths.MC_TESTS.value):
+            if os.path.exists(TPaths.MC_TESTS_INPUT.value):
+                HM.__delete_subdirectory_tree_of_tests(TPaths.MC_TESTS_INPUT.value)
+            if os.path.exists(TPaths.MC_TESTS_OUTPUT.value):
+                HM.__delete_subdirectory_tree_of_tests(TPaths.MC_TESTS_OUTPUT.value)
 
     @staticmethod
-    def remove_tests_Inputs_Outputs_folders():
-        if os.path.exists(HM.path_tests):
-            if os.path.exists(HM.path_tests_Inputs):
-                HM.__delete_directory_tree_of_tests_InputsOutputs(HM.rel_path_Inputs.strip('/'))
-            if os.path.exists(HM.path_tests_Outputs):
-                HM.__delete_directory_tree_of_tests_InputsOutputs(HM.rel_path_Outputs.strip('/'))
+    def remove_config_folders():
+        if os.path.exists(TPaths.MC_TESTS.value):
+            if os.path.exists(TPaths.MC_TESTS_CONFIG.value):
+                HM.__delete_subdirectory_tree_of_tests(TPaths.REL_CONFIG.value)
 
     @staticmethod
-    def __delete_directory_tree_of_tests_InputsOutputs(rel_path_InputsOutputs):
-        os.chdir(HM.path_tests)
-        print(os.getcwd())
-        if not os.getcwd() == '/Users/u0120577/PycharmProjects/MutateCompute/tests':
-            raise ValueError('Current working directory is not MutateCompute/tests. Not proceeding with deletion of '
-                             'inputs & outputs subfolders')
+    def __delete_subdirectory_tree_of_tests(path_to_delete):
+        os.chdir(TPaths.MC_TESTS.value)
+        if not os.getcwd() == TPaths.MC_TESTS.value:
+            raise ValueError('Current working directory is not MutateCompute/tests. '
+                             '\nNot proceeding with deletion of ' + path_to_delete)
         else:
             try:
-                shutil.rmtree(rel_path_InputsOutputs)
+                shutil.rmtree('/' + path_to_delete)
             except OSError as e:
                 print("Error removing: %s - %s." % (e.filename, e.strerror))
 
