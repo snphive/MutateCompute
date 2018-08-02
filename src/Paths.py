@@ -8,13 +8,15 @@ from enum import Enum
 # All paths are absolute paths unless prefix with an "REL_" which indicates they are relative paths.
 class Paths(Enum):
 
-    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml'
+    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/configuration/pathsAndDictionaries.yaml'
 
     with open(YAML_FILE, 'r') as stream:
 
         try:
 
             paths_and_dictionaries = yaml.load(stream)
+
+            # ABSOLUTE PATHS
             ZEUS_R_EXE = paths_and_dictionaries['ROOT']['path_zeus_r_exe']
             ZEUS_FOLDX_EXE = paths_and_dictionaries['ROOT']['path_zeus_fx_exe']
             ZEUS_AGADIR_EXE = paths_and_dictionaries['ROOT']['path_zeus_agad_exe']
@@ -26,6 +28,9 @@ class Paths(Enum):
             ZEUS_SNPEFFECT = paths_and_dictionaries['ROOT']['path_zeus_snpeffect']
             LOCAL_MUTATECOMPUTE = paths_and_dictionaries['ROOT']['path_local_mutatecompute']
 
+            LOCAL_PDB_REPO = paths_and_dictionaries['ROOT']['/Users/u0120577/PDB_repository']
+
+            #  RELATIVE PATHS
             REL_CONFIG = paths_and_dictionaries['ROOT']['path_rel_config']
             REL_CONFIG_AGAD = paths_and_dictionaries['ROOT']['path_rel_config_agadconfig']
             REL_CONFIG_JOBQ = paths_and_dictionaries['ROOT']['path_rel_config_clustjobq']
@@ -41,6 +46,7 @@ class Paths(Enum):
             REL_FX_BM = paths_and_dictionaries['ROOT']['path_rel_fx_bm']
             REL_FX_REP = paths_and_dictionaries['ROOT']['path_rel_fx_rep']
             REL_MUTATE_FASTA = paths_and_dictionaries['ROOT']['path_rel_mutatefasta']
+            REL_PDB_REPO = paths_and_dictionaries['ROOT']['path_rel_pdb_repository']
 
             # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
             MC_CONFIG = LOCAL_MUTATECOMPUTE + REL_CONFIG
@@ -61,6 +67,7 @@ class Paths(Enum):
             SE_CONFIG_FX_BMRUNSCRIPT = ZEUS_SNPEFFECT + REL_CONFIG_FX_BMRUNSCRIPT
             SE_INPUT = ZEUS_SNPEFFECT + REL_INPUT
             SE_OUTPUT = ZEUS_SNPEFFECT + REL_OUTPUT
+            SE_PDB_REPO = ZEUS_SNPEFFECT + REL_PDB_REPO
 
         except yaml.YAMLError as exc:
             print(exc)
