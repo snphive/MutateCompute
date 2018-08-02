@@ -1,9 +1,9 @@
 from enum import Enum
 
 
-# All paths are constants and stored in the config directory in 'pathsAndDictionaries' yaml file.
+# All paths are constants and stored in the configuration directory in 'pathsAndDictionaries' yaml file.
 # They are read into the Paths enum from which all other classes source all path strings.
-# However for tests, the absolute paths are directed towards the "tests" directory, so do not access the yaml config.
+# However for tests, the absolute paths are directed towards the "tests" directory, so do not access the yaml configuration.
 #
 # All paths are absolute paths unless prefix with an "REL" which indicates they are relative.
 # All paths are prefixed with "PATH"
@@ -13,18 +13,18 @@ class TPaths(Enum):
     MC_TESTS = "/Users/u0120577/PycharmProjects/MutateCompute/tests"
 
     # CONFIGURATION FILES FROM MAIN DIRECTORY (i.e. real data)
-    CONFIG_FOR_READ_ONLY = "/Users/u0120577/PycharmProjects/MutateCompute/config"
+    CONFIG_FOR_READ_ONLY = "/Users/u0120577/PycharmProjects/MutateCompute/configuration"
     # INPUT FILES FROM MAIN DIRECTORY (i.e. real data)
     INPUT_FOR_READ_ONLY = "/Users/u0120577/PycharmProjects/MutateCompute/input_data"
 
-    # The following might not even be used as entire config directory is being copied straight into /tests in one go.
-    REL_CONFIG = "/config"
-    REL_CONFIG_AGAD = "/config/agadir_config"
-    REL_CONFIG_JOBQ = "/config/cluster_jobq"
-    REL_CONFIG_FX = "/config/foldx_config"
-    REL_CONFIG_GLOBAL_OPTIONS = "/config/global_options"
-    REL_CONFIG_FX_ACRUNSCRIPT = "/config/foldx_config/ac_runscript"
-    REL_CONFIG_FX_BMRUNSCRIPT = "/config/foldx_config/bm_runscript"
+    # The following might not even be used as entire configuration directory is being copied straight into /tests in one go.
+    REL_CONFIG = "/configuration"
+    REL_CONFIG_AGAD = "/configuration/agadir_config"
+    REL_CONFIG_JOBQ = "/configuration/cluster_jobq"
+    REL_CONFIG_FX = "/configuration/foldx_config"
+    REL_CONFIG_GLOBAL_OPTIONS = "/configuration/global_options"
+    REL_CONFIG_FX_ACRUNSCRIPT = "/configuration/foldx_config/ac_runscript"
+    REL_CONFIG_FX_BMRUNSCRIPT = "/configuration/foldx_config/bm_runscript"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
     MC_TESTS_CONFIG = MC_TESTS + REL_CONFIG
     MC_TESTS_CONFIG_AGAD = MC_TESTS + REL_CONFIG_AGAD

@@ -9,7 +9,7 @@ import subprocess
 
 class TestGUM(TestCase):
 
-    # Currently the tests are copying over all config and input data from the main directory into the tests before
+    # Currently the tests are copying over all configuration and input data from the main directory into the tests before
     # running the tests (i.e. here in the setUpClass method).
     # The data in those main folders will be programmatically generated but is currently manually transferred.
     @classmethod
@@ -27,7 +27,7 @@ class TestGUM(TestCase):
     # that when the method is called without supplying a (keyword-named) value, the default value is applied.
     # (The default values for all 3 are False).
     #
-    # 30.07.18 Have redesigned the directory structure such that runscripts will go in config/foldx/and maybe another
+    # 30.07.18 Have redesigned the directory structure such that runscripts will go in configuration/foldx/and maybe another
     # level such as analyse_complex or build_model or stability etc.
     def test_write_runscript_for_pdbs(self):
         # arrange

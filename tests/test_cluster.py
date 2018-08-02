@@ -8,7 +8,7 @@ from tests.HelperMethods import HM
 
 class TestCluster(TestCase):
 
-    # Currently the tests are copying over all config and input data from the main directory into the tests before
+    # Currently the tests are copying over all configuration and input data from the main directory into the tests before
     # running the tests (i.e. here in the setUpClass method).
     # The data in those main folders will be programmatically generated but is currently manually transferred.
     @classmethod

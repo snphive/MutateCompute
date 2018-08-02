@@ -20,7 +20,7 @@ class TestScheduler(TestCase):
     global dict_aa_3to1
     global list_all_20_aa
 
-    with open("~/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml", 'r') as stream:
+    with open("~/PycharmProjects/MutateCompute/configFiles/pathsAndDictionaries.yaml", 'r') as stream:
         try:
 
             paths_and_dictionaries = yaml.load(stream)
