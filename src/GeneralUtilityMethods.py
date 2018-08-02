@@ -33,7 +33,7 @@ class GUM(object):
     # print_networks        Boolean     True to output network data on .. ?
     # calculate_stability   Boolean     True include a stability calculation.
     #
-    # 30.07.18 Have redesigned the directory structure such that runscripts will go in config/foldx/and maybe another
+    # 30.07.18 Redesigned the directory structure such that runscripts will go in configuration/foldx/ & maybe another
     # level such as analyse_complex or build_model or stability etc.
     @staticmethod
     def write_runscript_for_pdbs(path_runscript, pdbs, action, show_sequence_detail=False, print_networks=False,

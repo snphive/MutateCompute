@@ -51,7 +51,7 @@ class Cluster(object):
     # It means that the caller of this method must also pass named parameters to the method.
     #
     # job_name                 N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
-    # job_q_dest               Name of destination directory for this job.q file. Root is fixed to /config/cluster_jobq.
+    # job_q_dest               Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
     # using_runscript          True/False using runscript (hence running FoldX).
     # python_script_with_path  Which script to run with python command to run it.
     # queue                    q specifies which oge queue you want to use, e.g. 'all.q' for all queues.

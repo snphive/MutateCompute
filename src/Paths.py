@@ -2,7 +2,7 @@ import yaml
 from enum import Enum
 
 
-# All paths are constants and stored in the config directory in 'pathsAndDictionaries' yaml file.
+# All paths are constants and stored in the configuration directory in 'pathsAndDictionaries' yaml file.
 # They are read into the Paths enum from which all other classes source all path strings.
 #
 # All paths are absolute paths unless prefix with an "REL_" which indicates they are relative paths.
