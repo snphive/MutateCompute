@@ -23,7 +23,7 @@ class IdProt(object):
     def start(path_fasta_file, write_blastp_json, build_idmap_csv, path_output):
         fasta_file = path_fasta_file.split('/')[-1]
         filename = fasta_file.split('.')[0]
-        fasta_str = IdProt._read_fasta_file(path_fasta_file)
+        fasta_str = GUM.read_fasta_file(path_fasta_file)
         blastp_result = Biopy.run_blastp(fasta_str)
         path_blastp_xml_result = IdProt._write_blastp_xml_result(path_output, filename, blastp_result)
         blastp_result_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blastp_xml_result, filename, path_fasta_file)
@@ -34,16 +34,9 @@ class IdProt(object):
             IdProt._write_idmap_csv(path_output, filename, id_map)
         return blastp_result_dict
 
-    # Reads FASTA input file in and returns the text including the >name, the /n, and the amino acid sequence.
-    #
-    # path_fasta_file       String      FASTA file (with .fasta extension) and absolute path to the file.
-    @staticmethod
-    def _read_fasta_file(path_fasta_file):
-        with open(path_fasta_file) as fasta_io:
-            fasta_str = fasta_io.read()
-        return fasta_str
-
-    #
+    # path_output           String
+    # filename              String
+    # blastp_result         ?
     @staticmethod
     def _write_blastp_xml_result(path_output, filename, blastp_result):
         path_output = GUM.create_dir_tree(path_output, filename, IdProt.DIR_BLASTP)
