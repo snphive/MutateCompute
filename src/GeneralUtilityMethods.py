@@ -4,6 +4,7 @@ import os
 import shutil
 from src.AminoAcids import AA
 import warnings
+from src.Paths import Paths
 import multiprocessing as mp
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
@@ -137,6 +138,7 @@ class GUM(object):
             fasta_file.close()
 
     # For the pdb passed here, all chains are read from the pdb file and returned as a list of chain character(s).
+    #
     # pdb               pdb (io file?)      The pdb file (with ",pdb" extension).
     # rel_path_to_pdb   String              The relative path to the pdb.
     @staticmethod
@@ -174,25 +176,23 @@ class GUM(object):
     #
     # path_to_fasta     String      The path to the fasta file.
     @staticmethod
-    def get_fasta_sequence(path_to_fasta):
+    def get_sequence_only_from_fasta_file(path_to_fasta):
+        with open(path_to_fasta, 'r').readlines() as fasta_lines:
+            if len(fasta_lines) > 2 or len(fasta_lines) < 1:
+                raise ValueError('There is either an extra unexpected carriage return or no sequence data at all')
+            fasta_seq = fasta_lines[1] if len(fasta_lines) == 2 else fasta_lines[0]
+        return fasta_seq
 
-        fasta_lines = open(path_to_fasta, 'r').readlines()
-        fasta_list = []
-
-        if len(fasta_lines) == 2:
-
-            for amino_acid in fasta_lines[1]:
-                fasta_list.append(amino_acid)
-
-        else:
-
-            for fasta_line in fasta_lines[1:]:
-
-                for amino_acid in fasta_line:
-                    fasta_list.append(amino_acid)
-
-        fasta = ''.join(fasta_list)
-        return fasta
+    @staticmethod
+    def get_title_sequence_dict_from_fasta_file(path_to_fasta):
+        title_sequence_dict = {}
+        with open(path_to_fasta, 'r').readlines() as fasta_lines:
+            if len(fasta_lines) > 2 or len(fasta_lines) < 1:
+                raise ValueError('There is either an extra unexpected carriage return or no sequence data at all')
+            title = fasta_lines[0] if len(fasta_lines) == 2 else os.path.splitext(path_to_fasta)[0]
+            fasta_seq = fasta_lines[1] if len(fasta_lines) == 2 else fasta_lines[0]
+            title_sequence_dict[title] = fasta_seq
+        return title_sequence_dict
 
     ###################################################################################################################
     # Builds a directory tree with any number of child nodes. Each new node is only ever one level down (siblings).
@@ -295,9 +295,6 @@ class GUM(object):
                 if file.endswith('.pdb') and file in target_file_list:
                     shutil.move(path_src_dir + GUM.fslash + file, path_src_dir_subfoldername + GUM.fslash + file)
 
-            # copy_linux_cmd = 'cp' + GUM.space + '-r' + GUM.space + path_src_dir_subfoldername + GUM.space + \
-            #                  path_dst_dir_subfoldername
-            # subprocess.call(copy_linux_cmd, shell=True)
             GUM.linux_copy(path_src_dir_subfoldername, path_dst_dir_subfoldername, do_recursively=True)
 
     # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
@@ -306,12 +303,74 @@ class GUM(object):
     def _make_subfoldername(starting_num, total_num_to_copy):
         return str(starting_num) + '...' + str(total_num_to_copy)
 
+    # Reads FASTA input file in and returns the text including the >name, the /n, and the amino acid sequence.
+    #
+    # path_fasta_file       String      FASTA file (with .fasta extension) and absolute path to the file.
+    @staticmethod
+    def read_fasta_file(path_fasta_file):
+        with open(path_fasta_file) as fasta_io:
+            fasta_str = fasta_io.read()
+        return fasta_str
 
     @staticmethod
     def linux_copy(path_src, path_dst, do_recursively):
-        recurse = (GUM.space + '-r') if do_recursively else ''
-        cmd = 'cp' + recurse + GUM.space + path_src + GUM.space + path_dst
+        recurse_cmd = (GUM.space + '-r') if do_recursively else ''
+        cmd = 'cp' + recurse_cmd + GUM.space + path_src + GUM.space + path_dst
         subprocess.call(cmd, shell=True)
+
+    # Moves files from one directory to another list of directories that bear the same name.
+    # Typically this method is used for getting a list of pdbs from a directory and copying them over to the
+    # directories in the input_data folder which should already have a folder for each of the listed directories
+    # which are passed as
+    @staticmethod
+    def copy_input_files_from_repo_to_input(path_src_dir, path_dst_dir_list):
+        file_list = os.listdir(path_src_dir)
+        for path_dst_dir in path_dst_dir_list:
+
+            GUM.linux_copy()
+
+            GUM.create_dir_tree_one_level(path_root_input, input_pdb_list, input_fasta_list)
+
+
+
+
+
+
+
+
+    # BEWARE OF THE REMOVE METHODS AS THEY WILL PERMANENTLY DELETE THE SPECIFIED INPUT, OUTPUT OR CONFIG FOLDER!
+    @staticmethod
+    def remove_input_dirs():
+        time
+        if os.path.exists(Paths.MC_INPUT.value):
+            GUM.__delete_subdirectory_tree_of_tests(Paths.MC_INPUT.value)
+
+    # BEWARE OF THE REMOVE METHODS AS THEY WILL PERMANENTLY DELETE THE SPECIFIED INPUT, OUTPUT OR CONFIG FOLDER!
+    @staticmethod
+    def remove_output_dirs():
+        if os.path.exists(Paths.MC_OUTPUT.value):
+            GUM.__delete_subdirectory_tree_of_tests(Paths.MC_OUTPUT.value)
+
+    # BEWARE OF THE REMOVE METHODS AS THEY WILL PERMANENTLY DELETE THE SPECIFIED INPUT, OUTPUT OR CONFIG FOLDER!
+    @staticmethod
+    def remove_config_folders():
+        if os.path.exists(Paths.MC_CONFIG.value):
+            GUM.__delete_subdirectory_tree_of_tests(Paths.REL_CONFIG.value)
+
+    # NEVER EVER CALL THIS PRIVATE METHOD FROM ANYWHERE. IT IS DESIGNED TO ONLY BE CALLED BY THE REMOVE METHODS ABOVE.
+    @staticmethod
+    def __delete_subdirectory_tree_of_tests(path_to_delete):
+        os.chdir(Paths.MC_TESTS.value)
+        if not os.getcwd() == Paths.MC_TESTS.value:
+            raise ValueError('Current working directory is not MutateCompute/tests. '
+                             '\nNot proceeding with deletion of ' + path_to_delete)
+        else:
+            try:
+                shutil.rmtree('/' + path_to_delete)
+            except OSError as e:
+                print("Error removing: %s - %s." % (e.filename, e.strerror))
+
+
 
     # @staticmethod
     # def perform_local_multithreading(process_method_name, file_to_process):
