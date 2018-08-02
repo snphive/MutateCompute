@@ -5,7 +5,7 @@ from enum import Enum
 # Name of enum may change from AminoAcids.AA if other types of data are stored here in future.
 class AA(Enum):
 
-    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml'
+    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/configuration/pathsAndDictionaries.yaml'
 
     with open(YAML_FILE.value, 'r') as stream:
 
