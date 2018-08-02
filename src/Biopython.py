@@ -40,11 +40,14 @@ class Biopy(object):
     # remotely is only reduced from 22 to 21 seconds. However, the output xml is reduced in size from 77 KB to 15 KB.
     # The remaining data blast_record are not used so nothing is lost by reducing the scope of the analysis. We are
     # only looking for 100 % identity anyway. NOTE: occasionally the qblast took over 4 minutes!
+    #
+    # fasta          String     The text of a fasta file including >title/n and sequence (standard FASTA format).
+    # returns what biopython's NCBIWWW.qblast method returns, which is a io file.
     @staticmethod
-    def run_blastp(fasta_input_str):
+    def run_blastp(fasta):
         return NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
                               database=Biopy.BlastParam.SWSPRT.value,
-                              sequence=fasta_input_str,
+                              sequence=fasta,
                               entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
                               alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
                               hitlist_size=Biopy.BlastParam.MAX_HIT_20.value)
