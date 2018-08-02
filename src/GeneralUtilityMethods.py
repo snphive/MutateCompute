@@ -322,18 +322,16 @@ class GUM(object):
     # Typically this method is used for getting a list of pdbs from a directory and copying them over to the
     # directories in the input_data folder which should already have a folder for each of the listed directories
     # which are passed as
-    @staticmethod
-    def copy_input_files_from_repo_to_input(path_src_dir, path_dst_dir_list):
-        file_list = os.listdir(path_src_dir)
-        for path_dst_dir in path_dst_dir_list:
-
-            GUM.linux_copy()
-
-            GUM.create_dir_tree_one_level(path_root_input, input_pdb_list, input_fasta_list)
-
-
-
-
+    # @staticmethod
+    # def copy_input_files_from_repo_to_input(path_src_dir, path_dst_dir_list):
+    #     file_list = os.listdir(path_src_dir)
+    #     for path_dst_dir in path_dst_dir_list:
+    #
+    #         GUM.linux_copy()
+    #
+    #         GUM.create_dir_tree_one_level(path_root_input, input_pdb_list, input_fasta_list)
+    #
+    # TODO
 
 
 
