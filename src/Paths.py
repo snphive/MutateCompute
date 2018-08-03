@@ -28,7 +28,7 @@ class Paths(Enum):
             ZEUS_SNPEFFECT = paths_and_dictionaries['ROOT']['path_zeus_snpeffect']
             LOCAL_MUTATECOMPUTE = paths_and_dictionaries['ROOT']['path_local_mutatecompute']
 
-            LOCAL_PDB_REPO = paths_and_dictionaries['ROOT']['/Users/u0120577/PDB_repository']
+            LOCAL_PDB_REPO = paths_and_dictionaries['ROOT']['path_local_pdb_repository']
 
             #  RELATIVE PATHS
             REL_CONFIG = paths_and_dictionaries['ROOT']['path_rel_config']
