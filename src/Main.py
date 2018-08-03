@@ -25,7 +25,7 @@ class Main(object):
         list_of_mutant_aa = Main._determine_residues_to_mutate_to()
         path_dst_pdb_dir = Paths.SE_INPUT if cluster else Paths.MC_INPUT
         path_src_pdb_dir = Paths.SE_PDB_REPO if cluster else Paths.LOCAL_PDB_REPO
-        GUM.copy_input_files_from_repo_to_input(path_src_pdb_dir, path_dst_pdb_dir, input_pdb_list, input_fasta_list)
+        GUM.copy_files_from_repo_to_input_filedir(path_src_pdb_dir, path_dst_pdb_dir, input_pdb_list, input_fasta_list)
         Main._start_scheduler(operations, Paths.MC_INPUT, input_pdb_list, input_fasta_list, list_of_mutant_aa)
 
     @staticmethod
