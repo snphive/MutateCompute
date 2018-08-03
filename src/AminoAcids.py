@@ -7,7 +7,7 @@ class AA(Enum):
 
     YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/configuration/pathsAndDictionaries.yaml'
 
-    with open(YAML_FILE.value, 'r') as stream:
+    with open(YAML_FILE, 'r') as stream:
 
         try:
 
