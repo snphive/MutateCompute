@@ -184,12 +184,12 @@ class GUM(object):
         return fasta_seq
 
     @staticmethod
-    def get_title_sequence_dict_from_fasta_file(path_to_fasta):
+    def get_title_sequence_dict_from_fasta_file(path_fasta_file):
         title_sequence_dict = {}
-        with open(path_to_fasta, 'r').readlines() as fasta_lines:
+        with open(path_fasta_file, 'r').readlines() as fasta_lines:
             if len(fasta_lines) > 2 or len(fasta_lines) < 1:
                 raise ValueError('There is either an extra unexpected carriage return or no sequence data at all')
-            title = fasta_lines[0] if len(fasta_lines) == 2 else os.path.splitext(path_to_fasta)[0]
+            title = fasta_lines[0] if len(fasta_lines) == 2 else os.path.splitext(path_fasta_file)[0]
             fasta_seq = fasta_lines[1] if len(fasta_lines) == 2 else fasta_lines[0]
             title_sequence_dict[title] = fasta_seq
         return title_sequence_dict
@@ -318,23 +318,19 @@ class GUM(object):
         cmd = 'cp' + recurse_cmd + GUM.space + path_src + GUM.space + path_dst
         subprocess.call(cmd, shell=True)
 
-    # Moves files from one directory to another list of directories that bear the same name.
-    # Typically this method is used for getting a list of pdbs from a directory and copying them over to the
-    # directories in the input_data folder which should already have a folder for each of the listed directories
-    # which are passed as
-    # @staticmethod
-    # def copy_input_files_from_repo_to_input(path_src_dir, path_dst_dir_list):
-    #     file_list = os.listdir(path_src_dir)
-    #     for path_dst_dir in path_dst_dir_list:
-    #
-    #         GUM.linux_copy()
-    #
-    #         GUM.create_dir_tree_one_level(path_root_input, input_pdb_list, input_fasta_list)
-    #
-    # TODO
-
-
-
+    # Copy and moves files from one directory (typically the pdb_repository folder) to another list of directories that
+    # bear the same name (typically the input_data folder, to create individual folders for each pdb).
+    # path_src_dir      String      Path of repository directory from which to copy input files (pdb, fasta, other)
+    # path_dst_dir      String      Path of destination directory to which copied files are transferred, via creating
+    #                               individual directories for each file, bearing the same name.
+    @staticmethod
+    def copy_input_files_from_repo_to_input(path_src_dir, path_dst_dir, copy_all_files_from_src_dir=False):
+        do_recursively = copy_all_files_from_src_dir
+        file_list = os.listdir(path_src_dir)  # file names (incl. extension)
+        # file_dir_list = os.listdir(path_dst_dir_list)
+        for file in file_list:
+            path_dst_dir_filename = GUM.create_dir_tree_one_level(path_dst_dir, file.split('.')[0])
+            GUM.linux_copy(path_src_dir + '/' + file, path_dst_dir, path_dst_dir_filename, do_recursively=False)
 
     # BEWARE OF THE REMOVE METHODS AS THEY WILL PERMANENTLY DELETE THE SPECIFIED INPUT, OUTPUT OR CONFIG FOLDER!
     @staticmethod
