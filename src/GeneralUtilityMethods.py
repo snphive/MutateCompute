@@ -1,11 +1,13 @@
-import subprocess
-import time
 import os
 import shutil
-from src.AminoAcids import AA
+import subprocess
+import time
 import warnings
+
+from src.AminoAcids import AA
 from src.Paths import Paths
-import multiprocessing as mp
+
+
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
@@ -209,17 +211,13 @@ class GUM(object):
     @staticmethod
     def create_dir_tree_one_level(path_root, *args):
         complete_paths = []
-
         if not os.path.exists(path_root):
             os.makedirs(path_root)
-
         for leaf in args:
             path_root_leaf = path_root + '/' + leaf
             complete_paths.append(path_root_leaf)
-
             if not os.path.exists(path_root_leaf):
                 os.mkdir(path_root_leaf)
-
         return complete_paths
 
     ###################################################################################################################
@@ -246,20 +244,16 @@ class GUM(object):
     @staticmethod
     def create_dir_tree(path_root, *args):
         path_root_leaf = path_root
-
         if not os.path.exists(path_root):
             os.makedirs(path_root)
-
         for leaf in args:
             path_root_leaf = path_root + '/' + leaf
-
             if not os.path.exists(path_root_leaf):
                 os.mkdir(path_root_leaf)
-            path_root = path_root_leaf
-
-        if path_root_leaf == path_root:
-            warnings.warn_explicit(message='No new directory tree was created. Returning the unchanged root.',
+            else:
+                warnings.warn_explicit(message='No new directory tree was created. Returning the unchanged root.',
                                    category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
+            path_root = path_root_leaf
         return path_root_leaf
 
     # path_src_dir          String      The path of source for pdb files to copy from.
@@ -318,53 +312,77 @@ class GUM(object):
         cmd = 'cp' + recurse_cmd + GUM.space + path_src + GUM.space + path_dst
         subprocess.call(cmd, shell=True)
 
-    # Copy and moves files from one directory (typically the pdb_repository folder) to another list of directories that
-    # bear the same name (typically the input_data folder, to create individual folders for each pdb).
+    # Copy files from a source directory (typically the pdb_repository folder) to a destination directory.
+    # This method does something extra though. It places each file in its own subdirectory, giving each the same name
+    # as the file. E.g. file1.pdb will be copied to /input_data/file1/
     # path_src_dir      String      Path of repository directory from which to copy input files (pdb, fasta, other)
     # path_dst_dir      String      Path of destination directory to which copied files are transferred, via creating
     #                               individual directories for each file, bearing the same name.
+    # copy_all_files    Boolean     False by default, otherwise it will recursively copy all files from the src to dst
     @staticmethod
-    def copy_input_files_from_repo_to_input(path_src_dir, path_dst_dir, copy_all_files_from_src_dir=False):
-        do_recursively = copy_all_files_from_src_dir
+    def copy_files_from_repo_to_input_filedir(path_src_dir, path_dst_dir, copy_all_files=False):
         file_list = os.listdir(path_src_dir)  # file names (incl. extension)
         # file_dir_list = os.listdir(path_dst_dir_list)
         for file in file_list:
-            path_dst_dir_filename = GUM.create_dir_tree_one_level(path_dst_dir, file.split('.')[0])
-            GUM.linux_copy(path_src_dir + '/' + file, path_dst_dir, path_dst_dir_filename, do_recursively=False)
+            path_dst_dir_filename = GUM.create_dir_tree(path_dst_dir, file.split('.')[0])
+            GUM.linux_copy(path_src_dir + '/' + file, path_dst_dir_filename, do_recursively=copy_all_files)
 
-    # BEWARE OF THE REMOVE METHODS AS THEY WILL PERMANENTLY DELETE THE SPECIFIED INPUT, OUTPUT OR CONFIG FOLDER!
+    # Permanently removes input_data and all contents!
     @staticmethod
-    def remove_input_dirs():
-        time
-        if os.path.exists(Paths.MC_INPUT.value):
-            GUM.__delete_subdirectory_tree_of_tests(Paths.MC_INPUT.value)
+    def remove_inputdata_dir_tree():
+        path_to_delete = Paths.MC_INPUT.value
+        GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=332)
+        if os.path.exists():
+            GUM.__delete_subdirectory_tree_of_inputdata()
 
-    # BEWARE OF THE REMOVE METHODS AS THEY WILL PERMANENTLY DELETE THE SPECIFIED INPUT, OUTPUT OR CONFIG FOLDER!
+    # Permanently removes output_data and all contents!
     @staticmethod
     def remove_output_dirs():
-        if os.path.exists(Paths.MC_OUTPUT.value):
-            GUM.__delete_subdirectory_tree_of_tests(Paths.MC_OUTPUT.value)
+        path_to_delete = Paths.MC_OUTPUT.value
+        GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=340)
+        if os.path.exists(path_to_delete):
+            GUM.__delete_subdirectory_tree_of_outputdata()
 
-    # BEWARE OF THE REMOVE METHODS AS THEY WILL PERMANENTLY DELETE THE SPECIFIED INPUT, OUTPUT OR CONFIG FOLDER!
+    # Permanently removes config and all contents!
     @staticmethod
     def remove_config_folders():
-        if os.path.exists(Paths.MC_CONFIG.value):
-            GUM.__delete_subdirectory_tree_of_tests(Paths.REL_CONFIG.value)
+        path_to_delete = Paths.MC_CONFIG.value
+        GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=348)
+        if os.path.exists(path_to_delete):
+            GUM.__delete_subdirectory_tree_of_outputdata()
 
-    # NEVER EVER CALL THIS PRIVATE METHOD FROM ANYWHERE. IT IS DESIGNED TO ONLY BE CALLED BY THE REMOVE METHODS ABOVE.
     @staticmethod
-    def __delete_subdirectory_tree_of_tests(path_to_delete):
-        os.chdir(Paths.MC_TESTS.value)
-        if not os.getcwd() == Paths.MC_TESTS.value:
-            raise ValueError('Current working directory is not MutateCompute/tests. '
-                             '\nNot proceeding with deletion of ' + path_to_delete)
-        else:
-            try:
-                shutil.rmtree('/' + path_to_delete)
-            except OSError as e:
-                print("Error removing: %s - %s." % (e.filename, e.strerror))
+    def do_userWarning_deleting_dir(dir, lineno):
+        warnings.warn_explicit(message='You are about to delete '+ dir + 'dir tree. You have 10 secs to abort!',
+                               category=UserWarning, filename='GeneralUtilityMethods.py', lineno=lineno)
+        time.sleep(10)
 
+    # PRIVATE METHOD
+    # Permanently deletes /config and all its contents.
+    @staticmethod
+    def __delete_subdirectory_tree_of_config():
+        try:
+            shutil.rmtree(Paths.MC_CONFIG.value)
+        except OSError as e:
+            print("Error removing: %s - %s." % (e.filename, e.strerror))
 
+    # PRIVATE METHOD
+    # Permanently deletes /input_data and all its contents.
+    @staticmethod
+    def __delete_subdirectory_tree_of_inputdata():
+        try:
+            shutil.rmtree(Paths.MC_INPUT.value)
+        except OSError as e:
+            print("Error removing: %s - %s." % (e.filename, e.strerror))
+
+    # PRIVATE METHOD
+    # Permanently deletes /output_data and all its contents.
+    @staticmethod
+    def __delete_subdirectory_tree_of_outputdata():
+        try:
+            shutil.rmtree(Paths.MC_OUTPUT.value)
+        except OSError as e:
+            print("Error removing: %s - %s." % (e.filename, e.strerror))
 
     # @staticmethod
     # def perform_local_multithreading(process_method_name, file_to_process):

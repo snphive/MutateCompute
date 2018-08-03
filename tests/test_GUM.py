@@ -27,12 +27,13 @@ class TestGUM(TestCase):
     # that when the method is called without supplying a (keyword-named) value, the default value is applied.
     # (The default values for all 3 are False).
     #
-    # 30.07.18 Have redesigned the directory structure such that runscripts will go in configuration/foldx/and maybe another
+    # 30.07.18 Have redesigned the directory structure such that runscripts will go in configuration/foldx/and maybe
+    # another
     # level such as analyse_complex or build_model or stability etc.
     def test_write_runscript_for_pdbs(self):
         # arrange
         pdb = 'RepairPDB_1.pdb'
-        path_runscript = TPaths.MC_TESTS_CONFIG_FX
+        path_runscript = TPaths.MC_TESTS_CONFIG_FX.value
         if not os.path.exists(path_runscript):
             os.makedirs(path_runscript)
         action = '<BuildModel>#,individual_list.txt'
@@ -61,3 +62,15 @@ class TestGUM(TestCase):
         # assert
         # expected_call_count_1 = 1
         # self.assertEqual(expected_call_count_1, mock_make_subfoldername.call_count)
+
+    def test_copy_input_files_from_repo_to_input(self):
+        # arrange
+        path_src_dir = '/Users/u0120577/PDB_repo10'
+        path_dst_dir = TPaths.MC_TESTS_INPUT.value
+        files = os.listdir(path_src_dir)
+        subprocess.call('cp -r /Users/u0120577/PDB_repo10 ' + TPaths.MC_TESTS_REFFILES.value, shell=True)
+        # action
+        GUM.copy_files_from_repo_to_input_filedir(path_src_dir, path_dst_dir)
+        # assert
+        for file in files:
+            self.assertTrue(os.path.exists(TPaths.MC_TESTS_INPUT.value + '/' + file.split('.')[0] + '/' + file))
