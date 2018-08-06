@@ -7,7 +7,7 @@ from enum import Enum
 #
 # All paths are absolute paths unless prefix with an "REL" which indicates they are relative.
 # All paths are prefixed with "PATH"
-class TPaths(Enum):
+class TPL(Enum):
 
     # ABSOLUTE PATHS FOR TESTS ROOT
     MC_TESTS = "/Users/u0120577/PycharmProjects/MutateCompute/tests"

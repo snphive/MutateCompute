@@ -3,7 +3,7 @@ from src.GeneralUtilityMethods import GUM
 from tests.HelperMethods import HM
 import os
 from unittest.mock import patch
-from tests.TestPaths import TPaths
+from tests.TestPathsAndLists import TPL
 import subprocess
 
 
@@ -14,12 +14,12 @@ class TestGUM(TestCase):
     # The data in those main folders will be programmatically generated but is currently manually transferred.
     @classmethod
     def setUpClass(cls):
-        if not os.path.exists(TPaths.MC_TESTS_CONFIG.value):
-            GUM.linux_copy(path_src=TPaths.CONFIG_FOR_READ_ONLY.value, path_dst=TPaths.MC_TESTS_CONFIG.value,
+        if not os.path.exists(TPL.MC_TESTS_CONFIG.value):
+            GUM.linux_copy(path_src=TPL.CONFIG_FOR_READ_ONLY.value, path_dst=TPL.MC_TESTS_CONFIG.value,
                            do_recursively=True)
 
-        if not os.path.exists(TPaths.MC_TESTS_INPUT.value):
-            GUM.linux_copy(path_src=TPaths.INPUT_FOR_READ_ONLY.value, path_dst=TPaths.MC_TESTS_INPUT.value,
+        if not os.path.exists(TPL.MC_TESTS_INPUT.value):
+            GUM.linux_copy(path_src=TPL.INPUT_FOR_READ_ONLY.value, path_dst=TPL.MC_TESTS_INPUT.value,
                            do_recursively=True)
 
     # Write_runscript_for_pdbs() takes 6 arguments. The last 3 (namely show_sequence_detail, print_networks,
@@ -33,7 +33,7 @@ class TestGUM(TestCase):
     def test_write_runscript_for_pdbs(self):
         # arrange
         pdb = 'RepairPDB_1.pdb'
-        path_runscript = TPaths.MC_TESTS_CONFIG_FX.value
+        path_runscript = TPL.MC_TESTS_CONFIG_FX.value
         if not os.path.exists(path_runscript):
             os.makedirs(path_runscript)
         action = '<BuildModel>#,individual_list.txt'
@@ -54,8 +54,8 @@ class TestGUM(TestCase):
     # @patch.object(GUM, '_make_subfoldername')
     def test_copy_and_move_pdb_files(self):
         # arrange
-        path_src_dir = TPaths.MC_TESTS_INPUT.value
-        path_dst_dir = TPaths.MC_TESTS_OUTPUT.value
+        path_src_dir = TPL.MC_TESTS_INPUT.value
+        path_dst_dir = TPL.MC_TESTS_OUTPUT.value
         starting_num = 1
         # action
         GUM.copy_and_move_pdb_files(path_src_dir, path_dst_dir, starting_num, total_num_to_copy=9)
@@ -66,11 +66,11 @@ class TestGUM(TestCase):
     def test_copy_input_files_from_repo_to_input(self):
         # arrange
         path_src_dir = '/Users/u0120577/PDB_repo10'
-        path_dst_dir = TPaths.MC_TESTS_INPUT.value
+        path_dst_dir = TPL.MC_TESTS_INPUT.value
         files = os.listdir(path_src_dir)
-        subprocess.call('cp -r /Users/u0120577/PDB_repo10 ' + TPaths.MC_TESTS_REFFILES.value, shell=True)
+        subprocess.call('cp -r /Users/u0120577/PDB_repo10 ' + TPL.MC_TESTS_REFFILES.value, shell=True)
         # action
         GUM.copy_files_from_repo_to_input_filedir(path_src_dir, path_dst_dir)
         # assert
         for file in files:
-            self.assertTrue(os.path.exists(TPaths.MC_TESTS_INPUT.value + '/' + file.split('.')[0] + '/' + file))
+            self.assertTrue(os.path.exists(TPL.MC_TESTS_INPUT.value + '/' + file.split('.')[0] + '/' + file))

@@ -12,9 +12,13 @@ ROOT:
     path_zeus_snpeffect: '/switchlab/group/shazib/SnpEffect'
     path_local_mutatecompute: '/Users/u0120577/PycharmProjects/MutateCompute'
 
+    # path to local datasets
+    path_local_pdb_repository: '/Users/u0120577/PDB_repository'
+
     # relative paths - common to both cluster and local trees
     path_rel_config: '/configuration'
     path_rel_config_agadconfig: '/configuration/agadir_config'
+    path_rel_config_clustjobq: '/configuration/cluster_jobq'
     path_rel_config_fxconfig: '/configuration/foldx_config'
     path_rel_config_globoptions: '/configuration/global_options'
     path_rel_config_fxconf_acrunscript: '/configuration/foldx_config/ac_runscript'
@@ -28,7 +32,10 @@ ROOT:
     path_rel_fx_bm: '/foldx/build_model'
     path_rel_fx_rep: '/foldx/repair'
     path_rel_mutatefasta: '/mutate_fasta'
+    path_rel_pdb_repository: '/PDB_repository'
 
+
+    # dictionaries & lists (amino acids)
     dict_aa_1to3:
         A: ALA
         C: CYS

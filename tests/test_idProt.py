@@ -7,7 +7,7 @@ from Bio.Blast import NCBIXML
 from Bio import SeqIO
 from tests.HelperMethods import HM
 from src.IdentifyProtein import IdProt
-from tests.TestPaths import TPaths
+from tests.TestPathsAndLists import TPL
 
 
 class TestIdProt(TestCase):
@@ -20,7 +20,7 @@ class TestIdProt(TestCase):
     # constants related to output - for all mutants
     DIR_BLASTP = 'blastp'
     REL_BLASTP = '/' + DIR_BLASTP
-    PATH_TESTS_REFFILES_BLASTP = TPaths.MC_TESTS_REFFILES.value + REL_BLASTP
+    PATH_TESTS_REFFILES_BLASTP = TPL.MC_TESTS_REFFILES.value + REL_BLASTP
 
     @classmethod
     def setUpClass(cls):
@@ -33,7 +33,7 @@ class TestIdProt(TestCase):
         # constants related to input - mutant 1_A
         cls.FASTA_FILE_1_A = '1_A.fasta'
         cls.DIR_PDB_1_A = '1_A'
-        cls.PATH_FASTA_1_A = TPaths.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTA_FILE_1_A
+        cls.PATH_FASTA_1_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTA_FILE_1_A
         cls.FASTA_SEQ_1_A = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -49,7 +49,7 @@ class TestIdProt(TestCase):
 
         cls.FASTA_FILE_1_B = '1_B.fasta'
         cls.DIR_PDB_1_B = '1_B'
-        cls.PATH_FASTA_1_B = TPaths.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_B + '/' + cls.FASTA_FILE_1_B
+        cls.PATH_FASTA_1_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_B + '/' + cls.FASTA_FILE_1_B
         cls.FASTA_SEQ_1_B = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -66,7 +66,7 @@ class TestIdProt(TestCase):
 
         cls.FASTA_FILE_2_A = '2_A.fasta'
         cls.DIR_PDB_2_A = '2_A'
-        cls.PATH_FASTA_2_A = TPaths.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_2_A + '/' + cls.FASTA_FILE_2_A
+        cls.PATH_FASTA_2_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_2_A + '/' + cls.FASTA_FILE_2_A
         cls.FASTA_SEQ_2_A = 'EIVQYGVKNNTTFLECAPKSPQASIKWLLQKDKDRRKEVKLNERIIATSQGLLIRSVQGSDQGLYHCIATENSFKQTIAKINFKVLD'
         cls.NAME_2_A = cls.FASTA_FILE_2_A.split('.')[0]
         cls.XML_FILE_2_A = cls.NAME_2_A + '.xml'
@@ -76,7 +76,7 @@ class TestIdProt(TestCase):
 
         cls.FASTA_FILE_3_A = '3_A.fasta'
         cls.DIR_PDB_3_A = '3_A'
-        cls.PATH_FASTA_3_A = TPaths.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_A + '/' + cls.FASTA_FILE_3_A
+        cls.PATH_FASTA_3_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_A + '/' + cls.FASTA_FILE_3_A
         cls.FASTA_SEQ_3_A = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -92,7 +92,7 @@ class TestIdProt(TestCase):
 
         cls.FASTA_FILE_3_B = '3_B.fasta'
         cls.DIR_PDB_3_B = '3_B'
-        cls.PATH_FASTA_3_B = TPaths.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_B + '/' + cls.FASTA_FILE_3_B
+        cls.PATH_FASTA_3_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_B + '/' + cls.FASTA_FILE_3_B
         cls.FASTA_SEQ_3_B = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -108,7 +108,7 @@ class TestIdProt(TestCase):
 
         cls.FASTA_FILE_10_B = '10_B.fasta'
         cls.DIR_PDB_10_B = '10_B'
-        cls.PATH_FASTA_10_B = TPaths.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_10_B + '/' + cls.FASTA_FILE_10_B
+        cls.PATH_FASTA_10_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_10_B + '/' + cls.FASTA_FILE_10_B
         cls.FASTA_SEQ_10_B = 'SCIQFTRHASDVLLNLNRLRSRDILTDVVIVVSREQFRAHKTVLMACSGLFYSIFTDQLKCNLSVINLDPEINPEGFCILLDFMYT' \
                              'SRLNLREGNIMAVMATAMYLQMEHVVDTCRKFIKAS'
         cls.NAME_10_B = cls.FASTA_FILE_10_B.split('.')[0]
@@ -134,7 +134,7 @@ class TestIdProt(TestCase):
                                                entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
                                                alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
                                                hitlist_size=Biopy.BlastParam.MAX_HIT_20.value)
-                HM.write_blastp_to_tests_dir(TPaths.MC_TESTS_REFFILES.value, TestIdProt.DIR_BLASTP,
+                HM.write_blastp_to_tests_dir(TPL.MC_TESTS_REFFILES.value, TestIdProt.DIR_BLASTP,
                                              result_handle, blast_out_xml)
 
     @patch.object(IdProt, "_write_blastp_xml_result")
@@ -161,7 +161,7 @@ class TestIdProt(TestCase):
         with open(self.PATH_TESTS_REFFILES_BLASTP_1_A_XML) as test_1_A_xml:
             mock_qblast.return_value = test_1_A_xml
         mock__write_blastp_xml_result.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
-        path_output = TPaths.MC_TESTS_OUTPUT + '/' + self.DIR_PDB_1_A + TestIdProt.DIR_BLASTP
+        path_output = TPL.MC_TESTS_OUTPUT + '/' + self.DIR_PDB_1_A + TestIdProt.DIR_BLASTP
         # action
         result_dict = IdProt.start(path_fasta_file=self.PATH_FASTA_1_A, write_blastp_json=False, build_idmap_csv=False,
                                    path_output=path_output)
