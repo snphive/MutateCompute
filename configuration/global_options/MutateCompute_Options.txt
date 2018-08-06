@@ -1,12 +1,12 @@
 ######## NUMBER OF PDBs TO ANALYSE ###############################################################################
 #
-## All or blank means All PDBs in the PDB folder
+## All means all PDBs in the specified source directory
 #
-PDBs: 10;
+PDBs: 4;
 #
 ######## NUMBER OF FASTA FILES TO ANALYSE ########################################################################
 #
-## All or blank means All FASTA files in the FASTA folder
+## All means all FASTA files in specified source directory
 #
 FASTAs: 10;
 #
@@ -28,6 +28,6 @@ FOLDX_ANALYSECOMPLEX: FALSE
 #
 ######## AMINO ACIDS YOU WANT TO MUTATE TO ########################################################################
 #
-## All or blank means All FASTA files in the FASTA folder. Otherwise as FASTA without spaces, e.g. "ACDEFGHIKLMNOP;"
+## All means all 20 amino acids. Otherwise each amino acid in FASTA format, e.g. "ACDEFGHIKLMNOP;"
 #
 RESIDUES: All;
