@@ -7,33 +7,52 @@ from threading import Thread
 class Scheduler(object):
 
     @staticmethod
-    def start(operations, path_input, input_pdb_list, input_fasta_list, mutant_aa_list):
-        for input_fasta in input_fasta_list:
-            if operations['do_mutate_fasta'] == 'True':
+    def start(operations, path_input, pdb_list, fasta_list, mutant_aa_list):
+        process_started = False
+        for fasta in fasta_list:
+            if operations['do_mutate_fasta']:
                 mutate_fasta = MutateFasta()
-                thread = Thread(target=mutate_fasta.mutate_every_residue_fastas,
-                                args=(path_input, input_fasta_list, mutant_aa_list))
+                thread = Thread(target=mutate_fasta.mutate_every_residue_in_fasta_list,
+                                args=(path_input, fasta_list, mutant_aa_list))
                 thread.start()
+                process_started = True
                 thread.join()
             if operations['do_agadir']:
                 agadir = Agadir()
-                thread = Thread(target=agadir.compute, args=input_fasta)
+                thread = Thread(target=agadir.compute, args=fasta)
                 thread.start()
+                process_started = True
                 thread.join()
 
-        for input_pdb in input_pdb_list:
+        for pdb in pdb_list:
             if operations['do_foldx_repair']:
                 repair = FoldX().Repair()
-                repair.do_repair(input_pdb)
+                thread = Thread(target=repair.do_repair, args=pdb)
+                thread.start()
+                process_started = True
+                thread.join()
 
             if operations['do_foldx_buildmodel']:
                 write_wt_fasta_files = True
-                FoldX.BuildModel().mutate_residues_of_pdb(input_pdb, mutant_aa_list, write_wt_fasta_files)
+                buildmodel = FoldX().BuildModel()
+                thread = Thread(target=buildmodel.mutate_residues_of_pdb,
+                                args=(pdb, mutant_aa_list, write_wt_fasta_files))
+                thread.start()
+                process_started = True
+                thread.join()
 
-            # if operations['do_foldx_stability']:
-            #     stability = FoldX().Stability()
-            #     stability.do_stuff(input_pdb)
-            # if operations['do_foldx_analysecomplex']:
-            #     analyseComplex = FoldX().AnalyseComplex()
-            #     analyseComplex.do_stuff(input_pdb)
+            if operations['do_foldx_stability']:
+                stability = FoldX().Stability()
+                thread = Thread(target=stability.calculate_stability, args=pdb)
+                thread.start()
+                process_started = True
+                thread.join()
 
+            if operations['do_foldx_analysecomplex']:
+                analysecomplex = FoldX().AnalyseComplex()
+                thread = Thread(target=analysecomplex.calculate_complex_energies, args=pdb)
+                thread.start()
+                process_started = True
+                thread.join()
+
+        return process_started
