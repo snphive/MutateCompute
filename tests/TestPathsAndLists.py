@@ -17,6 +17,9 @@ class TPL(Enum):
     # INPUT FILES FROM MAIN DIRECTORY (i.e. real data)
     INPUT_FOR_READ_ONLY = "/Users/u0120577/PycharmProjects/MutateCompute/input_data"
 
+    # REPOSITORY OF PDBs and FASTAs
+    REPO_PDB_FASTA = '/Users/u0120577/REPO_PDB_FASTA'
+
     # The following might not even be used as entire configuration directory is being copied straight into /tests in one go.
     REL_CONFIG = "/configuration"
     REL_CONFIG_AGAD = "/configuration/agadir_config"
@@ -25,6 +28,7 @@ class TPL(Enum):
     REL_CONFIG_GLOBAL_OPTIONS = "/configuration/global_options"
     REL_CONFIG_FX_ACRUNSCRIPT = "/configuration/foldx_config/ac_runscript"
     REL_CONFIG_FX_BMRUNSCRIPT = "/configuration/foldx_config/bm_runscript"
+
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
     MC_TESTS_CONFIG = MC_TESTS + REL_CONFIG
     MC_TESTS_CONFIG_AGAD = MC_TESTS + REL_CONFIG_AGAD
