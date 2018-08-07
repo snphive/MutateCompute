@@ -1,8 +1,10 @@
 import os
+import glob
 import shutil
 import subprocess
 import time
 import warnings
+
 
 from src.AminoAcids import AA
 from src.Paths import Paths
@@ -78,111 +80,108 @@ class GUM(object):
     # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
     # if these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
     #
-    # pdbs              String or List of Strings   The pdb file (including ".pdb") or files
-    # path_input        String                      Path to where the pdbs can be found.
-    # write_fasta       Boolean                     True to write out as a side effect of the method.
-    # path_fasta_root   String                      Absolute path of root for fasta sequence file (without >title).
+    # pdbfiles                  String or List of Strings   The pdb file (including ".pdb") or files (no path).
+    # path_input                String                      Path to where the pdb subdirectories can be found.
+    # write_fastafile           Boolean                     True to write fasta string incl. >title to new fasta file.
+    # path_to_write_fastafile   String                      Absolute path of root for fasta file (without >title).
+    #
+    # Returns a dictionary of the pdbname_chain and the protein sequence in FASTA format.
     @staticmethod
-    def extract_pdbname_chain_fasta_from_pdb(pdbs, path_input_pdbs, write_fasta_seq, path_fasta_root):
-        pdbname_chain_fasta_dict: dict = {}
-
-        if isinstance(pdbs, str):
-            pdbs = [pdbs]
-
-        for pdb in pdbs:
-            pdb_file = open(path_input_pdbs + pdb).readlines()
-            atom_lines = []
+    def extract_pdbname_chain_fasta_from_pdbs(pdbfiles, path_input, write_fastafile, path_to_write_fastafile):
+        pdbname_chain_fastaseq_dict: dict = {}
+        if isinstance(pdbfiles, str):
+            pdbfiles = [pdbfiles]
+        for pdbfile in pdbfiles:
+            with open(path_input + '/' + pdbfile.split('.')[0] + '/' + pdbfile) as pdbfile_opened:
+                pdbfile_lines = pdbfile_opened.readlines()
+            pdbfile_lines_with_atom = []
             protein_chains = []
-
-            for line in pdb_file:
-
-                if 'ATOM' == line[0:4]:
-                    protein_chain = line[21]
-                    atom_lines.append(line)
-
+            for pdbfile_line in pdbfile_lines:
+                if 'ATOM' == pdbfile_line[0:4]:
+                    protein_chain = pdbfile_line[21]
+                    pdbfile_lines_with_atom.append(pdbfile_line)
                     if protein_chain not in protein_chains:
                         protein_chains.append(protein_chain)
-
             for protein_chain in protein_chains:
                 fasta_list = []
-                resnum = '0'
-
-                for line in atom_lines:
-
-                    if line[21] == protein_chain and resnum != line[22:26].strip(' '):
-                        resnum = line[22:26].strip(' ')
-                        amino_acid = line[17:20]
-
-                        if amino_acid in AA.DICT_AA_3TO1.value.keys():
-                            fasta_list.append(AA.DICT_AA_3TO1.value[amino_acid])
+                residue_num = '0'
+                for pdbfile_line in pdbfile_lines_with_atom:
+                    protein_chain_on_this_line = pdbfile_line[21]
+                    residue_num_on_this_line = pdbfile_line[22:26].strip(' ')
+                    if protein_chain_on_this_line == protein_chain and residue_num_on_this_line != residue_num:
+                        residue_num = residue_num_on_this_line
+                        amino_acid_on_this_line = pdbfile_line[17:20]
+                        if amino_acid_on_this_line in AA.DICT_AA_3TO1.value.keys():
+                            fasta_list.append(AA.DICT_AA_3TO1.value[amino_acid_on_this_line])
                         else:
                             print('This 3-letter word is not recognised as 1 of the 20 amino acids! '
-                                  'Cannot extract FASTA from ' + pdb + ' !')
+                                  'Cannot extract FASTA from ' + pdbfile + ' !')
 
                 fasta_sequence = "".join(fasta_list)
-                pdbname = GUM._remove_prefix_and_suffix('RepairPDB_', '_1_0', pdb.split('/')[-1].split('.')[0])
+                pdbname = GUM._remove_prefix_and_suffix('RepairPDB_', '_1_0', pdbfile.split('/')[-1].split('.')[0])
                 pdbname_chain = pdbname + '_' + protein_chain
                 print(pdbname_chain + ' : ' + fasta_sequence)
-                pdbname_chain_fasta_dict[pdbname_chain] = fasta_sequence
-                if write_fasta_seq:
-                    GUM.write_fasta(pdbname_chain_fasta_dict, path_fasta_root)
-        return pdbname_chain_fasta_dict
+                pdbname_chain_fastaseq_dict[pdbname_chain] = fasta_sequence
+                if write_fastafile:
+                    GUM.write_fastafile_to_name_chain_dir(pdbname_chain_fastaseq_dict, path_to_write_fastafile)
+        return pdbname_chain_fastaseq_dict
 
+    # Write the fasta file (with >title) to a new subdirectory in the specified directory. The subdirectory has the same
+    # name as the fasta file (which includes the protein chain).
+    #
     # pdbname_chain_fasta_dict  Dictionary  The pdbname_chain is the key, the amino acid sequence is the value.
     # path_fasta_root           String      Absolute path of root for fasta sequence file (without >title).
     @staticmethod
-    def write_fasta(pdbname_chain_fasta_dict, path_fasta_root):
+    def write_fastafile_to_name_chain_dir(pdbname_chain_fasta_dict, path_to_write_fastafile_root):
         for pdbname_chain, fasta_sequence in pdbname_chain_fasta_dict.items():
-            path_output_pdb_pdbchain = GUM.create_dir_tree(path_fasta_root, pdbname_chain.split('_')[0], pdbname_chain)
-            fasta_file = open(path_output_pdb_pdbchain + pdbname_chain + '.fasta', 'w')
-            fasta_file.write('>' + pdbname_chain + '\n')
-            fasta_file.write(fasta_sequence)
-            fasta_file.close()
+            path_output_pdb_pdbchain = GUM.create_dir_tree(path_to_write_fastafile_root, pdbname_chain.split('_')[0],
+                                                           pdbname_chain)
+            with open(path_output_pdb_pdbchain + pdbname_chain + '.fasta', 'w') as fasta_file:
+                fasta_file.write('>' + pdbname_chain + '\n')
+                fasta_file.write(fasta_sequence)
 
-    # For the pdb passed here, all chains are read from the pdb file and returned as a list of chain character(s).
+    # For the pdb passed here, all chains are read from the pdb file.
     #
-    # pdb               pdb (io file?)      The pdb file (with ",pdb" extension).
-    # rel_path_to_pdb   String              The relative path to the pdb.
+    # pdbfile           String      String name of pdb file (incl. '.pdb' extension).
+    # path_pdbfile      String      Absolute path to directory where the target pdbfile is.
+    #
+    # Returns list of protein chains in the pdbfile (as alphabetic single-letter characters).
     @staticmethod
-    def extract_all_chains_from_pdb(pdb, rel_path_to_pdb):
-        pdb_file = open(rel_path_to_pdb + pdb).readlines()
+    def extract_all_chains_from_pdb(pdbfile, path_pdbfile):
+        with open(path_pdbfile + '/' + pdbfile) as pdbfile_opened:
+            pdbfile_lines = pdbfile_opened.readlines()
         protein_chains = []
-
-        for line in pdb_file:
-
-            if 'ATOM' == line[0:4]:
-                protein_chain = line[21]
-
+        for pdbfile_line in pdbfile_lines:
+            if 'ATOM' == pdbfile_line[0:4]:
+                protein_chain = pdbfile_line[21]
                 if protein_chain not in protein_chains:
                     protein_chains.append(protein_chain)
-
         return protein_chains
 
     # prefix    String      The prefix to remove
     # suffix    String      The suffix to remove
-    # pdbname   String      The pdb name (without ".pdb" extension)
-    @staticmethod
-    def _remove_prefix_and_suffix(prefix, suffix, pdbname):
-
-        if prefix in pdbname:
-            str.replace(pdbname, prefix, '')
-
-        if suffix in pdbname:
-            str.replace(pdbname, suffix, '')
-
-        return pdbname
-
-    # Originally used in solubis.py but removed as it was not necessary.
-    # Keeping this code for now should it be needed in near future
-    # Reads a FASTA file and returns the sequence only (not including the >title).
+    # name      String      Any string word
     #
-    # path_to_fasta     String      The path to the fasta file.
+    # Returns the name without the specified prefix and/or suffix
     @staticmethod
-    def get_sequence_only_from_fasta_file(path_to_fasta):
-        with open(path_to_fasta, 'r').readlines() as fasta_lines:
-            if len(fasta_lines) > 2 or len(fasta_lines) < 1:
-                raise ValueError('There is either an extra unexpected carriage return or no sequence data at all')
-            fasta_seq = fasta_lines[1] if len(fasta_lines) == 2 else fasta_lines[0]
+    def _remove_prefix_and_suffix(prefix, suffix, name):
+        if prefix in name:
+            str.replace(name, prefix, '')
+        if suffix in name:
+            str.replace(name, suffix, '')
+        return name
+
+    # Originally used in solubis.py but not used at the moment in this project. Keeping as may be useful.
+    # Reads a fasta file for the sequence part only (not including the >title).
+    #s
+    # path_fastafile     String      Absolute path to the fasta file, including fasta file itself (incl. .fasta ext).
+    #
+    # Returns the (amino acid) sequence of the fasta file.
+    @staticmethod
+    def get_sequenceonly_from_fasta_file(path_fastafile):
+        with open(path_fastafile, 'r') as fastafile_opened:
+            fastafile_lines = fastafile_opened.readlines()
+            fasta_seq = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
         return fasta_seq
 
     @staticmethod
@@ -312,21 +311,71 @@ class GUM(object):
         cmd = 'cp' + recurse_cmd + GUM.space + path_src + GUM.space + path_dst
         subprocess.call(cmd, shell=True)
 
-    # Copy files from a source directory (typically the pdb_repository folder) to a destination directory.
-    # This method does something extra though. It places each file in its own subdirectory, giving each the same name
-    # as the file. E.g. file1.pdb will be copied to /input_data/file1/
-    # path_src_dir      String      Path of repository directory from which to copy input files (pdb, fasta, other)
-    # path_dst_dir      String      Path of destination directory to which copied files are transferred, via creating
-    #                               individual directories for each file, bearing the same name.
-    # copy_all_files    Boolean     False by default, otherwise it will recursively copy all files from the src to dst
+    # Copy files from a source repository directory to destination directories.
+    # (Src dir is typically ~/REPO_PDB_FASTA/PDBs_10 and ~/REPO_PDB_FASTA/FASTAs_100.
+    # Dst dirs are typically MutateCompute/input_data/<pdbname> directories and
+    # MutateCompute/input_data/fasta/<fastaname> directories).
+    # 1. Identify which subfolder (/PDBs_ or /FASTAs_) is src subdirectory in REPO_PDB_FASTA src directory.
+    #    Get exact name of the subfolder and set this in the path of src directory (i.e. /PDBs_100).
+    # 2. Remove any files from wanted list that are not found in the source directory.
+    # 3. Create /input_data/<pdbname> or input_data/fastas/<fastaname> subdirectories in dst dir for each pdb or fasta
+    #    to be copied in to.
+    # 4. Copy the pdb or fasta files in to their corresponding subdirectories.
+    #
+    # E.g. file1.pdb will be copied to /input_data/file1/file.pdb
+    # E.g. file1_A.fasta will be copied to /input_data/fastas/file1_A/file1_A.fasta
+    #
+    # path_src_repo_dir     String      Path of repository directory from which to copy pdb files (pdb, fasta, other).
+    # path_dst_dir          String      Path of destination directory to which the specified pdbfiles are copied, via
+    #                                   (creating) individual subdirectories for each file, bearing the same name.
+    # src_file_list
+    # wanted_file_list      List        List of strings of pdb files or a list of fasta files (incl. extension) to copy.
+    # copy_all_files        Boolean     False by default, otherwise will recursively copy all files from
+    #                                   path_src_pdb_dir to path_dst_dir_pdbname
+    #                                   (If this is set to true, the wanted_pdb_list is ignored.)
+    #
+    # Returns wanted_file_list containing only those files that were found in, and copied from, the source directory.
     @staticmethod
-    def copy_files_from_repo_to_input_filedir(path_src_dir, path_dst_dir, copy_all_files=False):
-        file_list = os.listdir(path_src_dir)  # file names (incl. extension)
-        # file_dir_list = os.listdir(path_dst_dir_list)
-        for file in file_list:
-            path_dst_dir_filename = GUM.create_dir_tree(path_dst_dir, file.split('.')[0])
-            GUM.linux_copy(path_src_dir + '/' + file, path_dst_dir_filename, do_recursively=copy_all_files)
+    def copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir, src_file_list, wanted_file_list,
+                                              copy_all_files=False):
+        PDBs_or_FASTAs = 'PDBs' if wanted_file_list[0].endswith('.pdb') else 'FASTAs'
+        path_src_repo_dir = GUM.get_subdirname_starting_with(path_src_repo_dir, PDBs_or_FASTAs)
+        path_root_dst_dir = path_dst_dir if PDBs_or_FASTAs == 'PDBs' else path_dst_dir + '/fastas'
+        for wanted_file in wanted_file_list:
+            if wanted_file not in src_file_list:
+                wanted_file_list.remove(wanted_file)
+            else:
+                path_dst_dir = GUM.create_dir_tree(path_root_dst_dir, wanted_file.split('.')[0])
+                path_file_to_copy = path_src_repo_dir + '/' + wanted_file
+                GUM.linux_copy(path_file_to_copy, path_dst_dir, do_recursively=copy_all_files)
+        return wanted_file_list
 
+    @staticmethod
+    def get_subdirname_starting_with(path, starting_with):
+        dirnames = []
+        for dir_tuple in os.walk(path):
+            if dir_tuple[0].split('/')[-1].startswith(starting_with):
+                dirnames.append(dir_tuple[0])
+                dirname = ''.join(dirnames[0])
+                break
+        if dirname == '':
+            raise ValueError('No directory with a name starting with ' + starting_with + ' was found in ' + path)
+        return dirname
+
+    # The repo directory structure is expected to be /REPO_PDB_FASTA/PDBs_<number> and /REPO_PDB_FASTA/FASTAs_<number>.
+    # Note: It assumes only 1 PDB and 1 FASTA subdirectory. If there is more than 1, the rest will not be seen.
+    #
+    # path_src_repo_dir     String          Absolute path of the source repository directory.
+    # PDBs_or_FASTAs        String          Either 'PDBs' or 'FASTAs'
+    #
+    # Returns full list of pdb files or fasta files from one of two subdirectories that should be in REPO_PDB_FASTA.
+    @staticmethod
+    def get_filelist_from_subdirs(path_src_repo_dir, PDBs_or_FASTAs):
+        file_ext = '.pdb' if (PDBs_or_FASTAs == 'PDBs') else '.fasta'
+        filelist = glob.glob(path_src_repo_dir + '/' + PDBs_or_FASTAs + '*/*' + file_ext)
+        return filelist
+
+######################################################################################################################
     # Permanently removes input_data and all contents!
     @staticmethod
     def remove_inputdata_dir_tree():
