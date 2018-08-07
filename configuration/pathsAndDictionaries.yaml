@@ -13,7 +13,7 @@ ROOT:
     path_local_mutatecompute: '/Users/u0120577/PycharmProjects/MutateCompute'
 
     # path to local datasets
-    path_local_pdb_repository: '/Users/u0120577/PDB_repository'
+    path_local_pdb_fasta_repository: '/Users/u0120577/REPO_PDB_FASTA'
 
     # relative paths - common to both cluster and local trees
     path_rel_config: '/configuration'
@@ -32,7 +32,7 @@ ROOT:
     path_rel_fx_bm: '/foldx/build_model'
     path_rel_fx_rep: '/foldx/repair'
     path_rel_mutatefasta: '/mutate_fasta'
-    path_rel_pdb_repository: '/PDB_repository'
+    path_rel_pdb_fasta_repository: '/REPO_PDB_FASTA'
 
 
     # dictionaries & lists (amino acids)
