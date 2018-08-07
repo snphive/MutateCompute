@@ -35,8 +35,8 @@ class FoldX(object):
             pdbname = pdb.split('.')[0]
             path_input_PDBs_pdbname = GUM.create_dir_tree(Paths.MC_INPUT, 'PDBs', pdbname)
             path_runscript_dest = GUM.create_dir_tree(path_input_PDBs_pdbname, 'FX_BuildModel')
-            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdb(pdb, Paths.MC_INPUT,
-                                                                                write_wt_fasta_files, Paths.MC_OUTPUT)
+            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(pdb, Paths.MC_INPUT,
+                                                                                 write_wt_fasta_files, Paths.MC_OUTPUT)
             fx_mutant_name_list = self._make_fx_mutant_name_list(mutate_to_aa_list, pdbname_chain_fasta_dict)
 
             if not os.path.exists(path_runscript_dest):
@@ -85,10 +85,17 @@ class FoldX(object):
         def __init__(self):
             print('helloworld constructor')
 
+        def calculate_stability(self, pdb):
+            print('not implemented yet')
+
     class AnalyseComplex(object):
 
         def __init__(self):
             print('helloworld constructor')
+
+        def calculate_complex_energies(self, pdbname):
+            self._prepare_for_FoldX_AnalyseComplex(pdbname)
+            print('not yet implemented')
 
         def _prepare_for_FoldX_AnalyseComplex(self, repair_pdbname):
             _0_1_2_pdbs = ['0.pdb,', '1.pdb,', '2.pdb,']
