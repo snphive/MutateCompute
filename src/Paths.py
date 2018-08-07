@@ -28,7 +28,7 @@ class Paths(Enum):
             ZEUS_SNPEFFECT = paths_and_dictionaries['ROOT']['path_zeus_snpeffect']
             LOCAL_MUTATECOMPUTE = paths_and_dictionaries['ROOT']['path_local_mutatecompute']
 
-            LOCAL_PDB_REPO = paths_and_dictionaries['ROOT']['path_local_pdb_repository']
+            LOCAL_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_local_pdb_fasta_repository']
 
             #  RELATIVE PATHS
             REL_CONFIG = paths_and_dictionaries['ROOT']['path_rel_config']
@@ -46,7 +46,7 @@ class Paths(Enum):
             REL_FX_BM = paths_and_dictionaries['ROOT']['path_rel_fx_bm']
             REL_FX_REP = paths_and_dictionaries['ROOT']['path_rel_fx_rep']
             REL_MUTATE_FASTA = paths_and_dictionaries['ROOT']['path_rel_mutatefasta']
-            REL_PDB_REPO = paths_and_dictionaries['ROOT']['path_rel_pdb_repository']
+            REL_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_rel_pdb_fasta_repository']
 
             # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
             MC_CONFIG = LOCAL_MUTATECOMPUTE + REL_CONFIG
@@ -67,7 +67,7 @@ class Paths(Enum):
             SE_CONFIG_FX_BMRUNSCRIPT = ZEUS_SNPEFFECT + REL_CONFIG_FX_BMRUNSCRIPT
             SE_INPUT = ZEUS_SNPEFFECT + REL_INPUT
             SE_OUTPUT = ZEUS_SNPEFFECT + REL_OUTPUT
-            SE_PDB_REPO = ZEUS_SNPEFFECT + REL_PDB_REPO
+            SE_REPO_PDB_FASTA = ZEUS_SNPEFFECT + REL_REPO_PDB_FASTA
 
         except yaml.YAMLError as exc:
             print(exc)
