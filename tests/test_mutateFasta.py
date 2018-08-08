@@ -1,6 +1,9 @@
 from unittest import TestCase
 from src.MutateFasta import MutateFasta
-from tests.TestPathsAndLists import TPL
+from tests.TestPathsAndListsSeqs import TPLS
+from unittest.mock import patch
+from unittest.mock import MagicMock
+from src.GeneralUtilityMethods import GUM
 
 
 class TestMutateFasta(TestCase):
@@ -13,36 +16,53 @@ class TestMutateFasta(TestCase):
     def tearDownClass(cls):
         cls.mutateFasta = None
 
-# MAKES SENSE TO WRITE TESTS FOR THE PRIVATE METHODS FIRST.
-    # def test_mutate_every_residue_in_fasta_list(self):
-    #     # arrange
-    #     path_input = TPL.MC_TESTS_INPUT
-    #     with open('/Users/u0120577/FASTA_repo100') as fastafiles
-    #         fasta_list = fastafiles.readlines()
-    #     mutant_aa_list = TPL.LIST_ALL_20_AA
-    #
-    #     # action
-    #     MutateFasta().mutate_every_residue_in_fasta_list(path_input, fasta_list, mutant_aa_list)
-    #     # assert
-
-    def test__build_complete_paths_for_fastafiles(self):
+    def test__add_mutantTitle_mutatedSeq_to_dict(self):
         # arrange
-        path_input = TPL.MC_TESTS_INPUT.value
-        fastafile_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta']
-        expected_path_list = ['/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_A/1_A.fasta',
-                              '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_B/1_B.fasta',
-                              '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/2_A/2_A.fasta']
-        mutateFasta = MutateFasta()
+        titleSeqDict = {'WT': 'SCI'}
+        wt_title = 'WT'
+        wt_seq = TPLS.FASTA_TRIPEP_SEQ_WILDTYPE.value
+        mutant_aa_list = TPLS.LIST_ALL_20_AA.value
+        expected_mutantTitle_SeqDict = TPLS.FASTA_TRIPEP_TITLE_TITLE_SEQ_DICT_ALL_20_INCL_WT.value
         # action
-        path_list = mutateFasta._build_complete_paths_for_fastafiles(path_input, fastafile_list)
+        mutantTitle_SeqDict = self.mutateFasta._add_mutantTitle_mutatedSeq_to_dict(titleSeqDict, wt_title, wt_seq,
+                                                                                   mutant_aa_list)
         # assert
-        self.assertListEqual(expected_path_list, path_list)
+        # self.maxDiff = None
+        self.assertEqual(len(expected_mutantTitle_SeqDict.keys()), len(mutantTitle_SeqDict.keys()))
+        self.assertDictEqual(expected_mutantTitle_SeqDict, mutantTitle_SeqDict)
 
-    # def test__build_list_of_title_sequence_dict_from_fastafiles(self):
-    #     self.fail()
-    #
-    # def test__mutate_sequences_in_list_of_dict(self):
-    #     self.fail()
-    #
-    # def test__mutate_fasta(self):
-    #     self.fail()
+    # I CAN'T WORK OUT HOW TO MAKE MOCK'S SIDE-EFFECT THING WORK!! HOW TO MAKE IT MOCK A SPECIFIC METHOD TO RETURN
+    # ONE VALUE ON THE FIRST TIME IT'S CALLED AND ANOTHER VALUE THE 2ND TIME IT'S CALLED.
+    def test__populate_titleTitleSeqDictDict_with_mutants(self):
+        # arrange
+        titleTitleSeqDictDict = {'WT1': {'WT1': 'SC'}, 'WT2': {'WT2': 'GE'}}
+        mutant_aa_list = ['A', 'C']
+        expected_titleTitleSeqDictDict_w_muts = {'WT1': {'WT1': 'SC', 'S1A': 'AC', 'S1C': 'CC', 'C2A': 'SA'},
+                                                 'WT2': {'WT2': 'GE', 'G1A': 'AE', 'G1C': 'CE', 'E2A': 'GA',
+                                                         'E2C': 'GC'}}
+        # action
+        titleTitleSeqDictDict_w_muts = self.mutateFasta._populate_titleTitleSeqDictDict_with_mutants(
+            titleTitleSeqDictDict, mutant_aa_list)
+        # assert
+        self.assertDictEqual(expected_titleTitleSeqDictDict_w_muts, titleTitleSeqDictDict_w_muts)
+
+    # TODO
+    def test_mutate_every_residue_in_fasta_list(self):
+        # arrange
+        path_input = TPLS.MC_TESTS_INPUT.value
+        fastafile_list = ['WT']
+        mutant_aa_list = ['A']
+        # expected_mutants = # TODO
+        # action
+        mutants = self.mutateFasta.mutate_every_residue_in_fasta_list(path_input, fastafile_list, mutant_aa_list)
+        # assert
+        # self.assertDictEqual(expected_mutants, mutants)
+
+    # TODO
+    def test_write_mutants_to_file(self):
+        # arrange
+        mutants = {}
+        # action
+        self.mutateFasta._write_mutants_to_file(mutants)
+        # assert
+        # compare with reference files
