@@ -1,7 +1,7 @@
 import os
 import shutil
 from src.GeneralUtilityMethods import GUM
-from tests.TestPathsAndLists import TPL
+from tests.TestPathsAndListsSeqs import TPLS
 
 
 # A collection of "helper" methods to be used by unit tests.
@@ -9,22 +9,22 @@ class HM(object):
 
     @staticmethod
     def remove_tests_input_output_dirs():
-        if os.path.exists(TPL.MC_TESTS.value):
-            if os.path.exists(TPL.MC_TESTS_INPUT.value):
-                HM.__delete_subdirectory_tree_of_tests(TPL.MC_TESTS_INPUT.value)
-            if os.path.exists(TPL.MC_TESTS_OUTPUT.value):
-                HM.__delete_subdirectory_tree_of_tests(TPL.MC_TESTS_OUTPUT.value)
+        if os.path.exists(TPLS.MC_TESTS.value):
+            if os.path.exists(TPLS.MC_TESTS_INPUT.value):
+                HM.__delete_subdirectory_tree_of_tests(TPLS.MC_TESTS_INPUT.value)
+            if os.path.exists(TPLS.MC_TESTS_OUTPUT.value):
+                HM.__delete_subdirectory_tree_of_tests(TPLS.MC_TESTS_OUTPUT.value)
 
     @staticmethod
     def remove_config_folders():
-        if os.path.exists(TPL.MC_TESTS.value):
-            if os.path.exists(TPL.MC_TESTS_CONFIG.value):
-                HM.__delete_subdirectory_tree_of_tests(TPL.REL_CONFIG.value)
+        if os.path.exists(TPLS.MC_TESTS.value):
+            if os.path.exists(TPLS.MC_TESTS_CONFIG.value):
+                HM.__delete_subdirectory_tree_of_tests(TPLS.REL_CONFIG.value)
 
     @staticmethod
     def __delete_subdirectory_tree_of_tests(path_to_delete):
-        os.chdir(TPL.MC_TESTS.value)
-        if not os.getcwd() == TPL.MC_TESTS.value:
+        os.chdir(TPLS.MC_TESTS.value)
+        if not os.getcwd() == TPLS.MC_TESTS.value:
             raise ValueError('Current working directory is not MutateCompute/tests. '
                              '\nNot proceeding with deletion of ' + path_to_delete)
         else:

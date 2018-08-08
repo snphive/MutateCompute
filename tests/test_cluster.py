@@ -2,7 +2,7 @@ import os
 from unittest import TestCase
 from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
-from tests.TestPathsAndLists import TPL
+from tests.TestPathsAndListsSeqs import TPLS
 from tests.HelperMethods import HM
 
 
@@ -13,12 +13,12 @@ class TestCluster(TestCase):
     # The data in those main folders will be programmatically generated but is currently manually transferred.
     @classmethod
     def setUpClass(cls):
-        if not os.path.exists(TPL.MC_TESTS_CONFIG.value):
-            GUM.linux_copy(path_src=TPL.CONFIG_FOR_READ_ONLY.value, path_dst=TPL.MC_TESTS_CONFIG.value,
+        if not os.path.exists(TPLS.MC_TESTS_CONFIG.value):
+            GUM.linux_copy(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS_CONFIG.value,
                            do_recursively=True)
 
-        if not os.path.exists(TPL.MC_TESTS_INPUT.value):
-            GUM.linux_copy(path_src=TPL.INPUT_FOR_READ_ONLY.value, path_dst=TPL.MC_TESTS_INPUT.value,
+        if not os.path.exists(TPLS.MC_TESTS_INPUT.value):
+            GUM.linux_copy(path_src=TPLS.INPUT_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS_INPUT.value,
                            do_recursively=True)
 
     @classmethod
@@ -41,16 +41,16 @@ class TestCluster(TestCase):
         fx_mutant_name = 'RA1A'
         jobname = fxbm_jobname_prefix + fx_mutant_name
         expected_job_q = '#!/bin/bash\n' + '#$ -N ' + jobname + '\n' + '#$ -V\n' + '#$ -cwd\n' + \
-                              'source ~/.bash_profile\n' + TPL.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt\n'
+                              'source ~/.bash_profile\n' + TPLS.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt\n'
         single_space = ' '
         not_expected_job_q = '#!/bin/bash' + single_space + '\n' + '#$ -N ' + jobname + '\n' + '#$ -V\n' + \
-                             '#$ -cwd\n' + 'source ~/.bash_profile\n' + TPL.ZEUS_FOLDX_EXE.value + \
+                             '#$ -cwd\n' + 'source ~/.bash_profile\n' + TPLS.ZEUS_FOLDX_EXE.value + \
                              ' -runfile runscript.txt\n'
         missing_new_line = ''
         not_expected_job_q_2 = '#!/bin/bash\n' + '#$ -N ' + jobname + missing_new_line + '#$ -V\n' + \
-                             '#$ -cwd\n' + 'source ~/.bash_profile\n' + TPL.ZEUS_FOLDX_EXE.value + \
+                             '#$ -cwd\n' + 'source ~/.bash_profile\n' + TPLS.ZEUS_FOLDX_EXE.value + \
                              ' -runfile runscript.txt\n'
-        path_job_q_file = TPL.MC_TESTS_CONFIG_JOBQ.value + '/' + 'testWriteJobQDstDir'
+        path_job_q_file = TPLS.MC_TESTS_CONFIG_JOBQ.value + '/' + 'testWriteJobQDstDir'
         # action
         actual_job_q = self.cluster.write_job_q_bash(jobname, 'testWriteJobQDstDir')
         # assert

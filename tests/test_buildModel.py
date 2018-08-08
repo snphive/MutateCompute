@@ -4,7 +4,7 @@ from src.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 from unittest.mock import patch
 from tests.HelperMethods import HM
-from tests.TestPathsAndLists import TPL
+from tests.TestPathsAndListsSeqs import TPLS
 
 
 # Note: A test pdb is used here which is taken from the RepairPDBs folder, but includes only the first 5 residues of
@@ -14,7 +14,7 @@ class TestBuildModel(TestCase):
 
     def setUp(self):
         foldx = FoldX()
-        self.buildModel = foldx.BuildModel(TPL.ZEUS_FOLDX_EXE.value, TPL.LOCAL_FOLDX_EXE.value)
+        self.buildModel = foldx.BuildModel(TPLS.ZEUS_FOLDX_EXE.value, TPLS.LOCAL_FOLDX_EXE.value)
 
     def tearDown(self):
         self.buildModel = None
@@ -47,7 +47,7 @@ class TestBuildModel(TestCase):
         mutant_aa_list = ['A', 'C']
         pdb = 'RepairPDB_1.pdb'
         # action
-        self.buildModel.mutate_residues_of_pdb(TPL.MC_TESTS_INPUT.value, TPL.MC_TESTS_OUTPUT.value, pdb,
+        self.buildModel.mutate_residues_of_pdb(TPLS.MC_TESTS_INPUT.value, TPLS.MC_TESTS_OUTPUT.value, pdb,
                                                mutant_aa_list, write_wt_fastafiles)
         # assert
         expected_call_count_1 = 1

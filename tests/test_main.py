@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 from src.Main import Main
-from tests.TestPathsAndLists import TPL
+from tests.TestPathsAndListsSeqs import TPLS
 from src.GeneralUtilityMethods import GUM
 from src.Scheduler import Scheduler
 
@@ -10,11 +10,11 @@ class TestMain(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        GUM.linux_copy(path_src=TPL.CONFIG_FOR_READ_ONLY.value, path_dst=TPL.MC_TESTS.value, do_recursively=True)
+        GUM.linux_copy(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value, do_recursively=True)
 
     def test__read_global_options(self):
         # arrange
-        path_globoptions_file = TPL.MC_TESTS_CONFIG_GLOBAL_OPTIONS.value + '/MutateCompute_Options.txt'
+        path_globoptions_file = TPLS.MC_TESTS_CONFIG_GLOBAL_OPTIONS.value + '/MutateCompute_Options.txt'
         expected_global_options = ['######## NUMBER OF PDBs TO ANALYSE ##############################################'
                                    '#################################\n', '#\n', '## All means all PDBs in the '
                                     'specified source directory\n', '#\n', 'PDBs: 4;\n', '#\n', '######## NUMBER OF '
@@ -44,7 +44,7 @@ class TestMain(TestCase):
         # arrange
         globaloptions_lines = ['#\n', 'PDBs: 4;\n', '#']
         PDB_or_FASTA = 'PDBs'
-        path_input = TPL.MC_TESTS_INPUT.value
+        path_input = TPLS.MC_TESTS_INPUT.value
         expected_pdb_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb', 'RepairPDB_3.pdb', 'RepairPDB_4.pdb']
         # action
         pdb_list = Main._build_filelist_for_analysis(globaloptions_lines, PDB_or_FASTA, path_input)
@@ -110,7 +110,7 @@ class TestMain(TestCase):
         # arrange
         operations = {'do_mutate_fasta': True}
         # operations = {} would need to add something to here to check for raising a ValueError (mock sideeffect?)
-        path_input = TPL.MC_TESTS_INPUT
+        path_input = TPLS.MC_TESTS_INPUT
         pdb_list = ['RepairPDB_1.pdb']
         fasta_list = ['1_A.fasta']
         list_of_mutant_aa = ['A']
