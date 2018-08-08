@@ -107,66 +107,16 @@ class TPLS(Enum):
                     'QVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRRSRRQDVRHGNPLTQCR'
     FASTA_SEQ_10_B = 'SCIQFTRHASDVLLNLNRLRSRDILTDVVIVVSREQFRAHKTVLMACSGLFYSIFTDQLKCNLSVINLDPEINPEGFCILLDFMYTSRLNLREGN' \
                      'IMAVMATAMYLQMEHVVDTCRKFIKAS'
-    FASTA_SEQ_MIN_WT = 'SCI'
-    FASTA_SEQ_MIN_S1A = 'ACI'
-    FASTA_SEQ_MIN_S1C = 'CCI'
-    FASTA_SEQ_MIN_S1D = 'DCI'
-    FASTA_SEQ_MIN_S1E = 'ECI'
-    FASTA_SEQ_MIN_S1F = 'FCI'
-    FASTA_SEQ_MIN_S1G = 'GCI'
-    FASTA_SEQ_MIN_S1H = 'HCI'
-    FASTA_SEQ_MIN_S1I = 'ICI'
-    FASTA_SEQ_MIN_S1K = 'KCI'
-    FASTA_SEQ_MIN_S1L = 'LCI'
-    FASTA_SEQ_MIN_S1M = 'MCI'
-    FASTA_SEQ_MIN_S1N = 'NCI'
-    FASTA_SEQ_MIN_S1P = 'PCI'
-    FASTA_SEQ_MIN_S1Q = 'QCI'
-    FASTA_SEQ_MIN_S1R = 'RCI'
-    FASTA_SEQ_MIN_S1S = 'SCI'
-    FASTA_SEQ_MIN_S1T = 'TCI'
-    FASTA_SEQ_MIN_S1V = 'VCI'
-    FASTA_SEQ_MIN_S1W = 'WCI'
-    FASTA_SEQ_MIN_S1Y = 'YCI'
-
-    FASTA_SEQ_MIN_C2A = 'SAI'
-    FASTA_SEQ_MIN_C2C = 'SCI'
-    FASTA_SEQ_MIN_C2D = 'SDI'
-    FASTA_SEQ_MIN_C2E = 'SEI'
-    FASTA_SEQ_MIN_C2F = 'SFI'
-    FASTA_SEQ_MIN_C2G = 'SGI'
-    FASTA_SEQ_MIN_C2H = 'SHI'
-    FASTA_SEQ_MIN_C2I = 'SII'
-    FASTA_SEQ_MIN_C2K = 'SKI'
-    FASTA_SEQ_MIN_C2L = 'SLI'
-    FASTA_SEQ_MIN_C2M = 'SMI'
-    FASTA_SEQ_MIN_C2N = 'SNI'
-    FASTA_SEQ_MIN_C2P = 'SPI'
-    FASTA_SEQ_MIN_C2Q = 'SQI'
-    FASTA_SEQ_MIN_C2R = 'SRI'
-    FASTA_SEQ_MIN_C2S = 'SSI'
-    FASTA_SEQ_MIN_C2T = 'STI'
-    FASTA_SEQ_MIN_C2V = 'SVI'
-    FASTA_SEQ_MIN_C2W = 'SWI'
-    FASTA_SEQ_MIN_C2Y = 'SYI'
-
-    FASTA_SEQ_MIN_I3A = 'SCA'
-    FASTA_SEQ_MIN_I3C = 'SCC'
-    FASTA_SEQ_MIN_I3D = 'SCD'
-    FASTA_SEQ_MIN_I3E = 'SCE'
-    FASTA_SEQ_MIN_I3F = 'SCF'
-    FASTA_SEQ_MIN_I3G = 'SCG'
-    FASTA_SEQ_MIN_I3H = 'SCH'
-    FASTA_SEQ_MIN_I3I = 'SCI'
-    FASTA_SEQ_MIN_I3K = 'SCK'
-    FASTA_SEQ_MIN_I3L = 'SCL'
-    FASTA_SEQ_MIN_I3M = 'SCM'
-    FASTA_SEQ_MIN_I3N = 'SCN'
-    FASTA_SEQ_MIN_I3P = 'SCP'
-    FASTA_SEQ_MIN_I3Q = 'SCQ'
-    FASTA_SEQ_MIN_I3R = 'SCR'
-    FASTA_SEQ_MIN_I3S = 'SCS'
-    FASTA_SEQ_MIN_I3T = 'SCT'
-    FASTA_SEQ_MIN_I3V = 'SCV'
-    FASTA_SEQ_MIN_I3W = 'SCW'
-    FASTA_SEQ_MIN_I3Y = 'SCY'
+    MINI_FASTA_SEQ_WILDTYPE = 'SCI'
+    MINI_FASTA_TITLE_SEQ_DICT_ALL_20 = {'S1A': 'ACI', 'S1C': 'CCI', 'S1D': 'DCI', 'S1E': 'ECI', 'S1F': 'FCI',
+                                        'S1G': 'GCI', 'S1H': 'HCI', 'S1I': 'ICI', 'S1K': 'KCI', 'S1L': 'LCI',
+                                        'S1M': 'MCI', 'S1N': 'NCI', 'S1P': 'PCI', 'S1Q': 'QCI', 'S1R': 'RCI',
+                                        'S1S': 'SCI', 'S1T': 'TCI', 'S1V': 'VCI', 'S1W': 'WCI', 'S1Y': 'YCI',
+                                        'C2A': 'SAI', 'C2C': 'SCI', 'C2D': 'SDI', 'C2E': 'SEI', 'C2F': 'SFI',
+                                        'C2G': 'SGI', 'C2H': 'SHI', 'C2K': 'SKI', 'C2L': 'SLI', 'C2M': 'SMI',
+                                        'C2N': 'SNI', 'C2P': 'SPI', 'C2Q': 'SQI', 'C2R': 'SRI', 'C2S': 'SSI',
+                                        'C2T': 'STI', 'C2V': 'SVI', 'C2W': 'SWI', 'C2Y': 'SYI', 'I3A': 'SCA',
+                                        'I3C': 'SCC', 'I3D': 'SCD', 'I3E': 'SCE', 'I3F': 'SCF', 'I3G': 'SCG',
+                                        'I3H': 'SCH', 'I3I': 'SCI', 'I3K': 'SCK', 'I3L': 'SCL', 'I3M': 'SCM',
+                                        'I3N': 'SCN', 'I3P': 'SCP', 'I3Q': 'SCQ', 'I3R': 'SCR', 'I3S': 'SCS',
+                                        'I3T': 'SCT', 'I3V': 'SCV', 'I3W': 'SCW', 'I3Y': 'SCY'}
