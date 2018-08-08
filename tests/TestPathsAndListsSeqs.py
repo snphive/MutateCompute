@@ -107,16 +107,22 @@ class TPLS(Enum):
                     'QVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRRSRRQDVRHGNPLTQCR'
     FASTA_SEQ_10_B = 'SCIQFTRHASDVLLNLNRLRSRDILTDVVIVVSREQFRAHKTVLMACSGLFYSIFTDQLKCNLSVINLDPEINPEGFCILLDFMYTSRLNLREGN' \
                      'IMAVMATAMYLQMEHVVDTCRKFIKAS'
-    MINI_FASTA_SEQ_WILDTYPE = 'SCI'
-    MINI_FASTA_TITLE_SEQ_DICT_ALL_20 = {'S1A': 'ACI', 'S1C': 'CCI', 'S1D': 'DCI', 'S1E': 'ECI', 'S1F': 'FCI',
-                                        'S1G': 'GCI', 'S1H': 'HCI', 'S1I': 'ICI', 'S1K': 'KCI', 'S1L': 'LCI',
-                                        'S1M': 'MCI', 'S1N': 'NCI', 'S1P': 'PCI', 'S1Q': 'QCI', 'S1R': 'RCI',
-                                        'S1S': 'SCI', 'S1T': 'TCI', 'S1V': 'VCI', 'S1W': 'WCI', 'S1Y': 'YCI',
-                                        'C2A': 'SAI', 'C2C': 'SCI', 'C2D': 'SDI', 'C2E': 'SEI', 'C2F': 'SFI',
-                                        'C2G': 'SGI', 'C2H': 'SHI', 'C2K': 'SKI', 'C2L': 'SLI', 'C2M': 'SMI',
-                                        'C2N': 'SNI', 'C2P': 'SPI', 'C2Q': 'SQI', 'C2R': 'SRI', 'C2S': 'SSI',
-                                        'C2T': 'STI', 'C2V': 'SVI', 'C2W': 'SWI', 'C2Y': 'SYI', 'I3A': 'SCA',
-                                        'I3C': 'SCC', 'I3D': 'SCD', 'I3E': 'SCE', 'I3F': 'SCF', 'I3G': 'SCG',
-                                        'I3H': 'SCH', 'I3I': 'SCI', 'I3K': 'SCK', 'I3L': 'SCL', 'I3M': 'SCM',
-                                        'I3N': 'SCN', 'I3P': 'SCP', 'I3Q': 'SCQ', 'I3R': 'SCR', 'I3S': 'SCS',
-                                        'I3T': 'SCT', 'I3V': 'SCV', 'I3W': 'SCW', 'I3Y': 'SCY'}
+    FASTA_TRIPEP_SEQ_WILDTYPE = 'SCI'
+    FASTA_TRIPEP_TITLE_SEQ_DICT_ALL_20_MUTANTS_ONLY = \
+        {'S1A': 'ACI', 'S1C': 'CCI', 'S1D': 'DCI', 'S1E': 'ECI', 'S1F': 'FCI', 'S1G': 'GCI', 'S1H': 'HCI', 'S1I': 'ICI',
+         'S1K': 'KCI', 'S1L': 'LCI', 'S1M': 'MCI', 'S1N': 'NCI', 'S1P': 'PCI', 'S1Q': 'QCI', 'S1R': 'RCI', 'S1T': 'TCI',
+         'S1V': 'VCI', 'S1W': 'WCI', 'S1Y': 'YCI', 'C2A': 'SAI', 'C2D': 'SDI', 'C2E': 'SEI', 'C2F': 'SFI', 'C2G': 'SGI',
+         'C2H': 'SHI', 'C2I': 'SII', 'C2K': 'SKI', 'C2L': 'SLI', 'C2M': 'SMI', 'C2N': 'SNI', 'C2P': 'SPI', 'C2Q': 'SQI',
+         'C2R': 'SRI', 'C2S': 'SSI', 'C2T': 'STI', 'C2V': 'SVI', 'C2W': 'SWI', 'C2Y': 'SYI', 'I3A': 'SCA', 'I3C': 'SCC',
+         'I3D': 'SCD', 'I3E': 'SCE', 'I3F': 'SCF', 'I3G': 'SCG', 'I3H': 'SCH', 'I3K': 'SCK', 'I3L': 'SCL', 'I3M': 'SCM',
+         'I3N': 'SCN', 'I3P': 'SCP', 'I3Q': 'SCQ', 'I3R': 'SCR', 'I3S': 'SCS', 'I3T': 'SCT', 'I3V': 'SCV', 'I3W': 'SCW',
+         'I3Y': 'SCY'}
+    FASTA_TRIPEP_TITLE_TITLE_SEQ_DICT_ALL_20_INCL_WT = \
+        {'WT': 'SCI', 'S1A': 'ACI', 'S1C': 'CCI', 'S1D': 'DCI', 'S1E': 'ECI', 'S1F': 'FCI', 'S1G': 'GCI', 'S1H': 'HCI',
+         'S1I': 'ICI', 'S1K': 'KCI', 'S1L': 'LCI', 'S1M': 'MCI', 'S1N': 'NCI', 'S1P': 'PCI', 'S1Q': 'QCI', 'S1R': 'RCI',
+         'S1T': 'TCI', 'S1V': 'VCI', 'S1W': 'WCI', 'S1Y': 'YCI', 'C2A': 'SAI', 'C2D': 'SDI', 'C2E': 'SEI', 'C2F': 'SFI',
+         'C2G': 'SGI', 'C2H': 'SHI', 'C2I': 'SII', 'C2K': 'SKI', 'C2L': 'SLI', 'C2M': 'SMI', 'C2N': 'SNI', 'C2P': 'SPI',
+         'C2Q': 'SQI', 'C2R': 'SRI', 'C2S': 'SSI', 'C2T': 'STI', 'C2V': 'SVI', 'C2W': 'SWI', 'C2Y': 'SYI', 'I3A': 'SCA',
+         'I3C': 'SCC', 'I3D': 'SCD', 'I3E': 'SCE', 'I3F': 'SCF', 'I3G': 'SCG', 'I3H': 'SCH', 'I3K': 'SCK', 'I3L': 'SCL',
+         'I3M': 'SCM', 'I3N': 'SCN', 'I3P': 'SCP', 'I3Q': 'SCQ', 'I3R': 'SCR', 'I3S': 'SCS', 'I3T': 'SCT', 'I3V': 'SCV',
+         'I3W': 'SCW', 'I3Y': 'SCY'}
