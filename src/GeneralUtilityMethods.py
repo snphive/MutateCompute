@@ -80,7 +80,7 @@ class GUM(object):
     # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
     # if these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
     #
-    # pdbfiles                  String or List of Strings   The pdb file (including ".pdb") or files (no path).
+    # pdbfiles                  String OR List of Strings   The pdb file (including ".pdb") or files (no path).
     # path_input                String                      Path to where the pdb subdirectories can be found.
     # write_fastafile           Boolean                     True to write fasta string incl. >title to new fasta file.
     # path_fastafile            String                      Absolute path of root for fasta file (without >title) that
@@ -119,7 +119,7 @@ class GUM(object):
                                   'Cannot extract FASTA from ' + pdbfile + ' !')
 
                 fasta_sequence = "".join(fasta_list)
-                pdbname = GUM._remove_prefix_and_suffix('RepairPDB_', '_1_0', pdbfile.split('/')[-1].split('.')[0])
+                pdbname = GUM._remove_prefix_and_suffix(pdbfile.split('/')[-1].split('.')[0], 'RepairPDB_', '_1_0')
                 pdbname_chain = pdbname + '_' + protein_chain
                 print(pdbname_chain + ' : ' + fasta_sequence)
                 pdbname_chain_fastaseq_dict[pdbname_chain] = fasta_sequence
@@ -159,18 +159,19 @@ class GUM(object):
                     protein_chains.append(protein_chain)
         return protein_chains
 
-    # prefix    String      The prefix to remove
-    # suffix    String      The suffix to remove
-    # name      String      Any string word
+    # input_string      String      Any string that you want to trim.
+    # prefix            String      The prefix you want to remove from the input string.
+    # suffix            String      The suffix you want to remove from the input string.
     #
-    # Returns the name without the specified prefix and/or suffix
+    # Returns the input string with the specified prefix and suffix trimmed off.
     @staticmethod
-    def _remove_prefix_and_suffix(prefix, suffix, name):
-        if prefix in name:
-            str.replace(name, prefix, '')
-        if suffix in name:
-            str.replace(name, suffix, '')
-        return name
+    def _remove_prefix_and_suffix(input_string, prefix, suffix):
+        trimmed = input_string
+        if input_string.startswith(prefix):
+            trimmed = input_string.replace(prefix, '')
+        if trimmed.endswith(suffix):
+            trimmed = trimmed.replace(suffix, '')
+        return trimmed
 
     # Originally used in solubis.py but not used at the moment in this project. Keeping as may be useful.
     # Reads a fasta file for the sequence part only (not including the >title).
@@ -185,16 +186,91 @@ class GUM(object):
             fasta_seq = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
         return fasta_seq
 
+    # Combines the absolute path given to every fasta file in the given list. Builds ayn missing subdirectories such as
+    # /fastas/<fastaname>
+    # This separation of path to input directory and fasta files was done to provide more flexibility (it makes it
+    # more testable too).
+    #
+    # path_input        String       Absolute path of directory holding list of fasta files.
+    # fastafile_list    List         List of strings which are the target fasta files (including extensions).
+    #
+    # Returns list of fasta files with absolute path to them, e.g. ~/.../input_data/fastas/1_A/1_A.fasta
     @staticmethod
-    def get_title_sequence_dict_from_fastafile(path_fastafile):
+    def build_complete_paths_for_fastafiles(path_input, fastafile_list):
+        return [path_input + '/fastas/' + fastafile.split('.')[0] + '/' + fastafile for fastafile in fastafile_list]
+
+    # Splits a fastafile's text contents into a dictionary. The key is fastafile's title, value is (amino acid)
+    # sequence.
+    # E.g.
+    # ">1_A\n'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVG...' etc"
+    #
+    # is saved as
+    #
+    # {
+    #   '1_A': <seq of 1_A>,
+    #   '2_A': <seq of 2_A>,
+    #    etc..
+    # }
+    #
+    #
+    # The fastafile is assumed to be either two lines: 1st line ">title", 2nd line sequence, but the method also allows
+    # there to be either no title (i.e. sequence only) or an empty title (">" with no title after it). In these both
+    # scenarios, the title is created based on the name of the file itself.
+    #
+    # path_fastafiles   String OR List of Strings   Absolute path to the fasta file, including the file (incl. .fasta)
+    #                                               e.g. ~/../input_data/fastas/1_A/1_A.fasta
+    #
+    # Returns title:sequence dictionary.
+    @staticmethod
+    def make_titleSeqDict_from_fastafile(path_fastafiles):
         title_sequence_dict = {}
-        with open(path_fastafile, 'r').readlines() as fasta_lines:
-            if len(fasta_lines) > 2 or len(fasta_lines) < 1:
-                raise ValueError('There is either an extra unexpected carriage return or no sequence data at all')
-            title = fasta_lines[0] if len(fasta_lines) == 2 else os.path.splitext(path_fastafile)[0]
-            fasta_seq = fasta_lines[1] if len(fasta_lines) == 2 else fasta_lines[0]
-            title_sequence_dict[title] = fasta_seq
+        if isinstance(path_fastafiles, str):
+            path_fastafiles = [path_fastafiles]
+        for path_fastafile in path_fastafiles:
+            with open(path_fastafile, 'r') as path_fastafile_opened:
+                fastafile_lines = path_fastafile_opened.readlines()
+                if len(fastafile_lines) > 2 or len(fastafile_lines) < 1:
+                    raise ValueError('There is either an extra unexpected carriage return or no sequence data at all')
+                elif len(fastafile_lines) == 2:
+                    title = GUM._remove_prefix_and_suffix(fastafile_lines[0],  ">", "\n")
+                if title == "" or len(fastafile_lines) == 1:
+                    title = os.path.splitext(path_fastafiles)[0]
+                fasta_seq = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
+                title_sequence_dict[title] = fasta_seq
         return title_sequence_dict
+
+    # Converts a title:sequence dictionary to a title: {title:seq dictionary} dictionary. One use of this is to add
+    # 19 more titles per residue for different titles which represent point mutants.
+    # E.g.
+    #
+    # {
+    #   '1_A': <seq of 1_A>,
+    #   '2_A': <seq of 2_A>,
+    #    etc..
+    # }
+    #
+    # is converted to
+    #
+    # {
+    #   '1_A':
+    #           {'1_A'      : <seq of 1_A>,
+    #            '1_A_R1A'  : <seq of 1_A_R1A>, ... etc },
+    #   '2_A':
+    #           {'2_A'      : <seq of 2_A>,
+    #            '2_A_P1A'  : <seq of 2_A_P1A>, ... etc },
+    #    etc..
+    # }
+    #
+    # title_sequence_dict   Dictionary   Fasta title (i.e. sequence id) is key. Sequence in FASTA format is value.
+    #
+    # Returns dictionary of title: title:sequence dictionaries.
+    @staticmethod
+    def convert_titleSeqDict_to_titleTitleSeqDictDict(title_sequence_dict):
+        title_titleSeqDict_dict = {}
+        for title in title_sequence_dict.keys():
+            title_titleSeqDict_dict[title] = title_sequence_dict
+        return title_titleSeqDict_dict
+
 
     ###################################################################################################################
     # Builds a directory tree with any number of child nodes. Each new node is only ever one level down (siblings).
@@ -265,7 +341,6 @@ class GUM(object):
     #
     # NB: I DON'T THINK I'VE COMPLETED THIS METHOD BECAUSE IT DOESN'T LOOK LIKE IT USES THE STARTING NUMBER TO DECIDE
     # WHICH 100 PDBS TO COPY AND MOVE.***** *** **
-    #
     @staticmethod
     def copy_and_move_pdb_files(path_src_dir, path_dst_dir, starting_num, total_num_to_copy=100):
 
@@ -292,7 +367,7 @@ class GUM(object):
             GUM.linux_copy(path_src_dir_subfoldername, path_dst_dir_subfoldername, do_recursively=True)
 
     # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
-    # Folder will be name "1...100". If starting_num is 20025, it will name it "20025...20125"
+    # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
     @staticmethod
     def _make_subfoldername(starting_num, total_num_to_copy):
         return str(starting_num) + '...' + str(total_num_to_copy)
