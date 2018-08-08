@@ -33,10 +33,10 @@ class Scheduler(object):
                 thread.join()
 
             if operations['do_foldx_buildmodel']:
-                write_wt_fasta_files = True
+                write_wt_fastafiles = True
                 buildmodel = FoldX().BuildModel()
                 thread = Thread(target=buildmodel.mutate_residues_of_pdb,
-                                args=(pdb, mutant_aa_list, write_wt_fasta_files))
+                                args=(pdb, mutant_aa_list, write_wt_fastafiles))
                 thread.start()
                 process_started = True
                 thread.join()

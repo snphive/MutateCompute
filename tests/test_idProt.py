@@ -31,9 +31,9 @@ class TestIdProt(TestCase):
         cls.XML_1_A_BLASTP_OUTPUT_FILE = '1_A.xml'
 
         # constants related to input - mutant 1_A
-        cls.FASTA_FILE_1_A = '1_A.fasta'
+        cls.FASTAFILE_1_A = '1_A.fasta'
         cls.DIR_PDB_1_A = '1_A'
-        cls.PATH_FASTA_1_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTA_FILE_1_A
+        cls.PATH_FASTA_1_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTAFILE_1_A
         cls.FASTA_SEQ_1_A = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -41,15 +41,15 @@ class TestIdProt(TestCase):
                             'GTCPGGAFTPNMRTTKEFPDDVVTFIRNHPLMYNSIYPIHKRPLIVRIGTDYKYTKIAVDRVNAADGRYHVLFLGTDRGTVQKVVVL' \
                             'PTNNSVSGELILEELEVFKNHAPITTMKISSKKQQLYVSSNEGVSQVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRR' \
                             'SRRQDVRHGNPLTQCR'
-        cls.NAME_1_A = cls.FASTA_FILE_1_A.split('.')[0]
+        cls.NAME_1_A = cls.FASTAFILE_1_A.split('.')[0]
         cls.XML_FILE_1_A = cls.NAME_1_A + '.xml'
         cls.FASTA_STR_1_A = ">" + cls.NAME_1_A + "\n" + cls.FASTA_SEQ_1_A
 
         ########     mutant 1_B     ##################################################################################
 
-        cls.FASTA_FILE_1_B = '1_B.fasta'
+        cls.FASTAFILE_1_B = '1_B.fasta'
         cls.DIR_PDB_1_B = '1_B'
-        cls.PATH_FASTA_1_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_B + '/' + cls.FASTA_FILE_1_B
+        cls.PATH_FASTA_1_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_B + '/' + cls.FASTAFILE_1_B
         cls.FASTA_SEQ_1_B = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -58,25 +58,25 @@ class TestIdProt(TestCase):
                             'PTNNSVSGELILEELEVFKNHAPITTMKISSKKQQLYVSSNEGVSQVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRR' \
                             'SRRQDVRHGNPLTQCR'
 
-        cls.NAME_1_B = cls.FASTA_FILE_1_B.split('.')[0]
+        cls.NAME_1_B = cls.FASTAFILE_1_B.split('.')[0]
         cls.XML_FILE_1_B = cls.NAME_1_B + '.xml'
         cls.FASTA_STR_1_B = ">" + cls.NAME_1_B + "\n" + cls.FASTA_SEQ_1_B
 
         ########     mutant 2_A     ##################################################################################
 
-        cls.FASTA_FILE_2_A = '2_A.fasta'
+        cls.FASTAFILE_2_A = '2_A.fasta'
         cls.DIR_PDB_2_A = '2_A'
-        cls.PATH_FASTA_2_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_2_A + '/' + cls.FASTA_FILE_2_A
+        cls.PATH_FASTA_2_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_2_A + '/' + cls.FASTAFILE_2_A
         cls.FASTA_SEQ_2_A = 'EIVQYGVKNNTTFLECAPKSPQASIKWLLQKDKDRRKEVKLNERIIATSQGLLIRSVQGSDQGLYHCIATENSFKQTIAKINFKVLD'
-        cls.NAME_2_A = cls.FASTA_FILE_2_A.split('.')[0]
+        cls.NAME_2_A = cls.FASTAFILE_2_A.split('.')[0]
         cls.XML_FILE_2_A = cls.NAME_2_A + '.xml'
         cls.FASTA_STR_2_A = ">" + cls.NAME_2_A + "\n" + cls.FASTA_SEQ_2_A
 
         ########     mutant 3_A     ##################################################################################
 
-        cls.FASTA_FILE_3_A = '3_A.fasta'
+        cls.FASTAFILE_3_A = '3_A.fasta'
         cls.DIR_PDB_3_A = '3_A'
-        cls.PATH_FASTA_3_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_A + '/' + cls.FASTA_FILE_3_A
+        cls.PATH_FASTA_3_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_A + '/' + cls.FASTAFILE_3_A
         cls.FASTA_SEQ_3_A = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -84,15 +84,15 @@ class TestIdProt(TestCase):
                             'GTCPGGAFTPNMRTTKEFPDDVVTFIRNHPLMYNSIYPIHKRPLIVRIGTDYKYTKIAVDRVNAADGRYHVLFLGTDRGTVQKVVVL' \
                             'PTNNSVSGELILEELEVFKNHAPITTMKISSKKQQLYVSSNEGVSQVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRR' \
                             'SRRQDVRHGNPLTQCR'
-        cls.NAME_3_A = cls.FASTA_FILE_3_A.split('.')[0]
+        cls.NAME_3_A = cls.FASTAFILE_3_A.split('.')[0]
         cls.XML_FILE_3_A = cls.NAME_3_A + '.xml'
         cls.FASTA_STR_3_A = ">" + cls.NAME_3_A + "\n" + cls.FASTA_SEQ_3_A
 
         ########     mutant 3_B     ##################################################################################
 
-        cls.FASTA_FILE_3_B = '3_B.fasta'
+        cls.FASTAFILE_3_B = '3_B.fasta'
         cls.DIR_PDB_3_B = '3_B'
-        cls.PATH_FASTA_3_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_B + '/' + cls.FASTA_FILE_3_B
+        cls.PATH_FASTA_3_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_B + '/' + cls.FASTAFILE_3_B
         cls.FASTA_SEQ_3_B = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -100,18 +100,18 @@ class TestIdProt(TestCase):
                             'GTCPGGAFTPNMRTTKEFPDDVVTFIRNHPLMYNSIYPIHKRPLIVRIGTDYKYTKIAVDRVNAADGRYHVLFLGTDRGTVQKVVVL' \
                             'PTNNSVSGELILEELEVFKNHAPITTMKISSKKQQLYVSSNEGVSQVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRR' \
                             'SRRQDVRHGNPLTQCR'
-        cls.NAME_3_B = cls.FASTA_FILE_3_B.split('.')[0]
+        cls.NAME_3_B = cls.FASTAFILE_3_B.split('.')[0]
         cls.XML_FILE_3_B = cls.NAME_3_B + '.xml'
         cls.FASTA_STR_3_B = ">" + cls.NAME_3_B + "\n" + cls.FASTA_SEQ_3_B
 
         ########     mutant 10_B     ##################################################################################
 
-        cls.FASTA_FILE_10_B = '10_B.fasta'
+        cls.FASTAFILE_10_B = '10_B.fasta'
         cls.DIR_PDB_10_B = '10_B'
-        cls.PATH_FASTA_10_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_10_B + '/' + cls.FASTA_FILE_10_B
+        cls.PATH_FASTA_10_B = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_10_B + '/' + cls.FASTAFILE_10_B
         cls.FASTA_SEQ_10_B = 'SCIQFTRHASDVLLNLNRLRSRDILTDVVIVVSREQFRAHKTVLMACSGLFYSIFTDQLKCNLSVINLDPEINPEGFCILLDFMYT' \
                              'SRLNLREGNIMAVMATAMYLQMEHVVDTCRKFIKAS'
-        cls.NAME_10_B = cls.FASTA_FILE_10_B.split('.')[0]
+        cls.NAME_10_B = cls.FASTAFILE_10_B.split('.')[0]
         cls.XML_FILE_10_B = cls.NAME_10_B + '.xml'
         cls.FASTA_STR_10_B = ">" + cls.NAME_10_B + "\n" + cls.FASTA_SEQ_10_B
         ###############################################################################################################
@@ -163,13 +163,13 @@ class TestIdProt(TestCase):
         mock__write_blastp_xml_result.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
         path_output = TPL.MC_TESTS_OUTPUT + '/' + self.DIR_PDB_1_A + TestIdProt.DIR_BLASTP
         # action
-        result_dict = IdProt.start(path_fasta_file=self.PATH_FASTA_1_A, write_blastp_json=False, build_idmap_csv=False,
+        result_dict = IdProt.start(path_fastafile=self.PATH_FASTA_1_A, write_blastp_json=False, build_idmap_csv=False,
                                    path_output=path_output)
         # assert
         self.assertEqual(expected_qblast_dict_1_A, result_dict)
 
 
-    def test__read_fasta_file(self):
+    def test__read_fastafile(self):
         self.fail()
 
     def test__write_blastp_xml_result(self):

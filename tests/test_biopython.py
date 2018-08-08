@@ -10,9 +10,9 @@ class TestBiopython(TestCase):
     @classmethod
     def setUpClass(cls):
         # constants related to input
-        cls.FASTA_FILE_1_A = '1_A.fasta'
+        cls.FASTAFILE_1_A = '1_A.fasta'
         cls.DIR_PDB_1_A = '1_A'
-        cls.PATH_FASTA_1_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTA_FILE_1_A
+        cls.PATH_FASTA_1_A = TPL.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTAFILE_1_A
         cls.FASTA_SEQ_1_A = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -20,7 +20,7 @@ class TestBiopython(TestCase):
                             'GTCPGGAFTPNMRTTKEFPDDVVTFIRNHPLMYNSIYPIHKRPLIVRIGTDYKYTKIAVDRVNAADGRYHVLFLGTDRGTVQKVVVL' \
                             'PTNNSVSGELILEELEVFKNHAPITTMKISSKKQQLYVSSNEGVSQVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRR' \
                             'SRRQDVRHGNPLTQCR'
-        cls.NAME_1_A = cls.FASTA_FILE_1_A.split('.')[0]
+        cls.NAME_1_A = cls.FASTAFILE_1_A.split('.')[0]
         cls.XML_FILE_1_A = cls.NAME_1_A + '.xml'
         cls.FASTA_STR_1_A = ">" + cls.NAME_1_A + "\n" + cls.FASTA_SEQ_1_A
 

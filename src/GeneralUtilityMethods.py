@@ -83,11 +83,12 @@ class GUM(object):
     # pdbfiles                  String or List of Strings   The pdb file (including ".pdb") or files (no path).
     # path_input                String                      Path to where the pdb subdirectories can be found.
     # write_fastafile           Boolean                     True to write fasta string incl. >title to new fasta file.
-    # path_to_write_fastafile   String                      Absolute path of root for fasta file (without >title).
+    # path_fastafile            String                      Absolute path of root for fasta file (without >title) that
+    #                                                       will be written if write_fastafile is True.
     #
     # Returns a dictionary of the pdbname_chain and the protein sequence in FASTA format.
     @staticmethod
-    def extract_pdbname_chain_fasta_from_pdbs(pdbfiles, path_input, write_fastafile, path_to_write_fastafile):
+    def extract_pdbname_chain_fasta_from_pdbs(pdbfiles, path_input, write_fastafile, path_fastafile):
         pdbname_chain_fastaseq_dict: dict = {}
         if isinstance(pdbfiles, str):
             pdbfiles = [pdbfiles]
@@ -123,7 +124,7 @@ class GUM(object):
                 print(pdbname_chain + ' : ' + fasta_sequence)
                 pdbname_chain_fastaseq_dict[pdbname_chain] = fasta_sequence
                 if write_fastafile:
-                    GUM.write_fastafile_to_name_chain_dir(pdbname_chain_fastaseq_dict, path_to_write_fastafile)
+                    GUM.write_fastafile_to_name_chain_dir(pdbname_chain_fastaseq_dict, path_fastafile)
         return pdbname_chain_fastaseq_dict
 
     # Write the fasta file (with >title) to a new subdirectory in the specified directory. The subdirectory has the same
@@ -136,9 +137,9 @@ class GUM(object):
         for pdbname_chain, fasta_sequence in pdbname_chain_fasta_dict.items():
             path_output_pdb_pdbchain = GUM.create_dir_tree(path_to_write_fastafile_root, pdbname_chain.split('_')[0],
                                                            pdbname_chain)
-            with open(path_output_pdb_pdbchain + pdbname_chain + '.fasta', 'w') as fasta_file:
-                fasta_file.write('>' + pdbname_chain + '\n')
-                fasta_file.write(fasta_sequence)
+            with open(path_output_pdb_pdbchain + pdbname_chain + '.fasta', 'w') as fastafile:
+                fastafile.write('>' + pdbname_chain + '\n')
+                fastafile.write(fasta_sequence)
 
     # For the pdb passed here, all chains are read from the pdb file.
     #
@@ -178,19 +179,19 @@ class GUM(object):
     #
     # Returns the (amino acid) sequence of the fasta file.
     @staticmethod
-    def get_sequenceonly_from_fasta_file(path_fastafile):
+    def get_sequenceonly_from_fastafile(path_fastafile):
         with open(path_fastafile, 'r') as fastafile_opened:
             fastafile_lines = fastafile_opened.readlines()
             fasta_seq = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
         return fasta_seq
 
     @staticmethod
-    def get_title_sequence_dict_from_fasta_file(path_fasta_file):
+    def get_title_sequence_dict_from_fastafile(path_fastafile):
         title_sequence_dict = {}
-        with open(path_fasta_file, 'r').readlines() as fasta_lines:
+        with open(path_fastafile, 'r').readlines() as fasta_lines:
             if len(fasta_lines) > 2 or len(fasta_lines) < 1:
                 raise ValueError('There is either an extra unexpected carriage return or no sequence data at all')
-            title = fasta_lines[0] if len(fasta_lines) == 2 else os.path.splitext(path_fasta_file)[0]
+            title = fasta_lines[0] if len(fasta_lines) == 2 else os.path.splitext(path_fastafile)[0]
             fasta_seq = fasta_lines[1] if len(fasta_lines) == 2 else fasta_lines[0]
             title_sequence_dict[title] = fasta_seq
         return title_sequence_dict
@@ -298,10 +299,10 @@ class GUM(object):
 
     # Reads FASTA input file in and returns the text including the >name, the /n, and the amino acid sequence.
     #
-    # path_fasta_file       String      FASTA file (with .fasta extension) and absolute path to the file.
+    # path_fastafile       String      Absolute path to fasta file (incl. extension).
     @staticmethod
-    def read_fasta_file(path_fasta_file):
-        with open(path_fasta_file) as fasta_io:
+    def read_fastafile(path_fastafile):
+        with open(path_fastafile) as fasta_io:
             fasta_str = fasta_io.read()
         return fasta_str
 

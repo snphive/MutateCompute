@@ -140,7 +140,7 @@ class TestGUM(TestCase):
         # assert
         self.assertEqual(expected_word, word)
 
-    def test_get_sequenceonly_from_fasta_file(self):
+    def test_get_sequenceonly_from_fastafile(self):
         # arrange
         path_fastafile = TPL.MC_TESTS_INPUT.value + '/fastas/1_A/1_A.fasta'
         expected_seq = \
@@ -150,6 +150,6 @@ class TestGUM(TestCase):
         'PFAHKEGPNHQLISYQGRIPYPRPGTCPGGAFTPNMRTTKEFPDDVVTFIRNHPLMYNSIYPIHKRPLIVRIGTDYKYTKIAVDRVNAADGRYHVLFLGTDRGTVQKV' \
         'VVLPTNNSVSGELILEELEVFKNHAPITTMKISSKKQQLYVSSNEGVSQVSLHRCHIYGTACADCCLARDPYCAWDGHSCSRFYPTGKRRSRRQDVRHGNPLTQCR'
         # action
-        sequence = GUM.get_sequenceonly_from_fasta_file(path_fastafile)
+        sequence = GUM.get_sequenceonly_from_fastafile(path_fastafile)
         # assert
         self.assertEqual(expected_seq, sequence)

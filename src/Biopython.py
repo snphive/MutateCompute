@@ -55,7 +55,7 @@ class Biopy(object):
     # NOTE: Time taken for this remote qblast for sequence 1_A.fasta was about 20 seconds.
     # NOTE: The query sequence id is also the filename and is used here for the name of the output xml.
     @staticmethod
-    def parse_filter_blastp_xml_to_dict(path_qblast_result, filename, path_fasta_file):
+    def parse_filter_blastp_xml_to_dict(path_qblast_result, filename, path_fastafile):
         with open(path_qblast_result) as f:
             blast_record = NCBIXML.read(f)
             query_length = blast_record.query_length
@@ -73,7 +73,7 @@ class Biopy(object):
         len_sbjct_prot = qblast_result_dict['alignment_dict']['hsp_dict']['sbjct_end'] - \
                          qblast_result_dict['alignment_dict']['hsp_dict']['sbjct_start']
 
-        Biopy.__print_discrepancies(query_length, query_letters, path_fasta_file, len_sbjct_prot)
+        Biopy.__print_discrepancies(query_length, query_letters, path_fastafile, len_sbjct_prot)
         return qblast_result_dict
 
     # Builds a dictionary of relevant info for each high-scoring pair (hsp) alignment where there are zero gaps and
@@ -101,13 +101,13 @@ class Biopy(object):
 
     # query_length      int     qblast output value, refers to length of the input fasta sequence.
     # query_letters     int     qblast letters value, refers to number of input fasta sequence characters.
-    # path_fasta_file   String  FASTA file (with extension) and absolute path.
+    # path_fastafile    String  FASTA file (with extension) and absolute path.
     # len_hit           int     length of protein that blast hit
     @staticmethod
-    def __print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fasta_file, len_hit):
+    def __print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fastafile, len_hit):
         if not query_length == query_letters:
             print("Warning: query_length of blast_record is not same as query letters of blast_record.")
-        if not query_length == len(SeqIO.read(path_fasta_file, 'fasta').seq):
+        if not query_length == len(SeqIO.read(path_fastafile, 'fasta').seq):
             print("Warning: length of fasta input sequence not same as query length of blast_record.")
         if not query_length < len_hit:
             print("NB: length of fasta input (" + str(query_length) + ") is less than length of hit(" + str(len_hit))

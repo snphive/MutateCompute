@@ -15,18 +15,18 @@ class IdProt(object):
     # (Manually transfer fasta files to an input folder at the path set as a constant global variable method.)
     #
     #
-    # path_fasta_file       String      Absolute path to FASTA input file (with .fasta extension).
+    # path_fastafile        String      Absolute path to FASTA input file (with .fasta extension).
     # write_blastp_json     Boolean     True to write the blastp result dictionary to a json output file.
     # build_idmap_csv       Boolean     True to build a csv file that maps ids (accession and RvdK ids).
     # path_output           String      Absolute path to output files. Typically output_data/<pdbname>/blastp.
     @staticmethod
-    def start(path_fasta_file, write_blastp_json, build_idmap_csv, path_output):
-        fasta_file = path_fasta_file.split('/')[-1]
-        filename = fasta_file.split('.')[0]
-        fasta_str = GUM.read_fasta_file(path_fasta_file)
+    def start(path_fastafile, write_blastp_json, build_idmap_csv, path_output):
+        fastafile = path_fastafile.split('/')[-1]
+        filename = fastafile.split('.')[0]
+        fasta_str = GUM.read_fastafile(path_fastafile)
         blastp_result = Biopy.run_blastp(fasta_str)
         path_blastp_xml_result = IdProt._write_blastp_xml_result(path_output, filename, blastp_result)
-        blastp_result_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blastp_xml_result, filename, path_fasta_file)
+        blastp_result_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blastp_xml_result, filename, path_fastafile)
         if write_blastp_json:
             IdProt._write_dict_to_json_file(path_output, filename, blastp_result_dict)
         if build_idmap_csv:

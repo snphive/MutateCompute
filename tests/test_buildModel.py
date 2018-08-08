@@ -43,12 +43,12 @@ class TestBuildModel(TestCase):
                                                           'LA4C', 'TA5A', 'TA5C', 'RB1A', 'RB1C', 'VB2A', 'VB2C',
                                                           'YB3A', 'YB3C', 'LB4A', 'LB4C', 'TB5A', 'TB5C']
         mock_os_chdir.return_value = None
-        write_wt_fasta_files = False
+        write_wt_fastafiles = False
         mutant_aa_list = ['A', 'C']
         pdb = 'RepairPDB_1.pdb'
         # action
         self.buildModel.mutate_residues_of_pdb(TPL.MC_TESTS_INPUT.value, TPL.MC_TESTS_OUTPUT.value, pdb,
-                                               mutant_aa_list, write_wt_fasta_files)
+                                               mutant_aa_list, write_wt_fastafiles)
         # assert
         expected_call_count_1 = 1
         expected_call_count_20 = len(mock__make_fx_mutant_name_list.return_value)

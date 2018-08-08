@@ -7,34 +7,38 @@ from Bio.Alphabet import IUPAC
 class MutateFasta(object):
 
     def __init__(self):
-        print('hello world MutateFasta constructor')
+        print('')
 
     # Mutates FASTA (typically wild-type) sequences at every position, to every residue specified (typically all other
     # 19 residues.)
-    # path_input
-    def mutate_every_residue_in_fasta_list(self, path_input, fasta_list, mutant_aa_list):
-        path_fasta_file_list = self._build_path_for_fasta_file(path_input, fasta_list)
-        list_of_fasta_title_sequence_dict = self._build_list_of_title_sequence_dict_from_fasta_files(path_fasta_file_list)
+    #
+    # path_input        String
+    # fastafile_list   List
+    # mutant_aa_list    List
+    def mutate_every_residue_in_fasta_list(self, path_input, fastafile_list, mutant_aa_list):
+        path_fastafile_list = self._build_complete_paths_for_fastafiles(path_input, fastafile_list)
+        list_of_fasta_title_sequence_dict = self._build_list_of_title_sequence_dict_from_fastafiles(path_fastafile_list)
         mutant_fasta_list = self._mutate_sequences_in_list_of_dict(list_of_fasta_title_sequence_dict, mutant_aa_list)
         return mutant_fasta_list
 
-    # Combines the absolute path to an input directory given to each fasta file in a list. However, it must identity
-    # which pdb it belongs to in order to
-    # This separation of path to the input directory and fasta files was done to provide more flexibility (and actually
-    # makes it more testable too).
-    # path_input    String      Absolute path of directory holding list of fasta files
-    # fasta_list    List        List of strings that are the target fasta files (including extensions).
-    def _build_path_for_fasta_file(self, path_input, fasta_list):
-        path_fasta_file_list = []
-        for fasta in fasta_list:
-            path_fasta_file_list.append(path_input + '/' + fasta + '/' + fasta + '.fasta')
-        return path_fasta_file_list
+    # Combines the absolute path given to every fasta file in the given list. Builds ayn missing subdirectories such as
+    # /fastas/<fastaname>
+    # This separation of path to input directory and fasta files was done to provide more flexibility (it makes it
+    # more testable too).
+    #
+    # path_input        String       Absolute path of directory holding list of fasta files.
+    # fastafile_list    List         List of strings which are the target fasta files (including extensions).
+    #
+    # Returns list of fasta files with absolute path to them, e.g. ~/.../input_data/fastas/1_A/1_A.fasta
+    def _build_complete_paths_for_fastafiles(self, path_input, fastafile_list):
+        return [path_input + '/fastas/' + fastafile.split('.')[0] + '/' + fastafile for fastafile in fastafile_list]
 
-    # returns a list of fasta title:sequence dictionaries
-    def _build_list_of_title_sequence_dict_from_fasta_files(self, path_fasta_file_list):
+    #
+    # Returns a list of fasta title:sequence dictionaries.
+    def _build_list_of_title_sequence_dict_from_fastafiles(self, path_fastafile_list):
         fasta_title_sequence_dict_list = []
-        for path_fasta_file in path_fasta_file_list:
-            fasta_title_sequence_dict_list.append(GUM.get_title_sequence_dict_from_fasta_file(path_fasta_file))
+        for path_fastafile in path_fastafile_list:
+            fasta_title_sequence_dict_list.append(GUM.get_title_sequence_dict_from_fastafile(path_fastafile))
         return fasta_title_sequence_dict_list
 
     def _mutate_sequences_in_list_of_dict(self, fasta_title_sequence_dict_list, mutant_aa_list):

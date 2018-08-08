@@ -23,17 +23,17 @@ class Main(object):
         globaloptions_lines = Main._read_global_options(Paths.MC_CONFIG_GLOBAL_OPTIONS.value +
                                                         '/MutateCompute_Options.txt')
         wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.pdbs, Paths.MC_INPUT.value)
-        wanted_fastfile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.fastas, Paths.MC_INPUT.value)
+        wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.fastas, Paths.MC_INPUT.value)
         operations = Main._determine_which_operations_to_perform(globaloptions_lines)
         list_of_mutant_aa = Main._determine_residues_to_mutate_to()
         path_dst_dir = Paths.SE_INPUT.value if cluster else Paths.MC_INPUT.value
         path_src_repo_dir = Paths.SE_REPO_PDB_FASTA.value if cluster else Paths.LOCAL_REPO_PDB_FASTA.value
         src_pdbfile_list = GUM.get_filelist_from_subdirs(path_src_repo_dir, self.pdbs)
         src_fastafile_list = GUM.get_filelist_from_subdirs(path_src_repo_dir, self.fastas)
-        wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir, src_pdbfile_list,
-                                                                        wanted_pdbfile_list)
+        wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir,
+                                                                        src_pdbfile_list, wanted_pdbfile_list)
         wanted_fastafile_list = GUM.copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir,
-                                                                          src_fastafile_list, wanted_fastfile_list)
+                                                                          src_fastafile_list, wanted_fastafile_list)
         Main._start_scheduler(operations, Paths.MC_INPUT, wanted_pdbfile_list, wanted_fastafile_list, list_of_mutant_aa)
 
     # Reads the MutateCompute_Options.txt in /configuration/global_options and .
@@ -62,7 +62,8 @@ class Main(object):
     # globaloptions_lines   List        List of strings, each element is a line of the options text ending with '/n'.
     # PDB_or_FASTA          String      Either "PDBs" or "FASTAs" to indicate which files to retrieve.
     # path_input            String      Path to the input_data files (including PDB and FASTA files).
-    # returns a list of pdb or fasta files according to the global_options PDBs or FASTAs. (Files include extensions).
+    #
+    # Returns a list of pdb or fasta files according to the global_options PDBs or FASTAs. (Files include extensions).
     @staticmethod
     def _build_filelist_for_analysis(globaloptions_lines, PDB_or_FASTA, path_input):
         file_list = []
