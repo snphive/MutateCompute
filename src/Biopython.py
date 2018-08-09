@@ -32,6 +32,7 @@
 from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 from Bio import SeqIO
+import warnings
 
 
 class Biopy(object):
@@ -106,15 +107,19 @@ class Biopy(object):
     @staticmethod
     def __print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fastafile, len_hit):
         if not query_length == query_letters:
-            print("Warning: query_length of blast_record is not same as query letters of blast_record.")
+            warnings.warn_explicit(message='Query_length of blast_record is not same as query letters of blast_record.',
+                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
         if not query_length == len(SeqIO.read(path_fastafile, 'fasta').seq):
-            print("Warning: length of fasta input sequence not same as query length of blast_record.")
+            warnings.warn_explicit(message='Length of fasta input sequence not same as query length of blast_record.',
+                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
         if not query_length < len_hit:
-            print("NB: length of fasta input (" + str(query_length) + ") is less than length of hit(" + str(len_hit))
+            warnings.warn_explicit(message='Length of fasta input (' + str(query_length) + ') is less than length of '
+                                           'hit(" + str(len_hit).',
+                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
 
-# Note this enum class is created to hold constant values.
     from enum import Enum
 
+    # Note this enum class is created to hold constant values.
     class BlastParam(Enum):
         BLST_P = "blastp"
         SWSPRT = "swissprot"
