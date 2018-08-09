@@ -135,7 +135,7 @@ class TestGUM(TestCase):
         path_fastafile = TPLS.MC_TESTS_INPUT.value + '/fastas/1_A/1_A.fasta'
         expected_seq_1_A = TPLS.FASTA_SEQ_1_A.value
         # action
-        sequence = GUM.get_sequenceonly_from_fastafile(path_fastafile)
+        sequence = GUM.get_sequenceOnly_from_fastafile(path_fastafile)
         # assert
         self.assertEqual(expected_seq_1_A, sequence)
 
