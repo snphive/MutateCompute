@@ -373,15 +373,6 @@ class GUM(object):
     def _make_subfoldername(starting_num, total_num_to_copy):
         return str(starting_num) + '...' + str(total_num_to_copy)
 
-    # Reads FASTA input file in and returns the text including the >name, the /n, and the amino acid sequence.
-    #
-    # path_fastafile       String      Absolute path to fasta file (incl. extension).
-    @staticmethod
-    def read_fastafile(path_fastafile):
-        with open(path_fastafile) as fasta_io:
-            fasta_str = fasta_io.read()
-        return fasta_str
-
     @staticmethod
     def linux_copy(path_src, path_dst, do_recursively):
         recurse_cmd = (GUM.space + '-r') if do_recursively else ''
