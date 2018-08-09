@@ -180,7 +180,7 @@ class GUM(object):
     #
     # Returns the (amino acid) sequence of the fasta file.
     @staticmethod
-    def get_sequenceonly_from_fastafile(path_fastafile):
+    def get_sequenceOnly_from_fastafile(path_fastafile):
         with open(path_fastafile, 'r') as fastafile_opened:
             fastafile_lines = fastafile_opened.readlines()
             fasta_seq = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
@@ -225,7 +225,7 @@ class GUM(object):
     def make_titleSeqDict_from_fastafile(path_fastafiles):
         title_sequence_dict = {}
         if isinstance(path_fastafiles, str):
-            path_fastafiles = [path_fastafiles]
+            path_fastafiles     = [path_fastafiles]
         for path_fastafile in path_fastafiles:
             with open(path_fastafile, 'r') as path_fastafile_opened:
                 fastafile_lines = path_fastafile_opened.readlines()
@@ -294,6 +294,9 @@ class GUM(object):
             complete_paths.append(path_root_leaf)
             if not os.path.exists(path_root_leaf):
                 os.mkdir(path_root_leaf)
+        if not complete_paths:
+            warnings.warn_explicit(message='No new directory trees were created. Returning an empty list.',
+                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=288)
         return complete_paths
 
     ###################################################################################################################
@@ -317,18 +320,16 @@ class GUM(object):
     #
     # path_root     String                      The path to the root (ideally absolute), "/path/of/root"
     # *args         String or list of Strings   Name or list of names of directory to add to root, then root-leaf.
+    #
+    # NOTE: os.makedirs(path) does the same thing but throws an exception if the path already exists.
     @staticmethod
     def create_dir_tree(path_root, *args):
-        path_root_leaf = path_root
         if not os.path.exists(path_root):
             os.makedirs(path_root)
         for leaf in args:
             path_root_leaf = path_root + '/' + leaf
             if not os.path.exists(path_root_leaf):
                 os.mkdir(path_root_leaf)
-            else:
-                warnings.warn_explicit(message='No new directory tree was created. Returning the unchanged root.',
-                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
             path_root = path_root_leaf
         return path_root_leaf
 
@@ -429,6 +430,7 @@ class GUM(object):
     @staticmethod
     def get_subdirname_starting_with(path, starting_with):
         dirnames = []
+        dirname = ''
         for dir_tuple in os.walk(path):
             if dir_tuple[0].split('/')[-1].startswith(starting_with):
                 dirnames.append(dir_tuple[0])
@@ -478,7 +480,7 @@ class GUM(object):
 
     @staticmethod
     def do_userWarning_deleting_dir(dir, lineno):
-        warnings.warn_explicit(message='You are about to delete '+ dir + 'dir tree. You have 10 secs to abort!',
+        warnings.warn_explicit(message='You are about to delete ' + dir + 'dir tree. You have 10 secs to abort!',
                                category=UserWarning, filename='GeneralUtilityMethods.py', lineno=lineno)
         time.sleep(10)
 
