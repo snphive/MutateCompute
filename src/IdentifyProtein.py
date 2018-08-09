@@ -21,17 +21,18 @@ class IdProt(object):
     # path_output           String      Absolute path to output files. Typically output_data/<pdbname>/blastp.
     @staticmethod
     def start(path_fastafile, write_blastp_json, build_idmap_csv, path_output):
-        fastafile = path_fastafile.split('/')[-1]
-        filename = fastafile.split('.')[0]
-        fasta_str = GUM.read_fastafile(path_fastafile)
+        with open(path_fastafile) as fasta_io:
+            fasta_str = fasta_io.read()
         blastp_result = Biopy.run_blastp(fasta_str)
-        path_blastp_xml_result = IdProt._write_blastp_xml_result(path_output, filename, blastp_result)
-        blastp_result_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blastp_xml_result, filename, path_fastafile)
+        print('******************#########***********************' + str(type(blastp_result)))
+        fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
+        path_blstp_resultXml = IdProt._write_blastp_xml_result(path_output, fastafile_name, blastp_result)
+        blastp_result_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_resultXml, fastafile_name, path_fastafile)
         if write_blastp_json:
-            IdProt._write_dict_to_json_file(path_output, filename, blastp_result_dict)
+            IdProt._write_dict_to_json_file(path_output, fastafile_name, blastp_result_dict)
         if build_idmap_csv:
-            id_map = IdProt._build_idmap(blastp_result_dict, filename)
-            IdProt._write_idmap_csv(path_output, filename, id_map)
+            id_map = IdProt._build_idmap(blastp_result_dict, fastafile_name)
+            IdProt._write_idmap_csv(path_output, fastafile_name, id_map)
         return blastp_result_dict
 
     # path_output           String
@@ -57,13 +58,13 @@ class IdProt(object):
     @staticmethod
     def _build_idmap(blastp_result_dict, filename):
         #  TODO
-        # lots to do here to parse the dict or xmsl into a csv that can be uploaded to mysql table
+        # lots to do here to parse the dict or xml into a csv that can be uploaded to mysql table
         dict = {}
         return dict
 
     @staticmethod
     def _write_idmap_csv(path_output, filename, id_map):
-        path_csv_file = path_output + "/" + filename + '/' + IdProt.DIR_BLAST_SWISPROT + "/" + filename + '.csv'
-        with open(path_csv_file, 'w') as f:
+        path_output_filename_blstpswp_csvfile = path_output + "/" + filename + '/' + IdProt.DIR_BLAST_SWISPROT + "/" + filename + '.csv'
+        with open(path_output_filename_blstpswp_csvfile, 'w') as f:
             f.write(json.dumps(id_map))
-
+        return path_output_filename_blstpswp_csvfile

@@ -55,8 +55,14 @@ class Biopy(object):
 
     # NOTE: Time taken for this remote qblast for sequence 1_A.fasta was about 20 seconds.
     # NOTE: The query sequence id is also the filename and is used here for the name of the output xml.
+    #
+    # path_qblast_result    String
+    # fastafile_name        String
+    # path_fastafile        String
+    #
+    # Returns a data structure of the elements of the qblast result that are considered here to be pertinent.
     @staticmethod
-    def parse_filter_blastp_xml_to_dict(path_qblast_result, filename, path_fastafile):
+    def parse_filter_blastp_xml_to_dict(path_qblast_result, fastafile_name, path_fastafile):
         with open(path_qblast_result) as f:
             blast_record = NCBIXML.read(f)
             query_length = blast_record.query_length
@@ -65,7 +71,7 @@ class Biopy(object):
             database_seqs_num = blast_record.database_sequences
             alignments = blast_record.alignments
 
-        qblast_result_dict = {'query_seq_id': filename,
+        qblast_result_dict = {'query_seq_id': fastafile_name,
                               'query_length': query_length,
                               'database': database_used,
                               'database_seqs_num': database_seqs_num,

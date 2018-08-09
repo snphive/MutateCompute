@@ -1,7 +1,9 @@
+import os
+import io
 from unittest import TestCase
+from unittest import mock
 from unittest.mock import patch
 from src.Biopython import Biopy
-import os
 from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 from Bio import SeqIO
@@ -114,8 +116,8 @@ class TestIdProt(TestCase):
 
     @patch.object(IdProt, "_write_blastp_xml_result")
     @patch.object(NCBIWWW, "qblast")
-    @patch.object(Biopy, "_read_input_fasta_seq")
-    def test_start_1_A(self, mock__read_input_fasta_seq, mock_qblast, mock__write_blastp_xml_result):
+    @patch('builtins.open', create=True)
+    def test_start_1_A(self, mock_open, mock_qblast, mock__write_blastp_xml_result):
         # arrange
         len_1_A = len(self.FASTA_SEQ_1_A)
         query_len = align_len = idents = q_end = len_1_A
@@ -132,11 +134,17 @@ class TestIdProt(TestCase):
         expected_qblast_dict_1_A = {'database': self.SWSPRT_DB, 'database_seqs_num': self.SWSPRT_PROTS_NUM,
                                         'query_length': query_len, 'query_seq_id': self.NAME_1_A,
                                         'alignment_dict': expected_align_dict_1_A}
-        mock__read_input_fasta_seq.return_value = self.FASTA_STR_1_A
+
+        # I was attempting to mock the open() and read() functions to simply return the fasta_str but this doesn't seem
+        # to quite achieve it. Nonetheless it's useful to mock this as the method won't crash if the fasta file
+        # it is looking for doesn't exist at the specified path. Furthermore the fasta string value is used in the
+        # start() method to pass to biopython's qblast method which is mocked here anyway so it doesn't matter what
+        # value is passed to it.
+        mock.mock_open(read_data="ABC")
         with open(self.PATH_TESTS_REFFILES_BLASTP_1_A_XML) as test_1_A_xml:
             mock_qblast.return_value = test_1_A_xml
         mock__write_blastp_xml_result.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
-        path_output = TPLS.MC_TESTS_OUTPUT + '/' + self.DIR_PDB_1_A + TestIdProt.DIR_BLASTP
+        path_output = TPLS.MC_TESTS_OUTPUT.value + '/' + self.DIR_PDB_1_A + TestIdProt.DIR_BLASTP
         # action
         result_dict = IdProt.start(path_fastafile=self.PATH_FASTA_1_A, write_blastp_json=False, build_idmap_csv=False,
                                    path_output=path_output)
@@ -144,17 +152,43 @@ class TestIdProt(TestCase):
         self.assertEqual(expected_qblast_dict_1_A, result_dict)
 
 
-    def test__read_fastafile(self):
-        self.fail()
-
     def test__write_blastp_xml_result(self):
-        self.fail()
+        # arrange
+        path_output = TPLS.MC_TESTS_OUTPUT.value
+        filename = ''
+        blastp_result = {}
+        # action
+        IdProt._write_blastp_xml_result(path_output, filename, blastp_result)
+        # assert
 
     def test__write_dict_to_json_file(self):
-        self.fail()
+        # arrange
+        path_output = TPLS.MC_TESTS_OUTPUT.value
+        filename = ''
+        blastp_result_dict = {}
+        expected_path_res_file = ''
+        # action
+        path_result_file = IdProt._write_dict_to_json_file(path_output, filename, blastp_result_dict)
+        # assert
+        self.assertEqual()
+        self.assertTrue(os.path.exists(path_result_file))
 
     def test__build_idmap(self):
-        self.fail()
+        # arrange
+        blastp_result_dict = {}
+        filename = ''
+        # action
+        IdProt._build_idmap(blastp_result_dict, filename)
+        # assert
+        self.assertEqual()
 
     def test__write_idmap_csv(self):
-        self.fail()
+        # arrange
+        path_output = TPLS.MC_TESTS_OUTPUT.value
+        filename = ''
+        id_map = {}
+        # action
+        path_csv_file = IdProt._write_idmap_csv(path_output, filename, id_map)
+        # assert
+        self.assertEqual()
+        self.assertTrue(os.path.exists(path_csv_file))
