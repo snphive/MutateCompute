@@ -1,14 +1,18 @@
+import os
 from src.GeneralUtilityMethods import GUM
-from Bio.Seq import Seq
 from Bio.Seq import MutableSeq
 from Bio.Alphabet import IUPAC
 
 
 class MutateFasta(object):
 
+    # def __init__(self, path_input, fastafile_list, mutant_aa_list):
+    #     mutants = self.mutate_every_residue_in_fasta_list(path_input, fastafile_list, mutant_aa_list)
+    #     self._write_mutants_to_file(fastamutants, path_input, make_fastafile_for_all_mutants,
+    #                            make_fastafile_per_mutant,  path_output, make_csv_file=True, make_txt_file=True)
+
     def __init__(self):
-        mutants = self.mutate_every_residue_in_fasta_list()
-        self._write_mutants_to_file(mutants)
+        print('')
 
     # Mutates FASTA (typically wild-type) sequences at every position, to every residue specified (typically all other
     # 19 residues.)
@@ -50,8 +54,7 @@ class MutateFasta(object):
     # mutant_aa_list                List
     #
     def _add_mutantTitle_mutatedSeq_to_dict(self, titleSeqDict, wt_title,  wt_seq, mutant_aa_list):
-        titleSeqDict_w_mutants = {}
-        titleSeqDict_w_mutants[wt_title] = titleSeqDict[wt_title]
+        titleSeqDict_w_mutants = {wt_title: titleSeqDict[wt_title]}
         mutable_seq = MutableSeq(wt_seq, IUPAC.protein)
         for i, wt_aa in enumerate(mutable_seq):
             for mutant_aa in mutant_aa_list:
@@ -63,7 +66,57 @@ class MutateFasta(object):
                     mutable_seq[i] = wt_aa_at_i
         return titleSeqDict_w_mutants
 
-    # TODO
-    # Writes the mutants data structure out to a csv file and txt file.
-    def _write_mutants_to_file(self, mutants):
-        print('')
+    # Writes the mutants out either to fastafiles. There is the option to write each mutant out to its own fastafile,
+    # and/or all mutants to one fastafile, and/or all mutants to one csv file and/or all mutants to a txt file.
+    #
+    # title_titleSeq_w_mutants      Dictionary  Title of wild-type associated to every mutant title:sequence
+    #                                           starting with the wild-type title:sequence pair.
+    # path_input                    String      Absolute path of input_data dir (where fastafiles will be written).
+    # make_fastafile_all_mutants    Boolean     True to write one fastafile containing all mutants, separated by \n.
+    # make_fastafile_per_mutant     Boolean     True to write one fastafile per mutant.
+    # path_output                   String      Absolute path of input_data dir (where txt & csv seqs will be written).
+    # make_csv_file                 Boolean     True to write one csv file for all mutants including wild-type.
+    # make_txt_file                 Boolean     True to write one txt file for all mutants including wild-type.
+    def _write_mutants_to_file(self, title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
+                               make_fastafile_per_mutant, path_output, make_csv_file=False, make_txt_file=False):
+        path_all_mutants_fastafile = None
+        path_seqs_w_mutants = None
+        for wt_title, title_seq in title_titleSeq_w_mutants.items():
+            path_input_fastas_title_mutants = path_input + '/fastas/' + wt_title + '/mutants'
+            try:
+                os.makedirs(path_input_fastas_title_mutants)
+            except FileExistsError:
+                print('Part of all of path already exists. This is absolutely fine.')
+            if make_fastafile_all_mutants:
+                path_all_mutants_fastafile = open(path_input_fastas_title_mutants + '/' + wt_title +
+                                                  '_mutants.fasta', 'w')
+            if make_csv_file or make_txt_file:
+                path_output_title_seqs = path_output + '/' + wt_title + '/sequences'
+                try:
+                    os.makedirs(path_output_title_seqs)
+                except FileExistsError:
+                    print('Part of all of path already exists. This is absolutely fine.')
+            if make_csv_file:
+                path_seqs_w_mutants = open(path_output_title_seqs + '/' + wt_title + '_mutants.csv', 'w')
+                path_seqs_w_mutants.write(wt_title + ':' + title_seq[wt_title] + ',')
+            if make_txt_file:
+                path_seqs_w_mutants = open(path_output_title_seqs + '/' + wt_title + '_mutants.txt', 'w')
+                path_seqs_w_mutants.write(wt_title + ':' + title_seq[wt_title] + '\n')
+            for mut_title, mut_seq in title_seq.items():
+                if mut_title is not wt_title:
+                    if path_all_mutants_fastafile is not None:
+                        path_all_mutants_fastafile.write('>' + mut_title + '\n' + mut_seq + '\n')
+                    if path_seqs_w_mutants is not None:
+                        if make_csv_file:
+                            path_seqs_w_mutants.write(mut_title + ':' + mut_seq + ',')
+                        if make_txt_file:
+                            path_seqs_w_mutants.write(mut_title + ':' + mut_seq + '\n')
+                    if make_fastafile_per_mutant:
+                        path_mutant_fastafile = open(path_input_fastas_title_mutants + '/' + mut_title +
+                                                     '.fasta', 'w')
+                        path_mutant_fastafile.write('>' + mut_title + '\n' + mut_seq)
+                        path_mutant_fastafile.close()
+            if path_all_mutants_fastafile is not None:
+                path_all_mutants_fastafile.close()
+            if path_seqs_w_mutants is not None:
+                path_seqs_w_mutants.close()
