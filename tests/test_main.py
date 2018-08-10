@@ -40,7 +40,8 @@ class TestMain(TestCase):
         # assert
         self.assertEqual(expected_global_options, global_options)
 
-    def test__build_filelist_for_analysis(self):
+     # pdbfiles only
+    def test__build_filelist_for_analysis_1(self):
         # arrange
         globaloptions_lines = ['#\n', 'PDBs: 4;\n', '#']
         PDB_or_FASTA = 'PDBs'
@@ -52,6 +53,8 @@ class TestMain(TestCase):
         self.assertNotEqual('', pdb_list)
         self.assertListEqual(expected_pdb_list, pdb_list)
 
+    # fastafiles only
+    def test__build_filelist_for_analysis_2(self):
         # arrange
         globaloptions_lines = ['#\n', 'FASTAs: 4;\n', '#']
         PDB_or_FASTA = 'FASTAs'
