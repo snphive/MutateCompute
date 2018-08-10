@@ -33,18 +33,18 @@ class TPLS(Enum):
     DIR_BMRUNSCRIPT = "bm_runscript"
 
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-    MC_TESTS_CONFIG = os.path.join(MC_TESTS.value, DIR_CONFIG.value)
-    MC_TESTS_CONFIG_AGADCONFIG = os.path.join(MC_TESTS_CONFIG.value, DIR_AGADIRCONFIG.value)
-    MC_TESTS_CONFIG_JOBQ = os.path.join(MC_TESTS_CONFIG.value, DIR_JOBQ.value)
-    MC_TESTS_CONFIG_GLOBAL_OPTIONS = os.path.join(MC_TESTS_CONFIG.value, DIR_GLOBAL_OPTIONS.value)
-    MC_TESTS_CONFIG_FXCONFIG = os.path.join(MC_TESTS_CONFIG.value, DIR_FXCONFIG.value)
-    MC_TESTS_CONFIG_FXCONFIG_ACRUNSCRIPT = os.path.join(MC_TESTS_CONFIG_FXCONFIG.value, DIR_ACRUNSCRIPT.value)
-    MC_TESTS_CONFIG_FXCONFIG_BMRUNSCRIPT = os.path.join(MC_TESTS_CONFIG_FXCONFIG.value, DIR_BMRUNSCRIPT.value)
+    MC_TESTS_CONFIG = os.path.join(MC_TESTS, DIR_CONFIG)
+    MC_TESTS_CONFIG_AGADCONFIG = os.path.join(MC_TESTS_CONFIG, DIR_AGADIRCONFIG)
+    MC_TESTS_CONFIG_JOBQ = os.path.join(MC_TESTS_CONFIG, DIR_JOBQ)
+    MC_TESTS_CONFIG_GLOBAL_OPTIONS = os.path.join(MC_TESTS_CONFIG, DIR_GLOBAL_OPTIONS)
+    MC_TESTS_CONFIG_FXCONFIG = os.path.join(MC_TESTS_CONFIG, DIR_FXCONFIG)
+    MC_TESTS_CONFIG_FXCONFIG_ACRUNSCRIPT = os.path.join(MC_TESTS_CONFIG_FXCONFIG, DIR_ACRUNSCRIPT)
+    MC_TESTS_CONFIG_FXCONFIG_BMRUNSCRIPT = os.path.join(MC_TESTS_CONFIG_FXCONFIG, DIR_BMRUNSCRIPT)
 
     # REFERENCE FILES - NOTE: THESE ARE ONLY USED FOR TESTS
     DIR_REFFILES = "reference_files"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-    MC_TESTS_REFFILES = os.path.join(MC_TESTS.value, DIR_REFFILES.value)
+    MC_TESTS_REFFILES = os.path.join(MC_TESTS, DIR_REFFILES)
 
     # INPUT_DATA-RELATED PATHS ONLY
     # e.g. /tests/input_data/<pdbname>/all_mutants/<fxmutantchainname>
@@ -52,8 +52,8 @@ class TPLS(Enum):
     DIR_ALL_MUTANTS = "all_mutants"
     DIR_FASTAS = "fastas"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-    MC_TESTS_INPUT = os.path.join(MC_TESTS.value, DIR_INPUT.value)
-    MC_TESTS_INPUT_FASTAS = os.path.join(MC_TESTS_INPUT.value, DIR_FASTAS.value)
+    MC_TESTS_INPUT = os.path.join(MC_TESTS, DIR_INPUT)
+    MC_TESTS_INPUT_FASTAS = os.path.join(MC_TESTS_INPUT, DIR_FASTAS)
 
     # OUTPUT_DATA-RELATED PATHS ONLY
     # e.g.#1: tests/output_data/<pdbname>/foldx/build_model/<fxmutantchainname>
@@ -65,11 +65,11 @@ class TPLS(Enum):
     # DIR_MUTATE_FASTA = "mutate_fasta"
     DIR_BLASTP = "blastp"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-    MC_TESTS_OUTPUT = os.path.join(MC_TESTS.value, DIR_OUTPUT.value)
-    MC_TESTS_OUTPUT_BLASTP = os.path.join(MC_TESTS_OUTPUT.value, DIR_BLASTP.value)
-    MC_TESTS_OUTPUT_FX = os.path.join(MC_TESTS_OUTPUT.value, DIR_FX.value)
-    MC_TESTS_OUTPUT_FX_AC = os.path.join(MC_TESTS_OUTPUT_FX.value, DIR_AC.value)
-    MC_TESTS_OUTPUT_FX_BM = os.path.join(MC_TESTS_OUTPUT_FX.value, DIR_BM.value)
+    MC_TESTS_OUTPUT = os.path.join(MC_TESTS, DIR_OUTPUT)
+    MC_TESTS_OUTPUT_BLASTP = os.path.join(MC_TESTS_OUTPUT, DIR_BLASTP)
+    MC_TESTS_OUTPUT_FX = os.path.join(MC_TESTS_OUTPUT, DIR_FX)
+    MC_TESTS_OUTPUT_FX_AC = os.path.join(MC_TESTS_OUTPUT_FX, DIR_AC)
+    MC_TESTS_OUTPUT_FX_BM = os.path.join(MC_TESTS_OUTPUT_FX, DIR_BM)
 
     DICT_AA_1TO3 = {'A': 'ALA', 'C': 'CYS', 'D': 'ASP', 'E': 'GLU', 'F': 'PHE', 'G': 'GLY', 'H': 'HIS', 'I': 'ILE',
                     'K': 'LYS', 'L': 'LEU', 'M': 'MET', 'N': 'ASN', 'P': 'PRO', 'Q': 'GLN', 'R': 'ARG', 'S': 'SER',
