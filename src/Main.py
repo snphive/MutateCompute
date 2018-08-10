@@ -5,6 +5,7 @@ from src.Paths import Paths
 from src.AminoAcids import AA
 import natsort
 
+
 # The following 4 lines of code successfully connect to
 # import mysql.connector
 # cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
@@ -16,8 +17,17 @@ import natsort
 # Hence run_Main.py could then be called by a cmd line or bash script "python run_Main.py".
 class Main(object):
 
+    # All algorithmic analyses start from here. Biopython Blast is the only program that is currently designed to be
+    # run independently.
+    #
+    # KickOff.py script is called from the Pycharm configuration. User can also just enter
+    #
+    # use_cluster   Boolean     True if program(s) should run on the cluster (whereupon paths are set to zeus paths).
+    #                           Currently set to false by default.
+    #
+    #
     # At the moment this is set up to run either in local or on cluster, not both. This is temporary.
-    def __init__(self, cluster):
+    def __init__(self, use_cluster=False):
         self.pdbs = 'PDBs'
         self.fastas = 'FASTAs'
         globaloptions_lines = Main._read_global_options(Paths.MC_CONFIG_GLOBAL_OPTIONS.value +
@@ -25,9 +35,9 @@ class Main(object):
         wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.pdbs, Paths.MC_INPUT.value)
         wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.fastas, Paths.MC_INPUT.value)
         operations = Main._determine_which_operations_to_perform(globaloptions_lines)
-        list_of_mutant_aa = Main._determine_residues_to_mutate_to()
-        path_dst_dir = Paths.SE_INPUT.value if cluster else Paths.MC_INPUT.value
-        path_src_repo_dir = Paths.SE_REPO_PDB_FASTA.value if cluster else Paths.LOCAL_REPO_PDB_FASTA.value
+        list_of_mutant_aa = Main._determine_residues_to_mutate_to(globaloptions_lines)
+        path_dst_dir = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
+        path_src_repo_dir = Paths.SE_REPO_PDB_FASTA.value if use_cluster else Paths.LOCAL_REPO_PDB_FASTA.value
         src_pdbfile_list = GUM.get_filelist_from_subdirs(path_src_repo_dir, self.pdbs)
         src_fastafile_list = GUM.get_filelist_from_subdirs(path_src_repo_dir, self.fastas)
         wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir,
@@ -47,23 +57,26 @@ class Main(object):
 
     # Takes the /configuration/global_options/MutateCompute_Options.txt text as a list of \n separated
     # lines.
+    #
     # Reads the option given at either "PDBs" and "FASTAs".
     # The option is expected to be in one of four forms: "", "all", "<filename(s)>", or "<number>".
     # '' indictes no files - returns None.
     # 'all' indicates all files in specified input source directory.
     # '<filename(s)>' indicates specific files by name (if found in the specified input source directory).
-    # '<number>' indicates the maximum number of files from the naturallyy sorted specified input source directory.
-    # Note that the sorting of the source directory before building the list of target files could be inefficient if
-    # the number of files in the source directory is much larger than the number of files the user has asked for via
-    # the options file. I.e. if the source directory contains 30000 pdbs and the user wants the first 5, it will be
-    # sorting 30000 pdbs just to get the first 5 of them.
+    # '<number>' indicates the maximum number of files from the naturally-sorted list that is based on what files are
+    # present in the specified input_data source directory.
     # E.g. line = "PDBs: 4;\n", returns ['RepairPDB_1.pdb', 'RepairPDB_2.pdb', 'RepairPDB_3.pdb', 'RepairPDB_4.pdb'].
+    #
+    # Note the risk of inefficiency where the program spends a lot of time sorting the source directory to build the
+    # list of available target files, but only a relatively small number of files will be used E.g. source dir sorts
+    # about 30,000 pdbs for user to get access to first 5 only!
     #
     # globaloptions_lines   List        List of strings, each element is a line of the options text ending with '/n'.
     # PDB_or_FASTA          String      Either "PDBs" or "FASTAs" to indicate which files to retrieve.
     # path_input            String      Path to the input_data files (including PDB and FASTA files).
     #
-    # Returns a list of pdb or fasta files according to the global_options PDBs or FASTAs. (Files include extensions).
+    # Returns a list of pdbfiles or fastafiles according to that specified in the global_options/MC_Options file at
+    # values given for 'PDBs' and 'FASTAs'. (pdbiles and fastafiles are strings including .pdb and .fasta extensions).
     @staticmethod
     def _build_filelist_for_analysis(globaloptions_lines, PDB_or_FASTA, path_input):
         file_list = []
