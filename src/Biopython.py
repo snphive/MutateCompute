@@ -59,10 +59,15 @@ class Biopy(object):
                               alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
                               hitlist_size=Biopy.BlastParam.MAX_HIT_20.value)
 
+    # Parses qblast result and filters (assigns to a data structure) only those fields that are of interest.
+    #
+    # NCBIXML.read() takes the _io.TextIOTextWrapper (which is created when xml file is opened).
+    # NCBIXML.read() returns a Bio.Blast.Record.Blast object that has assigned various values in the qblast record as
+    # fields that can be directly accessed.
     # NOTE: Time taken for this remote qblast for sequence 1_A.fasta was about 20 seconds.
     # NOTE: The query sequence id is also the filename and is used here for the name of the output xml.
     #
-    # path_qblast_result    String
+    # path_qblast_result    String      Abs path to the output xml file.
     # fastafile_name        String
     # path_fastafile        String
     #
