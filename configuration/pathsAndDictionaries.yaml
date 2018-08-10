@@ -33,6 +33,7 @@ ROOT:
     path_rel_fx_rep: '/foldx/repair'
     path_rel_mutatefasta: '/mutate_fasta'
     path_rel_pdb_fasta_repository: '/REPO_PDB_FASTA'
+    path_rel_blastp: 'blastp'
 
 
     # dictionaries & lists (amino acids)
