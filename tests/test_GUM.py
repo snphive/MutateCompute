@@ -25,14 +25,16 @@ class TestGUM(TestCase):
     # that when the method is called without supplying a (keyword-named) value, the default value is applied.
     # (The default values for all 3 are False).
     #
-    # 30.07.18 Have redesigned the directory structure such that runscripts will go in configuration/foldx/and maybe
-    # another level such as analyse_complex or build_model or stability etc.
+    # 30.07.18 Have redesigned the directory structure such that runscripts will go in /configuration /foldx_config
+    # /ac_runscript or /bm_runscript (and others).
     def test_write_runscript_for_pdbs(self):
         # arrange
         pdb = 'RepairPDB_1.pdb'
-        path_runscript = TPLS.MC_TESTS_CONFIG_FX.value
-        if not os.path.exists(path_runscript):
+        path_runscript = TPLS.MC_TESTS_CONFIG_FXCONFIG_BMRUNSCRIPT.value
+        try:
             os.makedirs(path_runscript)
+        except FileExistsError:
+            print('Part of all of path already exists. This is absolutely fine.')
         action = '<BuildModel>#,individual_list.txt'
         expected_runscript = '<TITLE>FOLDX_runscript;\n' + '<JOBSTART>#;\n' + '<PDBS>' + pdb + ';\n' + \
                              '<BATCH>#;\n' + '<COMMANDS>FOLDX_commandfile;\n' + action + ';\n' + '<END>#;\n' + \
