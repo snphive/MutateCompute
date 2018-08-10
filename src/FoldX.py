@@ -39,8 +39,10 @@ class FoldX(object):
                                                                                  write_wt_fastafiles, Paths.MC_OUTPUT)
             fx_mutant_name_list = self._make_fx_mutant_name_list(mutate_to_aa_list, pdbname_chain_fasta_dict)
 
-            if not os.path.exists(path_runscript_dest):
+            try:
                 os.makedirs(path_runscript_dest)
+            except FileExistsError:
+                print('Part of all of path already exists. This is absolutely fine.')
 
             action = '<BuildModel>#,individual_list.txt'
             GUM.write_runscript_for_pdbs(path_runscript_dest, 'RepairPDB_' + pdb, action)
@@ -48,8 +50,11 @@ class FoldX(object):
             for fx_mutant_name in fx_mutant_name_list:
                 path_jobq_indivlist_dest = GUM.create_dir_tree(path_input_PDBs_pdbname, fx_mutant_name)
 
-                if not os.path.exists(path_jobq_indivlist_dest):
+                try:
                     os.makedirs(path_jobq_indivlist_dest)
+                except FileExistsError:
+                    print('Part of all of path already exists. This is absolutely fine.')
+
                 try:
                     os.chdir(path_jobq_indivlist_dest)
                 except ValueError:
