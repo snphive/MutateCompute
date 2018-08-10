@@ -1,3 +1,4 @@
+import os
 import yaml
 from enum import Enum
 
@@ -30,44 +31,55 @@ class Paths(Enum):
 
             LOCAL_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_local_pdb_fasta_repository']
 
-            #  RELATIVE PATHS
-            REL_CONFIG = paths_and_dictionaries['ROOT']['path_rel_config']
-            REL_CONFIG_AGAD = paths_and_dictionaries['ROOT']['path_rel_config_agadconfig']
-            REL_CONFIG_JOBQ = paths_and_dictionaries['ROOT']['path_rel_config_clustjobq']
-            REL_CONFIG_FX = paths_and_dictionaries['ROOT']['path_rel_config_fxconfig']
-            REL_CONFIG_GLOBAL_OPTIONS = paths_and_dictionaries['ROOT']['path_rel_config_globoptions']
-            REL_CONFIG_FX_ACRUNSCRIPT = paths_and_dictionaries['ROOT']['path_rel_config_fxconf_acrunscript']
-            REL_CONFIG_FX_BMRUNSCRIPT = paths_and_dictionaries['ROOT']['path_rel_config_fxconf_bmrunscript']
-            REL_CONFIG_FX_REPRUNSCRIPT = paths_and_dictionaries['ROOT']['path_rel_config_fxconf_reprunscript']
-            REL_SRC = paths_and_dictionaries['ROOT']['path_rel_src']
-            REL_INPUT = paths_and_dictionaries['ROOT']['path_rel_input']
-            REL_OUTPUT = paths_and_dictionaries['ROOT']['path_rel_output']
-            REL_FX_AC = paths_and_dictionaries['ROOT']['path_rel_fx_ac']
-            REL_FX_BM = paths_and_dictionaries['ROOT']['path_rel_fx_bm']
-            REL_FX_REP = paths_and_dictionaries['ROOT']['path_rel_fx_rep']
-            REL_MUTATE_FASTA = paths_and_dictionaries['ROOT']['path_rel_mutatefasta']
-            REL_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_rel_pdb_fasta_repository']
+            #  DIRECTORY NAMES (USED TO CONSTRUCT ABSOLYTE PATHS BELOW)
+            DIR_CONFIG = paths_and_dictionaries['ROOT']['dir_config']
+            DIR_CONFIG_AGAD = paths_and_dictionaries['ROOT']['dir_agadconfig']
+            DIR_CONFIG_JOBQ = paths_and_dictionaries['ROOT']['dir_clustjobq']
+            DIR_CONFIG_GLOBAL_OPTIONS = paths_and_dictionaries['ROOT']['dir_globoptions']
+            DIR_CONFIG_FX = paths_and_dictionaries['ROOT']['dir_fxconfig']
+            DIR_CONFIG_FX_ACRUNSCRIPT = paths_and_dictionaries['ROOT']['dir_acrunscript']
+            DIR_CONFIG_FX_BMRUNSCRIPT = paths_and_dictionaries['ROOT']['dir_bmrunscript']
+            DIR_CONFIG_FX_REPRUNSCRIPT = paths_and_dictionaries['ROOT']['dir_reprunscript']
+            DIR_SRC = paths_and_dictionaries['ROOT']['dir_src']
+            DIR_INPUT = paths_and_dictionaries['ROOT']['dir_input']
+            DIR_MUTANTS = paths_and_dictionaries['ROOT']['dir_mutants']
+            DIR_OUTPUT = paths_and_dictionaries['ROOT']['dir_output']
+            DIR_FX_AC = paths_and_dictionaries['ROOT']['dir_ac']
+            DIR_FX_BM = paths_and_dictionaries['ROOT']['dir_bm']
+            DIR_FX_REP = paths_and_dictionaries['ROOT']['dir_rep']
+            DIR_FASTAS = paths_and_dictionaries['ROOT']['dir_fastas']
+            DIR_SEQUENCES = paths_and_dictionaries['ROOT']['dir_sequences']
+            DIR_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['dir_pdb_fasta_repo']
+            DIR_PDBS = paths_and_dictionaries['ROOT']['dir_pdbs']
+            DIR_BLASTP = paths_and_dictionaries['ROOT']['dir_blastp']
 
             # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-            MC_CONFIG = LOCAL_MUTATECOMPUTE + REL_CONFIG
-            MC_CONFIG_AGAD = LOCAL_MUTATECOMPUTE + REL_CONFIG_AGAD
-            MC_CONFIG_JOBQ = LOCAL_MUTATECOMPUTE + REL_CONFIG_JOBQ
-            MC_CONFIG_FX = LOCAL_MUTATECOMPUTE + REL_CONFIG_FX
-            MC_CONFIG_GLOBAL_OPTIONS = LOCAL_MUTATECOMPUTE + REL_CONFIG_GLOBAL_OPTIONS
-            MC_CONFIG_FX_ACRUNSCRIPT = LOCAL_MUTATECOMPUTE + REL_CONFIG_FX_ACRUNSCRIPT
-            MC_CONFIG_FX_BMRUNSCRIPT = LOCAL_MUTATECOMPUTE + REL_CONFIG_FX_BMRUNSCRIPT
-            MC_INPUT = LOCAL_MUTATECOMPUTE + REL_INPUT
-            MC_OUTPUT = LOCAL_MUTATECOMPUTE + REL_OUTPUT
-            SE_CONFIG = ZEUS_SNPEFFECT + REL_CONFIG
-            SE_CONFIG_AGAD = ZEUS_SNPEFFECT + REL_CONFIG_AGAD
-            SE_CONFIG_JOBQ = ZEUS_SNPEFFECT + REL_CONFIG_JOBQ
-            SE_CONFIG_FX = ZEUS_SNPEFFECT + REL_CONFIG_FX
-            SE_CONFIG_GLOBAL_OPTIONS = ZEUS_SNPEFFECT + REL_CONFIG_GLOBAL_OPTIONS
-            SE_CONFIG_FX_ACRUNSCRIPT = ZEUS_SNPEFFECT + REL_CONFIG_FX_ACRUNSCRIPT
-            SE_CONFIG_FX_BMRUNSCRIPT = ZEUS_SNPEFFECT + REL_CONFIG_FX_BMRUNSCRIPT
-            SE_INPUT = ZEUS_SNPEFFECT + REL_INPUT
-            SE_OUTPUT = ZEUS_SNPEFFECT + REL_OUTPUT
-            SE_REPO_PDB_FASTA = ZEUS_SNPEFFECT + REL_REPO_PDB_FASTA
+            MC_CONFIG = os.path.join(LOCAL_MUTATECOMPUTE.value, DIR_CONFIG.value)
+            MC_CONFIG_AGAD = os.path.join(LOCAL_MUTATECOMPUTE.va, DIR_CONFIG_AGAD.value)
+            MC_CONFIG_JOBQ = os.path.join(LOCAL_MUTATECOMPUTE.value, DIR_CONFIG_JOBQ.value)
+            MC_CONFIG_FX = os.path.join(LOCAL_MUTATECOMPUTE.value, DIR_CONFIG_FX.value)
+            MC_CONFIG_GLOBAL_OPTIONS = os.path.join(LOCAL_MUTATECOMPUTE.value, DIR_CONFIG_GLOBAL_OPTIONS.value)
+            MC_CONFIG_FX_ACRUNSCRIPT = os.path.join(LOCAL_MUTATECOMPUTE.value, DIR_CONFIG_FX_ACRUNSCRIPT.value)
+            MC_CONFIG_FX_BMRUNSCRIPT = os.path.join(LOCAL_MUTATECOMPUTE.value, DIR_CONFIG_FX_BMRUNSCRIPT.value)
+            MC_INPUT = os.path.join(LOCAL_MUTATECOMPUTE.value, DIR_INPUT.value)
+            MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE.value, DIR_OUTPUT.value)
+            MC_OUTPUT_BLASTP = os.path.join(MC_OUTPUT.value, DIR_BLASTP.value)
+            MC_REPO_PDBS = os.path.join(LOCAL_REPO_PDB_FASTA.value, DIR_PDBS.value)
+            MC_REPO_FASTAS = os.path.join(LOCAL_REPO_PDB_FASTA.value, DIR_FASTAS.value)
+
+            SE_CONFIG = os.path.join(ZEUS_SNPEFFECT.value, DIR_CONFIG.value)
+            SE_CONFIG_AGAD = os.path.join(ZEUS_SNPEFFECT.value, DIR_CONFIG_AGAD.value)
+            SE_CONFIG_JOBQ = os.path.join(ZEUS_SNPEFFECT.value, DIR_CONFIG_JOBQ.value)
+            SE_CONFIG_FX = os.path.join(ZEUS_SNPEFFECT.value, DIR_CONFIG_FX.value)
+            SE_CONFIG_GLOBAL_OPTIONS = os.path.join(ZEUS_SNPEFFECT.value, DIR_CONFIG_GLOBAL_OPTIONS.value)
+            SE_CONFIG_FX_ACRUNSCRIPT = os.path.join(ZEUS_SNPEFFECT.value, DIR_CONFIG_FX_ACRUNSCRIPT.value)
+            SE_CONFIG_FX_BMRUNSCRIPT = os.path.join(ZEUS_SNPEFFECT.value, DIR_CONFIG_FX_BMRUNSCRIPT.value)
+            SE_INPUT = os.path.join(ZEUS_SNPEFFECT.value, DIR_INPUT.value)
+            SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT.value, DIR_OUTPUT.value)
+            SE_REPO_PDB_FASTA = os.path.join(ZEUS_SNPEFFECT.value, DIR_REPO_PDB_FASTA.value)
+            SE_REPO_PDBS = os.path.join(SE_REPO_PDB_FASTA.value, DIR_PDBS.value)
+            SE_REPO_FASTAS = os.path.join(SE_REPO_PDB_FASTA.value, DIR_FASTAS.value)
+            SE_OUTPUT_BLASTP = os.path.join(SE_OUTPUT.value, DIR_BLASTP.value)
 
         except yaml.YAMLError as exc:
             print(exc)

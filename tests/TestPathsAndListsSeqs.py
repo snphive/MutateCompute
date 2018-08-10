@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 
@@ -6,7 +7,8 @@ from enum import Enum
 # However for tests, the absolute paths are directed towards the "tests" directory, so tests should never need to
 # access the yaml configuration file.
 #
-# All paths are absolute paths unless prefix with an "REL" which indicates they are relative.
+# All paths are absolute paths. They are constructed here from a absoluate root and directory names that constitute
+# relative paths. (The use of os.path.join(root, dirs) replaces the need to explicitly build in fwd slashes).
 # All paths are prefixed with "PATH"
 class TPLS(Enum):
 
@@ -22,48 +24,52 @@ class TPLS(Enum):
     REPO_PDB_FASTA = '/Users/u0120577/REPO_PDB_FASTA'
 
     # These relative paths might not be used - entire config dir gets copied as a whole into /tests/ at start of tests.
-    REL_CONFIG = "/configuration"
-    REL_CONFIG_AGAD = "/configuration/agadir_config"
-    REL_CONFIG_JOBQ = "/configuration/cluster_jobq"
-    REL_CONFIG_FX = "/configuration/foldx_config"
-    REL_CONFIG_GLOBAL_OPTIONS = "/configuration/global_options"
-    REL_CONFIG_FX_ACRUNSCRIPT = "/configuration/foldx_config/ac_runscript"
-    REL_CONFIG_FX_BMRUNSCRIPT = "/configuration/foldx_config/bm_runscript"
+    DIR_CONFIG = "configuration"
+    DIR_AGADIRCONFIG = "agadir_config"
+    DIR_JOBQ = "cluster_jobq"
+    DIR_FXCONFIG = "foldx_config"
+    DIR_GLOBAL_OPTIONS = "global_options"
+    DIR_ACRUNSCRIPT = "ac_runscript"
+    DIR_BMRUNSCRIPT = "bm_runscript"
 
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-    MC_TESTS_CONFIG = MC_TESTS + REL_CONFIG
-    MC_TESTS_CONFIG_AGAD = MC_TESTS + REL_CONFIG_AGAD
-    MC_TESTS_CONFIG_JOBQ = MC_TESTS + REL_CONFIG_JOBQ
-    MC_TESTS_CONFIG_FX = MC_TESTS + REL_CONFIG_FX
-    MC_TESTS_CONFIG_GLOBAL_OPTIONS = MC_TESTS + REL_CONFIG_GLOBAL_OPTIONS
-    MC_TESTS_CONFIG_FX_ACRUNSCRIPT = MC_TESTS + REL_CONFIG_FX_ACRUNSCRIPT
-    MC_TESTS_CONFIG_FX_BMRUNSCRIPT = MC_TESTS + REL_CONFIG_FX_BMRUNSCRIPT
+    MC_TESTS_CONFIG = os.path.join(MC_TESTS.value, DIR_CONFIG.value)
+    MC_TESTS_CONFIG_AGADCONFIG = os.path.join(MC_TESTS_CONFIG.value, DIR_AGADIRCONFIG.value)
+    MC_TESTS_CONFIG_JOBQ = os.path.join(MC_TESTS_CONFIG.value, DIR_JOBQ.value)
+    MC_TESTS_CONFIG_GLOBAL_OPTIONS = os.path.join(MC_TESTS_CONFIG.value, DIR_GLOBAL_OPTIONS.value)
+    MC_TESTS_CONFIG_FXCONFIG = os.path.join(MC_TESTS_CONFIG.value, DIR_FXCONFIG.value)
+    MC_TESTS_CONFIG_FXCONFIG_ACRUNSCRIPT = os.path.join(MC_TESTS_CONFIG_FXCONFIG.value, DIR_ACRUNSCRIPT.value)
+    MC_TESTS_CONFIG_FXCONFIG_BMRUNSCRIPT = os.path.join(MC_TESTS_CONFIG_FXCONFIG.value, DIR_BMRUNSCRIPT.value)
 
     # REFERENCE FILES - NOTE: THESE ARE ONLY USED FOR TESTS
-    REL_REFFILES = "/reference_files"
+    DIR_REFFILES = "reference_files"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-    MC_TESTS_REFFILES = MC_TESTS + REL_REFFILES
+    MC_TESTS_REFFILES = os.path.join(MC_TESTS.value, DIR_REFFILES.value)
 
     # INPUT_DATA-RELATED PATHS ONLY
     # e.g. /tests/input_data/<pdbname>/all_mutants/<fxmutantchainname>
-    REL_INPUT = "/input_data"
-    REL_ALL_MUTANTS = "/all_mutants"
-    REL_FASTAS = "/fastas"
+    DIR_INPUT = "input_data"
+    DIR_ALL_MUTANTS = "all_mutants"
+    DIR_FASTAS = "fastas"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-    MC_TESTS_INPUT = MC_TESTS + REL_INPUT
-    MC_TESTS_INPUT_FASTAS = MC_TESTS_INPUT + REL_FASTAS
+    MC_TESTS_INPUT = os.path.join(MC_TESTS.value, DIR_INPUT.value)
+    MC_TESTS_INPUT_FASTAS = os.path.join(MC_TESTS_INPUT.value, DIR_FASTAS.value)
 
     # OUTPUT_DATA-RELATED PATHS ONLY
     # e.g.#1: tests/output_data/<pdbname>/foldx/build_model/<fxmutantchainname>
     # e.g.#2: tests/output_data/<pdbname>/mutate_fasta
-    REL_OUTPUT = "/output_data"
-    REL_FX_AC = "/foldx/analyse_complex"
-    REL_FX_BM = "/foldx/build_model"
-    REL_MUTATE_FASTA = "/mutate_fasta"
-    REL_BLASTP = "/blastp"
+    DIR_OUTPUT = "output_data"
+    DIR_FX = "foldx"
+    DIR_AC = "analyse_complex"
+    DIR_BM = "build_model"
+    # DIR_MUTATE_FASTA = "mutate_fasta"
+    DIR_BLASTP = "blastp"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
-    MC_TESTS_OUTPUT = MC_TESTS + REL_OUTPUT
-    MC_TESTS_OUTPUT_BLASTP = MC_TESTS_INPUT + REL_BLASTP
+    MC_TESTS_OUTPUT = os.path.join(MC_TESTS.value, DIR_OUTPUT.value)
+    MC_TESTS_OUTPUT_BLASTP = os.path.join(MC_TESTS_OUTPUT.value, DIR_BLASTP.value)
+    MC_TESTS_OUTPUT_FX = os.path.join(MC_TESTS_OUTPUT.value, DIR_FX.value)
+    MC_TESTS_OUTPUT_FX_AC = os.path.join(MC_TESTS_OUTPUT_FX.value, DIR_AC.value)
+    MC_TESTS_OUTPUT_FX_BM = os.path.join(MC_TESTS_OUTPUT_FX.value, DIR_BM.value)
 
     DICT_AA_1TO3 = {'A': 'ALA', 'C': 'CYS', 'D': 'ASP', 'E': 'GLU', 'F': 'PHE', 'G': 'GLY', 'H': 'HIS', 'I': 'ILE',
                     'K': 'LYS', 'L': 'LEU', 'M': 'MET', 'N': 'ASN', 'P': 'PRO', 'Q': 'GLN', 'R': 'ARG', 'S': 'SER',
