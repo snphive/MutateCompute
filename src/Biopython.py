@@ -37,13 +37,19 @@ import warnings
 
 class Biopy(object):
 
-    # Using alignments restricted to 5 and hitlist restricted to 5, the time qblast takes to run sequence 1_A.fasta
-    # remotely is only reduced from 22 to 21 seconds. However, the output xml is reduced in size from 77 KB to 15 KB.
-    # The remaining data blast_record are not used so nothing is lost by reducing the scope of the analysis. We are
-    # only looking for 100 % identity anyway. NOTE: occasionally the qblast took over 4 minutes!
+    # Using alignments restricted to a fixed number (currently 20) and hitlist restricted to a fixed number (currently
+    # 20), it takes about 21 seconds to run this qblast remotely.
+    # However, using smaller number of alignments than the default (of 50), the output which is parsed to an xml file
+    # is reduced in size from ~77 KB to ~53 KB. Any reduction could be important when you consider that there are
+    # 78,586 fasta files to run (that's likely over 1.5 GB in total).
+    # We are only interested in 100% identity hits, so unless a sequence has over 20 isoforms which all include that
+    # sequence, the remaining hits on the blast_record are not used anyway.
+    #
+    # NOTE: occasionally the qblast took about 4 minutes.
     #
     # fasta          String     The text of a fasta file including >title/n and sequence (standard FASTA format).
-    # returns what biopython's NCBIWWW.qblast method returns, which is a io file.
+    #
+    # Returns what biopython's NCBIWWW.qblast method returns, which is an _io.TextIOWrapper.
     @staticmethod
     def run_blastp(fasta):
         return NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
@@ -78,16 +84,20 @@ class Biopy(object):
                               'alignment_dict': Biopy._make_dict_of_hsps_with_0Gaps_queryLen_is_alignLen(query_length,
                                                                                                         alignments)}
         len_sbjct_prot = qblast_result_dict['alignment_dict']['hsp_dict']['sbjct_end'] - \
-                         qblast_result_dict['alignment_dict']['hsp_dict']['sbjct_start']
+                         qblast_result_dict['alignment_dict']['hsp_dict']['sbjct_start'] + 1
 
-        Biopy.__print_discrepancies(query_length, query_letters, path_fastafile, len_sbjct_prot)
+        Biopy._print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fastafile, len_sbjct_prot)
         return qblast_result_dict
 
     # Builds a dictionary of relevant info for each high-scoring pair (hsp) alignment where there are zero gaps and
-    # the alignment length is exactly the same as the query length, hence it is a 100% identity match. However, the hit
-    # fasta may still be longer than the query fasta. This info is stored in sbjct_start and sbjct_end.
+    # the alignment length is exactly the same as the query length, hence it is a 100% identity match.
+    #
+    # However, the hit fasta may still be longer than the query fasta. This info is stored in sbjct_start and sbjct_end.
+    #
     # query_length      int     qblast output value, refers to length of the input fasta sequence.
     # alignments        String ? can find out what Type this is with Python)*******
+    #
+    # Returns..
     @staticmethod
     def _make_dict_of_hsps_with_0Gaps_queryLen_is_alignLen(query_length, alignments):
         alignment_dict = {'accession_num': 0, 'length': 0, 'hit_def': '', 'hsp_dict': {}}
@@ -111,17 +121,18 @@ class Biopy(object):
     # path_fastafile    String  FASTA file (with extension) and absolute path.
     # len_hit           int     length of protein that blast hit
     @staticmethod
-    def __print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fastafile, len_hit):
+    def _print_discrepancies_in_query_sequence_length(query_length, query_letters, path_fastafile, len_hit):
         if not query_length == query_letters:
-            warnings.warn_explicit(message='Query_length of blast_record is not same as query letters of blast_record.',
-                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
-        if not query_length == len(SeqIO.read(path_fastafile, 'fasta').seq):
-            warnings.warn_explicit(message='Length of fasta input sequence not same as query length of blast_record.',
-                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
-        if not query_length < len_hit:
-            warnings.warn_explicit(message='Length of fasta input (' + str(query_length) + ') is less than length of '
-                                           'hit(" + str(len_hit).',
-                                   category=RuntimeWarning, filename='GeneralUtilityMethods.py', lineno=260)
+            warnings.warn_explicit(message="Query_length of blast_record is not same as number of query letters in "
+                                           "blast_record.",
+                                   category=RuntimeWarning, filename="Biopy", lineno=65)
+        if not query_length == len(SeqIO.read(path_fastafile, "fasta").seq):
+            warnings.warn_explicit(message="Length of fasta input sequence not same as query length of blast_record.",
+                                   category=RuntimeWarning, filename="Biopy", lineno=65)
+        if query_length < len_hit:
+            warnings.warn_explicit(message="Length of fasta input (" + str(query_length) + ") is less than length of "
+                                           "hit(" + str(len_hit) + ").",
+                                   category=RuntimeWarning, filename="Biopy", lineno=65)
 
     from enum import Enum
 
