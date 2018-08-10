@@ -60,8 +60,10 @@ class TPLS(Enum):
     REL_FX_AC = "/foldx/analyse_complex"
     REL_FX_BM = "/foldx/build_model"
     REL_MUTATE_FASTA = "/mutate_fasta"
+    REL_BLASTP = "/blastp"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
     MC_TESTS_OUTPUT = MC_TESTS + REL_OUTPUT
+    MC_TESTS_OUTPUT_BLASTP = MC_TESTS_INPUT + REL_BLASTP
 
     DICT_AA_1TO3 = {'A': 'ALA', 'C': 'CYS', 'D': 'ASP', 'E': 'GLU', 'F': 'PHE', 'G': 'GLY', 'H': 'HIS', 'I': 'ILE',
                     'K': 'LYS', 'L': 'LEU', 'M': 'MET', 'N': 'ASN', 'P': 'PRO', 'Q': 'GLN', 'R': 'ARG', 'S': 'SER',
