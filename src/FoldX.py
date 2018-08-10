@@ -60,7 +60,7 @@ class FoldX(object):
                 job_name = self.FXBM_jobname_prefix + fx_mutant_name
                 Cluster.write_job_q_bash(job_name, path_jobq_indivlist_dest)
 
-                if os.path.exists(path_runscript_dest + '/' + 'runscript.txt'):
+                if os.path.exists(os.path.join(path_runscript_dest, 'runscript.txt')):
                     subprocess.call('qsub job.q', shell=True)
                 else:
                     raise ValueError('No runscript file was found')

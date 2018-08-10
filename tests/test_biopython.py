@@ -1,3 +1,4 @@
+import os
 from unittest import TestCase
 from src.Biopython import Biopy
 from unittest.mock import patch
@@ -12,7 +13,7 @@ class TestBiopython(TestCase):
         # constants related to input
         cls.FASTAFILE_1_A = '1_A.fasta'
         cls.DIR_PDB_1_A = '1_A'
-        cls.PATH_FASTA_1_A = TPLS.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTAFILE_1_A
+        cls.PATH_FASTA_1_A = os.path.join(TPLS.MC_TESTS_INPUT.value, cls.DIR_PDB_1_A, cls.FASTAFILE_1_A)
         cls.FASTA_SEQ_1_A = 'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVGSKDHILSLNINNISQEALSVFWPASTIKVEECKMAGKDPTHGCGN' \
                             'FVRVIQTFNRTHLYVCGSGAFSPVCTYLNRGRRSEDQVFMIDSKCESGKGRCSFNPNVNTVSVMINEELFSGMYIDFMGTDAAIFRS' \
                             'LTKRNAVRTDQHNSKWLSEPMFVDAHVIPDGTDPNDAKVYFFFKEKLTDNNRSTKQIHSMIARICPNDTGGLRSLVNKWTTFLKARL' \
@@ -44,8 +45,8 @@ class TestBiopython(TestCase):
     def test_run_blastp_1_A(self):
         # arrange
         Hsp_eval = "Hsp_evalue"
-        path_actual = TPLS.MC_TESTS_OUTPUT.value + self.REL_BLASTP + '/' + self.XML_1_A_BLASTP_OUTPUT_FILE
-        path_expected = TPLS.MC_TESTS_REF_FILES.value + self.REL_BLASTP + '/' + self.XML_1_A_BLASTP_OUTPUT_FILE
+        path_actual = os.path.join(TPLS.MC_TESTS_OUTPUT.value + self.REL_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
+        path_expected = os.path.join(TPLS.MC_TESTS_REF_FILES.value + self.REL_BLASTP, + self.XML_1_A_BLASTP_OUTPUT_FILE)
         # action
         result_handle_1_A = Biopy.run_blastp(self.FASTA_STR_1_A)
         blastp_output_xml = self.XML_1_A_BLASTP_OUTPUT_FILE

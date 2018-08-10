@@ -50,7 +50,7 @@ class TestCluster(TestCase):
         not_expected_job_q_2 = '#!/bin/bash\n' + '#$ -N ' + jobname + missing_new_line + '#$ -V\n' + \
                              '#$ -cwd\n' + 'source ~/.bash_profile\n' + TPLS.ZEUS_FOLDX_EXE.value + \
                              ' -runfile runscript.txt\n'
-        path_job_q_file = TPLS.MC_TESTS_CONFIG_JOBQ.value + '/' + 'testWriteJobQDstDir'
+        path_job_q_file = os.path.join(TPLS.MC_TESTS_CONFIG_JOBQ.value, 'testWriteJobQDstDir')
         # action
         actual_job_q = self.cluster.write_job_q_bash(jobname, 'testWriteJobQDstDir')
         # assert

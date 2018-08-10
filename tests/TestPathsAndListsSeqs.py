@@ -44,14 +44,16 @@ class TPLS(Enum):
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
     MC_TESTS_REFFILES = MC_TESTS + REL_REFFILES
 
-    # INPUT PATHS ONLY
+    # INPUT_DATA-RELATED PATHS ONLY
     # e.g. /tests/input_data/<pdbname>/all_mutants/<fxmutantchainname>
     REL_INPUT = "/input_data"
     REL_ALL_MUTANTS = "/all_mutants"
+    REL_FASTAS = "/fastas"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
     MC_TESTS_INPUT = MC_TESTS + REL_INPUT
+    MC_TESTS_INPUT_FASTAS = MC_TESTS_INPUT + REL_FASTAS
 
-    # OUTPUT PATHS ONLY
+    # OUTPUT_DATA-RELATED PATHS ONLY
     # e.g.#1: tests/output_data/<pdbname>/foldx/build_model/<fxmutantchainname>
     # e.g.#2: tests/output_data/<pdbname>/mutate_fasta
     REL_OUTPUT = "/output_data"

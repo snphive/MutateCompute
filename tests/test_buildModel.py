@@ -76,15 +76,15 @@ class TestBuildModel(TestCase):
 
     # file comparison scripts, currently unused. It relies to some extent on the directory structure being in place
     # which I didn't know how to mock so I made the write_job.. method return the string that it writes to job.q file.
-    # with open(path_job_q_file + '/job.q') as f:
+    # with open(os.path.join(path_job_q_file, 'job.q')) as f:
     #   actual_job_q = f.read()
     #   self.assertEqual(actual_job_q, expected_job_q)
     #   self.assertNotEqual(actual_job_q, not_expected_job_q)
     #   self.assertNotEqual(actual_job_q, not_expected_job_q_2)
 
     # pdbname = pdb.split('.')[0]
-    # path_tests_Inputs_PDBs_pdbname = PFT.PATH_TESTS_INPTS_PDBS + '/' + pdbname
-    # path_tests_Inputs_PDBs_pdbname_FX_BM = path_tests_Inputs_PDBs_pdbname + '/FX_BuildModel'
-    # path_tests_Inputs_PDBs_pdbname_FXmutant = path_tests_Inputs_PDBs_pdbname + '/RA1A'
+    # path_tests_Inputs_PDBs_pdbname = os.path.join(PFT.PATH_TESTS_INPTS_PDBS, pdbname)
+    # path_tests_Inputs_PDBs_pdbname_FX_BM = os.path.join(path_tests_Inputs_PDBs_pdbname, FX_BuildModel')
+    # path_tests_Inputs_PDBs_pdbname_FXmutant = os.path.join(path_tests_Inputs_PDBs_pdbname, 'RA1A')
     # mock_os_path_join.side_effect = [path_tests_Inputs_PDBs_pdbname, path_tests_Inputs_PDBs_pdbname_FX_BM,
     #                                  path_tests_Inputs_PDBs_pdbname_FXmutant]

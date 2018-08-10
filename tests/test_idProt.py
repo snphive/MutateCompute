@@ -35,7 +35,7 @@ class TestIdProt(TestCase):
         # constants related to input - mutant 1_A
         cls.FASTAFILE_1_A = '1_A.fasta'
         cls.DIR_PDB_1_A = '1_A'
-        cls.PATH_FASTA_1_A = TPLS.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_A + '/' + cls.FASTAFILE_1_A
+        cls.PATH_FASTA_1_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_PDB_1_A, cls.FASTAFILE_1_A)
         cls.FASTA_SEQ_1_A = TPLS.FASTA_SEQ_1_A.value
         cls.NAME_1_A = cls.FASTAFILE_1_A.split('.')[0]
         cls.XML_FILE_1_A = cls.NAME_1_A + '.xml'
@@ -45,7 +45,7 @@ class TestIdProt(TestCase):
 
         cls.FASTAFILE_1_B = '1_B.fasta'
         cls.DIR_PDB_1_B = '1_B'
-        cls.PATH_FASTA_1_B = TPLS.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_1_B + '/' + cls.FASTAFILE_1_B
+        cls.PATH_FASTA_1_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_PDB_1_B, cls.FASTAFILE_1_B)
         cls.FASTA_SEQ_1_B = TPLS.FASTA_SEQ_1_B.value
 
         cls.NAME_1_B = cls.FASTAFILE_1_B.split('.')[0]
@@ -56,7 +56,7 @@ class TestIdProt(TestCase):
 
         cls.FASTAFILE_2_A = '2_A.fasta'
         cls.DIR_PDB_2_A = '2_A'
-        cls.PATH_FASTA_2_A = TPLS.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_2_A + '/' + cls.FASTAFILE_2_A
+        cls.PATH_FASTA_2_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_PDB_2_A, cls.FASTAFILE_2_A)
         cls.FASTA_SEQ_2_A = TPLS.FASTA_SEQ_2_A.value
         cls.NAME_2_A = cls.FASTAFILE_2_A.split('.')[0]
         cls.XML_FILE_2_A = cls.NAME_2_A + '.xml'
@@ -66,7 +66,7 @@ class TestIdProt(TestCase):
 
         cls.FASTAFILE_3_A = '3_A.fasta'
         cls.DIR_PDB_3_A = '3_A'
-        cls.PATH_FASTA_3_A = TPLS.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_A + '/' + cls.FASTAFILE_3_A
+        cls.PATH_FASTA_3_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_PDB_3_A, cls.FASTAFILE_3_A)
         cls.FASTA_SEQ_3_A = TPLS.FASTA_SEQ_3_A.value
         cls.NAME_3_A = cls.FASTAFILE_3_A.split('.')[0]
         cls.XML_FILE_3_A = cls.NAME_3_A + '.xml'
@@ -76,7 +76,7 @@ class TestIdProt(TestCase):
 
         cls.FASTAFILE_3_B = '3_B.fasta'
         cls.DIR_PDB_3_B = '3_B'
-        cls.PATH_FASTA_3_B = TPLS.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_3_B + '/' + cls.FASTAFILE_3_B
+        cls.PATH_FASTA_3_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_PDB_3_B, cls.FASTAFILE_3_B)
         cls.FASTA_SEQ_3_B = TPLS.FASTA_SEQ_3_B.value
         cls.NAME_3_B = cls.FASTAFILE_3_B.split('.')[0]
         cls.XML_FILE_3_B = cls.NAME_3_B + '.xml'
@@ -86,7 +86,7 @@ class TestIdProt(TestCase):
 
         cls.FASTAFILE_10_B = '10_B.fasta'
         cls.DIR_PDB_10_B = '10_B'
-        cls.PATH_FASTA_10_B = TPLS.MC_TESTS_INPUT.value + '/' + cls.DIR_PDB_10_B + '/' + cls.FASTAFILE_10_B
+        cls.PATH_FASTA_10_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_PDB_10_B, cls.FASTAFILE_10_B)
         cls.FASTA_SEQ_10_B = TPLS.FASTA_SEQ_10_B.value
         cls.NAME_10_B = cls.FASTAFILE_10_B.split('.')[0]
         cls.XML_FILE_10_B = cls.NAME_10_B + '.xml'
@@ -98,13 +98,13 @@ class TestIdProt(TestCase):
                          cls.XML_FILE_3_B: cls.FASTA_STR_3_B, cls.XML_FILE_10_B: cls.FASTA_STR_10_B}
         TestIdProt._build_reference_blastp_output_xml_files(sequence_dict)
 
-        cls.PATH_TESTS_REFFILES_BLASTP_1_A_XML = TestIdProt.PATH_TESTS_REFFILES_BLASTP + '/' + cls.XML_FILE_1_A
+        cls.PATH_TESTS_REFFILES_BLASTP_1_A_XML = TestIdProt.PATH_TESTS_REFFILES_BLASTP, cls.XML_FILE_1_A
 
-
+    # This is a helper method, called from setUpClass()
     @staticmethod
     def _build_reference_blastp_output_xml_files(sequence_dict):
         for blast_out_xml, fasta_input in sequence_dict.items():
-            if not os.path.exists(TestIdProt.PATH_TESTS_REFFILES_BLASTP + '/' + blast_out_xml):
+            if not os.path.exists(os.path.join(TestIdProt.PATH_TESTS_REFFILES_BLASTP, blast_out_xml)):
                 result_handle = NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
                                                database=Biopy.BlastParam.SWSPRT.value,
                                                sequence=fasta_input,
@@ -116,8 +116,8 @@ class TestIdProt(TestCase):
 
     @patch.object(IdProt, "_write_blastp_xml_result")
     @patch.object(NCBIWWW, "qblast")
-    @patch('builtins.open', create=True)
-    def test_start_1_A(self, mock_open, mock_qblast, mock__write_blastp_xml_result):
+    # @patch('builtins.open', create=True) mock_open,
+    def test_start_1_A(self,  mock_qblast, mock__write_blastp_xml_result):
         # arrange
         len_1_A = len(self.FASTA_SEQ_1_A)
         query_len = align_len = idents = q_end = len_1_A
@@ -140,17 +140,16 @@ class TestIdProt(TestCase):
         # it is looking for doesn't exist at the specified path. Furthermore the fasta string value is used in the
         # start() method to pass to biopython's qblast method which is mocked here anyway so it doesn't matter what
         # value is passed to it.
-        mock.mock_open(read_data="ABC")
+        # mock_open(read_data="ABC")
         with open(self.PATH_TESTS_REFFILES_BLASTP_1_A_XML) as test_1_A_xml:
             mock_qblast.return_value = test_1_A_xml
         mock__write_blastp_xml_result.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
-        path_output = TPLS.MC_TESTS_OUTPUT.value + '/' + self.DIR_PDB_1_A + TestIdProt.DIR_BLASTP
+        path_output = os.path.join(TPLS.MC_TESTS_OUTPUT.value, self.DIR_PDB_1_A + TestIdProt.DIR_BLASTP)
         # action
         result_dict = IdProt.start(path_fastafile=self.PATH_FASTA_1_A, write_blastp_json=False, build_idmap_csv=False,
                                    path_output=path_output)
         # assert
         self.assertEqual(expected_qblast_dict_1_A, result_dict)
-
 
     def test__write_blastp_xml_result(self):
         # arrange

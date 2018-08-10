@@ -93,30 +93,37 @@ class TestGUM(TestCase):
         for path_copied_file in path_copied_file_list:
             self.assertTrue(path_copied_file)
 
-    def test_extract_pdbname_chain_fasta_from_pdb(self):
+    def test_extract_pdbname_chain_fasta_from_pdbs(self):
         # arrange
         pdbfiles = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb']
         path_input = TPLS.MC_TESTS_INPUT.value
         write_fastafile = False
         path_to_write_fastafile = ''
+        # Need at some point to make a decision about whether to include 'RepairPDB_' in the names.
+        # expected_pdbname_chain_fastaseq_dict = {
+        # 'RepairPDB_1_A': TPLS.FASTA_SEQ_1_A.value,
+        # 'RepairPDB_1_B': TPLS.FASTA_SEQ_1_B.value,
+        # 'RepairPDB_2_A': TPLS.FASTA_SEQ_2_A.value}
         expected_pdbname_chain_fastaseq_dict = {
-        'RepairPDB_1_A': TPLS.FASTA_SEQ_1_A.value,
-        'RepairPDB_1_B': TPLS.FASTA_SEQ_1_B.value,
-        'RepairPDB_2_A': TPLS.FASTA_SEQ_2_A.value}
+        '1_A': TPLS.FASTA_SEQ_1_A.value,
+        '1_B': TPLS.FASTA_SEQ_1_B.value,
+        '2_A': TPLS.FASTA_SEQ_2_A.value}
         # action
         pdbname_chain_fastaseq_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(pdbfiles, path_input, write_fastafile,
                                                                             path_to_write_fastafile)
         # assert
+        # self.maxDiff = None
         self.assertDictEqual(expected_pdbname_chain_fastaseq_dict, pdbname_chain_fastaseq_dict)
 
     def test_extract_all_chains_from_pdb(self):
         # arrange
         pdbfile = 'RepairPDB_1.pdb'
-        path_pdbfile = TPLS.MC_TESTS_INPUT.value + '/' + pdbfile.split('.')[0]
+        path_pdbfile = os.path.join(TPLS.MC_TESTS_INPUT.value, pdbfile.split('.')[0])
         expected_protein_chains = ['A', 'B']
         # action
         protein_chains = GUM.extract_all_chains_from_pdb(pdbfile, path_pdbfile)
         # assert
+        self.maxDiff = None
         self.assertEqual(expected_protein_chains, protein_chains)
 
     def test_remove_prefix_and_suffix(self):

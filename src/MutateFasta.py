@@ -82,25 +82,25 @@ class MutateFasta(object):
         path_all_mutants_fastafile = None
         path_seqs_w_mutants = None
         for wt_title, title_seq in title_titleSeq_w_mutants.items():
-            path_input_fastas_title_mutants = path_input + '/fastas/' + wt_title + '/mutants'
+            path_input_fastas_title_mutants = os.path.join(path_input, 'fastas', wt_title, 'mutants')
             try:
                 os.makedirs(path_input_fastas_title_mutants)
             except FileExistsError:
                 print('Part of all of path already exists. This is absolutely fine.')
             if make_fastafile_all_mutants:
-                path_all_mutants_fastafile = open(path_input_fastas_title_mutants + '/' + wt_title +
-                                                  '_mutants.fasta', 'w')
+                path_all_mutants_fastafile = open(os.path.join(path_input_fastas_title_mutants,
+                                                               wt_title + '_mutants.fasta'), 'w')
             if make_csv_file or make_txt_file:
-                path_output_title_seqs = path_output + '/' + wt_title + '/sequences'
+                path_output_title_seqs = os.path.join(path_output, wt_title, 'sequences')
                 try:
                     os.makedirs(path_output_title_seqs)
                 except FileExistsError:
                     print('Part of all of path already exists. This is absolutely fine.')
             if make_csv_file:
-                path_seqs_w_mutants = open(path_output_title_seqs + '/' + wt_title + '_mutants.csv', 'w')
+                path_seqs_w_mutants = open(os.path.join(path_output_title_seqs, wt_title + '_mutants.csv'), 'w')
                 path_seqs_w_mutants.write(wt_title + ':' + title_seq[wt_title] + ',')
             if make_txt_file:
-                path_seqs_w_mutants = open(path_output_title_seqs + '/' + wt_title + '_mutants.txt', 'w')
+                path_seqs_w_mutants = open(os.path.join(path_output_title_seqs, wt_title + '_mutants.txt'), 'w')
                 path_seqs_w_mutants.write(wt_title + ':' + title_seq[wt_title] + '\n')
             for mut_title, mut_seq in title_seq.items():
                 if mut_title is not wt_title:
@@ -112,8 +112,8 @@ class MutateFasta(object):
                         if make_txt_file:
                             path_seqs_w_mutants.write(mut_title + ':' + mut_seq + '\n')
                     if make_fastafile_per_mutant:
-                        path_mutant_fastafile = open(path_input_fastas_title_mutants + '/' + mut_title +
-                                                     '.fasta', 'w')
+                        path_mutant_fastafile = open(os.path.join(path_input_fastas_title_mutants,
+                                                                  mut_title + '.fasta'), 'w')
                         path_mutant_fastafile.write('>' + mut_title + '\n' + mut_seq)
                         path_mutant_fastafile.close()
             if path_all_mutants_fastafile is not None:

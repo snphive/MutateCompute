@@ -79,6 +79,8 @@ class GUM(object):
     # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
     # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
     # if these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
+    # E.g. return value might look like:
+    # {'RepairPDB_1_A': 'RVYLTFDELRETK..etc', 'RepairPDB_2_A': 'RVYLTFDELRETK..etc', etc}
     #
     # pdbfiles                  String OR List of Strings   The pdb file (including ".pdb") or files (no path).
     # path_input                String                      Path to where the pdb subdirectories can be found.
@@ -93,7 +95,7 @@ class GUM(object):
         if isinstance(pdbfiles, str):
             pdbfiles = [pdbfiles]
         for pdbfile in pdbfiles:
-            with open(path_input + '/' + pdbfile.split('.')[0] + '/' + pdbfile) as pdbfile_opened:
+            with open(os.path.join(path_input, pdbfile.split('.')[0], pdbfile)) as pdbfile_opened:
                 pdbfile_lines = pdbfile_opened.readlines()
             pdbfile_lines_with_atom = []
             protein_chains = []
@@ -149,7 +151,7 @@ class GUM(object):
     # Returns list of protein chains in the pdbfile (as alphabetic single-letter characters).
     @staticmethod
     def extract_all_chains_from_pdb(pdbfile, path_pdbfile):
-        with open(path_pdbfile + '/' + pdbfile) as pdbfile_opened:
+        with open(os.path.join(path_pdbfile, pdbfile)) as pdbfile_opened:
             pdbfile_lines = pdbfile_opened.readlines()
         protein_chains = []
         for pdbfile_line in pdbfile_lines:
@@ -290,7 +292,7 @@ class GUM(object):
         if not os.path.exists(path_root):
             os.makedirs(path_root)
         for leaf in args:
-            path_root_leaf = path_root + '/' + leaf
+            path_root_leaf = os.path.join(path_root, leaf)
             complete_paths.append(path_root_leaf)
             if not os.path.exists(path_root_leaf):
                 os.mkdir(path_root_leaf)
@@ -327,7 +329,7 @@ class GUM(object):
         if not os.path.exists(path_root):
             os.makedirs(path_root)
         for leaf in args:
-            path_root_leaf = path_root + '/' + leaf
+            path_root_leaf = os.path.join(path_root, leaf)
             if not os.path.exists(path_root_leaf):
                 os.mkdir(path_root_leaf)
             path_root = path_root_leaf
@@ -414,7 +416,7 @@ class GUM(object):
                 wanted_file_list.remove(wanted_file)
             else:
                 path_dst_dir = GUM.create_dir_tree(path_root_dst_dir, wanted_file.split('.')[0])
-                path_file_to_copy = path_src_repo_dir + '/' + wanted_file
+                path_file_to_copy = os.path.join(path_src_repo_dir, wanted_file)
                 GUM.linux_copy(path_file_to_copy, path_dst_dir, do_recursively=copy_all_files)
         return wanted_file_list
 

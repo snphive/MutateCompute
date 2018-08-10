@@ -24,7 +24,6 @@ class IdProt(object):
         with open(path_fastafile) as fasta_io:
             fasta_str = fasta_io.read()
         blastp_result = Biopy.run_blastp(fasta_str)
-        print('******************#########***********************' + str(type(blastp_result)))
         fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
         path_blstp_resultXml = IdProt._write_blastp_xml_result(path_output, fastafile_name, blastp_result)
         blastp_result_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_resultXml, fastafile_name, path_fastafile)
@@ -35,9 +34,11 @@ class IdProt(object):
             IdProt._write_idmap_csv(path_output, fastafile_name, id_map)
         return blastp_result_dict
 
-    # path_output           String
-    # filename              String
-    # blastp_result         ?
+    #
+    # path_output       String
+    # filename          String
+    # blastp_result     io.TextIOWrapper
+    #
     @staticmethod
     def _write_blastp_xml_result(path_output, filename, blastp_result):
         path_output = GUM.create_dir_tree(path_output, filename, IdProt.DIR_BLASTP)
@@ -51,7 +52,7 @@ class IdProt(object):
 
     @staticmethod
     def _write_dict_to_json_file(path_output, filename, blastp_result_dict):
-        path_json_file = path_output + "/" + filename + '/' + IdProt.DIR_BLAST_SWISPROT + "/" + filename + '.json'
+        path_json_file = os.path.join(path_output, filename, IdProt.DIR_BLAST_SWISPROT, filename + '.json')
         with open(path_json_file, 'w') as f:
             f.write(json.dumps(blastp_result_dict))
 
@@ -64,7 +65,7 @@ class IdProt(object):
 
     @staticmethod
     def _write_idmap_csv(path_output, filename, id_map):
-        path_output_filename_blstpswp_csvfile = path_output + "/" + filename + '/' + IdProt.DIR_BLAST_SWISPROT + "/" + filename + '.csv'
+        path_output_filename_blstpswp_csvfile = os.path.join(path_output, filename, IdProt.DIR_BLAST_SWISPROT, filename + '.csv')
         with open(path_output_filename_blstpswp_csvfile, 'w') as f:
             f.write(json.dumps(id_map))
         return path_output_filename_blstpswp_csvfile
