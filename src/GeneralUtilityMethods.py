@@ -227,7 +227,7 @@ class GUM(object):
     def make_titleSeqDict_from_fastafile(path_fastafiles):
         title_sequence_dict = {}
         if isinstance(path_fastafiles, str):
-            path_fastafiles     = [path_fastafiles]
+            path_fastafiles = [path_fastafiles]
         for path_fastafile in path_fastafiles:
             with open(path_fastafile, 'r') as path_fastafile_opened:
                 fastafile_lines = path_fastafile_opened.readlines()
