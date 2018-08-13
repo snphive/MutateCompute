@@ -114,14 +114,14 @@ class TestIdProt(TestCase):
                 HM.write_blastp_to_tests_dir(TPLS.MC_TESTS_REFFILES.value, TestIdProt.DIR_BLASTP,
                                              result_handle, blast_out_xml)
 
-    def test_start(self):
+    def test_map_seq_to_swsprt_acc_id_and_write_csv(self):
         # arrange
         path_fastafile = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, '1_A', '1_A.fasta')
         write_blastp_json = False
         build_idmap_csv = False
         path_output = TPLS.MC_TESTS_OUTPUT.value
-        # action
-        IdProt.start(path_fastafile, write_blastp_json, build_idmap_csv, path_output)
+        # act
+        IdProt.map_seq_to_swsprt_acc_id_and_write_csv(path_fastafile, write_blastp_json, build_idmap_csv, path_output)
         # assert
 
     # I wanted to mock open() read(). Not quite managed it yet, but even so it prevents the method throwing an
@@ -130,10 +130,10 @@ class TestIdProt(TestCase):
     # stop the method execution. It is disabled atm, so tester must be sure there is a file at the expected location
     # with the expected name.
     # mock_open(read_data="ABC")
-    @patch.object(IdProt, "_write_blastp_xml_result")
+    @patch.object(IdProt, "_write_blast_xml")
     @patch.object(NCBIWWW, "qblast")
     # @patch('builtins.open', create=True) mock_open,
-    def test_start_1_A(self,  mock_qblast, mock__write_blastp_xml_result):
+    def test_map_seq_to_swsprt_acc_id_and_write_csv_1_A(self, mock_qblast, mock__write_blast_xml):
         # arrange
         len_1_A = len(self.FASTA_SEQ_1_A)
         query_len = align_len = idents = q_end = len_1_A
@@ -142,36 +142,88 @@ class TestIdProt(TestCase):
         hit_start_pos = 28
         hit_end_pos = hit_start_pos + query_len - 1
         hit_def = 'RecName: Full=Semaphorin-3C; AltName: Full=Semaphorin-E; Short=Sema E; Flags: Precursor'
-        expected_align_dict_1_A = {'accession_num': acc, 'length': hit_len, 'hit_def': hit_def,
+        expected_align_list_1_A = {'accession_num': acc, 'length': hit_len, 'hit_def': hit_def,
                                        'hsp_dict': {'align_length': align_len, 'gaps': self.ZERO_GAP,
                                                     'identities': idents, 'query_end': q_end,
                                                     'query_start': self.QSTRT_1, 'sbjct_end': hit_end_pos,
                                                     'sbjct_start': hit_start_pos}}
         expected_qblast_dict_1_A = {'database': self.SWSPRT_DB, 'database_seqs_num': self.SWSPRT_PROTS_NUM,
                                         'query_length': query_len, 'query_seq_id': self.NAME_1_A,
-                                        'alignment_dict': expected_align_dict_1_A}
+                                        'identical_aligns_list': expected_align_list_1_A}
         with open(self.PATH_TESTS_REFFILES_BLASTP_1_A_XML) as test_1_A_xml:
             mock_qblast.return_value = test_1_A_xml
-        mock__write_blastp_xml_result.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
+        mock__write_blast_xml.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
         path_output = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A)
-        # action
-        result_dict = IdProt.start(path_fastafile=self.PATH_FASTA_1_A, write_blastp_json=False,
-                                   build_idmap_csv=False, path_output=path_output)
+        # act
+        result_dict = IdProt.map_seq_to_swsprt_acc_id_and_write_csv(path_fastafile=self.PATH_FASTA_1_A, write_blastp_json=False,
+                                                                    write_idmap_csv=False, path_output=path_output)
         # assert
         self.assertEqual(expected_qblast_dict_1_A, result_dict)
 
-    def test__write_blastp_xml_result(self):
+    def test__write_blast_xml(self):
         # arrange
         path_output = TPLS.MC_TESTS_OUTPUT.value
         fastafile_name = self.DIR_1_A
         with open(os.path.join(TPLS.MC_TESTS_REFFILES.value, TPLS.DIR_BLASTP.value, self.XML_FILE_1_A)) as xml_1_A_open:
             blastp_result = xml_1_A_open
             expected_path_output_blastp_xmlfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.XML_FILE_1_A)
-            # action
-            path_output_blastp_xmlfile = IdProt._write_blastp_xml_result(path_output, fastafile_name, blastp_result)
+            # act
+            path_output_blastp_xmlfile = IdProt._write_blast_xml(path_output, fastafile_name, blastp_result)
         # assert
         self.assertTrue(os.path.exists(expected_path_output_blastp_xmlfile))
         self.assertEqual(expected_path_output_blastp_xmlfile, path_output_blastp_xmlfile)
+
+    def test__write_idmaps_for_mysqldb(self):
+        # arrange
+        fastafile_name = '1_A'
+        query_length = 538
+        database_used = 'swissprot'
+        database_seqs_num = 20379
+        accession_num = 'Q99985'
+        length = 751
+        sbjct_end = 565
+        sbjct_start = 28
+        identical_aligns_list = [{'accession_num': accession_num, 'length': length,
+                          'hit_def': 'RecName: Full=Semaphorin-3C; AltName: Full=Semaphorin-E; Short=Sema E; '
+                        'Flags: Precursor', 'hsp_dict': {'align_length': 538, 'gaps': 0, 'identities': 538,
+                        'query_end': 538, 'query_start': 1, 'sbjct_end': sbjct_end, 'sbjct_start': sbjct_start}}]
+        blastp_dict = {'query_seq_id': fastafile_name,
+                        'query_length': query_length,
+                        'database': database_used,
+                        'database_seqs_num': database_seqs_num,
+                        'identical_aligns_list': identical_aligns_list}
+        full_name = 'Semaphorin-3C'
+        altname = 'Semaphorin-E'
+        flags = 'Precursor'
+        expected_csv = 'sequence_id,accession_num,length,full name,altname,flags,start pos, end pos\n' + \
+                       fastafile_name + ',' + accession_num + ',' + str(length) + ',' + full_name + ',' + altname + \
+                       ',' + flags + ',' + str(sbjct_start) + ',' + str(sbjct_end)
+
+        expected_xml = '<?xml version="1.0" encoding="UTF-8"?><sequence_id="1_A"><accession_num>' + accession_num + \
+                       '</accession_num><length>' + str(length) + '</length> <full name>' + full_name + '</full name>' \
+                        '<altname>' + altname + '</altname><flags>' + flags + '</flags><start pos>' + \
+                       str(sbjct_start) + '</start pos><end pos>' + str(sbjct_end) + '</end pos></sequence_id>'
+        # act
+        IdProt._write_idmaps_for_mysqldb(blastp_dict)
+        # assert
+        with open('') as csv_opened:
+            csv = csv_opened.read()
+            self.assertTrue(expected_csv, csv)
+        with open('') as xml_opened:
+            xml = xml_opened.read()
+            self.assertTrue(expected_xml, xml)
+
+
+    # def test__write_idmap_csv(self):
+    #     # arrange
+    #     path_output = TPLS.MC_TESTS_OUTPUT.value
+    #     filename = ''
+    #     id_map = {}
+    #     # act
+    #     path_csv_file = IdProt._write_idmap_csv(path_output, filename, id_map)
+    #     # assert
+    #     self.assertEqual()
+    #     self.assertTrue(os.path.exists(path_csv_file))
 
     def test__write_dict_to_json_file(self):
         # arrange
@@ -179,28 +231,8 @@ class TestIdProt(TestCase):
         filename = ''
         blastp_result_dict = {}
         expected_path_res_file = ''
-        # action
+        # act
         path_result_file = IdProt._write_dict_to_json_file(path_output, filename, blastp_result_dict)
         # assert
         self.assertEqual()
         self.assertTrue(os.path.exists(path_result_file))
-
-    def test__build_idmap_for_mysqldb(self):
-        # arrange
-        blastp_result_dict = {}
-        filename = ''
-        # action
-        IdProt._build_idmap_for_mysqldb(blastp_result_dict, filename)
-        # assert
-        self.assertEqual()
-
-    def test__write_idmap_csv(self):
-        # arrange
-        path_output = TPLS.MC_TESTS_OUTPUT.value
-        filename = ''
-        id_map = {}
-        # action
-        path_csv_file = IdProt._write_idmap_csv(path_output, filename, id_map)
-        # assert
-        self.assertEqual()
-        self.assertTrue(os.path.exists(path_csv_file))
