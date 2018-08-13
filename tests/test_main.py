@@ -35,7 +35,7 @@ class TestMain(TestCase):
                                    'TO ########################################################################\n',
                                    '#\n', '## All means all 20 amino acids. Otherwise each amino acid in FASTA format,'
                                     ' e.g. "ACDEFGHIKLMNOP;"\n', '#\n', 'RESIDUES: All;']
-        # action
+        # act
         global_options = Main._read_global_options(path_globoptions_file)
         # assert
         self.assertEqual(expected_global_options, global_options)
@@ -47,7 +47,7 @@ class TestMain(TestCase):
         PDB_or_FASTA = 'PDBs'
         path_input = TPLS.MC_TESTS_INPUT.value
         expected_pdb_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb', 'RepairPDB_3.pdb', 'RepairPDB_4.pdb']
-        # action
+        # act
         pdb_list = Main._build_filelist_for_analysis(globaloptions_lines, PDB_or_FASTA, path_input)
         # assert
         self.assertNotEqual('', pdb_list)
@@ -59,7 +59,7 @@ class TestMain(TestCase):
         globaloptions_lines = ['#\n', 'FASTAs: 4;\n', '#']
         PDB_or_FASTA = 'FASTAs'
         expected_fasta_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta', '3_A.fasta']
-        # action
+        # act
         fasta_list = Main._build_filelist_for_analysis(globaloptions_lines, PDB_or_FASTA, path_input)
         # assert
         self.assertNotEqual('', fasta_list)
@@ -74,7 +74,7 @@ class TestMain(TestCase):
         expected_operations = {'do_mutate_fasta': True, 'do_agadir': False, 'do_foldx_repair': False,
                                'do_foldx_buildmodel': False, 'do_foldx_stability': False,
                                'do_foldx_analysecomplex': False}
-        # action
+        # act
         operations = Main._determine_which_operations_to_perform(globaloptions_lines)
         # assert
         self.assertNotEqual({}, operations)
@@ -85,7 +85,7 @@ class TestMain(TestCase):
         globaloptions_lines = ['#\n', 'RESIDUES: All;\n']
         expected_residues = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V',
                              'W', 'Y']
-        # action
+        # act
         residues = Main._determine_residues_to_mutate_to(globaloptions_lines)
         # assert
         self.assertListEqual(expected_residues, residues)
@@ -93,7 +93,7 @@ class TestMain(TestCase):
         # arrange
         globaloptions_lines = ['#\n', 'RESIDUES: ACDEFGHI;\n']
         expected_residues = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-        # action
+        # act
         residues = Main._determine_residues_to_mutate_to(globaloptions_lines)
         # assert
         self.assertListEqual(expected_residues, residues)
@@ -101,7 +101,7 @@ class TestMain(TestCase):
         # arrange
         globaloptions_lines = ['#\n', 'RESIDUES: AXZ;\n']
         expected_residues = ['A']
-        # action
+        # act
         residues = Main._determine_residues_to_mutate_to(globaloptions_lines)
         # assert
         self.assertListEqual(expected_residues, residues)
@@ -119,7 +119,7 @@ class TestMain(TestCase):
         list_of_mutant_aa = ['A']
         mock_start.return_value = True
         expected = True
-        # action
+        # act
         actual = Main._start_scheduler(operations, path_input, pdb_list, fasta_list, list_of_mutant_aa)
         # assert
         self.assertEqual(expected, actual)

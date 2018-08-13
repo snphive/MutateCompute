@@ -46,7 +46,7 @@ class TestBuildModel(TestCase):
         write_wt_fastafiles = False
         mutant_aa_list = ['A', 'C']
         pdb = 'RepairPDB_1.pdb'
-        # action
+        # act
         self.buildModel.mutate_residues_of_pdb(TPLS.MC_TESTS_INPUT.value, TPLS.MC_TESTS_OUTPUT.value, pdb,
                                                mutant_aa_list, write_wt_fastafiles)
         # assert

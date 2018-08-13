@@ -25,7 +25,7 @@ class TestMutateFasta(TestCase):
         wt_seq = TPLS.FASTA_TRIPEP_SEQ_WILDTYPE.value
         mutant_aa_list = TPLS.LIST_ALL_20_AA.value
         expected_mutantTitle_SeqDict = TPLS.FASTA_TRIPEP_TITLE_TITLE_SEQ_DICT_ALL_20_INCL_WT.value
-        # action
+        # act
         mutantTitle_SeqDict = self.mutateFasta._add_mutantTitle_mutatedSeq_to_dict(titleSeqDict, wt_title, wt_seq,
                                                                                    mutant_aa_list)
         # assert
@@ -42,7 +42,7 @@ class TestMutateFasta(TestCase):
         expected_titleTitleSeqDictDict_w_muts = {'WT1_SC': {'WT1_SC': 'SC', 'S1A': 'AC', 'S1C': 'CC', 'C2A': 'SA'},
                                                  'WT2_GE': {'WT2_GE': 'GE', 'G1A': 'AE', 'G1C': 'CE', 'E2A': 'GA',
                                                          'E2C': 'GC'}}
-        # action
+        # act
         titleTitleSeqDictDict_w_muts = self.mutateFasta._populate_titleTitleSeqDictDict_with_mutants(
             titleTitleSeqDictDict, mutant_aa_list)
         # assert
@@ -54,7 +54,7 @@ class TestMutateFasta(TestCase):
         fastafile_list = ['WT_SCI.fasta']
         mutant_aa_list = ['A']
         expected_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
-        # action
+        # act
         mutants = self.mutateFasta.mutate_every_residue_in_fasta_list(path_input, fastafile_list, mutant_aa_list)
         # assert
         self.assertDictEqual(expected_mutants, mutants)
@@ -68,7 +68,7 @@ class TestMutateFasta(TestCase):
         make_fastafile_per_mutant = False
         path_output = ''
         expected_all_mutants_fastafile = '>S1A\nACI\n>C2A\nSAI\n>I3A\nSCA\n'
-        # action
+        # act
         self.mutateFasta._write_mutants_to_file(title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
                                make_fastafile_per_mutant, path_output, make_csv_file=False, make_txt_file=False)
         # assert
@@ -89,7 +89,7 @@ class TestMutateFasta(TestCase):
         make_fastafile_per_mutant = True
         path_output = ''
         expected_mutant_fastafile_list = ['S1A.fasta', 'C2A.fasta', 'I3A.fasta']
-        # action
+        # act
         self.mutateFasta._write_mutants_to_file(title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
                                make_fastafile_per_mutant, path_output, make_csv_file=False, make_txt_file=False)
         mutant_fastafile_list = glob.glob(TPLS.MC_TESTS_INPUT.value + '/fastas/WT_SCI/mutants/*.fasta')
@@ -112,7 +112,7 @@ class TestMutateFasta(TestCase):
         make_txt_file = True
         path_output = TPLS.MC_TESTS_OUTPUT.value
         expected_txt_file_str = 'WT_SCI:SCI\nS1A:ACI\nC2A:SAI\nI3A:SCA\n'
-        # action
+        # act
         self.mutateFasta._write_mutants_to_file(title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
                     make_fastafile_per_mutant, path_output, make_csv_file=make_csv_file, make_txt_file=make_txt_file)
         # assert
@@ -135,7 +135,7 @@ class TestMutateFasta(TestCase):
         make_txt_file = False
         path_output = TPLS.MC_TESTS_OUTPUT.value
         expected_csv_file_str = 'WT_SCI:SCI,S1A:ACI,C2A:SAI,I3A:SCA,'
-        # action
+        # act
         self.mutateFasta._write_mutants_to_file(title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
                     make_fastafile_per_mutant, path_output, make_csv_file=make_csv_file, make_txt_file=make_txt_file)
         # assert

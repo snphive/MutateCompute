@@ -43,7 +43,7 @@ class TestGUM(TestCase):
                              '<OutPDB>#;\n' + '<END>#;\n' + '<JOBEND>#;\n' + '<ENDFILE>#;\n'
         single_space = ' '
         not_expected_runscript = single_space + expected_runscript
-        # action
+        # act
         actual_runscript = GUM.write_runscript_for_pdbs(path_runscript, pdb, action)
         # assert
         self.assertEqual(actual_runscript, expected_runscript)
@@ -56,7 +56,7 @@ class TestGUM(TestCase):
     #     path_src_dir = TPL.MC_TESTS_INPUT.value
     #     path_dst_dir = TPL.MC_TESTS_OUTPUT.value
     #     starting_num = 1
-    #     # action
+    #     # act
     #     GUM.copy_and_move_pdb_files(path_src_dir, path_dst_dir, starting_num, total_num_to_copy=9)
     #     # assert
     #     # expected_call_count_1 = 1
@@ -67,7 +67,7 @@ class TestGUM(TestCase):
         path_dst_dir = TPLS.MC_TESTS_INPUT.value
         src_file_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb', 'RepairPDB_3.pdb', 'RepairPDB_4.pdb', 'RepairPDB_5.pdb']
         wanted_file_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb']
-        # action
+        # act
         copied_wanted_file_list = GUM.copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir,
                                                                             src_file_list, wanted_file_list,
                                                                             copy_all_files=False)
@@ -85,7 +85,7 @@ class TestGUM(TestCase):
         path_dst_dir = TPLS.MC_TESTS_INPUT.value
         src_file_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta', '3_A.fasta', '3_B.fasta']
         wanted_file_list = ['1_A.fasta', '3_A.fasta']
-        # action
+        # act
         copied_wanted_file_list = GUM.copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir,
                                                                             src_file_list, wanted_file_list,
                                                                             copy_all_files=False)
@@ -110,7 +110,7 @@ class TestGUM(TestCase):
         '1_A': TPLS.FASTA_SEQ_1_A.value,
         '1_B': TPLS.FASTA_SEQ_1_B.value,
         '2_A': TPLS.FASTA_SEQ_2_A.value}
-        # action
+        # act
         pdbname_chain_fastaseq_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(pdbfiles, path_input, write_fastafile,
                                                                             path_to_write_fastafile)
         # assert
@@ -122,7 +122,7 @@ class TestGUM(TestCase):
         pdbfile = 'RepairPDB_1.pdb'
         path_pdbfile = os.path.join(TPLS.MC_TESTS_INPUT.value, pdbfile.split('.')[0])
         expected_protein_chains = ['A', 'B']
-        # action
+        # act
         protein_chains = GUM.extract_all_chains_from_pdb(pdbfile, path_pdbfile)
         # assert
         self.maxDiff = None
@@ -134,7 +134,7 @@ class TestGUM(TestCase):
         prefix = 'RepairPDB_'
         suffix = '.pdb'
         expected_trimmed = '1_A'
-        # action
+        # act
         trimmed = GUM._remove_prefix_and_suffix(input_str, prefix, suffix)
         # assert
         self.assertEqual(expected_trimmed, trimmed)
@@ -143,7 +143,7 @@ class TestGUM(TestCase):
         # arrange
         path_fastafile = TPLS.MC_TESTS_INPUT.value + '/fastas/1_A/1_A.fasta'
         expected_seq_1_A = TPLS.FASTA_SEQ_1_A.value
-        # action
+        # act
         sequence = GUM.get_sequenceOnly_from_fastafile(path_fastafile)
         # assert
         self.assertEqual(expected_seq_1_A, sequence)
@@ -152,7 +152,7 @@ class TestGUM(TestCase):
         # arrange
         path_fastafile_list = '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_A/1_A.fasta'
         expected_title_seq_dict = {'1_A': TPLS.FASTA_SEQ_1_A.value}
-        # action
+        # act
         title_seq_dict = GUM.make_titleSeqDict_from_fastafile(path_fastafile_list)
         # assert
         self.assertDictEqual(expected_title_seq_dict, title_seq_dict)
@@ -164,7 +164,7 @@ class TestGUM(TestCase):
         expected_path_list = ['/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_A/1_A.fasta',
                               '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_B/1_B.fasta',
                               '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/2_A/2_A.fasta']
-        # action
+        # act
         path_list = GUM.build_complete_paths_for_fastafiles(path_input, fastafile_list)
         # assert
         self.assertListEqual(expected_path_list, path_list)
@@ -173,7 +173,7 @@ class TestGUM(TestCase):
         # arrange
         title_sequence_dict = {'1_A': TPLS.FASTA_SEQ_1_A.value}
         expected_titleTitleSeqDictDict = {'1_A': {'1_A': TPLS.FASTA_SEQ_1_A.value}}
-        # action
+        # act
         titleTitleSeqDictDict = GUM.convert_titleSeqDict_to_titleTitleSeqDictDict(title_sequence_dict)
         # assert
         self.assertDictEqual(expected_titleTitleSeqDictDict, titleTitleSeqDictDict)
