@@ -26,53 +26,54 @@ class TestIdProt(TestCase):
     @classmethod
     def setUpClass(cls):
 
-        #   mutant 1_A     ##################################################################################
+        #   mutant 1_A     ############################################################################################
         #   constants related to output - mutant 1_A
         cls.XML_1_A_BLASTP_OUTPUT_FILE = '1_A.xml'
         #   constants related to input - mutant 1_A
         cls.FASTAFILE_1_A = '1_A.fasta'
         cls.DIR_1_A = '1_A'
-        cls.PATH_FASTA_1_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_1_A, cls.FASTAFILE_1_A)
+        cls.PATH_TESTS_INPUT_FASTA_1_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_1_A, cls.FASTAFILE_1_A)
         cls.FASTA_SEQ_1_A = TPLS.FASTA_SEQ_1_A.value
         cls.NAME_1_A = cls.FASTAFILE_1_A.split('.')[0]
         cls.XML_FILE_1_A = cls.NAME_1_A + '.xml'
         cls.FASTA_STR_1_A = ">" + cls.NAME_1_A + "\n" + cls.FASTA_SEQ_1_A
-        #   mutant 1_B     ##################################################################################
+        #   mutant 1_B     ############################################################################################
         cls.FASTAFILE_1_B = '1_B.fasta'
         cls.DIR_1_B = '1_B'
-        cls.PATH_FASTA_1_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_1_B, cls.FASTAFILE_1_B)
+        cls.PATH_TESTS_INPUT_FASTA_1_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_1_B, cls.FASTAFILE_1_B)
         cls.FASTA_SEQ_1_B = TPLS.FASTA_SEQ_1_B.value
         cls.NAME_1_B = cls.FASTAFILE_1_B.split('.')[0]
         cls.XML_FILE_1_B = cls.NAME_1_B + '.xml'
         cls.FASTA_STR_1_B = ">" + cls.NAME_1_B + "\n" + cls.FASTA_SEQ_1_B
-        #   mutant 2_A     ##################################################################################
+        #   mutant 2_A     ############################################################################################
         cls.FASTAFILE_2_A = '2_A.fasta'
         cls.DIR_2_A = '2_A'
-        cls.PATH_FASTA_2_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_2_A, cls.FASTAFILE_2_A)
+        cls.PATH_TESTS_INPUT_FASTA_2_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_2_A, cls.FASTAFILE_2_A)
         cls.FASTA_SEQ_2_A = TPLS.FASTA_SEQ_2_A.value
         cls.NAME_2_A = cls.FASTAFILE_2_A.split('.')[0]
         cls.XML_FILE_2_A = cls.NAME_2_A + '.xml'
         cls.FASTA_STR_2_A = ">" + cls.NAME_2_A + "\n" + cls.FASTA_SEQ_2_A
-        #   mutant 3_A     ##################################################################################
+        #   mutant 3_A     ############################################################################################
         cls.FASTAFILE_3_A = '3_A.fasta'
         cls.DIR_3_A = '3_A'
-        cls.PATH_FASTA_3_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_3_A, cls.FASTAFILE_3_A)
+        cls.PATH_TESTS_INPUT_FASTA_3_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_3_A, cls.FASTAFILE_3_A)
         cls.FASTA_SEQ_3_A = TPLS.FASTA_SEQ_3_A.value
         cls.NAME_3_A = cls.FASTAFILE_3_A.split('.')[0]
         cls.XML_FILE_3_A = cls.NAME_3_A + '.xml'
         cls.FASTA_STR_3_A = ">" + cls.NAME_3_A + "\n" + cls.FASTA_SEQ_3_A
-        #   mutant 3_B     ##################################################################################
+        #   mutant 3_B     ############################################################################################
         cls.FASTAFILE_3_B = '3_B.fasta'
         cls.DIR_3_B = '3_B'
-        cls.PATH_FASTA_3_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_3_B, cls.FASTAFILE_3_B)
+        cls.PATH_TESTS_INPUT_FASTA_3_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_3_B, cls.FASTAFILE_3_B)
         cls.FASTA_SEQ_3_B = TPLS.FASTA_SEQ_3_B.value
         cls.NAME_3_B = cls.FASTAFILE_3_B.split('.')[0]
         cls.XML_FILE_3_B = cls.NAME_3_B + '.xml'
         cls.FASTA_STR_3_B = ">" + cls.NAME_3_B + "\n" + cls.FASTA_SEQ_3_B
-        #   mutant 10_B     ##################################################################################
+        #   mutant 10_B     ###########################################################################################
         cls.FASTAFILE_10_B = '10_B.fasta'
         cls.DIR_10_B = '10_B'
-        cls.PATH_FASTA_10_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_10_B, cls.FASTAFILE_10_B)
+        cls.PATH_TESTS_INPUT_FASTA_10_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_10_B,
+                                                       cls.FASTAFILE_10_B)
         cls.FASTA_SEQ_10_B = TPLS.FASTA_SEQ_10_B.value
         cls.NAME_10_B = cls.FASTAFILE_10_B.split('.')[0]
         cls.XML_FILE_10_B = cls.NAME_10_B + '.xml'
@@ -98,14 +99,15 @@ class TestIdProt(TestCase):
                 HM.write_blastp_to_tests_dir(TPLS.MC_TESTS_REFFILES.value, TestIdProt.DIR_BLASTP,
                                              result_handle, blast_out_xml)
 
-    def test_map_seq_to_swsprt_acc_id_and_write_csv(self):
+    def test_map_seq_to_swsprt_acc_id_and_write_files(self):
         # arrange
-        path_fastafile = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, '1_A', '1_A.fasta')
-        write_blastp_json = False
-        build_idmap_csv = False
+        path_fastafile = self.PATH_TESTS_INPUT_FASTA_1_A
         path_output = TPLS.MC_TESTS_OUTPUT.value
+        write_idmaps_for_mysldb = False
         # act
-        IdProt.map_seq_to_swsprt_acc_id_and_write_csv(path_fastafile, write_blastp_json, build_idmap_csv, path_output)
+        IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_fastafile, path_output,
+                                                        write_idmaps_for_mysldb=write_idmaps_for_mysldb,
+                                                        make_json=False, make_csv=False, make_xml=False)
         # assert
 
     # I wanted to mock open() read(). Not quite managed it yet, but even so it prevents the method throwing an
@@ -117,7 +119,7 @@ class TestIdProt(TestCase):
     @patch.object(IdProt, "_write_blast_xml")
     @patch.object(NCBIWWW, "qblast")
     # @patch('builtins.open', create=True) mock_open,
-    def test_map_seq_to_swsprt_acc_id_and_write_csv_1_A(self, mock_qblast, mock__write_blast_xml):
+    def test_map_seq_to_swsprt_acc_id_and_write_files_1_A(self, mock_qblast, mock__write_blast_xml):
         # arrange
         len_1_A = len(self.FASTA_SEQ_1_A)
         query_len = align_len = idents = q_end = len_1_A
@@ -137,10 +139,13 @@ class TestIdProt(TestCase):
         with open(self.PATH_TESTS_REFFILES_BLASTP_1_A_XML) as test_1_A_xml:
             mock_qblast.return_value = test_1_A_xml
         mock__write_blast_xml.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
+        path_fastafile = self.PATH_TESTS_INPUT_FASTA_1_A
         path_output = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A)
+        write_idmaps_for_mysldb = False
         # act
-        result_dict = IdProt.map_seq_to_swsprt_acc_id_and_write_csv(path_fastafile=self.PATH_FASTA_1_A, write_blastp_json=False,
-                                                                    write_idmap_csv=False, path_output=path_output)
+        result_dict = IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_fastafile, path_output,
+                                                                      write_idmaps_for_mysldb=write_idmaps_for_mysldb,
+                                                                      make_json=False, make_csv=False, make_xml=False)
         # assert
         self.assertEqual(expected_qblast_dict_1_A, result_dict)
 
@@ -157,9 +162,12 @@ class TestIdProt(TestCase):
         self.assertTrue(os.path.exists(expected_path_output_blastp_xmlfile))
         self.assertEqual(expected_path_output_blastp_xmlfile, path_output_blastp_xmlfile)
 
+    # It seems that the method 'json.dumps()' produces something that unittest can handle. All the strings have double
+    # quotes. But assertEqual(string, jsonfileread) also sees the string as single quotes so it never finds it equal to
+    # an identical jsonfile that has been read in.
     def test__write_idmaps_for_mysqldb(self):
         # arrange
-        fastafile_name = '1_A'
+        fastafile_name = self.DIR_1_A
         query_length = 538
         database_used = 'swissprot'
         database_seqs_num = 20379
@@ -179,44 +187,118 @@ class TestIdProt(TestCase):
         full_name = 'Semaphorin-3C'
         altname = 'Semaphorin-E'
         flags = 'Precursor'
-        expected_csv = 'sequence_id,accession_num,length,full name,altname,flags,start pos, end pos\n' + \
-                       fastafile_name + ',' + accession_num + ',' + str(length) + ',' + full_name + ',' + altname + \
-                       ',' + flags + ',' + str(sbjct_start) + ',' + str(sbjct_end)
-
-        expected_xml = '<?xml version="1.0" encoding="UTF-8"?><sequence_id="1_A"><accession_num>' + accession_num + \
-                       '</accession_num><length>' + str(length) + '</length> <full name>' + full_name + '</full name>' \
-                        '<altname>' + altname + '</altname><flags>' + flags + '</flags><start pos>' + \
-                       str(sbjct_start) + '</start pos><end pos>' + str(sbjct_end) + '</end pos></sequence_id>'
+        expected_csv = 'sequence_id,accession_num,length,full_name,altname,flags,start_pos,end_pos\n' + \
+                       fastafile_name + ',' + accession_num + ',' + str(length) + ',' + full_name + ',' + \
+                       altname + ',' + flags + ',' + str(sbjct_start) + ',' + str(sbjct_end) + '\n'
+        expected_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<sequence_id id="1_A">\n\t<accession_num>' + \
+                       accession_num + '</accession_num>\n\t<length>' + str(length) + '</length>\n\t<full_name>' + \
+                       full_name + '</full_name>\n\t<altname>' + altname + '</altname>\n\t<flags>' + flags + \
+                       '</flags>\n\t<start_pos>' + str(sbjct_start) + '</start_pos>\n\t<end_pos>' + str(sbjct_end) + \
+                       '</end_pos>\n</sequence_id>\n'
+        expected_json = {"sequence_id": fastafile_name, "accession_num": accession_num, "length": 751,
+                         "full_name": full_name, "altname": altname, "flags": flags, "start_pos": 28,
+                         "end_pos": 565}
+        path_output = TPLS.MC_TESTS_OUTPUT.value
+        expected_path_output_blastp_xmlfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A + '_idmaps',
+                                                           'idmap_swsprt.xml')
+        expected_path_output_blastp_csvfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A + '_idmaps',
+                                                           'idmap_swsprt.csv')
+        expected_path_output_blastp_jsonfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A + '_idmaps',
+                                                            'idmap_swsprt.json')
         # act
-        IdProt._write_idmaps_for_mysqldb(blastp_dict)
+        IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, make_xml=True, make_csv=True, make_json=True)
         # assert
-        with open('') as csv_opened:
+        with open(expected_path_output_blastp_csvfile) as csv_opened:
+            csv = csv_opened.read()
+            self.assertEqual(expected_csv, csv)
+        with open(expected_path_output_blastp_xmlfile) as xml_opened:
+            xml = xml_opened.read()
+            self.assertEqual(expected_xml, xml)
+        path_ref_files_blastp_1_A_jsonfile = os.path.join(TPLS.MC_TESTS_REFFILES.value, TPLS.DIR_BLASTP.value,
+                                                          fastafile_name + '_idmaps', 'idmap_swsprt.json')
+        with open(expected_path_output_blastp_jsonfile) as json_opened, \
+                open(path_ref_files_blastp_1_A_jsonfile) as ref_json_opened:
+            json = json_opened.read()
+            expected_json = ref_json_opened.read()
+            self.assertEqual(expected_json, json)
+
+    def test__write_idmap_csv(self):
+        # arrange
+        fastafile_name = '1_A'
+        accession_num = 'Q99985'
+        length = 751
+        sbjct_end = 565
+        sbjct_start = 28
+        full_name = 'Semaphorin-3C'
+        altname = 'Semaphorin-E'
+        flags = 'Precursor'
+        expected_csv = 'sequence_id,accession_num,length,full_name,altname,flags,start_pos,end_pos\n' + \
+                       fastafile_name + ',' + accession_num + ',' + str(length) + ',' + full_name + ',' + \
+                       altname + ',' + flags + ',' + str(sbjct_start) + ',' + str(sbjct_end) + '\n'
+        path_output = TPLS.MC_TESTS_OUTPUT.value
+        expected_path_output_blastp_csvfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, fastafile_name +
+                                                           '_idmaps', 'idmap_swsprt.csv')
+        idmap = {'sequence_id': fastafile_name, 'accession_num': accession_num, 'length': 751, 'full_name': full_name,
+                 'altname': altname, 'flags': flags, 'start_pos': 28, 'end_pos': 565}
+        # act
+        IdProt._write_idmap_csv(path_output, idmap)
+        # assert
+        with open(expected_path_output_blastp_csvfile) as csv_opened:
             csv = csv_opened.read()
             self.assertTrue(expected_csv, csv)
-        with open('') as xml_opened:
+
+    def test__write_idmap_xml(self):
+        # arrange
+        fastafile_name = '1_A'
+        accession_num = 'Q99985'
+        length = 751
+        sbjct_end = 565
+        sbjct_start = 28
+        full_name = 'Semaphorin-3C'
+        altname = 'Semaphorin-E'
+        flags = 'Precursor'
+        expected_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<sequence_id="1_A">\n<accession_num>\n' + \
+                       accession_num + '</accession_num>\n<length>' + str(length) + '</length>\n<full name>' + \
+                       full_name + '</full name>\n<altname>' + altname + '</altname>\n<flags>' + flags + \
+                       '</flags>\n<start pos>' + str(sbjct_start) + '</start pos>\n<end pos>' + str(sbjct_end) + \
+                       '</end pos>\n</sequence_id\n'
+        path_output = TPLS.MC_TESTS_OUTPUT.value
+        expected_path_output_blastp_xmlfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, fastafile_name +
+                                                            '_idmaps', 'idmap_swsprt.xml')
+        idmap = {'sequence_id': fastafile_name, 'accession_num': accession_num, 'length': 751, 'full_name': full_name,
+                 'altname': altname, 'flags': flags, 'start_pos': 28, 'end_pos': 565}
+        # act
+        IdProt._write_idmap_xml(path_output, idmap)
+        # assert
+        with open(expected_path_output_blastp_xmlfile) as xml_opened:
             xml = xml_opened.read()
             self.assertTrue(expected_xml, xml)
 
-
-    # def test__write_idmap_csv(self):
-    #     # arrange
-    #     path_output = TPLS.MC_TESTS_OUTPUT.value
-    #     filename = ''
-    #     id_map = {}
-    #     # act
-    #     path_csv_file = IdProt._write_idmap_csv(path_output, filename, id_map)
-    #     # assert
-    #     self.assertEqual()
-    #     self.assertTrue(os.path.exists(path_csv_file))
-
     def test__write_dict_to_json_file(self):
         # arrange
+        fastafile_name = "1_A"
+        accession_num = "Q99985"
+        length = 751
+        sbjct_end = 565
+        sbjct_start = 28
+        full_name = "Semaphorin-3C"
+        altname = "Semaphorin-E"
+        flags = "Precursor"
+        idmap = {"sequence_id": fastafile_name, "accession_num": accession_num, "length": length,
+                 "full_name": full_name, "altname": altname, "flags": flags, "start_pos": sbjct_start,
+                 "end_pos": sbjct_end}
         path_output = TPLS.MC_TESTS_OUTPUT.value
-        filename = ''
-        blastp_result_dict = {}
-        expected_path_res_file = ''
+        expected_path_output_blastp_jsonfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, fastafile_name +
+                                                            "_idmaps", "idmap_swsprt.json")
+        path_ref_files_blastp_1_A_jsonfile = os.path.join(TPLS.MC_TESTS_REFFILES.value, TPLS.DIR_BLASTP.value,
+                                                          fastafile_name + '_idmaps', 'idmap_swsprt.json')
+        expected_json = str(idmap)
         # act
-        path_result_file = IdProt._write_dict_to_json_file(path_output, filename, blastp_result_dict)
+        IdProt._write_idmap_jsonfile(path_output, idmap)
         # assert
-        self.assertEqual()
-        self.assertTrue(os.path.exists(path_result_file))
+        with open(expected_path_output_blastp_jsonfile) as json_opened, \
+                open(path_ref_files_blastp_1_A_jsonfile) as ref_json_opened:
+            json = json_opened.read()
+            expected_json = ref_json_opened.read()
+            self.assertEqual(expected_json, json)
+
