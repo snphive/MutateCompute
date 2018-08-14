@@ -21,18 +21,15 @@ class TestIdProt(TestCase):
     QSTRT_1 = 1
     # constants related to output - for all mutants
     DIR_BLASTP = 'blastp'
-    REL_BLASTP = '/' + DIR_BLASTP
-    PATH_TESTS_REFFILES_BLASTP = TPLS.MC_TESTS_REFFILES.value + REL_BLASTP
+    PATH_TESTS_REFFILES_BLASTP = os.path.join(TPLS.MC_TESTS_REFFILES.value, DIR_BLASTP)
 
     @classmethod
     def setUpClass(cls):
 
-        #     mutant 1_A     ##################################################################################
-
-        # constants related to output - mutant 1_A
+        #   mutant 1_A     ##################################################################################
+        #   constants related to output - mutant 1_A
         cls.XML_1_A_BLASTP_OUTPUT_FILE = '1_A.xml'
-
-        # constants related to input - mutant 1_A
+        #   constants related to input - mutant 1_A
         cls.FASTAFILE_1_A = '1_A.fasta'
         cls.DIR_1_A = '1_A'
         cls.PATH_FASTA_1_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_1_A, cls.FASTAFILE_1_A)
@@ -40,20 +37,15 @@ class TestIdProt(TestCase):
         cls.NAME_1_A = cls.FASTAFILE_1_A.split('.')[0]
         cls.XML_FILE_1_A = cls.NAME_1_A + '.xml'
         cls.FASTA_STR_1_A = ">" + cls.NAME_1_A + "\n" + cls.FASTA_SEQ_1_A
-
-        #     mutant 1_B     ##################################################################################
-
+        #   mutant 1_B     ##################################################################################
         cls.FASTAFILE_1_B = '1_B.fasta'
         cls.DIR_1_B = '1_B'
         cls.PATH_FASTA_1_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_1_B, cls.FASTAFILE_1_B)
         cls.FASTA_SEQ_1_B = TPLS.FASTA_SEQ_1_B.value
-
         cls.NAME_1_B = cls.FASTAFILE_1_B.split('.')[0]
         cls.XML_FILE_1_B = cls.NAME_1_B + '.xml'
         cls.FASTA_STR_1_B = ">" + cls.NAME_1_B + "\n" + cls.FASTA_SEQ_1_B
-
-        #     mutant 2_A     ##################################################################################
-
+        #   mutant 2_A     ##################################################################################
         cls.FASTAFILE_2_A = '2_A.fasta'
         cls.DIR_2_A = '2_A'
         cls.PATH_FASTA_2_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_2_A, cls.FASTAFILE_2_A)
@@ -61,9 +53,7 @@ class TestIdProt(TestCase):
         cls.NAME_2_A = cls.FASTAFILE_2_A.split('.')[0]
         cls.XML_FILE_2_A = cls.NAME_2_A + '.xml'
         cls.FASTA_STR_2_A = ">" + cls.NAME_2_A + "\n" + cls.FASTA_SEQ_2_A
-
-        #     mutant 3_A     ##################################################################################
-
+        #   mutant 3_A     ##################################################################################
         cls.FASTAFILE_3_A = '3_A.fasta'
         cls.DIR_3_A = '3_A'
         cls.PATH_FASTA_3_A = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_3_A, cls.FASTAFILE_3_A)
@@ -71,9 +61,7 @@ class TestIdProt(TestCase):
         cls.NAME_3_A = cls.FASTAFILE_3_A.split('.')[0]
         cls.XML_FILE_3_A = cls.NAME_3_A + '.xml'
         cls.FASTA_STR_3_A = ">" + cls.NAME_3_A + "\n" + cls.FASTA_SEQ_3_A
-
-        #     mutant 3_B     ##################################################################################
-
+        #   mutant 3_B     ##################################################################################
         cls.FASTAFILE_3_B = '3_B.fasta'
         cls.DIR_3_B = '3_B'
         cls.PATH_FASTA_3_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_3_B, cls.FASTAFILE_3_B)
@@ -81,9 +69,7 @@ class TestIdProt(TestCase):
         cls.NAME_3_B = cls.FASTAFILE_3_B.split('.')[0]
         cls.XML_FILE_3_B = cls.NAME_3_B + '.xml'
         cls.FASTA_STR_3_B = ">" + cls.NAME_3_B + "\n" + cls.FASTA_SEQ_3_B
-
-        #     mutant 10_B     ##################################################################################
-
+        #   mutant 10_B     ##################################################################################
         cls.FASTAFILE_10_B = '10_B.fasta'
         cls.DIR_10_B = '10_B'
         cls.PATH_FASTA_10_B = os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, cls.DIR_10_B, cls.FASTAFILE_10_B)
@@ -92,15 +78,13 @@ class TestIdProt(TestCase):
         cls.XML_FILE_10_B = cls.NAME_10_B + '.xml'
         cls.FASTA_STR_10_B = ">" + cls.NAME_10_B + "\n" + cls.FASTA_SEQ_10_B
         ###############################################################################################################
-
         sequence_dict = {cls.XML_FILE_1_A: cls.FASTA_STR_1_A, cls.XML_FILE_1_B: cls.FASTA_STR_1_B,
                          cls.XML_FILE_2_A: cls.FASTA_STR_2_A, cls.XML_FILE_3_A: cls.FASTA_STR_3_A,
                          cls.XML_FILE_3_B: cls.FASTA_STR_3_B, cls.XML_FILE_10_B: cls.FASTA_STR_10_B}
         TestIdProt._build_reference_blastp_output_xml_files(sequence_dict)
-
         cls.PATH_TESTS_REFFILES_BLASTP_1_A_XML = os.path.join(TestIdProt.PATH_TESTS_REFFILES_BLASTP, cls.XML_FILE_1_A)
 
-    # This is a helper method, called from setUpClass()
+    # This is a 'helper method', called from setUpClass()
     @staticmethod
     def _build_reference_blastp_output_xml_files(sequence_dict):
         for blast_out_xml, fasta_input in sequence_dict.items():
