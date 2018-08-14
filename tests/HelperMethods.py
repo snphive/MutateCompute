@@ -19,17 +19,17 @@ class HM(object):
     def remove_config_folders():
         if os.path.exists(TPLS.MC_TESTS.value):
             if os.path.exists(TPLS.MC_TESTS_CONFIG.value):
-                HM.__delete_subdirectory_tree_of_tests(TPLS.REL_CONFIG.value)
+                HM.__delete_subdirectory_tree_of_tests(TPLS.DIR_CONFIG.value)
 
     @staticmethod
-    def __delete_subdirectory_tree_of_tests(path_to_delete):
+    def __delete_subdirectory_tree_of_tests(dir_to_delete):
         os.chdir(TPLS.MC_TESTS.value)
         if not os.getcwd() == TPLS.MC_TESTS.value:
             raise ValueError('Current working directory is not MutateCompute/tests. '
-                             '\nNot proceeding with deletion of ' + path_to_delete)
+                             '\nNot proceeding with deletion of ' + dir_to_delete)
         else:
             try:
-                shutil.rmtree('/' + path_to_delete)
+                shutil.rmtree(dir_to_delete)
             except OSError as e:
                 print("Error removing: %s - %s." % (e.filename, e.strerror))
 
