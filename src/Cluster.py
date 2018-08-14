@@ -1,3 +1,4 @@
+import os
 from src.Paths import Paths
 from src.GeneralUtilityMethods import GUM
 
@@ -60,9 +61,13 @@ class Cluster(object):
     # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use.
     # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
     @staticmethod
-    def write_job_q_bash(job_name, job_q_dest_dir, using_runscript=True, python_script_with_paths='', queue='',
+    def write_job_q_bash(job_name, path_job_q_dir, using_runscript=True, python_script_with_paths='', queue='',
                          n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
-        path_job_q_dest = GUM.create_dir_tree(Paths.MC_CONFIG_JOBQ.value, job_q_dest_dir)
+        try:
+            os.makedirs(path_job_q_dir)
+        except FileExistsError:
+            print("Some or all of the directories in the this path already exist. It's no problem.")
+
 
         job_q = []
         job_q.append('#!/bin/bash\n'+'#$ -N '+job_name+'\n'+'#$ -V\n')
@@ -97,7 +102,7 @@ class Cluster(object):
         if python_script_with_paths != '':
             job_q.append('python ' + python_script_with_paths + '\n')
 
-        with open(path_job_q_dest + '/job.q', 'w') as job_q_file:
+        with open(path_job_q_dir + '/job.q', 'w') as job_q_file:
             job_q_str = ''.join(job_q)
             job_q_file.write(job_q_str)
 

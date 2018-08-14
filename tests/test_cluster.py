@@ -21,9 +21,9 @@ class TestCluster(TestCase):
             GUM.linux_copy(path_src=TPLS.INPUT_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS_INPUT.value,
                            do_recursively=True)
 
-    @classmethod
-    def tearDownClass(cls):
-        HM.remove_config_folders()
+    # @classmethod
+    # def tearDownClass(cls):
+    #     # HM.remove_config_folders()
 
     def setUp(self):
         self.cluster = Cluster()
@@ -50,20 +50,19 @@ class TestCluster(TestCase):
         not_expected_job_q_2 = '#!/bin/bash\n' + '#$ -N ' + jobname + missing_new_line + '#$ -V\n' + \
                              '#$ -cwd\n' + 'source ~/.bash_profile\n' + TPLS.ZEUS_FOLDX_EXE.value + \
                              ' -runfile runscript.txt\n'
-        path_job_q_file = os.path.join(TPLS.MC_TESTS_CONFIG_JOBQ.value, 'testWriteJobQDstDir')
         # act
-        actual_job_q = self.cluster.write_job_q_bash(jobname, 'testWriteJobQDstDir')
+        actual_job_q = self.cluster.write_job_q_bash(jobname, TPLS.MC_TESTS_CONFIG_JOBQ.value)
         # assert
         self.assertEqual(expected_job_q, actual_job_q)
         self.assertNotEqual(not_expected_job_q, actual_job_q)
         self.assertNotEqual(not_expected_job_q_2, actual_job_q)
-        self._test_job_q_bash_file_created(path_job_q_file)
+        self._test_job_q_bash_file_created(os.path.join(TPLS.MC_TESTS_CONFIG_JOBQ.value, 'job.q'))
 
     def _test_job_q_bash_file_created(self, path_job_q_file):
         path_job_q_dir = path_job_q_file.strip(path_job_q_file.split('/')[-1])
         self.assertTrue(os.path.exists(path_job_q_dir), 'path to job.q directory (which should contain the job.q file) '
                                                         'does not exist: ' + path_job_q_dir)
         if os.path.exists(path_job_q_dir):
-            self.assertTrue(os.path.exists(path_job_q_file), 'path to job.q file does not exist: ' + path_job_q_file)
-            self.assertTrue(os.path.isfile('job.q'))
+            self.assertTrue(os.path.exists(path_job_q_file), '(Absolute path to) job.q file does not exist: ' + path_job_q_file)
+            self.assertTrue(os.path.isfile(path_job_q_file))
 
