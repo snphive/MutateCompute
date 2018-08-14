@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence_id id="1_A">
+	<accession_num>Q99985</accession_num>
+	<length>751</length>
+	<full_name>Semaphorin-3C</full_name>
+	<altname>Semaphorin-E</altname>
+	<flags>Precursor</flags>
+	<start_pos>28</start_pos>
+	<end_pos>565</end_pos>
+</sequence_id>
