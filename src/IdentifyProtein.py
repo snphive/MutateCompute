@@ -25,7 +25,7 @@ class IdProt(object):
         blastp_result = Biopy.run_blastp(fasta_str)
         fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
         path_blstp_xml = IdProt._write_blast_xml(path_output, fastafile_name, blastp_result)
-        blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
+        blastp_dict = Biopy.parse_and_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
         if write_idmaps_for_mysldb:
             IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, make_csv=make_csv, make_xml=make_xml,
                                              make_json=make_json)
