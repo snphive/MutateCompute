@@ -14,7 +14,7 @@ class TestMain(TestCase):
 
     def test__read_global_options(self):
         # arrange
-        path_globoptions_file = TPLS.MC_TESTS_CONFIG_GLOBAL_OPTIONS.value + '/MutateCompute_Options.txt'
+        path_globoptions_file = TPLS.MC_TESTS_CONFIG_GLOBAL_OPTIONS.value + '/global_options.txt'
         expected_global_options = ['######## NUMBER OF PDBs TO ANALYSE ##############################################'
                                    '#################################\n', '#\n', '## All means all PDBs in the '
                                     'specified source directory\n', '#\n', 'PDBs: 4;\n', '#\n', '######## NUMBER OF '
