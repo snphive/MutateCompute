@@ -35,7 +35,7 @@ class TestMutateFasta(TestCase):
 
     # I CAN'T WORK OUT HOW TO MAKE MOCK'S SIDE-EFFECT THING WORK!! HOW TO MAKE IT MOCK A SPECIFIC METHOD TO RETURN
     # ONE VALUE ON THE FIRST TIME IT'S CALLED AND ANOTHER VALUE THE 2ND TIME IT'S CALLED.
-    def test__populate_titleTitleSeqDictDict_with_mutants(self):
+    def test__populate_title_titleSeq_with_mutants(self):
         # arrange
         titleTitleSeqDictDict = {'WT1_SC': {'WT1_SC': 'SC'}, 'WT2_GE': {'WT2_GE': 'GE'}}
         mutant_aa_list = ['A', 'C']
@@ -43,35 +43,42 @@ class TestMutateFasta(TestCase):
                                                  'WT2_GE': {'WT2_GE': 'GE', 'G1A': 'AE', 'G1C': 'CE', 'E2A': 'GA',
                                                          'E2C': 'GC'}}
         # act
-        titleTitleSeqDictDict_w_muts = self.mutateFasta._populate_titleTitleSeqDictDict_with_mutants(
+        titleTitleSeqDictDict_w_muts = self.mutateFasta._populate_title_titleSeq_with_mutants(
             titleTitleSeqDictDict, mutant_aa_list)
         # assert
         self.assertDictEqual(expected_titleTitleSeqDictDict_w_muts, titleTitleSeqDictDict_w_muts)
 
-    def test_mutate_every_residue_in_fasta_list(self):
+    def test_mutate_every_residue(self):
         # arrange
         path_input = TPLS.MC_TESTS_INPUT.value
         fastafile_list = ['WT_SCI.fasta']
+        fastafile = ['WT_SCI.fasta']
         mutant_aa_list = ['A']
+        write_1_fasta_only = True
+        write_fasta_per_mut = False
+        path_output = TPLS.MC_TESTS_OUTPUT.value
         expected_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         # act
-        mutants = self.mutateFasta.mutate_every_residue_in_fasta_list(path_input, fastafile_list, mutant_aa_list)
+        mutants = self.mutateFasta.mutate_every_residue(path_input, fastafile_list, fastafile, mutant_aa_list,
+                write_1_fasta_only=write_1_fasta_only, write_fasta_per_mut=write_fasta_per_mut, path_output=path_output)
         # assert
         self.assertDictEqual(expected_mutants, mutants)
 
     # Write one fastafile for all mutants. All other flags are set to false.
-    def test_write_mutants_to_file_1(self):
+    def test_write_mutants_1(self):
         # arrange
         GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, 'WT_SCI','mutants'))
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         path_input = TPLS.MC_TESTS_INPUT.value
-        make_fastafile_all_mutants = True
-        make_fastafile_per_mutant = False
+        write_1_fasta_only = True
+        write_fasta_per_mut = False
         path_output = ''
+        write_csv = False
+        write_txt = False
         expected_all_mutants_fastafile = '>S1A\nACI\n>C2A\nSAI\n>I3A\nSCA\n'
         # act
-        self.mutateFasta._write_mutants_to_file(title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
-                               make_fastafile_per_mutant, path_output, make_csv_file=False, make_txt_file=False)
+        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
+                                        path_output, write_csv=write_csv, write_txt=write_txt)
         # assert
         self.assertTrue(os.path.exists(TPLS.MC_TESTS_INPUT.value + '/fastas/WT_SCI/mutants'),
             msg='~/PycharmProjects/MutateCompute/tests/input_data/fastas/WT_SCI/mutants folder was not found')
@@ -82,18 +89,20 @@ class TestMutateFasta(TestCase):
         self.assertEqual(expected_all_mutants_fastafile, all_mutants_fastafile)
 
     # Write one fastafile per mutant. All other flags are false.
-    def test_write_mutants_to_file_2(self):
+    def test_write_mutants_2(self):
         # arrange
         GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, 'WT_SCI', 'mutants'))
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         path_input = TPLS.MC_TESTS_INPUT.value
-        make_fastafile_all_mutants = False
-        make_fastafile_per_mutant = True
+        write_1_fasta_only = False
+        write_fasta_per_mut = True
         path_output = ''
+        write_csv = False
+        write_txt = False
         expected_mutant_fastafile_list = ['S1A.fasta', 'C2A.fasta', 'I3A.fasta']
         # act
-        self.mutateFasta._write_mutants_to_file(title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
-                               make_fastafile_per_mutant, path_output, make_csv_file=False, make_txt_file=False)
+        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
+                                        path_output, write_csv=write_csv, write_txt=write_txt)
         mutant_fastafile_list = glob.glob(TPLS.MC_TESTS_INPUT.value + '/fastas/WT_SCI/mutants/*.fasta')
         mutant_fastafile_list = [mutant_fastafile.split('/')[-1] for mutant_fastafile in mutant_fastafile_list]
 
@@ -104,20 +113,20 @@ class TestMutateFasta(TestCase):
             self.assertTrue(exp_mutant_fastafile in mutant_fastafile_list)
 
     # Write one txt file (for wild-type and all mutants). All other flags are false.
-    def test_write_mutants_to_file_3(self):
+    def test_write_mutants_3(self):
         # arrange
         GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT.value, 'WT_SCI', 'sequences'))
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         path_input = TPLS.MC_TESTS_INPUT.value
-        make_fastafile_all_mutants = False
-        make_fastafile_per_mutant = False
-        make_csv_file = False
-        make_txt_file = True
+        write_1_fasta_only = False
+        write_fasta_per_mut = False
+        write_csv = False
+        write_txt = True
         path_output = TPLS.MC_TESTS_OUTPUT.value
         expected_txt_file_str = 'WT_SCI:SCI\nS1A:ACI\nC2A:SAI\nI3A:SCA\n'
         # act
-        self.mutateFasta._write_mutants_to_file(title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
-                    make_fastafile_per_mutant, path_output, make_csv_file=make_csv_file, make_txt_file=make_txt_file)
+        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
+                                        path_output, write_csv=write_csv, write_txt=write_txt)
         # assert
         self.assertTrue(os.path.exists(TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences'),
             msg=TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences folder not found')
@@ -128,20 +137,20 @@ class TestMutateFasta(TestCase):
         self.assertEqual(expected_txt_file_str, txt_file_str)
 
     # Write one csv file (for wild-type and all mutants). All other flags are false.
-    def test_write_mutants_to_file_4(self):
+    def test_write_mutants_4(self):
         # arrange
         GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT.value, 'WT_SCI', 'sequences'))
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         path_input = TPLS.MC_TESTS_INPUT.value
-        make_fastafile_all_mutants = False
-        make_fastafile_per_mutant = False
-        make_csv_file = True
-        make_txt_file = False
+        write_1_fasta_only = False
+        write_fasta_per_mut = False
+        write_csv = True
+        write_txt = False
         path_output = TPLS.MC_TESTS_OUTPUT.value
         expected_csv_file_str = 'WT_SCI:SCI,S1A:ACI,C2A:SAI,I3A:SCA,'
         # act
-        self.mutateFasta._write_mutants_to_file(title_titleSeq_w_mutants, path_input, make_fastafile_all_mutants,
-                    make_fastafile_per_mutant, path_output, make_csv_file=make_csv_file, make_txt_file=make_txt_file)
+        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
+                                        path_output, write_csv=write_csv, write_txt=write_txt)
         # assert
         self.assertTrue(os.path.exists(TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences'),
             msg=TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences folder not found')
