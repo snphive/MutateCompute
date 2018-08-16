@@ -169,16 +169,13 @@ class Main(object):
 
     @staticmethod
     def _start_scheduler(operations, path_input, pdb_list, fasta_list, list_of_mutant_aa, use_multithreading):
-        process_started = False
         if operations == {}:
             raise ValueError("All options in 'operations' were either set to FALSE or there was a typo of some form. "
                              "Check that /configuration/global_options/global_options.txt was written correctly")
         elif operations['do_mutate_fasta'] or operations['do_agadir'] or operations['do_foldx_repair'] \
                 or operations['do_foldx_buildmodel'] or operations['do_foldx_stability'] \
                 or operations['do_foldx_analysecomplex']:
-            process_started = Scheduler.start(operations, path_input, pdb_list, fasta_list, list_of_mutant_aa,
-                                              use_multithreading)
-        return process_started
+            Scheduler.start(operations, path_input, pdb_list, fasta_list, list_of_mutant_aa, use_multithreading)
 
     # line   String    Alphanumeric text line of the global options ending with "\n".
     #                  Must have format "option name:<option value>;\n"
