@@ -80,10 +80,11 @@ class FoldX(object):
                         fx_mutant_name_list.append(wt_aa + chain + str(position) + mutant_aa)
             return fx_mutant_name_list
 
+        # Not tested yet.
         def _write_individual_list_for_mutant(self, fx_mutant_name, path_indivlist_dest):
-            individual_list_for_this_mutant_only = open(path_indivlist_dest + 'individual_list.txt', 'w')
-            individual_list_for_this_mutant_only.write(fx_mutant_name + ';\n')
-            individual_list_for_this_mutant_only.close()
+            path_indivlist_dest_txtfile = os.path.join(path_indivlist_dest, 'individual_list.txt')
+            with open(path_indivlist_dest_txtfile, 'w') as indiv_list_file_opened:
+                indiv_list_file_opened.write(fx_mutant_name + ';\n')
 
     class Stability(object):
 
