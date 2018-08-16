@@ -17,21 +17,21 @@ class Paths(Enum):
 
             paths_and_dictionaries = yaml.load(stream)
 
-            # ABSOLUTE PATHS
+            # ABSOLUTE PATHS - EXECUTABLES IN LOCAL
+            LOCAL_R_EXE = paths_and_dictionaries['ROOT']['path_local_r_exe']
+            LOCAL_FOLDX_EXE = paths_and_dictionaries['ROOT']['path_local_fx_exe']
+            LOCAL_AGADIR_EXE = paths_and_dictionaries['ROOT']['path_local_agad_exe']
+            # ABSOLUTE PATHS - EXECUTABLES IN ZEUS CLUSTER
             ZEUS_R_EXE = paths_and_dictionaries['ROOT']['path_zeus_r_exe']
             ZEUS_FOLDX_EXE = paths_and_dictionaries['ROOT']['path_zeus_fx_exe']
             ZEUS_AGADIR_EXE = paths_and_dictionaries['ROOT']['path_zeus_agad_exe']
             ZEUS_QSUB_EXE = paths_and_dictionaries['ROOT']['path_zeus_qsub_exe']
-            LOCAL_R_EXE = paths_and_dictionaries['ROOT']['path_local_r_exe']
-            LOCAL_FOLDX_EXE = paths_and_dictionaries['ROOT']['path_local_fx_exe']
-            LOCAL_AGADIR_EXE = paths_and_dictionaries['ROOT']['path_local_agad_exe']
 
-            ZEUS_SNPEFFECT = paths_and_dictionaries['ROOT']['path_zeus_snpeffect']
+            # ABSOLUTE PATHS - ROOTS LOCAL AND CLUSTER
             LOCAL_MUTATECOMPUTE = paths_and_dictionaries['ROOT']['path_local_mutatecompute']
+            ZEUS_SNPEFFECT = paths_and_dictionaries['ROOT']['path_zeus_snpeffect']
 
-            LOCAL_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_local_pdb_fasta_repository']
-
-            #  DIRECTORY NAMES (USED TO CONSTRUCT ABSOLYTE PATHS BELOW)
+            #  DIRECTORY NAMES (USED TO CONSTRUCT ABSOLUTE PATHS BELOW)
             DIR_CONFIG = paths_and_dictionaries['ROOT']['dir_config']
             DIR_AGAD = paths_and_dictionaries['ROOT']['dir_agadconfig']
             DIR_JOBQ = paths_and_dictionaries['ROOT']['dir_clustjobq']
@@ -53,7 +53,7 @@ class Paths(Enum):
             DIR_PDBS = paths_and_dictionaries['ROOT']['dir_pdbs']
             DIR_BLASTP = paths_and_dictionaries['ROOT']['dir_blastp']
 
-            # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
+            # ABSOLUTE PATHS BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_CONFIG = os.path.join(LOCAL_MUTATECOMPUTE, DIR_CONFIG)
             MC_CONFIG_AGAD = os.path.join(MC_CONFIG, DIR_AGAD)
             MC_CONFIG_JOBQ = os.path.join(MC_CONFIG, DIR_JOBQ)
@@ -64,24 +64,45 @@ class Paths(Enum):
             MC_INPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_INPUT)
             MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_OUTPUT)
             MC_OUTPUT_BLASTP = os.path.join(MC_OUTPUT, DIR_BLASTP)
+            # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
+            MC_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_local_pdb_fasta_repository']
+            MC_REPO_PDBS = os.path.join(MC_REPO_PDB_FASTA, DIR_PDBS)
+            MC_REPO_FASTAS = os.path.join(MC_REPO_PDB_FASTA, DIR_FASTAS)
 
-            MC_REPO_PDBS = os.path.join(LOCAL_REPO_PDB_FASTA, DIR_PDBS)
-            MC_REPO_FASTAS = os.path.join(LOCAL_REPO_PDB_FASTA, DIR_FASTAS)
-
+            # ABSOLUTE PATHS BUILT FROM ZEUS ROOT AND DIRECTORY NAMES
             SE_CONFIG = os.path.join(ZEUS_SNPEFFECT, DIR_CONFIG)
             SE_CONFIG_AGAD = os.path.join(SE_CONFIG, DIR_AGAD)
             SE_CONFIG_JOBQ = os.path.join(SE_CONFIG, DIR_JOBQ)
-            SE_CONFIG_FXCONFIG = os.path.join(SE_CONFIG, DIR_FXCONFIG)
+            SE_CONFIG_FX = os.path.join(SE_CONFIG, DIR_FXCONFIG)
             SE_CONFIG_GLOBAL_OPTIONS = os.path.join(SE_CONFIG, DIR_GLOBAL_OPTIONS)
             SE_CONFIG_FX_ACRUNSCRIPT = os.path.join(SE_CONFIG, DIR_ACRUNSCRIPT)
             SE_CONFIG_FX_BMRUNSCRIPT = os.path.join(SE_CONFIG, DIR_BMRUNSCRIPT)
             SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
             SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
+            SE_OUTPUT_BLASTP = os.path.join(SE_OUTPUT, DIR_BLASTP)
+            # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM ZEUS ROOT AND DIRECTORY NAMES
             SE_REPO_PDB_FASTA = os.path.join(ZEUS_SNPEFFECT, DIR_REPO_PDB_FASTA)
             SE_REPO_PDBS = os.path.join(SE_REPO_PDB_FASTA, DIR_PDBS)
             SE_REPO_FASTAS = os.path.join(SE_REPO_PDB_FASTA, DIR_FASTAS)
-            SE_OUTPUT_BLASTP = os.path.join(SE_OUTPUT, DIR_BLASTP)
 
         except yaml.YAMLError as exc:
             print(exc)
 
+    # Will set absolute paths to zeus cluster if wanted, otherwise left as default paths which are local.
+    #
+    # use_cluster   Boolean     True if specified operations are to run on cluster.
+    @staticmethod
+    def set_up_paths(use_cluster):
+        Paths.CONFIG = Paths.SE_CONFIG.value if use_cluster else Paths.MC_CONFIG.value
+        Paths.CONFIG_AGAD = Paths.SE_CONFIG_AGAD.value if use_cluster else Paths.MC_CONFIG_AGAD.value
+        Paths.CONFIG_JOBQ = Paths.SE_CONFIG_JOBQ.value if use_cluster else Paths.MC_CONFIG_JOBQ.value
+        Paths.CONFIG_FX = Paths.SE_CONFIG_FX.value if use_cluster else Paths.MC_CONFIG_FX.value
+        Paths.CONFIG_GLOBAL_OPTIONS = Paths.SE_CONFIG_GLOBAL_OPTIONS.value if use_cluster else Paths.MC_CONFIG_GLOBAL_OPTIONS.value
+        Paths.CONFIG_FX_ACRUNSCRIPT = Paths.SE_CONFIG_FX_ACRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_FX_ACRUNSCRIPT.value
+        Paths.CONFIG_FX_BMRUNSCRIPT = Paths.SE_CONFIG_FX_BMRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_FX_BMRUNSCRIPT.value
+        Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
+        Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.MC_INPUT.value
+        Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.MC_OUTPUT_BLASTP.value
+        Paths.REPO_PDB_FASTA = Paths.SE_REPO_PDB_FASTA.value if use_cluster else Paths.MC_REPO_PDB_FASTA.value
+        Paths.REPO_PDBS = Paths.SE_REPO_PDBS.value if use_cluster else Paths.MC_REPO_PDBS.value
+        Paths.REPO_FASTAS = Paths.SE_REPO_FASTAS.value if use_cluster else Paths.MC_REPO_FASTAS.value
