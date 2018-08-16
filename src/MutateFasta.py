@@ -12,7 +12,7 @@ class MutateFasta(object):
     #                            make_fastafile_per_mutant,  path_output, make_csv_file=True, make_txt_file=True)
 
     def __init__(self):
-        print('')
+        print('you be calling MutateFasta constructor, so you are.')
 
     # Mutates FASTA (typically wild-type) sequences at every position, to every residue specified (typically all other
     # 19 residues.)
@@ -49,10 +49,13 @@ class MutateFasta(object):
     # input as {'230498_A': 'MDVFM'}
     # output as {'230498_A': 'MDVFM','M1A': 'ADVFM','M1C': 'CDVFM', etc.. }
     #
-    # titleSeqDict   Dictionary      Already should have wt-title: wt-title:wt-sequence dictionary.
-    # wt_seq                  String
-    # mutant_aa_list                List
+    # titleSeqDict      Dictionary      Already should have wt-title: wt-title:wt-sequence dictionary.
+    # wt_title          String          Name of fasta sequence (same as the fastafile name)
+    # wt_seq            String          Amino acid sequence in the fastafile (in FASTA format).
+    # mutant_aa_list    List            Specified list of residues, to mutate every residue in protein to.
     #
+    # Returns a dictionary of sequence name as key, FASTA sequence itself as value, starting with wild-type and
+    # followed by every mutant according to a specified list of residues.
     def _add_mutantTitle_mutatedSeq_to_dict(self, titleSeqDict, wt_title,  wt_seq, mutant_aa_list):
         titleSeqDict_w_mutants = {wt_title: titleSeqDict[wt_title]}
         mutable_seq = MutableSeq(wt_seq, IUPAC.protein)
@@ -66,8 +69,12 @@ class MutateFasta(object):
                     mutable_seq[i] = wt_aa_at_i
         return titleSeqDict_w_mutants
 
-    # Writes the mutants out either to fastafiles. There is the option to write each mutant out to its own fastafile,
-    # and/or all mutants to one fastafile, and/or all mutants to one csv file and/or all mutants to a txt file.
+    # Writes the mutants out to fastafiles and/or csv files and/or txt files.
+    # These can be written in one file containing all mutants or one file per mutant.
+    # The fastafiles are written to /input_data/<fastafilename>/mutants/.
+    # The csvfiles and txtfiles are written to /output_data/<fastafilename/sequences/.
+    # The reason for fastafile mutants being written to an input folder is that these sequences are generated as direct
+    # inputs for the mutation operation.
     #
     # title_titleSeq_w_mutants      Dictionary  Title of wild-type associated to every mutant title:sequence
     #                                           starting with the wild-type title:sequence pair.
