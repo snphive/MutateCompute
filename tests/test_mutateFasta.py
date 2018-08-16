@@ -62,6 +62,7 @@ class TestMutateFasta(TestCase):
     # Write one fastafile for all mutants. All other flags are set to false.
     def test_write_mutants_to_file_1(self):
         # arrange
+        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, 'WT_SCI','mutants'))
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         path_input = TPLS.MC_TESTS_INPUT.value
         make_fastafile_all_mutants = True
@@ -83,6 +84,7 @@ class TestMutateFasta(TestCase):
     # Write one fastafile per mutant. All other flags are false.
     def test_write_mutants_to_file_2(self):
         # arrange
+        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, 'WT_SCI', 'mutants'))
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         path_input = TPLS.MC_TESTS_INPUT.value
         make_fastafile_all_mutants = False
@@ -104,6 +106,7 @@ class TestMutateFasta(TestCase):
     # Write one txt file (for wild-type and all mutants). All other flags are false.
     def test_write_mutants_to_file_3(self):
         # arrange
+        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT.value, 'WT_SCI', 'sequences'))
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         path_input = TPLS.MC_TESTS_INPUT.value
         make_fastafile_all_mutants = False
@@ -127,6 +130,7 @@ class TestMutateFasta(TestCase):
     # Write one csv file (for wild-type and all mutants). All other flags are false.
     def test_write_mutants_to_file_4(self):
         # arrange
+        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT.value, 'WT_SCI', 'sequences'))
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         path_input = TPLS.MC_TESTS_INPUT.value
         make_fastafile_all_mutants = False
