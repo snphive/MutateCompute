@@ -61,16 +61,16 @@ class TestGUM(TestCase):
     #     # assert
     #     # expected_call_count_1 = 1
     #     # self.assertEqual(expected_call_count_1, mock_make_subfoldername.call_count)
-    def test_copy_input_files_from_repo_to_input(self):
+    def test_copy_files_from_repo_to_input_dst_dir(self):
         # arrange
         path_src_repo_dir = TPLS.REPO_PDB_FASTA.value
         path_dst_dir = TPLS.MC_TESTS_INPUT.value
         src_file_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb', 'RepairPDB_3.pdb', 'RepairPDB_4.pdb', 'RepairPDB_5.pdb']
         wanted_file_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb']
         # act
-        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir,
+        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dst_dir(path_src_repo_dir, path_dst_dir,
                                                                             src_file_list, wanted_file_list,
-                                                                            copy_all_files=False)
+                                                                            copy_all_files_in_dir=False)
         path_copied_file_list = [path_dst_dir + '/' + x for x in copied_wanted_file_list]
 
         # assert
@@ -86,9 +86,9 @@ class TestGUM(TestCase):
         src_file_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta', '3_A.fasta', '3_B.fasta']
         wanted_file_list = ['1_A.fasta', '3_A.fasta']
         # act
-        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_filedir(path_src_repo_dir, path_dst_dir,
+        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dst_dir(path_src_repo_dir, path_dst_dir,
                                                                             src_file_list, wanted_file_list,
-                                                                            copy_all_files=False)
+                                                                            copy_all_files_in_dir=False)
         path_copied_file_list = [path_dst_dir + '/' + x for x in copied_wanted_file_list]
         # assert
         self.assertEqual(wanted_file_list, copied_wanted_file_list)
