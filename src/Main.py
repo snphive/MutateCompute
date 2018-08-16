@@ -27,7 +27,7 @@ class Main(object):
     #                           Currently set to false by default.
     #
     # At the moment, this is set up to run either in local or on cluster, not both.
-    def __init__(self, use_cluster, use_multithreading):
+    def __init__(self, use_cluster, use_multithread):
         Paths.set_up_paths(use_cluster)
         self.pdbs = 'PDBs'
         self.fastas = 'FASTAs'
@@ -35,7 +35,7 @@ class Main(object):
         wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.pdbs, Paths.REPO_PDB_FASTA)
         wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.fastas, Paths.REPO_PDB_FASTA)
         operations = Main._determine_which_operations_to_perform(globaloptions_lines)
-        list_of_mutant_aa = Main._determine_residues_to_mutate_to(globaloptions_lines)
+        mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
         path_dst_dir = Paths.INPUT
         path_src_repo_dir = Paths.REPO_PDB_FASTA
         available_pdbfile_list = GUM.get_filelist_from_subdirs(path_src_repo_dir, self.pdbs)
@@ -44,8 +44,10 @@ class Main(object):
                                                                         available_pdbfile_list, wanted_pdbfile_list)
         wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dst_dir(path_src_repo_dir, path_dst_dir,
                                                                         available_fastafile_list, wanted_fastafile_list)
-        Main._start_scheduler(operations, Paths.INPUT, wanted_pdbfile_list, wanted_fastafile_list, list_of_mutant_aa,
-                              use_multithreading)
+        write_1_fasta_only = True
+        write_fasta_per_mut = False
+        Main._start_scheduler(operations, Paths.INPUT, wanted_pdbfile_list, wanted_fastafile_list, mutant_aa_list,
+                              use_multithread, write_1_fasta_only, write_fasta_per_mut, Paths.OUTPUT)
 
     # Reads the global_options.txt in /configuration/global_options breaking the text up according to newlines.
     #
@@ -168,14 +170,16 @@ class Main(object):
         return mutant_aa_list
 
     @staticmethod
-    def _start_scheduler(operations, path_input, pdb_list, fasta_list, list_of_mutant_aa, use_multithreading):
+    def _start_scheduler(operations, path_input, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
+                         write_1_fasta_only, write_fasta_per_mut, path_output):
         if operations == {}:
             raise ValueError("All options in 'operations' were either set to FALSE or there was a typo of some form. "
                              "Check that /configuration/global_options/global_options.txt was written correctly")
         elif operations['do_mutate_fasta'] or operations['do_agadir'] or operations['do_foldx_repair'] \
                 or operations['do_foldx_buildmodel'] or operations['do_foldx_stability'] \
                 or operations['do_foldx_analysecomplex']:
-            Scheduler.start(operations, path_input, pdb_list, fasta_list, list_of_mutant_aa, use_multithreading)
+            Scheduler.start(operations, path_input, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
+                            write_1_fasta_only, write_fasta_per_mut, path_output)
 
     # line   String    Alphanumeric text line of the global options ending with "\n".
     #                  Must have format "option name:<option value>;\n"
