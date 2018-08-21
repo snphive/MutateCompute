@@ -69,7 +69,7 @@ class Biopy(object):
     #
     # path_qblast_result    String      Abs path to the output xml file.
     # fastafile_name        String      Name of fastafile (without .fasta extension).
-    # path_fastafile        String      Absolute path to fastafile (used downstream to spot any seq length anomalies).
+    # path_fastafile        String      Abs path to fastafile (used downstream to spot any seq length anomalies).
     #
     # Returns a data structure of the elements of the qblast result that are considered here to be pertinent.
     @staticmethod
@@ -86,7 +86,7 @@ class Biopy(object):
                         'query_length': query_length,
                         'database': database_used,
                         'database_seqs_num': database_seqs_num,
-                        'identical_aligns_list': Biopy._make_list_of_dicts_of_hsps_with_0gaps_and_queryLen_equal_alignLen(
+                        'identical_aligns_list': Biopy._make_list_of_dicts_of_hsps_w_0gaps_and_queryLen_equal_alignLen(
                         query_length, alignments)}
         Biopy._warn_if_discrepancies_in_query_seq_length(qblast_dict, query_length, query_letters, path_fastafile)
         return qblast_dict
@@ -101,7 +101,7 @@ class Biopy(object):
     #
     # Returns a list of identical alignment hits. The hit may still be longer.
     @staticmethod
-    def _make_list_of_dicts_of_hsps_with_0gaps_and_queryLen_equal_alignLen(query_length, alignments):
+    def _make_list_of_dicts_of_hsps_w_0gaps_and_queryLen_equal_alignLen(query_length, alignments):
         identical_aligns_list = []
         is_identical = False
         for alignment in alignments:
@@ -135,15 +135,15 @@ class Biopy(object):
 
             if not query_length == query_letters:
                 warnings.warn_explicit(message="Query_length of blast_record is not same as number of query letters in "
-                                               "blast_record.",
-                                       category=RuntimeWarning, filename="Biopy", lineno=65)
+                                               "blast_record.", category=RuntimeWarning, filename="Biopy", lineno=65)
             if not query_length == len(SeqIO.read(path_fastafile, "fasta").seq):
-                warnings.warn_explicit(message="Length of fasta input sequence not same as query length of blast_record.",
-                                       category=RuntimeWarning, filename="Biopy", lineno=65)
+                warnings.warn_explicit(message="Fasta input sequence length (" + str(query_length) + ") not same as "
+                                                "query length of blast_record.", category=RuntimeWarning,
+                                       filename="Biopy", lineno=65)
             if query_length < len_sbjct_prot:
-                warnings.warn_explicit(message="Length of fasta input (" + str(query_length) + ") is less than length of "
-                                               "hit(" + str(len_sbjct_prot) + ").",
-                                       category=RuntimeWarning, filename="Biopy", lineno=65)
+                warnings.warn_explicit(message="Fasta input sequence length (" + str(query_length) + ") is less than "
+                                                "length of hit(" + str(len_sbjct_prot) + ").", category=RuntimeWarning,
+                                       filename="Biopy", lineno=65)
 
     from enum import Enum
 
