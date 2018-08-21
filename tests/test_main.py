@@ -44,11 +44,11 @@ class TestMain(TestCase):
     def test__build_filelist_for_analysis_1(self):
         # arrange
         globaloptions_lines = ['#\n', 'PDBs: 4;\n', '#']
-        PDB_or_FASTA = 'PDBs'
+        PDBs_or_FASTAs = 'PDBs'
         path_input = TPLS.MC_TESTS_INPUT.value
         expected_pdb_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb', 'RepairPDB_3.pdb', 'RepairPDB_4.pdb']
         # act
-        pdb_list = Main._build_filelist_for_analysis(globaloptions_lines, PDB_or_FASTA, path_input)
+        pdb_list = Main._build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_input)
         # assert
         self.assertNotEqual('', pdb_list)
         self.assertListEqual(expected_pdb_list, pdb_list)
@@ -57,10 +57,10 @@ class TestMain(TestCase):
     def test__build_filelist_for_analysis_2(self):
         # arrange
         globaloptions_lines = ['#\n', 'FASTAs: 4;\n', '#']
-        PDB_or_FASTA = 'FASTAs'
+        PDBs_or_FASTAs = 'FASTAs'
         expected_fasta_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta', '3_A.fasta']
         # act
-        fasta_list = Main._build_filelist_for_analysis(globaloptions_lines, PDB_or_FASTA, path_input)
+        fasta_list = Main._build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_input)
         # assert
         self.assertNotEqual('', fasta_list)
         self.assertListEqual(expected_fasta_list, fasta_list)
