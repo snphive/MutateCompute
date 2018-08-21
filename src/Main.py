@@ -23,27 +23,24 @@ class Main(object):
     # All algorithmic analyses start from here.
     # IdentifyProtein.py which runs Blast analyses is the only program that currently runs independently.
     #
-    # use_cluster   Boolean     True if program(s) should run on the cluster (whereupon paths are set to zeus paths).
-    #                           Currently set to false by default.
+    # use_cluster       Boolean     True if program(s) should run on the cluster (whereupon paths are set to zeus
+    #                               paths). Currently set to false by default.
+    # use_multithread   Boolean     True if program(s) should be spawned on separate threads/processes.
     #
     # At the moment, this is set up to run either in local or on cluster, not both.
     def __init__(self, use_cluster, use_multithread):
         Paths.set_up_paths(use_cluster)
-        self.pdbs = 'PDBs'
-        self.fastas = 'FASTAs'
+        self.pdbs = 'pdbs'
+        self.fastas = 'fastas'
+        path_repo = Paths.REPO_PDB_FASTA
         globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
-        wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.pdbs, Paths.REPO_PDB_FASTA)
-        wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.fastas, Paths.REPO_PDB_FASTA)
+        wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.pdbs, path_repo)
+        wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.fastas, path_repo)
         operations = Main._determine_which_operations_to_perform(globaloptions_lines)
         mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
-        path_dst_dir = Paths.INPUT
-        path_src_repo_dir = Paths.REPO_PDB_FASTA
-        available_pdbfile_list = GUM.get_filelist_from_subdirs(path_src_repo_dir, self.pdbs)
-        available_fastafile_list = GUM.get_filelist_from_subdirs(path_src_repo_dir, self.fastas)
-        wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dst_dir(path_src_repo_dir, path_dst_dir,
-                                                                        available_pdbfile_list, wanted_pdbfile_list)
-        wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dst_dir(path_src_repo_dir, path_dst_dir,
-                                                                        available_fastafile_list, wanted_fastafile_list)
+        path_dst = Paths.INPUT
+        wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_pdbfile_list)
+        wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_fastafile_list)
         write_1_fasta_only = True
         write_fasta_per_mut = False
         Main._start_scheduler(operations, Paths.INPUT, wanted_pdbfile_list, wanted_fastafile_list, mutant_aa_list,
@@ -77,20 +74,20 @@ class Main(object):
     # about 30,000 pdbs for user to get access to first 5 only!
     #
     # globaloptions_lines   List        Alphanumeric text lines of the global options ending with "\n".
-    # PDB_or_FASTA          String      Either "PDBs" or "FASTAs" to indicate which files to retrieve.
-    # path_input            String      Path to the input_data files (including PDB and FASTA files).
+    # PDBs_or_FASTAs        String      Either "PDBs" or "FASTAs" from global_options indicates which files to retrieve.
+    # path_input            String      Path to the input_data files (including pdbfiles and fastafiles).
     #
-    # Returns a list of pdbfiles or fastafiles according to that specified in the global_options/Options file at
-    # values given for 'PDBs' and 'FASTAs'. (pdbiles and fastafiles are strings including .pdb and .fasta extensions).
+    # Returns a list of pdbfiles or fastafiles according to global_options.txt.
+    # The list if built from actual files that are in the path_input - typically a repository folder.
     @staticmethod
-    def _build_filelist_for_analysis(globaloptions_lines, PDB_or_FASTA, path_input):
+    def _build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_input_repo):
         file_list = []
-        file_extension = '.pdb' if PDB_or_FASTA == 'PDBs' else '.fasta'
-        path_files = path_input + '/**/*' + file_extension
+        file_extension = '.pdb' if PDBs_or_FASTAs == 'PDBs' else '.fasta'
+        path_repo_files = path_input_repo + '/**/*' + file_extension
         for line in globaloptions_lines:
             if '#' in line:
                 continue
-            if PDB_or_FASTA in line:
+            if PDBs_or_FASTAs in line:
                 # Main.__validate_option_text(line)
                 pdb_or_fasta_option = Main.__get_text_after_colon_before_semi(line)
                 if pdb_or_fasta_option == '':
@@ -99,7 +96,7 @@ class Main(object):
                 elif pdb_or_fasta_option.isdigit() and not pdb_or_fasta_option.isalpha():
                     # check that the number is reasonable, i.e. less than 1000 ?
                     num_of_files_to_analyse = int(pdb_or_fasta_option)
-                    path_file_natsorted_list = natsort.natsorted(glob.glob(path_files))
+                    path_file_natsorted_list = natsort.natsorted(glob.glob(path_repo_files))
                     if not path_file_natsorted_list:
                         raise ValueError('No files were found in the input_data directory tree. Files must be manually '
                                          'placed there')
@@ -109,7 +106,7 @@ class Main(object):
                         file_list.append(path_file_natsorted.split('/')[-1])
                 elif pdb_or_fasta_option.isalpha():
                     if pdb_or_fasta_option.lower() == 'all':
-                        path_file_list = glob.glob(path_files)
+                        path_file_list = glob.glob(path_repo_files)
                         for path_file in path_file_list:
                             file_list.append(path_file.split('/')[-1])
                     # else:
@@ -169,6 +166,15 @@ class Main(object):
                             mutant_aa_list.append(aa)
         return mutant_aa_list
 
+    # operations            Dictionary
+    # path_input            String
+    # pdb_list              List
+    # fastafile_list        List
+    # mutant_aa_list        List
+    # use_multithread       Boolean
+    # write_1_fasta_only    Boolean
+    # write_fasta_per_mut   Boolean
+    # path_output           String
     @staticmethod
     def _start_scheduler(operations, path_input, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
                          write_1_fasta_only, write_fasta_per_mut, path_output):
