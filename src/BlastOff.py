@@ -12,7 +12,7 @@ IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input=Paths.INPUT, path_out
 # be created if not already present. This involves a subdirectory bearing the name of the file, which for fastafiles is
 # typically '1_A' (unchanged from RvdK's naming scheme).)
 #
-# E.g. '1_A.fasta' copied from ~/REPO_PDB_FASTA/FASTAs_100/ to ~/PycharmProjects/MutateCompute/input_data/1_A/
+# E.g. '1_A.fasta' copied from ~/REPO_PDB_FASTA/fastas_100/ to ~/PycharmProjects/MutateCompute/input_data/1_A/
 #
 #
 # PROGRAM           INPUT FILES & DIRECTORIES                           OUTPUT FILES & DIRECTORIES
