@@ -38,9 +38,9 @@ class HM(object):
     # blastp_dir        Directory name of blastp data. Typically "blastp"
     # result_handle     the direct return object/handle of Biopython's qblast method
     @staticmethod
-    def write_blastp_to_tests_dir(path_tests, blastp_dir, result_handle, blastp_output_xml_file):
+    def write_blastp_to_tests_dir(path_tests, blastp_dir, result_handle, blastp_output_xmlfile):
         path_blastp = GUM.create_dir_tree(path_tests, blastp_dir)
-        path_blastp_xml = os.path.join(path_blastp, blastp_output_xml_file)
+        path_blastp_xml = os.path.join(path_blastp, blastp_output_xmlfile)
         with open(path_blastp_xml, 'w') as resx:
             resx.write(result_handle.read())
             result_handle.close()
