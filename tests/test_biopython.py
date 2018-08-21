@@ -4,6 +4,7 @@ from src.Biopython import Biopy
 from unittest.mock import patch
 from tests.HelperMethods import HM
 from tests.TestPathsAndListsSeqs import TPLS
+from Bio.Blast import NCBIXML
 
 
 class TestBiopython(TestCase):
@@ -46,12 +47,12 @@ class TestBiopython(TestCase):
         # arrange
         Hsp_eval = "Hsp_evalue"
         path_actual = os.path.join(TPLS.MC_TESTS_OUTPUT.value + self.REL_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
-        path_expected = os.path.join(TPLS.MC_TESTS_REF_FILES.value + self.REL_BLASTP, + self.XML_1_A_BLASTP_OUTPUT_FILE)
-        # action
-        result_handle_1_A = Biopy.run_blastp(self.FASTA_STR_1_A)
+        path_expected = os.path.join(TPLS.MC_TESTS_REF_FILES.value, self.REL_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
+        # act
+        result_handle_1_A = Biopy.run_blastp(fasta_str=self.FASTA_STR_1_A)
         blastp_output_xml = self.XML_1_A_BLASTP_OUTPUT_FILE
-        HM.write_blastp_to_tests_dir(TPLS.MC_TESTS_OUTPUT.value, self.DIR_BLASTP, result_handle_1_A,
-                                     blastp_output_xml)
+        HM.write_blastp_to_tests_dir(path_tests=TPLS.MC_TESTS_OUTPUT.value, blastp_dir=self.DIR_BLASTP,
+                                     result_handle=result_handle_1_A, blastp_output_xmlfile=blastp_output_xml)
         # assert
         with open(path_actual) as actual, open(path_expected) as expected:
             for actual_line, exp_line in zip(actual, expected):
@@ -64,11 +65,14 @@ class TestBiopython(TestCase):
                 else:
                     self.assertEqual(exp_line, actual_line)
 
+    def test_parse_and_filter_blastp_xml_to_dict(self):
+        self.fail()
+
     # NOTE: The difference cut-off of 0.0001 was arbitrarily chosen, may change this at some point.
     @staticmethod
     def _has_insignificant_diff_Hsp_evalues(exp_evalue_line, actual_evalue_line, str_tag):
-        exp_evalue = TestBiopython.__extract_value_from_tagged_line(exp_evalue_line, str_tag)
-        actual_evalue = TestBiopython.__extract_value_from_tagged_line(actual_evalue_line, str_tag)
+        exp_evalue = TestBiopython.__extract_value_from_tagged_line(line=exp_evalue_line, tag=str_tag)
+        actual_evalue = TestBiopython.__extract_value_from_tagged_line(line=actual_evalue_line, tag=str_tag)
         return abs(exp_evalue - actual_evalue) < 0.0001
 
     @staticmethod
@@ -82,3 +86,46 @@ class TestBiopython(TestCase):
         if value_end_index == -1:
             raise ValueError(end_tag + " not found in: " + line)
         return float(line[value_start_index:value_end_index])
+
+    # def test__make_list_of_dicts_of_hsps_with_0gaps_and_queryLen_equal_alignLen(self):
+    #     # arrange
+    #     # might need to mock these objects, this is not working
+    #     class Hsp(object):
+    #         def __init(self):
+    #             self.align_length = self.gaps = self.identities = self.query_end = self.query_start = self.sbjct_end
+    # = self.sbjct_start = 0
+    #             self.expect = 0.0
+    #
+    #     class Alignment(object):
+    #         def __init(self):
+    #             self.accession = ''
+    #             self.hit_def = ''
+    #             self.length = 0
+    #             self.hsps = []
+    #
+    #
+    #     hsp1 = Hsp()
+    #     hsp1.align_length = hsp1.identities = hsp1.query_end = hsp1.sbjct_end = 100
+    #     hsp1.query_start = hsp1.sbjct_start = 1
+    #     alignment1 = Alignment()
+    #     alignment1.hsps.append(Hsp)
+    #     alignment1.accession = 'X1234'
+    #     alignment1.hit_def = 'hit_X1234'
+    #     alignment1.length = 100
+    #     alignments = []
+    #     alignments.append(alignment1)
+    #
+    #     hsp2 = Hsp()
+    #     hsp2.align_length = hsp2.identities = hsp2.query_end = hsp2.sbjct_end = 101
+    #     hsp2.query_start = hsp2.sbjct_start = 2
+    #     alignment2 = Alignment()
+    #     alignment2.hsps.append(Hsp)
+    #     alignment2.accession = 'A4321'
+    #     alignment2.hit_def = 'hit_A4321'
+    #     alignment2.length = 100
+    #     alignments.append(alignment2)
+    #
+    #     query_length = 100
+    #     # act
+    #     Biopy._make_list_of_dicts_of_hsps_with_0gaps_and_queryLen_equal_alignLen(query_length, alignments)
+    #     # assert

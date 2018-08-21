@@ -2,6 +2,8 @@ import os
 import json
 from src.Biopython import Biopy
 from src.Paths import Paths
+from src.GeneralUtilityMethods import GUM
+import glob
 
 
 # Class to take any protein identifier, pdb file, FASTA, and identify the protein, potentially via Blast and/or then
@@ -11,27 +13,41 @@ class IdProt(object):
     # (This method relies on the presence of fastafiles in the specified folder, in order for them to be run on Blastp,
     # This transfer is currently done manually)
     #
-    # path_fastafile            String      Absolute path to FASTA input file (with .fasta extension).
-    # path_output               String      Absolute path to output files. Typically output_data/<pdbname>/blastp.
+    # path_input                String      Abs path of root dir for input fastafiles (..../input_data/).
+    # path_output               String      Abs path of root dir for output blastp files (..../output_data/).
     # write_idmaps_for_mysqldb  Boolean     True to build dict mapping RvdK ids to swsprt acc & write files.
     # write_csv                 Boolean     True to write csvfiles.
     # write_xml                 Boolean     True to write xmlfiles.
     # write_json                Boolean     True to write jsonfiles.
     #
-    # Returns the dictionary data structure representation of the parsed & filtered Blastp run result.
+    # Returns a list of dictionary data structure representations of each parsed & filtered Blastp run result.
     @staticmethod
-    def map_seq_to_swsprt_acc_id_and_write_files(path_fastafile, path_output, write_idmaps_for_mysldb, write_csv=True,
+    def map_seq_to_swsprt_acc_id_and_write_files(path_input, path_output, write_idmaps_for_mysldb, write_csv=True,
                                                  write_xml=True, write_json=False):
-        with open(path_fastafile) as fasta_io:
-            fasta_str = fasta_io.read()
-        blastp_result = Biopy.run_blastp(fasta_str)
-        fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
-        path_blstp_xml = IdProt._write_blast_xml(path_output, fastafile_name, blastp_result)
-        blastp_dict = Biopy.parse_and_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
-        if write_idmaps_for_mysldb:
-            IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
-                                             write_json=write_json)
-        return blastp_dict
+        path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=path_input,
+                                                                     intermed_dir=Paths.DIR_FASTAS.value,
+                                                                     fastadir=None)
+        GUM.copy_files_from_repo_to_input_dst_dir(path_repo=Paths.REPO_FASTAS, path_dst=path_input_fastas,
+                                                  wanted_file_list=None, copy_all_files_in_dir=True)
+        if not os.listdir(path_input_fastas):
+            raise ValueError('There are no subdirectories in your specified /input_data/fastas/ directory. Typically'
+                             'expecting /input_data/fastas/<fastafilenames>/, each containing a fastafile. It seems '
+                             'that no fastafiles were copied over from the repository directory.')
+        path_input_fastafile_list = glob.glob(path_input_fastas + '/*.fasta')
+        blastp_dict_list = []
+        for path_fastafile in path_input_fastafile_list:
+            with open(path_fastafile) as fastafile_opened:
+                fasta_str = fastafile_opened.read()
+                blastp_result = Biopy.run_blastp(fasta_str)
+                fastafile_name = path_input.split('/')[-1].split('.')[0]
+                xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
+                path_blstp_xml = xml
+                blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
+                blastp_dict_list.append(blastp_dict)
+                if write_idmaps_for_mysldb:
+                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
+                                                     write_json=write_json)
+        return blastp_dict_list
 
     # Writes the blastp result file to an xml file in a output_data subdir called blastp.
     #
@@ -41,14 +57,16 @@ class IdProt(object):
     #
     # Returns path to the newly-written xml file.
     @staticmethod
-    def _write_blast_xml(path_output, fastafile_name, blastp_result):
-        path_output_blastp = IdProt._build_output_blastp_dir(path_output)
+    def _write_raw_blast_xml(path_output, fastafile_name, blastp_result):
+        path_output_blastp = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
+                                                                      intermed_dir=Paths.DIR_BLASTP.value,
+                                                                      fastadir=fastafile_name)
         path_output_blastp_xmlfile = os.path.join(path_output_blastp, fastafile_name + ".xml")
         with open(path_output_blastp_xmlfile, 'w') as out_handle:
             out_handle.write(blastp_result.read())
             blastp_result.close()
 
-        if os.stat(path_output_blastp_xmlfile).st_size > IdProt.Strng.EST_MAX_SZE_BLSTP_RUN_200_KB:
+        if os.stat(path_output_blastp_xmlfile).st_size > IdProt.Strng.EST_MAX_SZE_BLSTP_RUN_200_KB.value:
             raise ValueError("blast xml output size is over 200 KB in size. Something may have gone wrong with the "
                              "blastp run.")
 
@@ -56,7 +74,7 @@ class IdProt(object):
 
     # Write to file the result of blastp run (that has already been parsed & filtered from the raw blastp result).
     #
-    # path_output   String          Absolute path to the output-data dir.
+    # path_output   String          Absolute path to the output_data dir.
     # blastp_dict   Dictionary      Data structure parsed and filtered from Blastp run.
     # write_xml     Boolean         True to write xmlfile represetation of blastp_dict, True by default.
     # write_csv     Boolean         True to write csvfile represetation of blastp_dict, True by default.
@@ -102,7 +120,9 @@ class IdProt(object):
                 xml_list.append('\n')
         xml_list.append('</' + IdProt.Strng.SEQ_ID.value + '>')
         xml_list.append('\n')
-        path_output_blastp_fastaname = IdProt._build_output_blastp_dir(path_output, idmap[IdProt.Strng.SEQ_ID.value])
+        path_output_blastp_fastaname = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
+                                                                            intermed_dir=Paths.DIR_BLASTP.value,
+                                                                            fastadir=idmap[IdProt.Strng.SEQ_ID.value])
         path_output_blastp_fastaname_xmlfile = os.path.join(path_output_blastp_fastaname, 'idmap_swsprt.xml')
         with open(path_output_blastp_fastaname_xmlfile, 'w') as idmap_file:
             xml_str = ''.join(xml_list)
@@ -128,7 +148,9 @@ class IdProt(object):
             csv_list.append(',')
         csv_list = csv_list[:-1]
         csv_list.append('\n')
-        path_output_blastp_fastaname = IdProt._build_output_blastp_dir(path_output, idmap[IdProt.Strng.SEQ_ID.value])
+        path_output_blastp_fastaname = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
+                                                                            intermed_dir=Paths.DIR_BLASTP.value,
+                                                                            fastadir=idmap[IdProt.Strng.SEQ_ID.value])
         path_output_blastp_fastaname_csvfile = os.path.join(path_output_blastp_fastaname, 'idmap_swsprt.csv')
         with open(path_output_blastp_fastaname_csvfile, 'w') as idmap_file:
             csv_str = ''.join(csv_list)
@@ -141,7 +163,9 @@ class IdProt(object):
     # idmap         Dictionary  Data structure representation of parsed & filtered Blastp runnresult.
     @staticmethod
     def _write_idmap_jsonfile(path_output, idmap):
-        path_output_blastp_fastaname = IdProt._build_output_blastp_dir(path_output, idmap[IdProt.Strng.SEQ_ID.value])
+        path_output_blastp_fastaname = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
+                                                                            intermed_dir=Paths.DIR_BLASTP.value,
+                                                                            fastadir=idmap[IdProt.Strng.SEQ_ID.value])
         path_output_blastp_fastaname_jsonfile = os.path.join(path_output_blastp_fastaname, 'idmap_swsprt.json')
         with open(path_output_blastp_fastaname_jsonfile, 'w') as f:
             f.write(json.dumps(idmap))
@@ -149,17 +173,23 @@ class IdProt(object):
     # To make directory and all intermediate directories, encapsulated in try/except clause as pre-existing result in
     # exceptions being thrown.
     #
-    # path_output   String      Abs path of the output_data root directory of tree to be built here.
-    # fastadirname  String      Name of fastafile (without extension)
+    # path_root     String      Abs path of root dir of tree to be built here (.../input_data/ or .../output/data/).
+    # intermed_dir  String      Abs path of intermediate dir of tree, subdir to root, in which filename subdir will be.
+    # fastadirname  String      Name of fastafile (without extension).
     @staticmethod
-    def _build_output_blastp_dir(path_output, fastadirname):
-        path_output_blastp_fastadirname = os.path.join(path_output, Paths.DIR_BLASTP.value, fastadirname +
-                                                       IdProt.Strng.DIR_SUFIX.value)
+    def _build_dir_tree_with_intermed_dir(path_root, intermed_dir, fastadir):
+        if fastadir is None:
+            path_root_subdirs = os.path.join(path_root, intermed_dir)
+        elif intermed_dir is Paths.DIR_BLASTP.value:
+            fastadir = fastadir + IdProt.Strng.DIR_SUFIX.value
+            path_root_subdirs = os.path.join(path_root, intermed_dir, fastadir)
+        else:
+            path_root_subdirs = os.path.join(path_root, intermed_dir, fastadir)
         try:
-            os.makedirs(path_output_blastp_fastadirname)
+            os.makedirs(path_root_subdirs)
         except FileExistsError:
             print('Part or all of path already exists. This is absolutely fine.')
-        return path_output_blastp_fastadirname
+        return path_root_subdirs
 
     # NOTE: This method assumes that the 'Recname', 'Altname', 'Flags' are always written in this order. It also
     # assumes that the Flag is the last string of any form in the line.
@@ -182,7 +212,7 @@ class IdProt(object):
                     if char == ';':
                         end_index = i
                         full_alt_names_flag[search_str] = hit_def[start_index:end_index]
-                        IdProt.__is_reasonable_length(len(full_alt_names_flag[search_str]))
+                        IdProt.__is_reasonable_length(full_alt_names_flag[search_str])
                         break
             except ValueError:
                 print('Did not find ' + search_str + ' in this hit_def: ' + hit_def)

@@ -10,6 +10,7 @@ from Bio import SeqIO
 from tests.HelperMethods import HM
 from src.IdentifyProtein import IdProt
 from tests.TestPathsAndListsSeqs import TPLS
+from src.GeneralUtilityMethods import GUM
 
 
 class TestIdProt(TestCase):
@@ -25,7 +26,7 @@ class TestIdProt(TestCase):
 
     @classmethod
     def setUpClass(cls):
-
+        cls.UNDR_SCR_ID_MAPS = '_idmaps'
         #   mutant 1_A     ############################################################################################
         #   constants related to output - mutant 1_A
         cls.XML_1_A_BLASTP_OUTPUT_FILE = '1_A.xml'
@@ -99,16 +100,14 @@ class TestIdProt(TestCase):
                 HM.write_blastp_to_tests_dir(TPLS.MC_TESTS_REFFILES.value, TestIdProt.DIR_BLASTP,
                                              result_handle, blast_out_xml)
 
+    # This test is a currently a sort of pretend test. I'm currently just using it to run blastp and see if there any
+    # errors.
     def test_map_seq_to_swsprt_acc_id_and_write_files(self):
-        # arrange
-        path_fastafile = self.PATH_TESTS_INPUT_FASTA_1_A
-        path_output = TPLS.MC_TESTS_OUTPUT.value
-        write_idmaps_for_mysldb = False
         # act
-        IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_fastafile, path_output,
-                                                        write_idmaps_for_mysldb=write_idmaps_for_mysldb,
-                                                        make_json=False, make_csv=False, make_xml=False)
-        # assert
+        IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input=self.PATH_TESTS_INPUT_FASTA_1_A,
+                                                        path_output=TPLS.MC_TESTS_OUTPUT.value,
+                                                        write_idmaps_for_mysldb=False, write_json=False,
+                                                        write_csv=False, write_xml=False)
 
     # I wanted to mock open() read(). Not quite managed it yet, but even so it prevents the method throwing an
     # exception if it doesn't find a file at the location it expects. As a result the method can continue and it
@@ -139,25 +138,27 @@ class TestIdProt(TestCase):
         with open(self.PATH_TESTS_REFFILES_BLASTP_1_A_XML) as test_1_A_xml:
             mock_qblast.return_value = test_1_A_xml
         mock__write_blast_xml.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
-        path_fastafile = self.PATH_TESTS_INPUT_FASTA_1_A
-        path_output = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A)
-        write_idmaps_for_mysldb = False
+        path_output_blastp_1_A = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A)
         # act
-        result_dict = IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_fastafile, path_output,
-                                                                      write_idmaps_for_mysldb=write_idmaps_for_mysldb,
-                                                                      make_json=False, make_csv=False, make_xml=False)
+        result_dict = IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_fastafile=self.PATH_TESTS_INPUT_FASTA_1_A,
+                                                    path_output=path_output_blastp_1_A, write_idmaps_for_mysldb=False,
+                                                    write_json=False, write_csv=False, write_xml=False)
         # assert
         self.assertEqual(expected_qblast_dict_1_A, result_dict)
 
     def test__write_blast_xml(self):
         # arrange
-        path_output = TPLS.MC_TESTS_OUTPUT.value
-        fastafile_name = self.DIR_1_A
-        with open(os.path.join(TPLS.MC_TESTS_REFFILES.value, TPLS.DIR_BLASTP.value, self.XML_FILE_1_A)) as xml_1_A_open:
-            blastp_result = xml_1_A_open
-            expected_path_output_blastp_xmlfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.XML_FILE_1_A)
+        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A +
+                                                   self.UNDR_SCR_ID_MAPS))
+        path_ref_blast_output_file = os.path.join(TPLS.MC_TESTS_REFFILES.value, TPLS.DIR_BLASTP.value, self.XML_FILE_1_A)
+        with open(path_ref_blast_output_file) as ref_xml_1_A_open:
+            id_map_fasta_dir = self.DIR_1_A + self.UNDR_SCR_ID_MAPS
+            expected_path_output_blastp_xmlfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, id_map_fasta_dir,
+                                                               self.XML_FILE_1_A)
             # act
-            path_output_blastp_xmlfile = IdProt._write_blast_xml(path_output, fastafile_name, blastp_result)
+            path_output_blastp_xmlfile = IdProt._write_raw_blast_xml(path_output=TPLS.MC_TESTS_OUTPUT.value,
+                                                                     fastafile_name=self.DIR_1_A,
+                                                                     blastp_result=ref_xml_1_A_open)
         # assert
         self.assertTrue(os.path.exists(expected_path_output_blastp_xmlfile))
         self.assertEqual(expected_path_output_blastp_xmlfile, path_output_blastp_xmlfile)
@@ -167,6 +168,8 @@ class TestIdProt(TestCase):
     # an identical jsonfile that has been read in.
     def test__write_idmaps_for_mysqldb(self):
         # arrange
+        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A +
+                                                   self.UNDR_SCR_ID_MAPS))
         fastafile_name = self.DIR_1_A
         query_length = 538
         database_used = 'swissprot'
@@ -198,7 +201,7 @@ class TestIdProt(TestCase):
         expected_json = {"sequence_id": fastafile_name, "accession_num": accession_num, "length": 751,
                          "full_name": full_name, "altname": altname, "flags": flags, "start_pos": 28,
                          "end_pos": 565}
-        path_output = TPLS.MC_TESTS_OUTPUT.value
+
         expected_path_output_blastp_xmlfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A + '_idmaps',
                                                            'idmap_swsprt.xml')
         expected_path_output_blastp_csvfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A + '_idmaps',
@@ -206,7 +209,8 @@ class TestIdProt(TestCase):
         expected_path_output_blastp_jsonfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A + '_idmaps',
                                                             'idmap_swsprt.json')
         # act
-        IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, make_xml=True, make_csv=True, make_json=True)
+        IdProt._write_idmaps_for_mysqldb(path_output=TPLS.MC_TESTS_OUTPUT.value, blastp_dict=blastp_dict,
+                                         write_xml=True, write_csv=True, write_json=True)
         # assert
         with open(expected_path_output_blastp_csvfile) as csv_opened:
             csv = csv_opened.read()
@@ -235,13 +239,13 @@ class TestIdProt(TestCase):
         expected_csv = 'sequence_id,accession_num,length,full_name,altname,flags,start_pos,end_pos\n' + \
                        fastafile_name + ',' + accession_num + ',' + str(length) + ',' + full_name + ',' + \
                        altname + ',' + flags + ',' + str(sbjct_start) + ',' + str(sbjct_end) + '\n'
-        path_output = TPLS.MC_TESTS_OUTPUT.value
+
         expected_path_output_blastp_csvfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, fastafile_name +
                                                            '_idmaps', 'idmap_swsprt.csv')
         idmap = {'sequence_id': fastafile_name, 'accession_num': accession_num, 'length': 751, 'full_name': full_name,
                  'altname': altname, 'flags': flags, 'start_pos': 28, 'end_pos': 565}
         # act
-        IdProt._write_idmap_csv(path_output, idmap)
+        IdProt._write_idmap_csv(path_output=TPLS.MC_TESTS_OUTPUT.value, idmap=idmap)
         # assert
         with open(expected_path_output_blastp_csvfile) as csv_opened:
             csv = csv_opened.read()
@@ -262,13 +266,13 @@ class TestIdProt(TestCase):
                        full_name + '</full name>\n<altname>' + altname + '</altname>\n<flags>' + flags + \
                        '</flags>\n<start pos>' + str(sbjct_start) + '</start pos>\n<end pos>' + str(sbjct_end) + \
                        '</end pos>\n</sequence_id\n'
-        path_output = TPLS.MC_TESTS_OUTPUT.value
+
         expected_path_output_blastp_xmlfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, fastafile_name +
                                                             '_idmaps', 'idmap_swsprt.xml')
         idmap = {'sequence_id': fastafile_name, 'accession_num': accession_num, 'length': 751, 'full_name': full_name,
                  'altname': altname, 'flags': flags, 'start_pos': 28, 'end_pos': 565}
         # act
-        IdProt._write_idmap_xml(path_output, idmap)
+        IdProt._write_idmap_xml(path_output=TPLS.MC_TESTS_OUTPUT.value, idmap=idmap)
         # assert
         with open(expected_path_output_blastp_xmlfile) as xml_opened:
             xml = xml_opened.read()
@@ -287,18 +291,17 @@ class TestIdProt(TestCase):
         idmap = {"sequence_id": fastafile_name, "accession_num": accession_num, "length": length,
                  "full_name": full_name, "altname": altname, "flags": flags, "start_pos": sbjct_start,
                  "end_pos": sbjct_end}
-        path_output = TPLS.MC_TESTS_OUTPUT.value
+
         expected_path_output_blastp_jsonfile = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, fastafile_name +
                                                             "_idmaps", "idmap_swsprt.json")
         path_ref_files_blastp_1_A_jsonfile = os.path.join(TPLS.MC_TESTS_REFFILES.value, TPLS.DIR_BLASTP.value,
                                                           fastafile_name + '_idmaps', 'idmap_swsprt.json')
         expected_json = str(idmap)
         # act
-        IdProt._write_idmap_jsonfile(path_output, idmap)
+        IdProt._write_idmap_jsonfile(path_output=TPLS.MC_TESTS_OUTPUT.value, idmap=idmap)
         # assert
         with open(expected_path_output_blastp_jsonfile) as json_opened, \
                 open(path_ref_files_blastp_1_A_jsonfile) as ref_json_opened:
             json = json_opened.read()
             expected_json = ref_json_opened.read()
             self.assertEqual(expected_json, json)
-
