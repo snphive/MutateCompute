@@ -61,17 +61,19 @@ class TestGUM(TestCase):
     #     # assert
     #     # expected_call_count_1 = 1
     #     # self.assertEqual(expected_call_count_1, mock_make_subfoldername.call_count)
-    def test_copy_files_from_repo_to_input_dst_dir(self):
+    @patch.object(GUM, 'get_pdb_or_fastafile_list_from_subdirs')
+    def test_copy_files_from_repo_to_input_dst_dir(self, mock_get_pdb_or_fastafile_list_from_subdirs):
         # arrange
-        path_src_repo_dir = TPLS.REPO_PDB_FASTA.value
-        path_dst_dir = TPLS.MC_TESTS_INPUT.value
-        src_file_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb', 'RepairPDB_3.pdb', 'RepairPDB_4.pdb', 'RepairPDB_5.pdb']
+        path_repo = TPLS.REPO_PDB_FASTA.value
+        path_dst = TPLS.MC_TESTS_INPUT.value
         wanted_file_list = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb']
+        mock_get_pdb_or_fastafile_list_from_subdirs.return_value = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb',
+                                                                'RepairPDB_3.pdb', 'RepairPDB_4.pdb', 'RepairPDB_5.pdb']
+        copy_all_files_in_dir =  False
         # act
-        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dst_dir(path_src_repo_dir, path_dst_dir,
-                                                                            src_file_list, wanted_file_list,
-                                                                            copy_all_files_in_dir=False)
-        path_copied_file_list = [path_dst_dir + '/' + x for x in copied_wanted_file_list]
+        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_file_list,
+                                                                            copy_all_files_in_dir=copy_all_files_in_dir)
+        path_copied_file_list = [path_dst + '/' + x for x in copied_wanted_file_list]
 
         # assert
         self.assertEqual(wanted_file_list, copied_wanted_file_list)
@@ -79,17 +81,19 @@ class TestGUM(TestCase):
             self.assertTrue(path_copied_file)
 
     # Same as test_copy_input_files_from_repo_to_input() above but for fasta files.
-    def test_copy_input_files_from_repo_to_input_2(self):
+    @patch.object(GUM, 'get_pdb_or_fastafile_list_from_subdirs')
+    def test_copy_input_files_from_repo_to_input_2(self, mock_get_pdb_or_fastafile_list_from_subdirs):
         # arrange
-        path_src_repo_dir = TPLS.REPO_PDB_FASTA.value
-        path_dst_dir = TPLS.MC_TESTS_INPUT.value
-        src_file_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta', '3_A.fasta', '3_B.fasta']
+        path_repo = TPLS.REPO_PDB_FASTA.value
+        path_dst = TPLS.MC_TESTS_INPUT.value
         wanted_file_list = ['1_A.fasta', '3_A.fasta']
+        mock_get_pdb_or_fastafile_list_from_subdirs.return_value = ['1_A.fasta', '1_B.fasta', '2_A.fasta', '3_A.fasta',
+                                                                    '3_B.fasta']
+        copy_all_files_in_dir = False
         # act
-        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dst_dir(path_src_repo_dir, path_dst_dir,
-                                                                            src_file_list, wanted_file_list,
-                                                                            copy_all_files_in_dir=False)
-        path_copied_file_list = [path_dst_dir + '/' + x for x in copied_wanted_file_list]
+        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_file_list,
+                                                                            copy_all_files_in_dir=copy_all_files_in_dir)
+        path_copied_file_list = [path_dst + '/' + x for x in copied_wanted_file_list]
         # assert
         self.assertEqual(wanted_file_list, copied_wanted_file_list)
         for path_copied_file in path_copied_file_list:
