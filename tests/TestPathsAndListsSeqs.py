@@ -50,7 +50,9 @@ class TPLS(Enum):
     # e.g. /tests/input_data/<pdbname>/all_mutants/<fxmutantchainname>
     DIR_INPUT = "input_data"
     DIR_ALL_MUTANTS = "all_mutants"
+    DIR_MUTANTS = "mutants"
     DIR_FASTAS = "fastas"
+    DIR_SEQS_TXT_CSV = "sequences_txt_csv"
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
     MC_TESTS_INPUT = os.path.join(MC_TESTS, DIR_INPUT)
     MC_TESTS_INPUT_FASTAS = os.path.join(MC_TESTS_INPUT, DIR_FASTAS)
@@ -67,6 +69,7 @@ class TPLS(Enum):
     # ABSOLUTE PATH BUILT FROM ROOT AND RELATIVE PATHS
     MC_TESTS_OUTPUT = os.path.join(MC_TESTS, DIR_OUTPUT)
     MC_TESTS_OUTPUT_BLASTP = os.path.join(MC_TESTS_OUTPUT, DIR_BLASTP)
+    MC_TESTS_OUTPUT_FASTAS = os.path.join(MC_TESTS_OUTPUT, DIR_FASTAS)
     MC_TESTS_OUTPUT_FX = os.path.join(MC_TESTS_OUTPUT, DIR_FX)
     MC_TESTS_OUTPUT_FX_AC = os.path.join(MC_TESTS_OUTPUT_FX, DIR_AC)
     MC_TESTS_OUTPUT_FX_BM = os.path.join(MC_TESTS_OUTPUT_FX, DIR_BM)
