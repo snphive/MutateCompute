@@ -10,7 +10,7 @@ class TestMain(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        GUM.linux_copy(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value, do_recursively=True)
+        GUM.linux_copy_all_dir(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value, do_recursively=True)
 
     def test__read_global_options(self):
         # arrange
@@ -58,9 +58,10 @@ class TestMain(TestCase):
         # arrange
         globaloptions_lines = ['#\n', 'FASTAs: 4;\n', '#']
         PDBs_or_FASTAs = 'FASTAs'
+        path_repo = TPLS.
         expected_fasta_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta', '3_A.fasta']
         # act
-        fasta_list = Main._build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_input)
+        fasta_list = Main._build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_repo)
         # assert
         self.assertNotEqual('', fasta_list)
         self.assertListEqual(expected_fasta_list, fasta_list)
