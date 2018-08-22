@@ -4,12 +4,8 @@ import shutil
 import subprocess
 import time
 import warnings
-
-
 from src.AminoAcids import AA
 from src.Paths import Paths
-
-
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
@@ -381,6 +377,12 @@ class GUM(object):
         file_ext = '.pdb' if (pdbs_or_fastas == 'pdbs') else '.fasta'
         filelist = glob.glob(path_src_repo_dir + '/' + pdbs_or_fastas + '*/*' + file_ext)
         return filelist
+
+    @staticmethod
+    def make_filelist_in_current_dir_and_subdirs_recursively(path_current_dir, dot_file_ext):
+        my_list = glob.glob(path_current_dir + '/**/*' + dot_file_ext, recursive=True)
+        my_list = [my_file.split('/')[-1] for my_file in my_list]
+        return my_list
 
 ######################################################################################################################
     # Permanently removes input_data and all contents!
