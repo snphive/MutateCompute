@@ -287,7 +287,7 @@ class GUM(object):
                 if file.endswith('.pdb') and file in target_file_list:
                     shutil.move(path_src_dir + GUM.fslash + file, path_src_dir_subfoldername + GUM.fslash + file)
 
-            GUM.linux_copy(path_src_dir_subfoldername, path_dst_dir_subfoldername, do_recursively=True)
+            GUM.linux_copy_all_dir(path_src_dir_subfoldername, path_dst_dir_subfoldername, do_recursively=True)
 
     # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
     # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
@@ -296,10 +296,28 @@ class GUM(object):
         return str(starting_num) + '...' + str(total_num_to_copy)
 
     @staticmethod
-    def linux_copy(path_src, path_dst, do_recursively):
+    def linux_copy_all_dir(path_src_dir, path_dst, do_recursively):
         recurse_cmd = (GUM.space + '-r') if do_recursively else ''
-        cmd = 'cp' + recurse_cmd + GUM.space + path_src + GUM.space + path_dst
+        cmd = 'cp' + recurse_cmd + GUM.space + path_src_dir + GUM.space + path_dst
         subprocess.call(cmd, shell=True)
+
+    @staticmethod
+    def linux_copy_specific_files(path_src_filelist, path_dst):
+        if isinstance(path_src_filelist, str):
+            path_src_filelist = [path_src_filelist]
+        for path_src_file in path_src_filelist:
+            cmd = 'cp' + GUM.space + path_src_file + GUM.space + path_dst
+            subprocess.call(cmd, shell=True)
+
+    @staticmethod
+    def linux_copy_files_into_own_subdir(path_src_filelist, path_dst):
+        if isinstance(path_src_filelist, str):
+            path_src_filelist = [path_src_filelist]
+        for path_src_file in path_src_filelist:
+            filename = path_src_file.split('/')[-1].split('.')[0]
+            path_dst_filenamedir = GUM._os_makedirs(path_dst, filename)
+            cmd = 'cp' + GUM.space + path_src_file + GUM.space + path_dst_filenamedir
+            subprocess.call(cmd, shell=True)
 
     @staticmethod
     def linux_remove_files_in_dir(path_dir):
@@ -349,7 +367,7 @@ class GUM(object):
                 wanted_file_dst_dirname = wanted_file.split('.')[0]
                 path_dst = GUM._os_makedirs(path_root_dst_dir, wanted_file_dst_dirname)
                 path_file_to_copy = os.path.join(path_repo, wanted_file)
-                GUM.linux_copy(path_file_to_copy, path_dst, do_recursively=copy_all_files_in_dir)
+                GUM.linux_copy_specific_files(path_file_to_copy, path_dst)
         return wanted_file_list
 
     @staticmethod
@@ -383,7 +401,7 @@ class GUM(object):
         my_list = glob.glob(path_current_dir + '/**/*' + dot_file_ext, recursive=True)
         return [my_file.split('/')[-1] for my_file in my_list]
 
-######################################################################################################################
+    ######################################################################################################################
     # Permanently removes input_data and all contents!
     @staticmethod
     def remove_inputdata_dir_tree():
