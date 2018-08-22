@@ -381,8 +381,7 @@ class GUM(object):
     @staticmethod
     def make_filelist_in_current_dir_and_subdirs_recursively(path_current_dir, dot_file_ext):
         my_list = glob.glob(path_current_dir + '/**/*' + dot_file_ext, recursive=True)
-        my_list = [my_file.split('/')[-1] for my_file in my_list]
-        return my_list
+        return [my_file.split('/')[-1] for my_file in my_list]
 
 ######################################################################################################################
     # Permanently removes input_data and all contents!
