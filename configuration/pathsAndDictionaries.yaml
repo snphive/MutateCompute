@@ -33,7 +33,7 @@ ROOT:
     dir_bm: 'build_model'
     dir_rep: 'repair'
     dir_fastas: 'fastas'
-    dir_sequences: 'sequences'
+    dir_seqs_txt_csv: 'sequences_txt_csv'
     dir_pdb_fasta_repo: 'REPO_PDB_FASTA'
     dir_pdbs: 'pdbs'
     dir_blastp: 'blastp'
