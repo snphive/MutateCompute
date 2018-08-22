@@ -35,5 +35,3 @@ main = Main(use_cluster=False, use_multithread=False)
 #               input_data/<pdbfilename>/                           output_data/<pdbfilename>/fx_ac/
 #               input_data/<pdbfilename>/mutants/                   output_data/<pdbfilename>/fx_ac/mutants/
 #
-#
-# Blast
