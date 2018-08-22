@@ -67,95 +67,83 @@ class TestMutateFasta(TestCase):
     # Write one fastafile for all mutants. All other flags are set to false.
     def test_write_mutants_1(self):
         # arrange
-        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, 'WT_SCI','mutants'))
+        path_tests_output_fastas_wtsci_mutants = os.path.join(TPLS.MC_TESTS_OUTPUT_FASTAS.value, 'WT_SCI',
+                                                             TPLS.DIR_MUTANTS.value)
+        GUM.linux_remove_files_in_dir(path_tests_output_fastas_wtsci_mutants)
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
-        path_input = TPLS.MC_TESTS_INPUT.value
-        write_1_fasta_only = True
-        write_fasta_per_mut = False
-        path_output = ''
-        write_csv = False
-        write_txt = False
-        expected_all_mutants_fastafile = '>S1A\nACI\n>C2A\nSAI\n>I3A\nSCA\n'
+        expected_all_mutants_single_fastafile = '>WT_SCI\nSCI\n>S1A\nACI\n>C2A\nSAI\n>I3A\nSCA\n'
         # act
-        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
-                                        path_output, write_csv=write_csv, write_txt=write_txt)
+        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only=True, write_fasta_per_mut=False,
+                                        path_output=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=False)
         # assert
-        self.assertTrue(os.path.exists(TPLS.MC_TESTS_INPUT.value + '/fastas/WT_SCI/mutants'),
-            msg='~/PycharmProjects/MutateCompute/tests/input_data/fastas/WT_SCI/mutants folder was not found')
-        self.assertTrue(os.path.exists(TPLS.MC_TESTS_INPUT.value + '/fastas/WT_SCI/mutants/WT_SCI_mutants.fasta'),
-            msg='~/PycharmProjects/MutateCompute/tests/input_data/fastas/WT_SCI/mutants/WT_SCI.fasta file not found')
-        with open(TPLS.MC_TESTS_INPUT.value + '/fastas/WT_SCI/mutants/WT_SCI_mutants.fasta') as all_mutants_fastafile:
+        self.assertTrue(os.path.exists(path_tests_output_fastas_wtsci_mutants),
+            msg=path_tests_output_fastas_wtsci_mutants + ' folder was not found.')
+
+        path_tests_output_fastas_sci_mutants_wtscifilemuts = os.path.join(path_tests_output_fastas_wtsci_mutants,
+                                                                            'WT_SCI_mutants.fasta')
+        self.assertTrue(os.path.exists(path_tests_output_fastas_sci_mutants_wtscifilemuts),
+            msg=path_tests_output_fastas_sci_mutants_wtscifilemuts + ' file not found.')
+
+        with open(path_tests_output_fastas_sci_mutants_wtscifilemuts) as all_mutants_fastafile:
             all_mutants_fastafile = all_mutants_fastafile.read()
-        self.assertEqual(expected_all_mutants_fastafile, all_mutants_fastafile)
+        self.assertEqual(expected_all_mutants_single_fastafile, all_mutants_fastafile)
 
     # Write one fastafile per mutant. All other flags are false.
     def test_write_mutants_2(self):
         # arrange
-        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_INPUT_FASTAS.value, 'WT_SCI', 'mutants'))
+        path_tests_output_fastas_wtsci = os.path.join(TPLS.MC_TESTS_OUTPUT_FASTAS.value, 'WT_SCI')
+        GUM.linux_remove_files_in_dir(path_tests_output_fastas_wtsci)
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
-        path_input = TPLS.MC_TESTS_INPUT.value
-        write_1_fasta_only = False
-        write_fasta_per_mut = True
-        path_output = ''
-        write_csv = False
-        write_txt = False
-        expected_mutant_fastafile_list = ['S1A.fasta', 'C2A.fasta', 'I3A.fasta']
+        expected_mutant_fastafile_list = ['WT_SCI.fasta', 'S1A.fasta', 'C2A.fasta', 'I3A.fasta']
         # act
-        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
-                                        path_output, write_csv=write_csv, write_txt=write_txt)
-        mutant_fastafile_list = glob.glob(TPLS.MC_TESTS_INPUT.value + '/fastas/WT_SCI/mutants/*.fasta')
-        mutant_fastafile_list = [mutant_fastafile.split('/')[-1] for mutant_fastafile in mutant_fastafile_list]
-
+        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only=False, write_fasta_per_mut=True,
+                                        path_output=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=False)
+        path_tests_output_fastas_wtsci_mutants = os.path.join(TPLS.MC_TESTS_OUTPUT.value, TPLS.DIR_FASTAS.value,
+                                                             'WT_SCI', TPLS.DIR_MUTANTS.value)
+        # mutant_fastafile_list = glob.glob(path_tests_output_fastas_wtsci + '/**/*.fasta', recursive=True)
+        # mutant_fastafile_list = [mutant_fastafile.split('/')[-1] for mutant_fastafile in mutant_fastafile_list]
+        mutant_fastafile_list = GUM.make_filelist_in_current_dir_and_subdirs_recursively(path_tests_output_fastas_wtsci,
+                                                                                     '.fasta')
         # assert
-        self.assertTrue(os.path.exists(TPLS.MC_TESTS_INPUT.value + '/fastas/WT_SCI/mutants'),
-            msg='~/PycharmProjects/MutateCompute/tests/input_data/fastas/WT_SCI/mutants folder not found')
+        self.assertTrue(path_tests_output_fastas_wtsci_mutants, msg=path_tests_output_fastas_wtsci_mutants +
+                                                                    ' folder not found.')
         for exp_mutant_fastafile in expected_mutant_fastafile_list:
             self.assertTrue(exp_mutant_fastafile in mutant_fastafile_list)
 
     # Write one txt file (for wild-type and all mutants). All other flags are false.
     def test_write_mutants_3(self):
         # arrange
-        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT.value, 'WT_SCI', 'sequences'))
+        path_tests_output_seqs_wtsci = os.path.join(TPLS.MC_TESTS_OUTPUT.value, TPLS.DIR_SEQS_TXT_CSV.value, 'WT_SCI')
+        GUM.linux_remove_files_in_dir(path_tests_output_seqs_wtsci)
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
-        path_input = TPLS.MC_TESTS_INPUT.value
-        write_1_fasta_only = False
-        write_fasta_per_mut = False
-        write_csv = False
-        write_txt = True
-        path_output = TPLS.MC_TESTS_OUTPUT.value
         expected_txt_file_str = 'WT_SCI:SCI\nS1A:ACI\nC2A:SAI\nI3A:SCA\n'
         # act
-        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
-                                        path_output, write_csv=write_csv, write_txt=write_txt)
+        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only=False, write_fasta_per_mut=False,
+                                        path_output=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=True)
         # assert
-        self.assertTrue(os.path.exists(TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences'),
-            msg=TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences folder not found')
-        self.assertTrue(os.path.exists(TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences/WT_SCI_mutants.txt'),
-            msg=TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences/WT_SCI_mutants.txt file not found')
-        with open(TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences/WT_SCI_mutants.txt') as txt_opened:
+        self.assertTrue(path_tests_output_seqs_wtsci, msg=path_tests_output_seqs_wtsci + ' folder not found.')
+        path_tests_output_seqs_wtsci_mutstxt = os.path.join(path_tests_output_seqs_wtsci, 'WT_SCI_mutants.txt')
+        self.assertTrue(os.path.exists(path_tests_output_seqs_wtsci_mutstxt),
+            msg=path_tests_output_seqs_wtsci_mutstxt + ' file not found.')
+        with open(path_tests_output_seqs_wtsci_mutstxt) as txt_opened:
             txt_file_str = txt_opened.read()
         self.assertEqual(expected_txt_file_str, txt_file_str)
 
     # Write one csv file (for wild-type and all mutants). All other flags are false.
     def test_write_mutants_4(self):
         # arrange
-        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT.value, 'WT_SCI', 'sequences'))
+        path_tests_output_seqs_wtsci = os.path.join(TPLS.MC_TESTS_OUTPUT.value, TPLS.DIR_SEQS_TXT_CSV.value, 'WT_SCI')
+        GUM.linux_remove_files_in_dir(path_tests_output_seqs_wtsci)
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
-        path_input = TPLS.MC_TESTS_INPUT.value
-        write_1_fasta_only = False
-        write_fasta_per_mut = False
-        write_csv = True
-        write_txt = False
-        path_output = TPLS.MC_TESTS_OUTPUT.value
         expected_csv_file_str = 'WT_SCI:SCI,S1A:ACI,C2A:SAI,I3A:SCA,'
         # act
-        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
-                                        path_output, write_csv=write_csv, write_txt=write_txt)
+        self.mutateFasta._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only=False, write_fasta_per_mut=False,
+                                        path_output=TPLS.MC_TESTS_OUTPUT.value, write_csv=True, write_txt=False)
         # assert
-        self.assertTrue(os.path.exists(TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences'),
-            msg=TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences folder not found')
-        self.assertTrue(os.path.exists(TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences/WT_SCI_mutants.csv'),
-            msg=TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences/WT_SCI_mutants.csv file not found')
-        with open(TPLS.MC_TESTS_OUTPUT.value + '/WT_SCI/sequences/WT_SCI_mutants.csv') as csv_opened:
+        self.assertTrue(path_tests_output_seqs_wtsci, msg=path_tests_output_seqs_wtsci + ' folder not found')
+        path_tests_output_seqs_wtscimutscsv = os.path.join(path_tests_output_seqs_wtsci, 'WT_SCI_mutants.csv')
+        self.assertTrue(os.path.exists(path_tests_output_seqs_wtscimutscsv),
+                        msg=path_tests_output_seqs_wtscimutscsv + ' file not found.')
+        with open(path_tests_output_seqs_wtscimutscsv) as csv_opened:
             csv_file_str = csv_opened.read()
         self.assertEqual(expected_csv_file_str, csv_file_str)
