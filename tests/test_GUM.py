@@ -13,11 +13,11 @@ class TestGUM(TestCase):
     @classmethod
     def setUpClass(cls):
         if not os.path.exists(TPLS.MC_TESTS_CONFIG.value):
-            GUM.linux_copy(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value,
+            GUM.linux_copy_all_dir(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value,
                            do_recursively=True)
 
         if not os.path.exists(TPLS.MC_TESTS_INPUT.value):
-            GUM.linux_copy(path_src=TPLS.INPUT_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value,
+            GUM.linux_copy_all_dir(path_src=TPLS.INPUT_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value,
                            do_recursively=True)
 
     # Write_runscript_for_pdbs() takes 6 arguments. The last 3 (namely show_sequence_detail, print_networks,
