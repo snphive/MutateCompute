@@ -75,15 +75,15 @@ class Main(object):
     #
     # globaloptions_lines   List        Alphanumeric text lines of the global options ending with "\n".
     # PDBs_or_FASTAs        String      Either "PDBs" or "FASTAs" from global_options indicates which files to retrieve.
-    # path_input            String      Path to the input_data files (including pdbfiles and fastafiles).
+    # path_repo             String      Path to the repository files (including pdbfiles and fastafiles).
     #
     # Returns a list of pdbfiles or fastafiles according to global_options.txt.
-    # The list if built from actual files that are in the path_input - typically a repository folder.
+    # The list can only include files that are actually in the path_repo (typically a repository dir)
     @staticmethod
-    def _build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_input_repo):
+    def _build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_repo):
         file_list = []
         file_extension = '.pdb' if PDBs_or_FASTAs == 'PDBs' else '.fasta'
-        path_repo_files = path_input_repo + '/**/*' + file_extension
+        path_repo_files = path_repo + '/**/*' + file_extension
         for line in globaloptions_lines:
             if '#' in line:
                 continue
