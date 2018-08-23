@@ -66,7 +66,11 @@ class FoldX(object):
                 Cluster.write_job_q_bash(job_name, path_jobq_indivlist_dest)
 
                 if os.path.exists(os.path.join(path_runscript_dest, 'runscript.txt')):
-                    subprocess.call('qsub job.q', shell=True)
+                    try:
+                        subprocess.call('qsub job.q', shell=True)
+                    except OSError:
+                        print('Problem with linux cp command.')
+
                 else:
                     raise ValueError('No runscript file was found')
 
