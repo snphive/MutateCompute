@@ -17,12 +17,19 @@ class GUM(object):
 
     @staticmethod
     def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix, message_to_print):
-        check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
+        check_qstat = ''
+        try:
+            check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
+        except OSError:
+            print('Problem with linux qstat command.')
         output_qstat = check_qstat.stdout.read()
         while grid_engine_job_prefix in output_qstat:
             print('Waiting for ' + message_to_print)
             time.sleep(10)
-            check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
+            try:
+                check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
+            except OSError:
+                print('Problem with linux qstat command.')
             output_qstat = check_qstat.stdout.read()
 
     # The runscript.txt is an input file for FoldX indicating which pdbs to analyse and which programs to run on them.
@@ -299,7 +306,11 @@ class GUM(object):
     def linux_copy_all_dir(path_src_dir, path_dst, do_recursively):
         recurse_cmd = (GUM.space + '-r') if do_recursively else ''
         cmd = 'cp' + recurse_cmd + GUM.space + path_src_dir + GUM.space + path_dst
-        subprocess.call(cmd, shell=True)
+        try:
+            subprocess.call(cmd, shell=True)
+        except OSError:
+            print('Problem with linux cp command.')
+
 
     @staticmethod
     def linux_copy_specific_files(path_src_filelist, path_dst):
@@ -307,7 +318,10 @@ class GUM(object):
             path_src_filelist = [path_src_filelist]
         for path_src_file in path_src_filelist:
             cmd = 'cp' + GUM.space + path_src_file + GUM.space + path_dst
-            subprocess.call(cmd, shell=True)
+            try:
+                subprocess.call(cmd, shell=True)
+            except OSError:
+                print('Problem with linux cp command.')
 
     @staticmethod
     def linux_copy_files_into_own_subdir(path_src_filelist, path_dst):
@@ -317,12 +331,18 @@ class GUM(object):
             filename = path_src_file.split('/')[-1].split('.')[0]
             path_dst_filenamedir = GUM._os_makedirs(path_dst, filename)
             cmd = 'cp' + GUM.space + path_src_file + GUM.space + path_dst_filenamedir
-            subprocess.call(cmd, shell=True)
+            try:
+                subprocess.call(cmd, shell=True)
+            except OSError:
+                print('Problem with linux cp command.')
 
     @staticmethod
     def linux_remove_files_in_dir(path_dir):
         cmd = 'rm' + GUM.space + path_dir + "/*"
-        subprocess.call(cmd, shell=True)
+        try:
+            subprocess.call(cmd, shell=True)
+        except OSError:
+            print('Problem with linux cp command.')
 
     # Copy files from a source repository directory to destination directories.
     # (Src dir is typically ~/REPO_PDB_FASTA/pdbs_10 and ~/REPO_PDB_FASTA/fastas_100.
@@ -396,6 +416,7 @@ class GUM(object):
         filelist = glob.glob(path_src_repo_dir + '/' + pdbs_or_fastas + '*/*' + file_ext)
         return filelist
 
+    # Note use of list comprehension.
     @staticmethod
     def make_filelist_in_current_dir_and_subdirs_recursively(path_current_dir, dot_file_ext):
         my_list = glob.glob(path_current_dir + '/**/*' + dot_file_ext, recursive=True)
