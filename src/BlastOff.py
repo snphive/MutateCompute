@@ -1,9 +1,18 @@
 from src.IdentifyProtein import IdProt
 from src.Paths import Paths
+from src.GeneralUtilityMethods import GUM
 
-IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input=Paths.INPUT, path_output=Paths.OUTPUT,
-                                                write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
-                                                write_json=False)
+use_cluster = True
+Paths.set_up_paths(use_cluster=use_cluster)
+path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=Paths.INPUT,
+                                                             intermed_dir=Paths.DIR_FASTAS.value, fastadir=None)
+path_repo = Paths.REPO_FASTAS + '_100'
+wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_subdir=path_repo, path_dst_dir=path_input_fastas,
+                                                          pdbs_or_fastas=Paths.DIR_FASTAS.value,
+                                                          wanted_file_list=None)
+IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas, use_cluster=use_cluster,
+                                                path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
+                                                write_csv=True, write_xml=True, write_json=False)
 # As with the MutateFasta, Agadir and FoldX programs, the start of operations begins with identifying which or how many
 # fasta files are to be analysed. These must then be copied over from the repository directory (REPO_PDB_FASTA/FASTAs_),
 # to the input_data directory.
