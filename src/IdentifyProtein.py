@@ -4,16 +4,18 @@ from src.Biopython import Biopy
 from src.Paths import Paths
 from src.GeneralUtilityMethods import GUM
 import glob
+from src.Cluster import Cluster
 
 
 # Class to take any protein identifier, pdb file, FASTA, and identify the protein, potentially via Blast and/or then
 # mapping whatever identifier the input has with the recognised identifiers (1_A to 32431_A from RvdK's repaired pdbs)
 class IdProt(object):
 
-    # (This method relies on the presence of fastafiles in the specified folder, in order for them to be run on Blastp,
+    # Expects a directory location of fastafiles (not a fastafile itself).
+    # (This method relies on the presence of fastafiles in the specified dir, in order for them to be run on Blastp.
     # This transfer is currently done manually)
     #
-    # path_input                String      Abs path of root dir for input fastafiles (..../input_data/).
+    # path_input_fastas         String      Abs path of root dir for input fastafiles (e.g. /input_data/fastas_10).
     # path_output               String      Abs path of root dir for output blastp files (..../output_data/).
     # write_idmaps_for_mysqldb  Boolean     True to build dict mapping RvdK ids to swsprt acc & write files.
     # write_csv                 Boolean     True to write csvfiles.
@@ -22,31 +24,38 @@ class IdProt(object):
     #
     # Returns a list of dictionary data structure representations of each parsed & filtered Blastp run result.
     @staticmethod
-    def map_seq_to_swsprt_acc_id_and_write_files(path_input, path_output, write_idmaps_for_mysldb, write_csv=True,
-                                                 write_xml=True, write_json=False):
-        path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=path_input,
-                                                                     intermed_dir=Paths.DIR_FASTAS.value,
-                                                                     fastadir=None)
-        GUM.copy_files_from_repo_to_input_dst_dir(path_repo=Paths.REPO_FASTAS, path_dst=path_input_fastas,
-                                                  wanted_file_list=None, copy_all_files_in_dir=True)
-        if not os.listdir(path_input_fastas):
-            raise ValueError('There are no subdirectories in your specified /input_data/fastas/ directory. Typically'
-                             'expecting /input_data/fastas/<fastafilenames>/, each containing a fastafile. It seems '
-                             'that no fastafiles were copied over from the repository directory.')
-        path_input_fastafile_list = glob.glob(path_input_fastas + '/*.fasta')
+    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir, use_cluster, path_output,
+                                                 write_idmaps_for_mysldb, write_csv=True, write_xml=True,
+                                                 write_json=False):
+        try:
+            path_input_fastas_dir_list = path_input_fastas_dir.split('/')
+            if '.fasta' in path_input_fastas_dir_list[-1]:
+                path_input_fastas_dir_list = path_input_fastas_dir_list[:-1]
+                path_input_fastas_dir = '/'.join(path_input_fastas_dir_list)
+            if not os.listdir(path_input_fastas_dir):
+                raise ValueError('There are no subdirectories in your specified /input_data/fastas/ directory. '
+                                 'Typically expecting /input_data/fastas/<fastafilenames>/, each containing a '
+                                 'fastafile. It seems that no fastafiles were copied over from the repository '
+                                 'directory. Therefore cannot proceed.')
+        except NotADirectoryError:
+            raise NotADirectoryError('The input path received: ' + path_input_fastas_dir + ' is is not a directory.')
+        path_input_fastafile_list = glob.glob(path_input_fastas_dir + '/*.fasta')
         blastp_dict_list = []
         for path_fastafile in path_input_fastafile_list:
             with open(path_fastafile) as fastafile_opened:
                 fasta_str = fastafile_opened.read()
+                fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
+                if use_cluster:
+                    Cluster.write_job_q_bash(job_name=fastafile_name, path_job_q_dir=Paths.CONFIG_JOBQ)
+                    Cluster.run_job_q()
                 blastp_result = Biopy.run_blastp(fasta_str)
-                fastafile_name = path_input.split('/')[-1].split('.')[0]
                 xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
                 path_blstp_xml = xml
                 blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
                 blastp_dict_list.append(blastp_dict)
                 if write_idmaps_for_mysldb:
-                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
-                                                     write_json=write_json)
+                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv,
+                                                     write_xml=write_xml, write_json=write_json)
         return blastp_dict_list
 
     # Writes the blastp result file to an xml file in a output_data subdir called blastp.
@@ -82,17 +91,19 @@ class IdProt(object):
     @staticmethod
     def _write_idmaps_for_mysqldb(path_output, blastp_dict, write_xml=True, write_csv=True, write_json=False):
         idmap = {IdProt.Strng.SEQ_ID.value: blastp_dict[IdProt.Strng.QRY_SEQ_ID.value]}
-        name_search_str = IdProt.Strng.NAME_SRCH_STR.value
-        altname_search_str = IdProt.Strng.ALTNAME_SRCH_STR.value
-        flags_search_str = IdProt.Strng.FLGS_SRCH_STR.value
         for alignment in blastp_dict[IdProt.Strng.IDENT_ALIGN_LST.value]:
             idmap[IdProt.Strng.ACC_NUM.value] = alignment[IdProt.Strng.ACC_NUM.value]
             idmap[IdProt.Strng.LEN.value] = alignment[IdProt.Strng.LEN.value]
-            full_alt_names_flags = IdProt._extract_names_flags(alignment[IdProt.Strng.HIT_DEF.value], name_search_str,
-                                                               altname_search_str, flags_search_str)
-            idmap[IdProt.Strng.NAME.value] = full_alt_names_flags[name_search_str]
-            idmap[IdProt.Strng.ALTNAME.value] = full_alt_names_flags[altname_search_str]
-            idmap[IdProt.Strng.FLGS.value] = full_alt_names_flags[flags_search_str]
+            full_alt_names_flags = IdProt._extract_names_flags(alignment[IdProt.Strng.HIT_DEF.value],
+                                                               IdProt.Strng.NAME_SRCH_STR.value,
+                                                               IdProt.Strng.ALTNAME_SRCH_STR.value,
+                                                               IdProt.Strng.FLGS_SRCH_STR.value)
+            idmap[IdProt.Strng.NAME.value] = full_alt_names_flags[IdProt.Strng.NAME_SRCH_STR.value]
+            idmap[IdProt.Strng.ALTNAME.value] = full_alt_names_flags[IdProt.Strng.ALTNAME_SRCH_STR.value]
+            try:
+                idmap[IdProt.Strng.FLGS.value] = full_alt_names_flags[IdProt.Strng.FLGS_SRCH_STR.value]
+            except KeyError:
+                print('This blastp hit has no flags.')
             idmap[IdProt.Strng.STRT_POS.value] = alignment[IdProt.Strng.HSP_DICT.value][IdProt.Strng.SBJCT_STRT.value]
             idmap[IdProt.Strng.END_POS.value] = alignment[IdProt.Strng.HSP_DICT.value][IdProt.Strng.SBJCT_END.value]
         if write_csv:
@@ -149,7 +160,7 @@ class IdProt(object):
         csv_list = csv_list[:-1]
         csv_list.append('\n')
         path_output_blastp_fastaname = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
-                                                                            intermed_dir=Paths.DIR_BLASTP.value,
+                                                                                intermed_dir=Paths.DIR_BLASTP.value,
                                                                             fastadir=idmap[IdProt.Strng.SEQ_ID.value])
         path_output_blastp_fastaname_csvfile = os.path.join(path_output_blastp_fastaname, 'idmap_swsprt.csv')
         with open(path_output_blastp_fastaname_csvfile, 'w') as idmap_file:
