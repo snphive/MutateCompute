@@ -1,7 +1,9 @@
 from src.Main import Main
+from src.Paths import Paths
 
-main = Main(use_cluster=False, use_multithread=False)
-
+path_repo_pdbs = Paths.REPO_PDBS + '_10'
+path_repo_fastas = Paths.REPO_FASTAS + '_10'
+main = Main(use_cluster=False, use_multithread=False, path_repo_pdbs=path_repo_pdbs, path_repo_fastas=path_repo_fastas)
 
 # In all cases, the start of operations begins with identifying which or how many pdb and/or fasta files are to be
 # analysed. These must then be copied over from either the repository directory (REPO_PDB_FASTA) or the output_data
@@ -14,7 +16,7 @@ main = Main(use_cluster=False, use_multithread=False)
 # 'RepairPDB_1' copied from ~/REPO_PDB_FASTA/PDBs_100/ to ~/PycharmProjects/MutateCompute/input_data/RepairPDB_1/
 #
 # The destination for output files is within the output_data directory tree.
-# and FoldX BuildModel are creating mutants precisely for further analysis (by Agadir and Fold
+# and FoldX BuildModel are creating mutants precisely for further analysis (by Agadir and FoldX)
 #
 #
 # PROGRAM       INPUT FILES & DIRECTORIES                           OUTPUT FILES & DIRECTORIES
@@ -35,3 +37,5 @@ main = Main(use_cluster=False, use_multithread=False)
 #               input_data/<pdbfilename>/                           output_data/<pdbfilename>/fx_ac/
 #               input_data/<pdbfilename>/mutants/                   output_data/<pdbfilename>/fx_ac/mutants/
 #
+#
+# To start this script from cmd line, sh KickOff.sh
