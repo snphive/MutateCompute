@@ -1,5 +1,6 @@
 import os
 import glob
+import sys
 import shutil
 import subprocess
 import time
@@ -48,7 +49,6 @@ class GUM(object):
         runscript = []
         runscript.append('<TITLE>FOLDX_runscript;\n')
         runscript.append('<JOBSTART>#;\n')
-
         runscript.append('<PDBS>' + pdbs + ';\n')
         runscript.append('<BATCH>#;\n')
         runscript.append('<COMMANDS>FOLDX_commandfile;\n')
@@ -71,11 +71,9 @@ class GUM(object):
         runscript.append('<END>#;\n')
         runscript.append('<JOBEND>#;\n')
         runscript.append('<ENDFILE>#;\n')
-
         with open(path_runscript + '/runscript.txt', 'w') as runscript_file:
             runscript_str = ''.join(runscript)
             runscript_file.write(runscript_str)
-
         return runscript_str
 
     # Extracts and writes a FASTA file for each chain described in the pdb.
@@ -273,68 +271,82 @@ class GUM(object):
     # WHICH 100 PDBS TO COPY AND MOVE.***** *** **
     @staticmethod
     def copy_and_move_pdb_files(path_src_dir, path_dst_dir, starting_num, total_num_to_copy=100):
-
         if os.path.exists(path_src_dir):
             file_list = os.listdir(path_src_dir)
             sorted_file_list = sorted(file_list)
-            subfoldername = GUM._make_subfoldername(starting_num, total_num_to_copy)
-            path_src_dir_subfoldername = path_src_dir + GUM.fslash + subfoldername
-            path_dst_dir_subfoldername = path_dst_dir + GUM.fslash + subfoldername
+            threedots_subdirname = GUM._make_3dots_subdirname(starting_num, total_num_to_copy)
+            path_src_dir_subfoldername = path_src_dir + GUM.fslash + threedots_subdirname
+            path_dst_dir_subfoldername = path_dst_dir + GUM.fslash + threedots_subdirname
             target_file_list = []
-
             for n in range(total_num_to_copy):
                 num = n + 1
                 target_file_list.append('RepairPDB_' + str(num) + '.pdb')
-
             if not os.path.exists(path_src_dir_subfoldername):
                 os.mkdir(path_src_dir_subfoldername)
-
             for file in sorted_file_list:
-
                 if file.endswith('.pdb') and file in target_file_list:
                     shutil.move(path_src_dir + GUM.fslash + file, path_src_dir_subfoldername + GUM.fslash + file)
-
-            GUM.linux_copy_all_dir(path_src_dir_subfoldername, path_dst_dir_subfoldername, do_recursively=True)
+            GUM.linux_copy_all_dir(path_src_dir_subfoldername, path_dst_dir_subfoldername, recursively=True)
 
     # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
     # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
     @staticmethod
-    def _make_subfoldername(starting_num, total_num_to_copy):
+    def _make_3dots_subdirname(starting_num, total_num_to_copy):
         return str(starting_num) + '...' + str(total_num_to_copy)
 
+    # THESE LINUX COPY METHODS WILL BE COMBINED INTO ONE WITH FLAGS FOR CREATING OWN SUBDIRS BASED ON FILE NAMES AND
+    # AND FOR DOING THE COPY RECURSIVELY. A FILELIST WILL ALSO BE INCLUDED BUT CAN BE EMPTY. IT MIGHT ALSO BE WORTH
+    # ENFORCING THAT THERE IS A PATH TO THE LOCATION OF THE FILES WITHOUT THE ACTUAL ABS PATH INCLUDING THE FILES
+    # THEMSELVES, I.E. THE GLOB.GLOB COULD BE DONE WITHIN THE LINUX COPY METHOD RATHER THAN OUTSIDE BUT THIS COULD
+    # ALSO INDICATE THAT HAVING TWO SEPARATE LINUX COPY METHODS MIGHT STILL BE WORTH HAVING RATHER THAN JUST ONE.
+
+    # path_src_dir      String      Abs path of src directory to copy files from.
+    # path_dst_dir      String      Abs path of dst directory to copy files to.
+    # recursively       Boolean     True to copy all files in current directory and all files in all subdirectories.
+    #
+    # NOTE: current cp command specifies not to overwrite existing files
     @staticmethod
-    def linux_copy_all_dir(path_src_dir, path_dst, do_recursively):
-        recurse_cmd = (GUM.space + '-r') if do_recursively else ''
-        cmd = 'cp' + recurse_cmd + GUM.space + path_src_dir + GUM.space + path_dst
+    def linux_copy_all_dir(path_src_dir, path_dst_dir, recursively=False):
+        recurse_cmd = (GUM.space + '-r') if recursively else ''
+        cmd = 'cp -n' + recurse_cmd + GUM.space + path_src_dir + GUM.space + path_dst_dir
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
             print('Problem with linux cp command.')
 
-
+    # NOTE: current cp command specifies not to overwrite existing files.
     @staticmethod
-    def linux_copy_specific_files(path_src_filelist, path_dst):
+    def linux_copy_files(path_src_filelist, path_dst, into_own_subdirs):
         if isinstance(path_src_filelist, str):
             path_src_filelist = [path_src_filelist]
         for path_src_file in path_src_filelist:
-            cmd = 'cp' + GUM.space + path_src_file + GUM.space + path_dst
+            if into_own_subdirs:
+                filename = path_src_file.split('/')[-1].split('.')[0]
+                path_dst_filenamedir = GUM._os_makedirs(path_dst, filename)
+                cmd = 'cp -n' + GUM.space + path_src_file + GUM.space + path_dst_filenamedir
+            else:
+                cmd = 'cp -n' + GUM.space + path_src_file + GUM.space + path_dst
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
                 print('Problem with linux cp command.')
 
+    # Finds files in the immediate specified directory, creates a subdir with same name as the file and moves the file
+    # into this new subdirectory.
+    #
+    # path_dir    String      Abs path of files that will each be moved into their own subdir with same name.
     @staticmethod
-    def linux_copy_files_into_own_subdir(path_src_filelist, path_dst):
-        if isinstance(path_src_filelist, str):
-            path_src_filelist = [path_src_filelist]
-        for path_src_file in path_src_filelist:
-            filename = path_src_file.split('/')[-1].split('.')[0]
-            path_dst_filenamedir = GUM._os_makedirs(path_dst, filename)
-            cmd = 'cp' + GUM.space + path_src_file + GUM.space + path_dst_filenamedir
-            try:
-                subprocess.call(cmd, shell=True)
-            except OSError:
-                print('Problem with linux cp command.')
+    def _move_files_into_own_subdirs(path_dir):
+        path_files_in_dir = glob.glob(path_dir + '/*.*')
+        for path_file_in_dir in path_files_in_dir:
+            if os.path.isfile(path_file_in_dir):
+                filename = path_file_in_dir.split('/')[-1].split('.')[0]
+                path_dir_filename = GUM._os_makedirs(path_dir, filename)
+                cmd = 'mv' + GUM.space + path_file_in_dir + GUM.space + path_dir_filename
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError:
+                    print('Problem with linux cp command.')
 
     @staticmethod
     def linux_remove_files_in_dir(path_dir):
@@ -343,6 +355,37 @@ class GUM(object):
             subprocess.call(cmd, shell=True)
         except OSError:
             print('Problem with linux cp command.')
+
+    # Might be better to log in manually, as this can hang if mulitplexing is used.
+    # @staticmethod
+    # def log_in_cluster_ssh(*modules):
+        # HOST = "zeus.psb.ugent.be"
+        # # Ports are handled in ~/.ssh/config since we use OpenSSH
+        # COMMAND = "-p 7788 shazib"
+        # Ports are handled in ~/.ssh/config since we use OpenSSH
+        # ssh = subprocess.Popen(["ssh", "%s" % HOST, COMMAND], shell=False, stdout=subprocess.PIPE,
+        # stderr=subprocess.PIPE)
+        # result = ssh.stdout.readlines()
+        # if result == []:
+        #     error = ssh.stderr.readlines()
+        #     print("ERROR: %s" % error, file=sys.stderr)
+        # else:
+        #     print(result)
+
+    # or use fabric??
+    # import os
+    # from fabric.api import *
+    #
+    # HOST="www.example.org"
+    # COMMAND="uname -a"
+    #
+    # env.user = os.getenv('SSH_USER', 'vagrant')
+    # env.password = os.getenv('SSH_PASSWORD', 'vagrant')
+    #
+    # @hosts(HOST)
+    # def do_something():
+    #     run(COMMAND)
+
 
     # Copy files from a source repository directory to destination directories.
     # (Src dir is typically ~/REPO_PDB_FASTA/pdbs_10 and ~/REPO_PDB_FASTA/fastas_100.
@@ -387,7 +430,7 @@ class GUM(object):
                 wanted_file_dst_dirname = wanted_file.split('.')[0]
                 path_dst = GUM._os_makedirs(path_root_dst_dir, wanted_file_dst_dirname)
                 path_file_to_copy = os.path.join(path_repo, wanted_file)
-                GUM.linux_copy_specific_files(path_file_to_copy, path_dst)
+                GUM.linux_copy_files(path_file_to_copy, path_dst)
         return wanted_file_list
 
     @staticmethod
@@ -426,7 +469,7 @@ class GUM(object):
     # Permanently removes input_data and all contents!
     @staticmethod
     def remove_inputdata_dir_tree():
-        path_to_delete = Paths.MC_INPUT.value
+        path_to_delete = Paths.INPUT.value
         GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=332)
         if os.path.exists():
             GUM.__delete_subdirectory_tree_of_inputdata()
@@ -434,7 +477,7 @@ class GUM(object):
     # Permanently removes output_data and all contents!
     @staticmethod
     def remove_output_dirs():
-        path_to_delete = Paths.MC_OUTPUT.value
+        path_to_delete = Paths.OUTPUT.value
         GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=340)
         if os.path.exists(path_to_delete):
             GUM.__delete_subdirectory_tree_of_outputdata()
@@ -442,7 +485,7 @@ class GUM(object):
     # Permanently removes config and all contents!
     @staticmethod
     def remove_config_folders():
-        path_to_delete = Paths.MC_CONFIG.value
+        path_to_delete = Paths.CONFIG.value
         GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=348)
         if os.path.exists(path_to_delete):
             GUM.__delete_subdirectory_tree_of_outputdata()
@@ -458,7 +501,7 @@ class GUM(object):
     @staticmethod
     def __delete_subdirectory_tree_of_config():
         try:
-            shutil.rmtree(Paths.MC_CONFIG.value)
+            shutil.rmtree(Paths.CONFIG.value)
         except OSError as e:
             print("Error removing: %s - %s." % (e.filename, e.strerror))
 
@@ -467,7 +510,7 @@ class GUM(object):
     @staticmethod
     def __delete_subdirectory_tree_of_inputdata():
         try:
-            shutil.rmtree(Paths.MC_INPUT.value)
+            shutil.rmtree(Paths.INPUT.value)
         except OSError as e:
             print("Error removing: %s - %s." % (e.filename, e.strerror))
 
@@ -476,7 +519,7 @@ class GUM(object):
     @staticmethod
     def __delete_subdirectory_tree_of_outputdata():
         try:
-            shutil.rmtree(Paths.MC_OUTPUT.value)
+            shutil.rmtree(Paths.OUTPUT.value)
         except OSError as e:
             print("Error removing: %s - %s." % (e.filename, e.strerror))
 

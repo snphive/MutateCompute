@@ -33,10 +33,10 @@ class FoldX(object):
         # write_wt_fastafiles   Boolean  True/False is you want to write the wild-type sequence of the input pdb out.
         def mutate_residues_of_pdb(self, pdb, mutate_to_aa_list, write_wt_fastafiles):
             pdbname = pdb.split('.')[0]
-            path_input_PDBs_pdbname = GUM.create_dir_tree(Paths.MC_INPUT, 'PDBs', pdbname)
+            path_input_PDBs_pdbname = GUM.create_dir_tree(Paths.INPUT, 'PDBs', pdbname)
             path_runscript_dest = GUM.create_dir_tree(path_input_PDBs_pdbname, 'FX_BuildModel')
-            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(pdb, Paths.MC_INPUT,
-                                                                                 write_wt_fastafiles, Paths.MC_OUTPUT)
+            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(pdb, Paths.INPUT,
+                                                                                 write_wt_fastafiles, Paths.OUTPUT)
             fx_mutant_name_list = self._make_fx_mutant_name_list(mutate_to_aa_list, pdbname_chain_fasta_dict)
 
             try:
