@@ -1,4 +1,5 @@
 import os
+import subprocess
 from src.Paths import Paths
 from src.GeneralUtilityMethods import GUM
 
@@ -48,20 +49,19 @@ from src.GeneralUtilityMethods import GUM
 
 class Cluster(object):
 
-    # Named arguments are used here to allow default values to be set.
-    # It means that the caller of this method must also pass named parameters to the method.
+    # Note that only the first two arguments are needed, the rest have default named arguments that can be overwritten.
     #
     # job_name                 N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
-    # job_q_dest               Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
+    # path_job_q_dir           Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
     # using_runscript          True/False using runscript (hence running FoldX).
-    # python_script_with_path  Which script to run with python command to run it.
+    # python_script_with_paths Which script to run with python command to run it.
     # queue                    q specifies which oge queue you want to use, e.g. 'all.q' for all queues.
     # n_slots                  serial is number of slots you want your job to use. There are 8 slots per cluster node.
     # total_memory_GB          mem_free is the total amount of memory (here as GB) you expect your job will need.
     # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use.
     # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
     @staticmethod
-    def write_job_q_bash(job_name, path_job_q_dir, using_runscript=True, python_script_with_paths='', queue='',
+    def write_job_q_bash(job_name, path_job_q_dir, using_runscript=False, python_script_with_paths='', queue='',
                          n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
         try:
             os.makedirs(path_job_q_dir)
@@ -107,3 +107,7 @@ class Cluster(object):
             job_q_file.write(job_q_str)
 
         return job_q_str
+
+    @staticmethod
+    def run_job_q(path_job_q_dir):
+        subprocess.call(path_job_q_dir + '/qsub job.q', shell=True)
