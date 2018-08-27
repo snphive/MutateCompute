@@ -28,23 +28,19 @@ class Main(object):
     # use_multithread   Boolean     True if program(s) should be spawned on separate threads/processes.
     #
     # At the moment, this is set up to run either in local or on cluster, not both.
-    def __init__(self, use_cluster, use_multithread):
+    def __init__(self, use_cluster, use_multithread, path_repo_pdbs, path_repo_fastas):
         Paths.set_up_paths(use_cluster)
-        self.pdbs = 'pdbs'
-        self.fastas = 'fastas'
-        path_repo = Paths.REPO_PDB_FASTA
         globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
-        wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.pdbs, path_repo)
-        wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, self.fastas, path_repo)
+        wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
+        wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
         operations = Main._determine_which_operations_to_perform(globaloptions_lines)
         mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
         path_dst = Paths.INPUT
-        wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_pdbfile_list)
-        wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_fastafile_list)
-        write_1_fasta_only = True
-        write_fasta_per_mut = False
-        Main._start_scheduler(operations, Paths.INPUT, wanted_pdbfile_list, wanted_fastafile_list, mutant_aa_list,
-                              use_multithread, write_1_fasta_only, write_fasta_per_mut, Paths.OUTPUT)
+        wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
+        wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst,
+                                                                       wanted_fastafile_list)
+        Main._start_scheduler(operations, Paths.INPUT, Paths.OUTPUT, wanted_pdbfile_list, wanted_fastafile_list,
+                              mutant_aa_list, use_multithread, write_1_fasta_only=True, write_fasta_per_mut=False)
 
     # Reads the global_options.txt in /configuration/global_options breaking the text up according to newlines.
     #
@@ -57,8 +53,7 @@ class Main(object):
             globaloptions_lines = globaloptions.readlines()
         return globaloptions_lines
 
-    # Takes the /configuration/global_options/global_options.txt text as a list of \n separated
-    # lines.
+    # Takes the /configuration/global_options/global_options.txt text as a list of \n separated lines.
     #
     # Reads the option given at either "PDBs" and "FASTAs".
     # The option is expected to be in one of four forms: "", "all", "<filename(s)>", or "<number>".
@@ -74,20 +69,23 @@ class Main(object):
     # about 30,000 pdbs for user to get access to first 5 only!
     #
     # globaloptions_lines   List        Alphanumeric text lines of the global options ending with "\n".
-    # PDBs_or_FASTAs        String      Either "PDBs" or "FASTAs" from global_options indicates which files to retrieve.
     # path_repo             String      Path to the repository files (including pdbfiles and fastafiles).
     #
     # Returns a list of pdbfiles or fastafiles according to global_options.txt.
     # The list can only include files that are actually in the path_repo (typically a repository dir)
     @staticmethod
-    def _build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_repo):
+    def _build_filelist_for_analysis(globaloptions_lines, path_repo):
         file_list = []
-        file_extension = '.pdb' if PDBs_or_FASTAs == 'PDBs' else '.fasta'
+        file_extension = '.pdb'
+        pdbs_or_fastas = 'PDBs'
+        if Paths.DIR_FASTAS.value in path_repo:
+            file_extension = '.fasta'
+            pdbs_or_fastas = 'FASTAs'
         path_repo_files = path_repo + '/**/*' + file_extension
         for line in globaloptions_lines:
             if '#' in line:
                 continue
-            if PDBs_or_FASTAs in line:
+            if pdbs_or_fastas in line:
                 # Main.__validate_option_text(line)
                 pdb_or_fasta_option = Main.__get_text_after_colon_before_semi(line)
                 if pdb_or_fasta_option == '':
@@ -176,8 +174,8 @@ class Main(object):
     # write_fasta_per_mut   Boolean
     # path_output           String
     @staticmethod
-    def _start_scheduler(operations, path_input, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
-                         write_1_fasta_only, write_fasta_per_mut, path_output):
+    def _start_scheduler(operations, path_input, path_output, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
+                         write_1_fasta_only, write_fasta_per_mut):
         if operations == {}:
             raise ValueError("All options in 'operations' were either set to FALSE or there was a typo of some form. "
                              "Check that /configuration/global_options/global_options.txt was written correctly")
