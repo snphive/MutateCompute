@@ -286,7 +286,7 @@ class GUM(object):
             for file in sorted_file_list:
                 if file.endswith('.pdb') and file in target_file_list:
                     shutil.move(path_src_dir + GUM.fslash + file, path_src_dir_subfoldername + GUM.fslash + file)
-            GUM.linux_copy_all_dir(path_src_dir_subfoldername, path_dst_dir_subfoldername, recursively=True)
+            GUM.linux_copy_all_files_in_dir(path_src_dir_subfoldername, path_dst_dir_subfoldername, recursively=True)
 
     # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
     # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
@@ -300,15 +300,17 @@ class GUM(object):
     # THEMSELVES, I.E. THE GLOB.GLOB COULD BE DONE WITHIN THE LINUX COPY METHOD RATHER THAN OUTSIDE BUT THIS COULD
     # ALSO INDICATE THAT HAVING TWO SEPARATE LINUX COPY METHODS MIGHT STILL BE WORTH HAVING RATHER THAN JUST ONE.
 
-    # path_src_dir      String      Abs path of src directory to copy files from.
-    # path_dst_dir      String      Abs path of dst directory to copy files to.
+    # Copies all files inside specified src dir. Does not include the folder itself.
+    #
+    # path_src_dir      String      Abs path of source directory to copy files from.
+    # path_dst_dir      String      Abs path of destination directory to copy files to.
     # recursively       Boolean     True to copy all files in current directory and all files in all subdirectories.
     #
     # NOTE: current cp command specifies not to overwrite existing files
     @staticmethod
-    def linux_copy_all_dir(path_src_dir, path_dst_dir, recursively=False):
+    def linux_copy_all_files_in_dir(path_src_dir, path_dst_dir, recursively=False):
         recurse_cmd = (GUM.space + '-r') if recursively else ''
-        cmd = 'cp -n' + recurse_cmd + GUM.space + path_src_dir + GUM.space + path_dst_dir
+        cmd = 'cp -n' + recurse_cmd + GUM.space + path_src_dir + '/.' + GUM.space + path_dst_dir
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
@@ -386,51 +388,49 @@ class GUM(object):
     # def do_something():
     #     run(COMMAND)
 
-
-    # Copy files from a source repository directory to destination directories.
-    # (Src dir is typically ~/REPO_PDB_FASTA/pdbs_10 and ~/REPO_PDB_FASTA/fastas_100.
+    # Copy files from a source repository subdirectory to destination directory.
+    # (Src dir is typically dirs like ~/REPO_PDB_FASTA/pdbs_10 and ~/REPO_PDB_FASTA/fastas_100.
     # Dst dirs are typically MutateCompute/input_data/<pdbname> directories and
-    # MutateCompute/input_data/fasta/<fastaname> directories).
-    # 1. Identify which subfolder (/pdbs_ or /fastas_) in REPO_PDB_FASTA src directory is src subdirectory.
-    #    Get exact name of the subfolder and set this in the path of src directory (i.e. /pdbs_100).
-    #    Currently not set up to know which dir to choose if there is more than 1 dir, e.g. pdbs_10 and pdbs_100.
-    # 2. Remove any files from wanted list that are not found in the source directory.
-    # 3. Create /input_data/<pdbname> or input_data/fastas/<fastaname> subdirectories in dst dir for each pdb or fasta
+    # MutateCompute/input_data/fastas/<fastaname> directories).
+    #
+    # 1. Remove any files from wanted list that are not found in the source directory.
+    # 2. Create /input_data/<pdbname> or input_data/fastas/<fastaname> subdirectories in dst dir for each pdb or fasta
     #    to be copied in to.
-    # 4. Copy the pdb or fasta files to their corresponding subdirectories.
+    # 3. Copy the pdbfiles or fastafiles to their corresponding subdirectories.
     #
     # E.g. file1.pdb will be copied to /input_data/file1/file.pdb
     # E.g. file1_A.fasta will be copied to /input_data/fastas/file1_A/file1_A.fasta
     #
-    # path_repo             String      Abs path of repository root dir from which to copy pdb or fasta files.
-    # path_dst              String      Path of destination directory to which the specified pdbfiles are copied, via
-    #                                   (creating) individual subdirectories for each file, bearing the same name.
-    # available_file_list   List        Strings of all pdb or fasta files that are available in the specified repo dir.
-    # wanted_file_list      List        List of strings of pdb files or a list of fasta files (incl. extension) to copy.
-    # copy_all_files        Boolean     False by default, otherwise will recursively copy all files from path_repo to
-    #                                   path_dst_dir_pdbname
-    #                                   (If this is set to true, the wanted_pdb_list is ignored.)
+    # path_repo_subdir              String      Abs path of repository subdir from which to copy pdb or fasta files.
+    #                                           It is a subdir of REPO_PDB_FASTA which itself contains only directories
+    #                                           of files (not files).
+    # path_dst_dir                  String      Path of dest dir to which the specified pdbfiles or fastafiles are
+    #                                           copied, via (creating) individual subdirs for each, bearing same name.
+    #                                           Typically /input_data/fastas or just /input_data. If the latter, then
+    #                                           /fastas will be created as subdir of /input_data.
+    # pdbs_or_fastas                String      'pdbs' or 'fastas'
+    # wanted_file_list              List        A subset of files that you want, specified by name (incl. file ext).
+    #                                           If this is None or '', it means you want all files in the specified dir.
     #
-    # Returns wanted_file_list containing only those files that were found in, and copied from, the source directory.
+    # Returns wanted_file_list containing only those files that were found in, and copied from, the path_repo src dir.
     @staticmethod
-    def copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_file_list, copy_all_files_in_dir=False):
-        pdb_or_fasta = 'pdbs' if wanted_file_list[0].endswith('.pdb') else 'fastas'
-        available_file_list = GUM.get_pdb_or_fastafile_list_from_subdirs(path_repo, pdb_or_fasta)
-        path_repo = GUM.get_subdirname_starting_with(path_repo, pdb_or_fasta)
-        path_root_dst_dir = path_dst if pdb_or_fasta == 'pdbs' else path_dst + '/fastas'
-        if not wanted_file_list and copy_all_files_in_dir is False:
-            print('Both the wanted_file_list is empty and copy_all_files_in_dir is False. NOTE: The flag will be now '
-                  'be changed to True, so all files in the specified directory will be copied.')
-            copy_all_files_in_dir = True
-        for wanted_file in wanted_file_list:
-            path_wantedfile = os.path.join(path_repo, wanted_file)
-            if path_wantedfile not in available_file_list:
-                wanted_file_list.remove(wanted_file)
-            else:
-                wanted_file_dst_dirname = wanted_file.split('.')[0]
-                path_dst = GUM._os_makedirs(path_root_dst_dir, wanted_file_dst_dirname)
-                path_file_to_copy = os.path.join(path_repo, wanted_file)
-                GUM.linux_copy_files(path_file_to_copy, path_dst)
+    def copy_files_from_repo_to_input_dirs(path_repo_subdir, path_dst_dir, pdbs_or_fastas, wanted_file_list):
+        if pdbs_or_fastas == Paths.DIR_FASTAS.value:
+            if path_dst_dir.split('/')[-1] != Paths.DIR_FASTAS.value:
+                path_dst_dir = GUM._os_makedirs(path_dst_dir, 'fastas')
+        available_file_list = GUM.get_pdb_or_fastafile_list_from_subdir(path_repo_subdir, pdbs_or_fastas)
+        if not wanted_file_list or wanted_file_list == '':
+            GUM.linux_copy_all_files_in_dir(path_src_dir=path_repo_subdir, path_dst_dir=path_dst_dir, recursively=True)
+        else:
+            for wanted_file in wanted_file_list:
+                path_wantedfile = os.path.join(path_repo_subdir, wanted_file)
+                if path_wantedfile not in available_file_list:
+                    wanted_file_list.remove(wanted_file)
+                else:
+                    wanted_file_dst_dirname = wanted_file.split('.')[0]
+                    path_dst_dir = GUM._os_makedirs(path_dst_dir, wanted_file_dst_dirname)
+                    path_file_to_copy = os.path.join(path_repo_subdir, wanted_file)
+                    GUM.linux_copy_files(path_file_to_copy, path_dst_dir)
         return wanted_file_list
 
     @staticmethod
@@ -449,14 +449,14 @@ class GUM(object):
     # The repo directory structure is expected to be /REPO_PDB_FASTA/pdbs_<number> and /REPO_PDB_FASTA/fastas_<number>.
     # Note: It assumes only 1 PDB and 1 FASTA subdirectory. If there is more than 1, they won't be seen.
     #
-    # path_src_repo_dir     String          Absolute path of the source repository directory.
+    # path_repo_subdir      String          Absolute path of the source repository directory.
     # pdbs_or_fastas        String          Either 'pdbs' or 'fastas'
     #
     # Returns full list of pdbfiles or fastafiles from one of two subdirectories that should be in REPO_PDB_FASTA.
     @staticmethod
-    def get_pdb_or_fastafile_list_from_subdirs(path_src_repo_dir, pdbs_or_fastas):
-        file_ext = '.pdb' if (pdbs_or_fastas == 'pdbs') else '.fasta'
-        filelist = glob.glob(path_src_repo_dir + '/' + pdbs_or_fastas + '*/*' + file_ext)
+    def get_pdb_or_fastafile_list_from_subdir(path_repo_subdir, pdbs_or_fastas):
+        file_ext = '.pdb' if (pdbs_or_fastas == Paths.DIR_PDBS.value) else '.fasta'
+        filelist = glob.glob(path_repo_subdir + '/*' + file_ext)
         return filelist
 
     # Note use of list comprehension.
