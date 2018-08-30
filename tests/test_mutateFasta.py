@@ -18,6 +18,36 @@ class TestMutateFasta(TestCase):
     def tearDownClass(cls):
         cls.mutateFasta = None
 
+    def test_convert_titleSeqDict_to_titleTitleSeqDictDict(self):
+        # arrange
+        title_sequence_dict = {'1_A': TPLS.FASTA_SEQ_1_A.value}
+        expected_titleTitleSeqDictDict = {'1_A': {'1_A': TPLS.FASTA_SEQ_1_A.value}}
+        # act
+        titleTitleSeqDictDict = MutateFasta.convert_titleSeqDict_to_titleTitleSeqDictDict(title_sequence_dict)
+        # assert
+        self.assertDictEqual(expected_titleTitleSeqDictDict, titleTitleSeqDictDict)
+
+    def test_make_titleSeqDict_from_fastafile(self):
+        # arrange
+        path_fastafile_list = '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_A/1_A.fasta'
+        expected_title_seq_dict = {'1_A': TPLS.FASTA_SEQ_1_A.value}
+        # act
+        title_seq_dict = self.mutateFasta.make_titleSeqDict_from_fastafile(path_fastafile_list)
+        # assert
+        self.assertDictEqual(expected_title_seq_dict, title_seq_dict)
+
+    def test__build_complete_paths_for_fastafiles(self):
+        # arrange
+        path_input = TPLS.MC_TESTS_INPUT.value
+        fastafile_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta']
+        expected_path_list = ['/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_A/1_A.fasta',
+                              '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_B/1_B.fasta',
+                              '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/2_A/2_A.fasta']
+        # act
+        path_list = self.mutateFasta.build_complete_paths_for_fastafiles(path_input, fastafile_list)
+        # assert
+        self.assertListEqual(expected_path_list, path_list)
+
     def test__add_mutantTitle_mutatedSeq_to_dict(self):
         # arrange
         titleSeqDict = {'WT_SCI': 'SCI'}
