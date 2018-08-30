@@ -1,5 +1,7 @@
 import os
 import json
+import io
+from src.GeneralUtilityMethods import GUM
 from src.Biopython import Biopy
 from src.Paths import Paths
 import glob
@@ -49,21 +51,25 @@ class IdProt(object):
                 if use_cluster:
                     python_script_w_paths = os.path.join(Paths.SRC, 'run_Biopython_Blastp.py') + ' ' + fasta_str + \
                                             ' ' + Paths.OUTPUT_BLASTP
-                    Cluster.write_job_q_bash(job_name=Paths.PREFIX_BLSTP.value + fastafile_name,
+                    jobname = Paths.PREFIX_BLSTP.value + fastafile_name
+                    Cluster.write_job_q_bash(job_name=jobname,
                                              path_job_q_dir=Paths.CONFIG_JOBQ,
                                              python_script_with_paths=python_script_w_paths)
-                    blastp_result = Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
-                    # blastp_result = needs to open file from the output_blastp dir. Find out what its name is first.
+                    path_output_blastp_fastaname = GUM._os_makedirs(Paths.OUTPUT_BLASTP, fastafile_name)
+                    os.chdir(path_output_blastp_fastaname)
+                    blastp_res = Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
+                    # with io.StringIO(os.path.join(path_output_blastp_fastaname, fastafile_name)) as raw_blastp_open:
+                    with io.BytesIO(os.path.join(path_output_blastp_fastaname, fastafile_name).encode()) as raw_blastp_open:
+                        blastp_result = raw_blastp_open
+                    Cluster.wait_for_grid_engine_job_to_complete(jobname)
                 else:
                     blastp_result = Biopy.run_blastp(fasta_str)
-
-                xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
-                path_blstp_xml = xml
+                path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
                 blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
                 blastp_dict_list.append(blastp_dict)
                 if write_idmaps_for_mysldb:
-                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv,
-                                                     write_xml=write_xml, write_json=write_json)
+                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
+                                                     write_json=write_json)
         return blastp_dict_list
 
     # Writes the blastp result file to an xml file in a output_data subdir called blastp.
@@ -75,6 +81,8 @@ class IdProt(object):
     # Returns path to the newly-written xml file.
     @staticmethod
     def _write_raw_blast_xml(path_output, fastafile_name, blastp_result):
+        if blastp_result is None:
+            raise ValueError('Blastp result is none. Something went wrong!')
         path_output_blastp = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
                                                                       intermed_dir=Paths.DIR_BLASTP.value,
                                                                       fastadir=fastafile_name)
@@ -117,7 +125,7 @@ class IdProt(object):
             try:
                 idmap[IdProt.Strng.FLGS.value] = full_alt_names_flags[IdProt.Strng.FLGS_SRCH_STR.value]
             except KeyError:
-                print('This blastp hit has no flags. So none will be added to the result idmap.')
+                print('This blastp hit has no flags, so no flag written to result idmap.')
             idmap[IdProt.Strng.STRT_POS.value] = alignment[IdProt.Strng.HSP_DICT.value][IdProt.Strng.SBJCT_STRT.value]
             idmap[IdProt.Strng.END_POS.value] = alignment[IdProt.Strng.HSP_DICT.value][IdProt.Strng.SBJCT_END.value]
         if write_csv:
@@ -249,7 +257,7 @@ class IdProt(object):
     # or flags that are 1 character long or more than 30 characters long - this is running assumption.
     @staticmethod
     def __is_reasonable_length(name_or_flag):
-        reasonable_max_name_or_flag_len = 30
+        reasonable_max_name_or_flag_len = 70
         if len(name_or_flag) < 2 | len(name_or_flag) > reasonable_max_name_or_flag_len:
             raise ValueError('Full name, altname or flag is either not there at all or seems too long.')
         return True
