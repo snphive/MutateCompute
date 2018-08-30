@@ -104,21 +104,21 @@ class TestIdProt(TestCase):
     # errors.
     def test_map_seq_to_swsprt_acc_id_and_write_files(self):
         # act
-        IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input=self.PATH_TESTS_INPUT_FASTA_1_A,
+        IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=self.PATH_TESTS_INPUT_FASTA_1_A,
                                                         path_output=TPLS.MC_TESTS_OUTPUT.value,
-                                                        write_idmaps_for_mysldb=False, write_json=False,
-                                                        write_csv=False, write_xml=False)
+                                                        write_idmaps_for_mysldb=False, write_csv=False,
+                                                        write_xml=False, write_json=False)
 
-    # I wanted to mock open() read(). Not quite managed it yet, but even so it prevents the method throwing an
+    # I wanted to mock open().read(). Not quite managed it yet, but even so, it prevents the method throwing an
     # exception if it doesn't find a file at the location it expects. As a result the method can continue and it
     # uses the subsequent qblast mock method anyway so it doesn't matter about mock_open as long as it doesn't
-    # stop the method execution. It is disabled atm, so tester must be sure there is a file at the expected location
-    # with the expected name.
+    # stop the method execution. It is disabled atm, so the tester must manually make sure there is a file at the
+    # expected location with the expected name.
     # mock_open(read_data="ABC")
-    @patch.object(IdProt, "_write_blast_xml")
+    @patch.object(IdProt, "_write_raw_blast_xml")
     @patch.object(NCBIWWW, "qblast")
     # @patch('builtins.open', create=True) mock_open,
-    def test_map_seq_to_swsprt_acc_id_and_write_files_1_A(self, mock_qblast, mock__write_blast_xml):
+    def test_map_seq_to_swsprt_acc_id_and_write_files_1_A(self, mock_qblast, mock__write_raw_blast_xml):
         # arrange
         len_1_A = len(self.FASTA_SEQ_1_A)
         query_len = align_len = idents = q_end = len_1_A
@@ -127,26 +127,28 @@ class TestIdProt(TestCase):
         hit_start_pos = 28
         hit_end_pos = hit_start_pos + query_len - 1
         hit_def = 'RecName: Full=Semaphorin-3C; AltName: Full=Semaphorin-E; Short=Sema E; Flags: Precursor'
-        expected_align_list_1_A = {'accession_num': acc, 'length': hit_len, 'hit_def': hit_def,
+        expected_align_list_1_A = [{'accession_num': acc, 'length': hit_len, 'hit_def': hit_def,
                                        'hsp_dict': {'align_length': align_len, 'gaps': self.ZERO_GAP,
                                                     'identities': idents, 'query_end': q_end,
                                                     'query_start': self.QSTRT_1, 'sbjct_end': hit_end_pos,
-                                                    'sbjct_start': hit_start_pos}}
-        expected_qblast_dict_1_A = {'database': self.SWSPRT_DB, 'database_seqs_num': self.SWSPRT_PROTS_NUM,
+                                                    'sbjct_start': hit_start_pos}}]
+        expected_qblast_dict_list_1_A = [{'database': self.SWSPRT_DB, 'database_seqs_num': self.SWSPRT_PROTS_NUM,
                                         'query_length': query_len, 'query_seq_id': self.NAME_1_A,
-                                        'identical_aligns_list': expected_align_list_1_A}
+                                        'identical_aligns_list': expected_align_list_1_A}]
         with open(self.PATH_TESTS_REFFILES_BLASTP_1_A_XML) as test_1_A_xml:
             mock_qblast.return_value = test_1_A_xml
-        mock__write_blast_xml.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
+        mock__write_raw_blast_xml.return_value = self.PATH_TESTS_REFFILES_BLASTP_1_A_XML
         path_output_blastp_1_A = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A)
         # act
-        result_dict = IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_fastafile=self.PATH_TESTS_INPUT_FASTA_1_A,
-                                                    path_output=path_output_blastp_1_A, write_idmaps_for_mysldb=False,
-                                                    write_json=False, write_csv=False, write_xml=False)
+        result_dict_list = IdProt.map_seq_to_swsprt_acc_id_and_write_files(
+            path_input_fastas_dir=self.PATH_TESTS_INPUT_FASTA_1_A, path_output=path_output_blastp_1_A,
+            write_idmaps_for_mysldb=False, write_csv=False, write_xml=False, write_json=False)
         # assert
-        self.assertEqual(expected_qblast_dict_1_A, result_dict)
+        self.maxDiff = None
+        self.assertListEqual(expected_qblast_dict_list_1_A, result_dict_list)
+        self.assertDictEqual(expected_qblast_dict_list_1_A[0], result_dict_list[0])
 
-    def test__write_blast_xml(self):
+    def test__write_raw_blast_xml(self):
         # arrange
         GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A +
                                                    self.UNDR_SCR_ID_MAPS))
