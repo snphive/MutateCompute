@@ -110,4 +110,5 @@ class Cluster(object):
 
     @staticmethod
     def run_job_q(path_job_q_dir):
-        subprocess.call(path_job_q_dir + '/qsub job.q', shell=True)
+        cmd = Paths.ZEUS_QSUB_EXE.value + 'qsub ' + os.path.join(path_job_q_dir, 'job.q')
+        subprocess.call(cmd, shell=True)
