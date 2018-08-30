@@ -1,6 +1,13 @@
 from src.Main import Main
 from src.Paths import Paths
+import site
+import sys
+print('user site-packages is at: ' + site.getusersitepackages())
+print('global site-packages is at: ' + ''.join(site.getsitepackages()))
+print('python version is at: ' + str(sys.version_info[0]))
 
+use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
+Paths.set_up_paths(use_cluster=True)
 path_repo_pdbs = Paths.REPO_PDBS + '_10'
 path_repo_fastas = Paths.REPO_FASTAS + '_10'
 main = Main(use_cluster=False, use_multithread=False, path_repo_pdbs=path_repo_pdbs, path_repo_fastas=path_repo_fastas)
