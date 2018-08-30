@@ -33,12 +33,12 @@ class MutateFasta(object):
     # Returns a dictionary of the wt-title as key, dict as value which has evert mutant title as key, sequence as value.
     def mutate_every_residue(self, path_input, fastafile_list, fastafile, mutant_aa_list, write_1_fasta_only,
                              write_fasta_per_mut, path_output, write_csv=False, write_txt=False):
-        path_input_fastafile = self.build_complete_paths_for_input_fastas(path_input, fastafile)
-        titleSeq = self.make_titleSeqDict_from_fastafile(path_input_fastafile)
+        # path_input_fastafile = self.build_complete_paths_for_input_fastas(path_input, fastafile)
+        titleSeq = self.make_titleSeqDict_from_fastafile(os.path.join(path_input, Paths.DIR_FASTAS.value, fastafile))
         title_titleSeq = self.convert_titleSeqDict_to_titleTitleSeqDictDict(titleSeq)
         title_titleSeq_w_mutants = self._populate_title_titleSeq_with_mutants(title_titleSeq, mutant_aa_list)
-        self._write_mutants(title_titleSeq_w_mutants, path_input, write_1_fasta_only, write_fasta_per_mut,
-                            path_output, write_csv, write_txt)
+        self._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only, write_fasta_per_mut, path_output, write_csv,
+                            write_txt)
         return title_titleSeq_w_mutants
 
     # title_titleSeq       Dictionary   Fasta title is key. Value is mutant-title: mutated-sequence dictionary.
@@ -219,7 +219,8 @@ class MutateFasta(object):
             title_titleSeqDict_dict[title] = title_sequence_dict
         return title_titleSeqDict_dict
 
-    # Builds list of absolute path(s) for fastafile or fastafiles in list.
+    # Builds list of absolute path(s) for fastafile or fastafiles in list, by adding an extra directory between the
+    # path_input and the file itself, named exactly the same as the file.
     # E.g. input_data/fastas/<fastaname>/fastafile.
     #
     # path_input        String              Absolute path of directory holding list of fasta files.
