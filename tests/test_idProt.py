@@ -86,6 +86,13 @@ class TestIdProt(TestCase):
         TestIdProt._build_reference_blastp_output_xml_files(sequence_dict)
         cls.PATH_TESTS_REFFILES_BLASTP_1_A_XML = os.path.join(TestIdProt.PATH_TESTS_REFFILES_BLASTP, cls.XML_FILE_1_A)
 
+        cls.RECNAME_SRCH_STR = 'RecName: Full='
+        cls.ALTNAME_SRCH_STR = 'AltName: Full='
+        cls.FLAGS_SRCH_STR = 'Flags: '
+        cls.NAME = 'full_name'
+        cls.ALTNAME = 'altname'
+        cls.FLGS = 'flags'
+
     # This is a 'helper method', called from setUpClass()
     @staticmethod
     def _build_reference_blastp_output_xml_files(sequence_dict):
@@ -307,3 +314,91 @@ class TestIdProt(TestCase):
             json = json_opened.read()
             expected_json = ref_json_opened.read()
             self.assertEqual(expected_json, json)
+
+    def test__extract_names_flags_10_D(self):
+        # arrange
+        hit_def = 'RecName: Full=B-cell lymphoma 6 protein; Short=BCL-6; AltName: Full=B-cell lymphoma 5 protein; ' \
+                  'Short=BCL-5; AltName: Full=Protein LAZ-3; AltName: Full=Zinc finger and BTB domain-containing ' \
+                  'protein 27; AltName: Full=Zinc finger protein 51'
+        expected_result = {self.RECNAME_SRCH_STR: 'B-cell lymphoma 6 protein',
+                           self.ALTNAME_SRCH_STR: 'B-cell lymphoma 5 protein'}
+        # act
+        actual_result = IdProt._extract_names_flags(hit_def, self.RECNAME_SRCH_STR, self.ALTNAME_SRCH_STR,
+                                                    self.FLAGS_SRCH_STR)
+        # assert
+        self.assertDictEqual(expected_result, actual_result)
+
+    def test__extract_names_flags_1_A(self):
+        # arrange
+        hit_def = 'RecName: Full=Semaphorin-3C; AltName: Full=Semaphorin-E; Short=Sema E; Flags: Precursor'
+        expected_result = {self.RECNAME_SRCH_STR: 'Semaphorin-3C',
+                           self.ALTNAME_SRCH_STR: 'Semaphorin-E',
+                           self.FLAGS_SRCH_STR: 'Precursor'}
+        # act
+        actual_result = IdProt._extract_names_flags(hit_def, self.RECNAME_SRCH_STR, self.ALTNAME_SRCH_STR,
+                                                    self.FLAGS_SRCH_STR)
+        # assert
+        self.assertDictEqual(expected_result, actual_result)
+
+    def test__extract_names_flags_11_B(self):
+        # arrange
+        hit_def = 'RecName: Full=B-cell lymphoma 6 protein; Short=BCL-6; AltName: Full=B-cell lymphoma 5 protein; ' \
+                  'Short=BCL-5; AltName: Full=Protein LAZ-3; AltName: Full=Zinc finger and BTB domain-containing ' \
+                  'protein 27; AltName: Full=Zinc finger protein 51'
+        expected_result = {self.RECNAME_SRCH_STR: 'B-cell lymphoma 6 protein',
+                           self.ALTNAME_SRCH_STR: 'B-cell lymphoma 5 protein'}
+        # act
+        actual_result = IdProt._extract_names_flags(hit_def, self.RECNAME_SRCH_STR, self.ALTNAME_SRCH_STR,
+                                                    self.FLAGS_SRCH_STR)
+        # assert
+        self.assertDictEqual(expected_result, actual_result)
+
+    def test__extract_names_flags_18_B(self):
+        # arrange
+        hit_def = 'RecName: Full=Alkaline phosphatase, tissue-nonspecific isozyme; Short=AP-TNAP; ' \
+                  'Short=TNSALP; AltName: Full=Alkaline phosphatase liver/bone/kidney isozyme; Flags: Precursor'
+        expected_result = {self.RECNAME_SRCH_STR: 'Alkaline phosphatase, tissue-nonspecific isozyme',
+                           self.ALTNAME_SRCH_STR: 'Alkaline phosphatase liver/bone/kidney isozyme',
+                           self.FLAGS_SRCH_STR: 'Precursor'}
+        # act
+        actual_result = IdProt._extract_names_flags(hit_def, self.RECNAME_SRCH_STR, self.ALTNAME_SRCH_STR,
+                                                    self.FLAGS_SRCH_STR)
+        # assert
+        self.assertDictEqual(expected_result, actual_result)
+
+    def test__extract_names_flags_24_C(self):
+        # arrange
+        hit_def = 'RecName: Full=Catenin delta-1; AltName: Full=Cadherin-associated Src substrate; Short=CAS; ' \
+                  'AltName: Full=p120 catenin; Short=p120(ctn); AltName: Full=p120(cas)'
+        expected_result = {self.RECNAME_SRCH_STR: 'Catenin delta-1',
+                           self.ALTNAME_SRCH_STR: 'Cadherin-associated Src substrate'}
+        # act
+        actual_result = IdProt._extract_names_flags(hit_def, self.RECNAME_SRCH_STR, self.ALTNAME_SRCH_STR,
+                                                    self.FLAGS_SRCH_STR)
+        # assert
+        self.assertDictEqual(expected_result, actual_result)
+
+    def test__extract_names_flags_37_B(self):
+        # arrange
+        hit_def = 'RecName: Full=Neurogenic locus notch homolog protein 1; Short=Notch 1; Short=hN1; AltName: ' \
+                  'Full=Translocation-associated notch protein TAN-1; Contains: RecName: Full=Notch 1 extracellular ' \
+                  'truncation; Short=NEXT; Contains: RecName: Full=Notch 1 intracellular domain; Short=NICD; ' \
+                  'Flags: Precursor'
+        expected_result = {self.RECNAME_SRCH_STR: 'Neurogenic locus notch homolog protein 1',
+                           self.ALTNAME_SRCH_STR: 'Translocation-associated notch protein TAN-1',
+                           self.FLAGS_SRCH_STR: 'Precursor'}
+        # act
+        actual_result = IdProt._extract_names_flags(hit_def, self.RECNAME_SRCH_STR, self.ALTNAME_SRCH_STR,
+                                                    self.FLAGS_SRCH_STR)
+        # assert
+        self.assertDictEqual(expected_result, actual_result)
+
+    def test__extract_names_flags_(self):
+        # arrange
+        hit_def = 'RecName: Full=Mastermind-like protein 1; Short=Mam-1'
+        expected_result = {self.RECNAME_SRCH_STR: 'Mastermind-like protein 1'}
+        # act
+        actual_result = IdProt._extract_names_flags(hit_def, self.RECNAME_SRCH_STR, self.ALTNAME_SRCH_STR,
+                                                    self.FLAGS_SRCH_STR)
+        # assert
+        self.assertDictEqual(expected_result, actual_result)
