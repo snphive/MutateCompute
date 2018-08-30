@@ -9,20 +9,21 @@ import multiprocessing as mp
 class Scheduler(object):
 
     # Not sure yet if I should instantiate the objects once at beginning rather than a new instance for every and every
-    # fasta or pdb
+    # fasta or pdb.
+    # (NOTE: argument list is identical as those of the calling method _start_scheduler())
     #
-    # operations            Dictionary
-    # path_input            String
-    # pdb_list              List
-    # fastafile_list        List
-    # mutant_aa_list        List
-    # use_multithread       Boolean
-    # write_1_fasta_only    Boolean
-    # write_fasta_per_mut   Boolean
-    # path_output           String
+    # operations            Dictionary  Operations each paired with a flag, True to run the operation.
+    # path_input            String      Abs path to input_data root dir.
+    # path_output           String      Abs path to output_data root dir.
+    # pdb_list              List        Pdbfiles to run (incl. .pdb extension)
+    # fastafile_list        List        Fastafiles to run (incl. .fasta extension)
+    # mutant_aa_list        List        All amino acids that any mutations operations will use to mutate residues to.
+    # use_multithread       Boolean     True to employ parallel processing.
+    # write_1_fasta_only    Boolean     True to write any fasta output data to 1 fasta file, each separated by \n.
+    # write_fasta_per_mut   Boolean     True to write any fasta output data as 1 fasta file per mutant.
     @staticmethod
-    def start(operations, path_input, pdb_list, fastafile_list, mutant_aa_list, use_multithread, write_1_fasta_only,
-              write_fasta_per_mut, path_output):
+    def start(operations, path_input, path_output, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
+              write_1_fasta_only, write_fasta_per_mut):
         print('This computer has ' + str(mp.cpu_count()) + ' cpus')
         start_time = time.perf_counter()
         mutate_fasta = MutateFasta()
