@@ -16,23 +16,6 @@ class GUM(object):
     space = ' '
     fslash = '/'
 
-    @staticmethod
-    def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix, message_to_print):
-        check_qstat = ''
-        try:
-            check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
-        except OSError:
-            print('Problem with linux qstat command.')
-        output_qstat = check_qstat.stdout.read()
-        while grid_engine_job_prefix in output_qstat:
-            print('Waiting for ' + message_to_print)
-            time.sleep(10)
-            try:
-                check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
-            except OSError:
-                print('Problem with linux qstat command.')
-            output_qstat = check_qstat.stdout.read()
-
     # The runscript.txt is an input file for FoldX indicating which pdbs to analyse and which programs to run on them.
     # path_runscript        String      Absolute path for runscript.txt file being written.
     # pdbs                  String      pdb(s) (incl. .pdb extension) inputs for FoldX.

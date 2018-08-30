@@ -1,6 +1,7 @@
 import os
 import subprocess
 from src.Paths import Paths
+import time
 from src.GeneralUtilityMethods import GUM
 
 # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
@@ -111,4 +112,16 @@ class Cluster(object):
     @staticmethod
     def run_job_q(path_job_q_dir):
         cmd = Paths.ZEUS_QSUB_EXE.value + 'qsub ' + os.path.join(path_job_q_dir, 'job.q')
-        subprocess.call(cmd, shell=True)
+        result = subprocess.call(cmd, shell=True)
+        return result
+
+    @staticmethod
+    def wait_for_grid_engine_job_to_complete(grid_engine_jobname):
+        check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
+        output_qstat = check_qstat.stdout.read().decode('ascii')
+        # output_qstat = output_qstat.decode('ascii')
+        while grid_engine_jobname in output_qstat:
+            print('Waiting for ' + grid_engine_jobname + ' to finish.')
+            time.sleep(10)
+            check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
+            output_qstat = check_qstat.stdout.read()
