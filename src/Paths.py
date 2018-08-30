@@ -1,6 +1,8 @@
 import os
 import yaml
 from enum import Enum
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 
 # All paths are constants and stored in the configuration directory in 'pathsAndDictionaries' yaml file.
@@ -9,7 +11,10 @@ from enum import Enum
 # All paths are absolute paths unless prefix with an "REL_" which indicates they are relative paths.
 class Paths(Enum):
 
-    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/configuration/pathsAndDictionaries.yaml'
+    cwd = os.getcwd()
+    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/configuration/pathsAndDictionaries.yaml' if not \
+        ('switchlab' in cwd or 'shazib' in cwd) else \
+        '/switchlab/group/shazib/SnpEffect/configuration/pathsAndDictionaries.yaml'
 
     with open(YAML_FILE, 'r') as stream:
 
@@ -55,6 +60,11 @@ class Paths(Enum):
             DIR_PDBS = paths_and_dictionaries['ROOT']['dir_pdbs']
             DIR_BLASTP = paths_and_dictionaries['ROOT']['dir_blastp']
             DIR_BASH = paths_and_dictionaries['ROOT']['dir_bash']
+            #  CLUSTER JOB NAME PREFIXES
+            PREFIX_BLSTP = paths_and_dictionaries['ROOT']['prefix_blastp']
+            PREFIX_AGADIR = paths_and_dictionaries['ROOT']['prefix_agadir']
+            PREFIX_FX_BM = paths_and_dictionaries['ROOT']['prefix_foldx_buildmodel']
+            PREFIX_FX_AC = paths_and_dictionaries['ROOT']['prefix_foldx_analysecomplex']
 
             # ABSOLUTE PATHS BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_CONFIG = os.path.join(LOCAL_MUTATECOMPUTE, DIR_CONFIG)
@@ -68,6 +78,7 @@ class Paths(Enum):
             MC_INPUT_FASTAS = os.path.join(MC_INPUT, DIR_FASTAS)
             MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_OUTPUT)
             MC_BASH = os.path.join(LOCAL_MUTATECOMPUTE, DIR_BASH)
+            MC_SRC = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC)
             MC_OUTPUT_FASTAS = os.path.join(MC_OUTPUT, DIR_FASTAS)
             MC_OUTPUT_BLASTP = os.path.join(MC_OUTPUT, DIR_BLASTP)
             # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
@@ -87,6 +98,7 @@ class Paths(Enum):
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
             SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
             SE_BASH = os.path.join(ZEUS_SNPEFFECT, DIR_BASH)
+            SE_SRC = os.path.join(ZEUS_SNPEFFECT, DIR_SRC)
             SE_OUTPUT_FASTAS = os.path.join(SE_OUTPUT, DIR_FASTAS)
             SE_OUTPUT_BLASTP = os.path.join(SE_OUTPUT, DIR_BLASTP)
             # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM ZEUS ROOT AND DIRECTORY NAMES
@@ -121,5 +133,8 @@ class Paths(Enum):
         Paths.FOLDX_EXE = Paths.ZEUS_FOLDX_EXE.value if use_cluster else Paths.LOCAL_FOLDX_EXE
         Paths.AGADIR_EXE = Paths.ZEUS_AGADIR_EXE.value if use_cluster else Paths.LOCAL_AGADIR_EXE.value
         Paths.BASH = Paths.SE_BASH.value if use_cluster else Paths.MC_BASH.value
+        Paths.SRC = Paths.SE_SRC.value if use_cluster else Paths.MC_SRC.value
 
 
+
+# pydevd.stoptrace()
