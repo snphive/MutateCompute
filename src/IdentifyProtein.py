@@ -2,9 +2,10 @@ import os
 import json
 from src.Biopython import Biopy
 from src.Paths import Paths
-from src.GeneralUtilityMethods import GUM
 import glob
 from src.Cluster import Cluster
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 
 # Class to take any protein identifier, pdb file, FASTA, and identify the protein, potentially via Blast and/or then
@@ -46,9 +47,16 @@ class IdProt(object):
                 fasta_str = fastafile_opened.read()
                 fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
                 if use_cluster:
-                    Cluster.write_job_q_bash(job_name=fastafile_name, path_job_q_dir=Paths.CONFIG_JOBQ)
-                    Cluster.run_job_q()
-                blastp_result = Biopy.run_blastp(fasta_str)
+                    python_script_w_paths = os.path.join(Paths.SRC, 'run_Biopython_Blastp.py') + ' ' + fasta_str + \
+                                            ' ' + Paths.OUTPUT_BLASTP
+                    Cluster.write_job_q_bash(job_name=Paths.PREFIX_BLSTP.value + fastafile_name,
+                                             path_job_q_dir=Paths.CONFIG_JOBQ,
+                                             python_script_with_paths=python_script_w_paths)
+                    blastp_result = Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
+                    # blastp_result = needs to open file from the output_blastp dir. Find out what its name is first.
+                else:
+                    blastp_result = Biopy.run_blastp(fasta_str)
+
                 xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
                 path_blstp_xml = xml
                 blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
@@ -98,12 +106,18 @@ class IdProt(object):
                                                                IdProt.Strng.NAME_SRCH_STR.value,
                                                                IdProt.Strng.ALTNAME_SRCH_STR.value,
                                                                IdProt.Strng.FLGS_SRCH_STR.value)
-            idmap[IdProt.Strng.NAME.value] = full_alt_names_flags[IdProt.Strng.NAME_SRCH_STR.value]
-            idmap[IdProt.Strng.ALTNAME.value] = full_alt_names_flags[IdProt.Strng.ALTNAME_SRCH_STR.value]
+            try:
+                idmap[IdProt.Strng.NAME.value] = full_alt_names_flags[IdProt.Strng.NAME_SRCH_STR.value]
+            except KeyError:
+                print('This blastp hit has no name (??). So none will be added to the result idmap.')
+            try:
+                idmap[IdProt.Strng.ALTNAME.value] = full_alt_names_flags[IdProt.Strng.ALTNAME_SRCH_STR.value]
+            except KeyError:
+                print('This blastp hit has no alt name. So none will be added to the result idmap.')
             try:
                 idmap[IdProt.Strng.FLGS.value] = full_alt_names_flags[IdProt.Strng.FLGS_SRCH_STR.value]
             except KeyError:
-                print('This blastp hit has no flags.')
+                print('This blastp hit has no flags. So none will be added to the result idmap.')
             idmap[IdProt.Strng.STRT_POS.value] = alignment[IdProt.Strng.HSP_DICT.value][IdProt.Strng.SBJCT_STRT.value]
             idmap[IdProt.Strng.END_POS.value] = alignment[IdProt.Strng.HSP_DICT.value][IdProt.Strng.SBJCT_END.value]
         if write_csv:
@@ -263,3 +277,5 @@ class IdProt(object):
         HSP_DICT = 'hsp_dict'
         XML_PROLOG = '<?xml version="1.0" encoding="UTF-8"?>'
         DIR_SUFIX = '_idmaps'
+
+# pydevd.stoptrace()
