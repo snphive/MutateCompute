@@ -2,6 +2,7 @@ from unittest import TestCase
 from src.GeneralUtilityMethods import GUM
 from tests.HelperMethods import HM
 import os
+import glob
 from unittest.mock import patch
 from tests.TestPathsAndListsSeqs import TPLS
 import subprocess
@@ -13,12 +14,12 @@ class TestGUM(TestCase):
     @classmethod
     def setUpClass(cls):
         if not os.path.exists(TPLS.MC_TESTS_CONFIG.value):
-            GUM.linux_copy_all_dir(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value,
-                           do_recursively=True)
+            GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst_dir=TPLS.MC_TESTS.value,
+                                            recursively=True)
 
         if not os.path.exists(TPLS.MC_TESTS_INPUT.value):
-            GUM.linux_copy_all_dir(path_src=TPLS.INPUT_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value,
-                           do_recursively=True)
+            GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.INPUT_FOR_READ_ONLY.value, path_dst_dir=TPLS.MC_TESTS.value,
+                                            recursively=True)
 
     # Write_runscript_for_pdbs() takes 6 arguments. The last 3 (namely show_sequence_detail, print_networks,
     # calculate_stability) are keyword (named) arguments. All have default values assigned in the method argument so
@@ -71,8 +72,7 @@ class TestGUM(TestCase):
                                                                 'RepairPDB_3.pdb', 'RepairPDB_4.pdb', 'RepairPDB_5.pdb']
         copy_all_files_in_dir =  False
         # act
-        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_file_list,
-                                                                            copy_all_files_in_dir=copy_all_files_in_dir)
+        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo, path_dst, wanted_file_list)
         path_copied_file_list = [path_dst + '/' + x for x in copied_wanted_file_list]
 
         # assert
@@ -91,8 +91,7 @@ class TestGUM(TestCase):
                                                                     '3_B.fasta']
         copy_all_files_in_dir = False
         # act
-        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dst_dir(path_repo, path_dst, wanted_file_list,
-                                                                            copy_all_files_in_dir=copy_all_files_in_dir)
+        copied_wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo, path_dst, wanted_file_list)
         path_copied_file_list = [path_dst + '/' + x for x in copied_wanted_file_list]
         # assert
         self.assertEqual(wanted_file_list, copied_wanted_file_list)
@@ -152,32 +151,12 @@ class TestGUM(TestCase):
         # assert
         self.assertEqual(expected_seq_1_A, sequence)
 
-    def test_make_titleSeqDict_from_fastafile(self):
+    # NEED TO ADD AN ASSERT (BUT THE METHOD DOES WORK)
+    def test_move_files_into_own_subdirs(self):
         # arrange
-        path_fastafile_list = '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_A/1_A.fasta'
-        expected_title_seq_dict = {'1_A': TPLS.FASTA_SEQ_1_A.value}
+        path_repo_fastafilelist = glob.glob(TPLS.REPO_PDB_FASTA.value + '/fastas_10/*.fasta')
+        GUM.linux_copy_files(path_repo_fastafilelist, path_dst=TPLS.MC_TESTS_INPUT_FASTAS.value, into_own_subdirs=False)
         # act
-        title_seq_dict = GUM.make_titleSeqDict_from_fastafile(path_fastafile_list)
+        GUM._move_files_into_own_subdirs(path_dir=TPLS.MC_TESTS_INPUT_FASTAS.value)
         # assert
-        self.assertDictEqual(expected_title_seq_dict, title_seq_dict)
-
-    def test__build_complete_paths_for_fastafiles(self):
-        # arrange
-        path_input = TPLS.MC_TESTS_INPUT.value
-        fastafile_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta']
-        expected_path_list = ['/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_A/1_A.fasta',
-                              '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/1_B/1_B.fasta',
-                              '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/fastas/2_A/2_A.fasta']
-        # act
-        path_list = GUM.build_complete_paths_for_fastafiles(path_input, fastafile_list)
-        # assert
-        self.assertListEqual(expected_path_list, path_list)
-
-    def test_convert_titleSeqDict_to_titleTitleSeqDictDict(self):
-        # arrange
-        title_sequence_dict = {'1_A': TPLS.FASTA_SEQ_1_A.value}
-        expected_titleTitleSeqDictDict = {'1_A': {'1_A': TPLS.FASTA_SEQ_1_A.value}}
-        # act
-        titleTitleSeqDictDict = GUM.convert_titleSeqDict_to_titleTitleSeqDictDict(title_sequence_dict)
-        # assert
-        self.assertDictEqual(expected_titleTitleSeqDictDict, titleTitleSeqDictDict)
+        print('nothing')
