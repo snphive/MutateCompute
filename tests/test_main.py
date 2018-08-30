@@ -10,7 +10,7 @@ class TestMain(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        GUM.linux_copy_all_dir(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS.value, do_recursively=True)
+        GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst_dir=TPLS.MC_TESTS.value, recursively=True)
 
     def test__read_global_options(self):
         # arrange
@@ -53,12 +53,13 @@ class TestMain(TestCase):
         self.assertNotEqual('', pdb_list)
         self.assertListEqual(expected_pdb_list, pdb_list)
 
+    #  TODO
     # fastafiles only
     def test__build_filelist_for_analysis_2(self):
         # arrange
         globaloptions_lines = ['#\n', 'FASTAs: 4;\n', '#']
         PDBs_or_FASTAs = 'FASTAs'
-        path_repo = TPLS.
+        # path_repo = TPLS.
         expected_fasta_list = ['1_A.fasta', '1_B.fasta', '2_A.fasta', '3_A.fasta']
         # act
         fasta_list = Main._build_filelist_for_analysis(globaloptions_lines, PDBs_or_FASTAs, path_repo)
@@ -107,20 +108,14 @@ class TestMain(TestCase):
         # assert
         self.assertListEqual(expected_residues, residues)
 
-
-
     @patch.object(Scheduler, 'start')
     def test__start_scheduler(self, mock_start):
-        # arrange
-        operations = {'do_mutate_fasta': True}
-        # operations = {} would need to add something to here to check for raising a ValueError (mock sideeffect?)
-        path_input = TPLS.MC_TESTS_INPUT
-        pdb_list = ['RepairPDB_1.pdb']
-        fasta_list = ['1_A.fasta']
-        list_of_mutant_aa = ['A']
         mock_start.return_value = True
         expected = True
         # act
-        actual = Main._start_scheduler(operations, path_input, pdb_list, fasta_list, list_of_mutant_aa)
+        actual = Main._start_scheduler(operations={'do_mutate_fasta': True}, path_input=TPLS.MC_TESTS_INPUT.value,
+                                       path_output=TPLS.MC_TESTS_OUTPUT, pdb_list=['RepairPDB_1.pdb'],
+                                       fastafile_list=['1_A.fasta'], mutant_aa_list=['A'], use_multithread=False,
+                                       write_1_fasta_only=True, write_fasta_per_mut=True)
         # assert
         self.assertEqual(expected, actual)
