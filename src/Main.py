@@ -26,10 +26,12 @@ class Main(object):
     # use_cluster       Boolean     True if program(s) should run on the cluster (whereupon paths are set to zeus
     #                               paths). Currently set to false by default.
     # use_multithread   Boolean     True if program(s) should be spawned on separate threads/processes.
+    # path_repo_pdbs    String      Abs path to repo of pdbfiles.
+    # path_repo_fastas  String      Abs path to repo of fastafiles.
     #
     # At the moment, this is set up to run either in local or on cluster, not both.
     def __init__(self, use_cluster, use_multithread, path_repo_pdbs, path_repo_fastas):
-        Paths.set_up_paths(use_cluster)
+        # Paths.set_up_paths(use_cluster)
         globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
         wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
         wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
@@ -37,8 +39,7 @@ class Main(object):
         mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
         path_dst = Paths.INPUT
         wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
-        wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst,
-                                                                       wanted_fastafile_list)
+        wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
         Main._start_scheduler(operations, Paths.INPUT, Paths.OUTPUT, wanted_pdbfile_list, wanted_fastafile_list,
                               mutant_aa_list, use_multithread, write_1_fasta_only=True, write_fasta_per_mut=False)
 
@@ -74,18 +75,18 @@ class Main(object):
     # Returns a list of pdbfiles or fastafiles according to global_options.txt.
     # The list can only include files that are actually in the path_repo (typically a repository dir)
     @staticmethod
-    def _build_filelist_for_analysis(globaloptions_lines, path_repo):
+    def _build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs_or_fastas):
         file_list = []
         file_extension = '.pdb'
-        pdbs_or_fastas = 'PDBs'
-        if Paths.DIR_FASTAS.value in path_repo:
+        pdbs_or_fastas_option = 'PDBs'
+        if Paths.DIR_FASTAS.value in path_repo_pdbs_or_fastas:
             file_extension = '.fasta'
-            pdbs_or_fastas = 'FASTAs'
-        path_repo_files = path_repo + '/**/*' + file_extension
+            pdbs_or_fastas_option = 'FASTAs'
+        path_repo_files = path_repo_pdbs_or_fastas + '/*' + file_extension
         for line in globaloptions_lines:
             if '#' in line:
                 continue
-            if pdbs_or_fastas in line:
+            if pdbs_or_fastas_option in line:
                 # Main.__validate_option_text(line)
                 pdb_or_fasta_option = Main.__get_text_after_colon_before_semi(line)
                 if pdb_or_fasta_option == '':
@@ -164,15 +165,15 @@ class Main(object):
                             mutant_aa_list.append(aa)
         return mutant_aa_list
 
-    # operations            Dictionary
-    # path_input            String
-    # pdb_list              List
-    # fastafile_list        List
-    # mutant_aa_list        List
-    # use_multithread       Boolean
-    # write_1_fasta_only    Boolean
-    # write_fasta_per_mut   Boolean
-    # path_output           String
+    # operations            Dictionary  Operations each paired with a flag, True to run the operation.
+    # path_input            String      Abs path to input_data root dir.
+    # path_output           String      Abs path to output_data root dir.
+    # pdb_list              List        Pdbfiles to run (incl. .pdb extension)
+    # fastafile_list        List        Fastafiles to run (incl. .fasta extension)
+    # mutant_aa_list        List        All amino acids that any mutations operations will use to mutate residues to.
+    # use_multithread       Boolean     True to employ parallel processing.
+    # write_1_fasta_only    Boolean     True to write any fasta output data to 1 fasta file, each separated by \n.
+    # write_fasta_per_mut   Boolean     True to write any fasta output data as 1 fasta file per mutant.
     @staticmethod
     def _start_scheduler(operations, path_input, path_output, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
                          write_1_fasta_only, write_fasta_per_mut):
@@ -182,8 +183,8 @@ class Main(object):
         elif operations['do_mutate_fasta'] or operations['do_agadir'] or operations['do_foldx_repair'] \
                 or operations['do_foldx_buildmodel'] or operations['do_foldx_stability'] \
                 or operations['do_foldx_analysecomplex']:
-            Scheduler.start(operations, path_input, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
-                            write_1_fasta_only, write_fasta_per_mut, path_output)
+            Scheduler.start(operations, path_input, path_output, pdb_list, fastafile_list, mutant_aa_list,
+                            use_multithread, write_1_fasta_only, write_fasta_per_mut)
 
     # line   String    Alphanumeric text line of the global options ending with "\n".
     #                  Must have format "option name:<option value>;\n"
