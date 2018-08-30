@@ -1,15 +1,20 @@
 from src.IdentifyProtein import IdProt
 from src.Paths import Paths
 from src.GeneralUtilityMethods import GUM
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
-use_cluster = True
+import sys
+print('(For debugging purposes) python version is: ' + str(sys.version_info[0]))
+
+use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
+
 Paths.set_up_paths(use_cluster=use_cluster)
 path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=Paths.INPUT,
                                                              intermed_dir=Paths.DIR_FASTAS.value, fastadir=None)
-path_repo = Paths.REPO_FASTAS + '_100'
-wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_subdir=path_repo, path_dst_dir=path_input_fastas,
-                                                          pdbs_or_fastas=Paths.DIR_FASTAS.value,
-                                                          wanted_file_list=None)
+path_repo = Paths.REPO_FASTAS + '_10'
+wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas=path_repo,
+                                                          path_dst_dir=path_input_fastas, wanted_file_list=None)
 IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas, use_cluster=use_cluster,
                                                 path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
                                                 write_csv=True, write_xml=True, write_json=False)
@@ -28,3 +33,5 @@ IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input
 # -------------------------------------------------------------------------------------------------------------------
 # IdentifyProtein   input_data/<fastafilename>/                         output_data/blastp/
 #                                                                       output_data/blastp/<fastafilename>_idmaps/
+
+pydevd.stoptrace()

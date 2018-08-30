@@ -92,7 +92,8 @@ class GUM(object):
     # Returns a dictionary of the pdbname_chain and the protein sequence in FASTA format.
     @staticmethod
     def extract_pdbname_chain_fasta_from_pdbs(pdbfiles, path_input, write_fastafile, path_fastafile):
-        pdbname_chain_fastaseq_dict: dict = {}
+        # pdbname_chain_fastaseq_dict: dict = {} version 3 only
+        pdbname_chain_fastaseq_dict = {}
         if isinstance(pdbfiles, str):
             pdbfiles = [pdbfiles]
         for pdbfile in pdbfiles:
@@ -408,28 +409,33 @@ class GUM(object):
     #                                           copied, via (creating) individual subdirs for each, bearing same name.
     #                                           Typically /input_data/fastas or just /input_data. If the latter, then
     #                                           /fastas will be created as subdir of /input_data.
-    # pdbs_or_fastas                String      'pdbs' or 'fastas'
     # wanted_file_list              List        A subset of files that you want, specified by name (incl. file ext).
     #                                           If this is None or '', it means you want all files in the specified dir.
     #
     # Returns wanted_file_list containing only those files that were found in, and copied from, the path_repo src dir.
     @staticmethod
-    def copy_files_from_repo_to_input_dirs(path_repo_subdir, path_dst_dir, pdbs_or_fastas, wanted_file_list):
+    def copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas, path_dst_dir, wanted_file_list):
+        # determine if
+        pdbs_or_fastas = Paths.DIR_PDBS
+        if Paths.DIR_FASTAS.value in path_repo_pdbs_or_fastas:
+            pdbs_or_fastas = 'FASTAs'
+        # add /fastas if path_dst_dir doesn't already have this at the end of this path string.
         if pdbs_or_fastas == Paths.DIR_FASTAS.value:
             if path_dst_dir.split('/')[-1] != Paths.DIR_FASTAS.value:
                 path_dst_dir = GUM._os_makedirs(path_dst_dir, 'fastas')
-        available_file_list = GUM.get_pdb_or_fastafile_list_from_subdir(path_repo_subdir, pdbs_or_fastas)
+        available_file_list = GUM.get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas)
         if not wanted_file_list or wanted_file_list == '':
-            GUM.linux_copy_all_files_in_dir(path_src_dir=path_repo_subdir, path_dst_dir=path_dst_dir, recursively=True)
+            GUM.linux_copy_all_files_in_dir(path_src_dir=path_repo_pdbs_or_fastas, path_dst_dir=path_dst_dir,
+                                            recursively=True)
         else:
             for wanted_file in wanted_file_list:
-                path_wantedfile = os.path.join(path_repo_subdir, wanted_file)
+                path_wantedfile = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
                 if path_wantedfile not in available_file_list:
                     wanted_file_list.remove(wanted_file)
                 else:
                     wanted_file_dst_dirname = wanted_file.split('.')[0]
                     path_dst_dir = GUM._os_makedirs(path_dst_dir, wanted_file_dst_dirname)
-                    path_file_to_copy = os.path.join(path_repo_subdir, wanted_file)
+                    path_file_to_copy = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
                     GUM.linux_copy_files(path_file_to_copy, path_dst_dir)
         return wanted_file_list
 
@@ -449,14 +455,13 @@ class GUM(object):
     # The repo directory structure is expected to be /REPO_PDB_FASTA/pdbs_<number> and /REPO_PDB_FASTA/fastas_<number>.
     # Note: It assumes only 1 PDB and 1 FASTA subdirectory. If there is more than 1, they won't be seen.
     #
-    # path_repo_subdir      String          Absolute path of the source repository directory.
-    # pdbs_or_fastas        String          Either 'pdbs' or 'fastas'
+    # path_repo_pdbs_or_fastas  String          Absolute path of the source repository directory.
     #
     # Returns full list of pdbfiles or fastafiles from one of two subdirectories that should be in REPO_PDB_FASTA.
     @staticmethod
-    def get_pdb_or_fastafile_list_from_subdir(path_repo_subdir, pdbs_or_fastas):
-        file_ext = '.pdb' if (pdbs_or_fastas == Paths.DIR_PDBS.value) else '.fasta'
-        filelist = glob.glob(path_repo_subdir + '/*' + file_ext)
+    def get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas):
+        file_ext = '.pdb' if (Paths.DIR_FASTAS.value in path_repo_pdbs_or_fastas) else '.fasta'
+        filelist = glob.glob(path_repo_pdbs_or_fastas + '/*' + file_ext)
         return filelist
 
     # Note use of list comprehension.
@@ -471,7 +476,7 @@ class GUM(object):
     def remove_inputdata_dir_tree():
         path_to_delete = Paths.INPUT.value
         GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=332)
-        if os.path.exists():
+        if os.path.exists(path_to_delete):
             GUM.__delete_subdirectory_tree_of_inputdata()
 
     # Permanently removes output_data and all contents!
