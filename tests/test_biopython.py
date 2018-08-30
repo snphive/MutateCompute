@@ -46,8 +46,8 @@ class TestBiopython(TestCase):
     def test_run_blastp_1_A(self):
         # arrange
         Hsp_eval = "Hsp_evalue"
-        path_actual = os.path.join(TPLS.MC_TESTS_OUTPUT.value + self.REL_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
-        path_expected = os.path.join(TPLS.MC_TESTS_REF_FILES.value, self.REL_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
+        path_actual = os.path.join(TPLS.MC_TESTS_OUTPUT.value, self.DIR_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
+        path_expected = os.path.join(TPLS.MC_TESTS_REFFILES.value, self.DIR_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
         # act
         result_handle_1_A = Biopy.run_blastp(fasta_str=self.FASTA_STR_1_A)
         blastp_output_xml = self.XML_1_A_BLASTP_OUTPUT_FILE
@@ -87,7 +87,7 @@ class TestBiopython(TestCase):
             raise ValueError(end_tag + " not found in: " + line)
         return float(line[value_start_index:value_end_index])
 
-    # def test__make_list_of_dicts_of_hsps_with_0gaps_and_queryLen_equal_alignLen(self):
+    # def test__make_list_of_dicts_of_hsps_w_0gaps_and_queryLen_equal_alignLen(self):
     #     # arrange
     #     # might need to mock these objects, this is not working
     #     class Hsp(object):
@@ -127,5 +127,5 @@ class TestBiopython(TestCase):
     #
     #     query_length = 100
     #     # act
-    #     Biopy._make_list_of_dicts_of_hsps_with_0gaps_and_queryLen_equal_alignLen(query_length, alignments)
+    #     Biopy._make_list_of_dicts_of_hsps_w_0gaps_and_queryLen_equal_alignLen(query_length, alignments)
     #     # assert
