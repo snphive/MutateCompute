@@ -1,8 +1,8 @@
 import os
+import sys
 import subprocess
 from src.Paths import Paths
 import time
-from src.GeneralUtilityMethods import GUM
 
 # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
 # to perform as well as how to run these computations
@@ -68,8 +68,6 @@ class Cluster(object):
             os.makedirs(path_job_q_dir)
         except FileExistsError:
             print("Some or all of the directories in the this path already exist. It's no problem.")
-
-
         job_q = []
         job_q.append('#!/bin/bash\n'+'#$ -N '+job_name+'\n'+'#$ -V\n')
 
@@ -101,7 +99,7 @@ class Cluster(object):
             job_q.append(Paths.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt\n')
 
         if python_script_with_paths != '':
-            job_q.append('python ' + python_script_with_paths + '\n')
+            job_q.append('python3 ' + python_script_with_paths + '\n')
 
         with open(path_job_q_dir + '/job.q', 'w') as job_q_file:
             job_q_str = ''.join(job_q)
@@ -112,15 +110,14 @@ class Cluster(object):
     @staticmethod
     def run_job_q(path_job_q_dir):
         cmd = Paths.ZEUS_QSUB_EXE.value + 'qsub ' + os.path.join(path_job_q_dir, 'job.q')
-        result = subprocess.call(cmd, shell=True)
-        return result
+        subprocess.call(cmd, shell=True)
 
     @staticmethod
     def wait_for_grid_engine_job_to_complete(grid_engine_jobname):
         check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
-        output_qstat = check_qstat.stdout.read().decode('ascii')
-        # output_qstat = output_qstat.decode('ascii')
-        while grid_engine_jobname in output_qstat:
+        output_qstat = check_qstat.stdout.read()
+        # output_qstat = output_qstat.decode('utf-8')
+        while grid_engine_jobname.encode('utf-8') in output_qstat:
             print('Waiting for ' + grid_engine_jobname + ' to finish.')
             time.sleep(10)
             check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
