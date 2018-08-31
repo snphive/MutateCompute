@@ -2,7 +2,7 @@
 source /home/shazib/.bash_profile
 source /switchlab/group/shazib/SnpEffect/venv/bin/activate
 
-export PYTHONPATH=$PYTHONPATH:/switchlab/group/shazib/SnpEffect/src/pycharm-debug.egg
+export PYTHONPATH=$PYTHONPATH:/switchlab/group/shazib/SnpEffect/venv/pycharm-debug.egg
 export PYTHONPATH=$PYTHONPATH:/switchlab/group/shazib/SnpEffect/venv/lib/python3.7/site-packages
 export PYTHONPATH=$PYTHONPATH:/switchlab/group/shazib/SnpEffect
 
