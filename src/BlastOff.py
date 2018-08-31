@@ -1,10 +1,11 @@
 from src.IdentifyProtein import IdProt
 from src.Paths import Paths
 from src.GeneralUtilityMethods import GUM
+import sys
 import pydevd
+import threading
 pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
-import sys
 print('(For debugging purposes) python version is: ' + str(sys.version_info[0]))
 
 use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
@@ -15,9 +16,12 @@ path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=Paths.INP
 path_repo = Paths.REPO_FASTAS + '_10'
 wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas=path_repo,
                                                           path_dst_dir=path_input_fastas, wanted_file_list=None)
-IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas, use_cluster=use_cluster,
+
+thread = threading.Thread(target=IdProt.map_seq_to_swsprt_acc_id_and_write_files, args=(path_input_fastas_dir=path_input_fastas, use_cluster=use_cluster,
                                                 path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
-                                                write_csv=True, write_xml=True, write_json=False)
+                                                write_csv=True, write_xml=True, write_json=False))
+thread.daemon = True  # Daemonize thread
+thread.start()
 # As with the MutateFasta, Agadir and FoldX programs, the start of operations begins with identifying which or how many
 # fasta files are to be analysed. These must then be copied over from the repository directory (REPO_PDB_FASTA/FASTAs_),
 # to the input_data directory.
