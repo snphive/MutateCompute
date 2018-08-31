@@ -1,11 +1,12 @@
 import os
 import json
-import io
-from src.GeneralUtilityMethods import GUM
 from src.Biopython import Biopy
 from src.Paths import Paths
 import glob
 from src.Cluster import Cluster
+import threading
+from src.GeneralUtilityMethods import GUM
+
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
@@ -44,32 +45,46 @@ class IdProt(object):
             raise NotADirectoryError('The input path received: ' + path_input_fastas_dir + ' is is not a directory.')
         path_input_fastafile_list = glob.glob(path_input_fastas_dir + '/*.fasta')
         blastp_dict_list = []
-        for path_fastafile in path_input_fastafile_list:
-            with open(path_fastafile) as fastafile_opened:
-                fasta_str = fastafile_opened.read()
-                fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
-                if use_cluster:
-                    python_script_w_paths = os.path.join(Paths.SRC, 'run_Biopython_Blastp.py') + ' ' + fasta_str + \
-                                            ' ' + Paths.OUTPUT_BLASTP
-                    jobname = Paths.PREFIX_BLSTP.value + fastafile_name
-                    Cluster.write_job_q_bash(job_name=jobname,
-                                             path_job_q_dir=Paths.CONFIG_JOBQ,
-                                             python_script_with_paths=python_script_w_paths)
-                    path_output_blastp_fastaname = GUM._os_makedirs(Paths.OUTPUT_BLASTP, fastafile_name)
-                    os.chdir(path_output_blastp_fastaname)
-                    blastp_res = Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
-                    # with io.StringIO(os.path.join(path_output_blastp_fastaname, fastafile_name)) as raw_blastp_open:
-                    with io.BytesIO(os.path.join(path_output_blastp_fastaname, fastafile_name).encode()) as raw_blastp_open:
-                        blastp_result = raw_blastp_open
-                    Cluster.wait_for_grid_engine_job_to_complete(jobname)
-                else:
-                    blastp_result = Biopy.run_blastp(fasta_str)
+        # There are problems with using Biopython.Blast on the cluster that I have not yet solved. I may use the
+        # blast module that is loaded on the cluster (v 2.5.0+) instead of via Biopython.
+        if use_cluster:
+            # for path_fastafile in path_input_fastafile_list:
+            #     with open(path_fastafile) as fastafile_opened:
+            #         fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
+            #         jobname = 'BLSTP_' + fastafile_name
+            #         Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.CONFIG_JOBQ)
+            #         path_output_blastp_fastaname = GUM._os_makedirs(Paths.OUTPUT_BLASTP, fastafile_name)
+            #         os.chdir(path_output_blastp_fastaname)
+            #         Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
+            #         Cluster.wait_for_grid_engine_job_to_complete(grid_engine_jobname=jobname)
+            #         path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name,
+            #                                                 blastp_result=Biopy.run_blastp(fastafile_opened.read()))
+            #         blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
+            #         # blastp_dict_list.append(blastp_dict)
+            #         if write_idmaps_for_mysldb:
+            #             IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv,
+            #                                              write_xml=write_xml,
+            #                                              write_json=write_json)
+
+            python_script_w_paths = os.path.join(Paths.SRC, 'run_BlstpZeus.py') + ' ' + path_input_fastas_dir + ' ' \
+                                    + path_output + ' ' + Paths.CONFIG_JOBQ + ' ' + Paths.OUTPUT_BLASTP + ' ' + \
+                                    str(write_idmaps_for_mysldb) + ' ' + str(write_csv) + ' ' + str(write_xml) + \
+                                    ' ' + str(write_json)
+            Cluster.write_job_q_bash(job_name='IdProtJobs', path_job_q_dir=Paths.CONFIG_JOBQ,
+                                     python_script_with_paths=python_script_w_paths)
+            Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
+        else:
+            for path_fastafile in path_input_fastafile_list:
+                with open(path_fastafile) as fastafile_opened:
+                    fasta_str = fastafile_opened.read()
+                    fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
+                blastp_result = Biopy.run_blastp(fasta_str)
                 path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
                 blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
                 blastp_dict_list.append(blastp_dict)
                 if write_idmaps_for_mysldb:
-                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
-                                                     write_json=write_json)
+                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv,
+                                                     write_xml=write_xml, write_json=write_json)
         return blastp_dict_list
 
     # Writes the blastp result file to an xml file in a output_data subdir called blastp.
