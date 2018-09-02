@@ -453,6 +453,10 @@ class GUM(object):
         my_list = glob.glob(path_current_dir + '/**/*' + dot_file_ext, recursive=True)
         return [my_file.split('/')[-1] for my_file in my_list]
 
+    @staticmethod
+    def using_cluster():
+        return 'switchlab' in os.getcwd()
+
     ######################################################################################################################
     # Permanently removes input_data and all contents!
     @staticmethod
