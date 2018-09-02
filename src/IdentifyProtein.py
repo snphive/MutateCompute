@@ -28,7 +28,7 @@ class IdProt(object):
     #
     # Returns a list of dictionary data structure representations of each parsed & filtered Blastp run result.
     @staticmethod
-    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir, use_cluster, path_output,
+    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir, path_output,
                                                  write_idmaps_for_mysldb, write_csv=True, write_xml=True,
                                                  write_json=False):
         try:
@@ -47,7 +47,7 @@ class IdProt(object):
         blastp_dict_list = []
         # There are problems with using Biopython.Blast on the cluster that I have not yet solved. I may use the
         # blast module that is loaded on the cluster (v 2.5.0+) instead of via Biopython.
-        if use_cluster:
+        if GUM.using_cluster():
             # for path_fastafile in path_input_fastafile_list:
             #     with open(path_fastafile) as fastafile_opened:
             #         fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
