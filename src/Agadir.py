@@ -1,6 +1,8 @@
 import os
 import glob
 import subprocess
+from src.Str import Str
+from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
 from src.Paths import Paths
 
@@ -45,23 +47,96 @@ class Agadir(object):
             fastaname = path_input_fastas_file.split('/')[-1].split('.')[0]
             path_output_agadir_fastaname = GUM._os_makedirs(path_output, Paths.DIR_AGADIR.value, fastaname)
             os.chdir(Paths.AGADIR_EXE)
-            cmd = 'chmod 111 agadirwrapper'
-            try:
-                subprocess.call(cmd, shell=True)
-            except OSError:
-                print('Problem with linux cp command.')
-            os.chdir(path_output_agadir_fastaname)
-            cmd = Paths.AGADIR_EXE + '/agadirwrapper' + GUM.space + path_input_fastas_file + GUM.space + \
-                  Paths.CONFIG_AGAD + '/Options.txt'
-            # path_bash_agadir_sh = os.path.join(Paths.BASH, 'agadirexe.sh')
-            # with open(path_bash_agadir_sh, 'w') as f:
-            #     f.write(execute)
-            # cmd = 'sh' + GUM.space + path_bash_agadir_sh
-            try:
-                subprocess.call(cmd, shell=True)
-            except OSError:
-                print('Problem with linux cp command.')
-            # os.chdir(self.path_Results_pdbname)
+            if GUM.using_cluster():
+                Cluster.write_job_q_bash(job_name=fastaname, path_job_q_dir=Paths.CONFIG_JOBQ)
+                Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
+                Cluster.wait_for_grid_engine_job_to_complete(grid_engine_jobname=fastaname)
+            else:
+                cmd = 'chmod 100 agadirwrapper'
+                # cmd = 'chmod +x agadirwrapper'
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError:
+                    print('Problem with linux cp command.')
 
-    def write_agadir_options_file(self):
-        print('')
+                os.chdir(path_output_agadir_fastaname)
+                cmd = Paths.AGADIR_EXE + '/agadirwrapper' + GUM.space + path_input_fastas_file + GUM.space + \
+                      Paths.CONFIG_AGAD + '/Options.txt'
+                # path_bash_agadir_sh = os.path.join(Paths.BASH, 'agadirexe.sh')
+                # with open(path_bash_agadir_sh, 'w') as f:
+                #     f.write(execute)
+                # cmd = 'sh' + GUM.space + path_bash_agadir_sh
+                try:
+                    subprocess.call(cmd, shell=True)
+                except OSError:
+                    print('Problem with linux cp command.')
+                # os.chdir(self.path_Results_pdbname)
+
+    # temp                      float
+    # pH                        float
+    # ion_strgth                float
+    # tfe                       float
+    # stab                      float
+    # conc                      float
+    # ntrm                      ?
+    # ctrm                      ?
+    # global_tot                String  true/false
+    # tango_wndw                String  true/false
+    # waltz_wndw                String  true/false
+    # limbo_wndw                String  true/false
+    # agadir_wndw               String  true/false
+    # csblnca_wndw              String  true/false
+    # complex_wndw              String  true/false
+    # repeat_wndw               String  true/false
+    # pat_tango_wndw             String  true/false
+    # tango_resid               String  true/false
+    # waltz_resid               String  true/false
+    # limbo_resid               String  true/false
+    # complex_resid             String  true/false
+    # agadir_resid              String  true/false
+    # csblnca_resid             String  true/false
+    # repeat_resid              String  true/false
+    # wndws_file_per_seq        String  true/false
+    # resid_file_per_seq        String  true/false
+    def write_agadir_options_file(self, temp=298, pH=7.5, ion_strgth=0.150, tfe=0, stab=0, conc=1, ntrm='#', ctrm='#',
+                                  global_tot=Str.T.value, tango_wndw=Str.T.value, waltz_wndw=Str.T.value,
+                                  limbo_wndw=Str.F.value, agadir_wndw=Str.F.value, csblnca_wndw=Str.F.value,
+                                  complex_wndw=Str.F.value, repeat_wndw=Str.F.value,
+                                  pat_tango_wndw=Str.F.value, tango_resid=Str.F.value,
+                                  waltz_resid=Str.F.value, limbo_resid=Str.F.value, complex_resid=Str.F.value,
+                                  agadir_resid=Str.F.value, csblnca_resid=Str.F.value,
+                                  repeat_resid=Str.F.value, wndws_file_per_seq=Str.F.value,
+                                  resid_file_per_seq=Str.F.value):
+        options = []
+        options.append('<TITLE>AGADIR_optionfile' + Str.SEMICO_NL.value)
+        options.append('<Temperature>' + str(temp) + '.' + Str.SEMICO_NL.value)
+        options.append('<pH>' + str(pH) + Str.SEMICO_NL.value)
+        options.append('<IonStrength>' + str(ion_strgth) + Str.SEMICO_NL.value)
+        options.append('<TfeConc>' + str(tfe) + '.' + Str.SEMICO_NL.value)
+        options.append('<Stability>' + str(stab) + '.' + Str.SEMICO_NL.value)
+        options.append('<Concentration>' + str(conc) + '.' + Str.SEMICO_NL.value)
+        options.append('<Nterm>' + ntrm + Str.SEMICO_NL.value)
+        options.append('<Cterm>' + ctrm + Str.SEMICO_NL.value)
+        options.append('<global_total>' + global_tot + Str.SEMICO_NL.value)
+        options.append('<tango_window>' + tango_wndw + Str.SEMICO_NL.value)
+        options.append('<waltz_window>true' + waltz_wndw + Str.SEMICO_NL.value)
+        options.append('<limbo_window>false' + limbo_wndw + Str.SEMICO_NL.value)
+        options.append('<agadir_window>false' + agadir_wndw + Str.SEMICO_NL.value)
+        options.append('<casablanca_window>false' + csblnca_wndw + Str.SEMICO_NL.value)
+        options.append('<complex_window>false' + complex_wndw + Str.SEMICO_NL.value)
+        options.append('<repeat_window>false' + repeat_wndw + Str.SEMICO_NL.value)
+        options.append('<patentTango_window>false' + pat_tango_wndw + Str.SEMICO_NL.value)
+        options.append('<tango_residue>false' + tango_resid + Str.SEMICO_NL.value)
+        options.append('<waltz_residue>false' + waltz_resid + Str.SEMICO_NL.value)
+        options.append('<limbo_residue>false' + limbo_resid + Str.SEMICO_NL.value)
+        options.append('<complex_residue>false' + complex_resid + Str.SEMICO_NL.value)
+        options.append('<agadir_residue>false' + agadir_resid + Str.SEMICO_NL.value)
+        options.append('<casablanca_residue>false' + csblnca_resid + Str.SEMICO_NL.value)
+        options.append('<repeat_residue>false' + repeat_resid + Str.SEMICO_NL.value)
+        options.append('<windows_file_per_sequence>false' + wndws_file_per_seq + Str.SEMICO_NL.value)
+        options.append('<residue_file_per_sequence>false' + resid_file_per_seq + Str.SEMICO_NL.value)
+        options.append('<END>' + Str.NEWLN.value)
+        with open(Paths.CONFIG_AGAD + '/Options.txt', 'w') as agadir_options:
+            options_str = ''.join(options)
+            agadir_options.write(options_str)
+        return options_str
