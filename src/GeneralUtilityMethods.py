@@ -5,6 +5,8 @@ import shutil
 import subprocess
 import time
 import warnings
+from natsort import natsort
+
 from src.AminoAcids import AA
 from src.Paths import Paths
 # import pydevd
@@ -241,42 +243,35 @@ class GUM(object):
         try:
             os.makedirs(path_root_newdirs)
         except FileExistsError:
-            print('Part or all of path already exists. No problemo.')
+            print('(part/all path already exists)')
         return path_root_newdirs
 
-    # path_src_dir          String      The path of source for pdb files to copy from.
-    # path_dst_dir          String      The path of destination for pdb files to copy to.
-    # starting_num          int         The starting number part of name for destination directory.
-    # total_num_to_copy     int         The total number of pdbs to copy&move (also used to destination directory name).
-    #                                   It is given as a keyword argument so that a default of 100 can be set when no
-    #                                   argument is given.
-    #
-    # NB: I DON'T THINK I'VE COMPLETED THIS METHOD BECAUSE IT DOESN'T LOOK LIKE IT USES THE STARTING NUMBER TO DECIDE
-    # WHICH 100 PDBS TO COPY AND MOVE.***** *** **
+    # path_src_dir          String      Absoluate path of source for files to copy from.
+    # path_dst_dir          String      Absolute path of destination for files to copy to.
+    # file_extension        String      T
+    # starting_num          int         Number of first file to copy from sorted src dir to dst subdir.
+    # total_num_to_copy     int         Total number of files to copy. Default of 1000.
     @staticmethod
-    def copy_and_move_pdb_files(path_src_dir, path_dst_dir, starting_num, total_num_to_copy=100):
-        if os.path.exists(path_src_dir):
-            file_list = os.listdir(path_src_dir)
-            sorted_file_list = sorted(file_list)
-            threedots_subdirname = GUM._make_3dots_subdirname(starting_num, total_num_to_copy)
-            path_src_dir_subfoldername = path_src_dir + GUM.fslash + threedots_subdirname
-            path_dst_dir_subfoldername = path_dst_dir + GUM.fslash + threedots_subdirname
-            target_file_list = []
-            for n in range(total_num_to_copy):
-                num = n + 1
-                target_file_list.append('RepairPDB_' + str(num) + '.pdb')
-            if not os.path.exists(path_src_dir_subfoldername):
-                os.mkdir(path_src_dir_subfoldername)
-            for file in sorted_file_list:
-                if file.endswith('.pdb') and file in target_file_list:
-                    shutil.move(path_src_dir + GUM.fslash + file, path_src_dir_subfoldername + GUM.fslash + file)
-            GUM.linux_copy_all_files_in_dir(path_src_dir_subfoldername, path_dst_dir_subfoldername, recursively=True)
+    def copy_files_to_3dot_dir(path_src_dir, path_dst_dir, file_extension, starting_num, num_to_copy_per_subdir=1000):
+        path_sorted_file_list = natsort.natsorted(glob.glob(path_src_dir + '/*' + file_extension))
+        subdir = file_extension.strip('.') + 's_'
+        path_dst_dir = os.path.join(path_dst_dir, subdir + str(num_to_copy_per_subdir))
+        if not path_sorted_file_list:
+            raise FileExistsError('No files found at this path')
+        for i, path_file in enumerate(path_sorted_file_list):
+            if i % num_to_copy_per_subdir == 0:
+                path_dst_3dot_dir = GUM._make_path_3dot_dir(path_dst_dir, starting_num + i, num_to_copy_per_subdir + i)
+            cmd = 'cp -n' + GUM.space + path_file + GUM.space + path_dst_3dot_dir
+            try:
+                subprocess.call(cmd, shell=True)
+            except OSError:
+                print('Problem with linux cp command.')
 
     # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
     # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
     @staticmethod
-    def _make_3dots_subdirname(starting_num, total_num_to_copy):
-        return str(starting_num) + '...' + str(total_num_to_copy)
+    def _make_path_3dot_dir(path_dst_dir, start_num, end_num):
+        return GUM._os_makedirs(path_dst_dir, str(start_num) + '...' + str(end_num))
 
     # THESE LINUX COPY METHODS WILL BE COMBINED INTO ONE WITH FLAGS FOR CREATING OWN SUBDIRS BASED ON FILE NAMES AND
     # AND FOR DOING THE COPY RECURSIVELY. A FILELIST WILL ALSO BE INCLUDED BUT CAN BE EMPTY. IT MIGHT ALSO BE WORTH
@@ -385,7 +380,7 @@ class GUM(object):
     # E.g. file1.pdb will be copied to /input_data/file1/file.pdb
     # E.g. file1_A.fasta will be copied to /input_data/fastas/file1_A/file1_A.fasta
     #
-    # path_repo_subdir              String      Abs path of repository subdir from which to copy pdb or fasta files.
+    # path_repo_pdbs_or_fastas      String      Abs path of repository subdir from which to copy pdb or fasta files.
     #                                           It is a subdir of REPO_PDB_FASTA which itself contains only directories
     #                                           of files (not files).
     # path_dst_dir                  String      Path of dest dir to which the specified pdbfiles or fastafiles are
@@ -393,34 +388,40 @@ class GUM(object):
     #                                           Typically /input_data/fastas or just /input_data. If the latter, then
     #                                           /fastas will be created as subdir of /input_data.
     # wanted_file_list              List        A subset of files that you want, specified by name (incl. file ext).
-    #                                           If this is None or '', it means you want all files in the specified dir.
     #
     # Returns wanted_file_list containing only those files that were found in, and copied from, the path_repo src dir.
     @staticmethod
     def copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas, path_dst_dir, wanted_file_list):
-        # determine if
-        pdbs_or_fastas = Paths.DIR_PDBS
-        if Paths.DIR_FASTAS.value in path_repo_pdbs_or_fastas:
-            pdbs_or_fastas = 'FASTAs'
-        # add /fastas if path_dst_dir doesn't already have this at the end of this path string.
-        if pdbs_or_fastas == Paths.DIR_FASTAS.value:
-            if path_dst_dir.split('/')[-1] != Paths.DIR_FASTAS.value:
-                path_dst_dir = GUM._os_makedirs(path_dst_dir, 'fastas')
-        available_file_list = GUM.get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas)
-        if not wanted_file_list or wanted_file_list == '':
-            GUM.linux_copy_all_files_in_dir(path_src_dir=path_repo_pdbs_or_fastas, path_dst_dir=path_dst_dir,
-                                            recursively=True)
-        else:
-            for wanted_file in wanted_file_list:
-                path_wantedfile = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
-                if path_wantedfile not in available_file_list:
-                    wanted_file_list.remove(wanted_file)
-                else:
-                    wanted_file_dst_dirname = wanted_file.split('.')[0]
-                    path_dst_dir = GUM._os_makedirs(path_dst_dir, wanted_file_dst_dirname)
-                    path_file_to_copy = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
-                    GUM.linux_copy_files(path_file_to_copy, path_dst_dir)
-        return wanted_file_list
+        if not wanted_file_list:
+            return
+        path_repo_pdbs_or_fastas_list = path_repo_pdbs_or_fastas.split('/')
+        path_dst_subdirs = []
+        for path_repo_pdbs_or_fastas_dir in path_repo_pdbs_or_fastas_list:
+            if '' == path_repo_pdbs_or_fastas_dir:
+                continue
+            if '...' in path_repo_pdbs_or_fastas_dir:
+                path_dst_subdirs.append(path_repo_pdbs_or_fastas_dir)
+            if Paths.DIR_FASTAS.value == path_repo_pdbs_or_fastas_dir or \
+                    Paths.DIR_PDBS.value == path_repo_pdbs_or_fastas_dir:
+                path_dst_subdirs.append(path_repo_pdbs_or_fastas_dir)
+        path_dst_dir = GUM._os_makedirs(path_dst_dir, *path_dst_subdirs)
+        path_input_fastafile_list = []
+        path_available_file_list = GUM.get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas)
+        for wanted_file in wanted_file_list:
+            path_wantedfile = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
+            if path_wantedfile not in path_available_file_list:
+                wanted_file_list.remove(wanted_file)
+            else:
+                path_file_to_copy = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
+                into_own_subdirs = True
+                GUM.linux_copy_files(path_file_to_copy, path_dst_dir, into_own_subdirs)
+                path_input_fastafile_list.append(GUM._build_path_filelist(path_dst_dir, wanted_file, into_own_subdirs))
+        return path_input_fastafile_list
+
+    @staticmethod
+    def _build_path_filelist(path_root, file, into_own_subdirs):
+        filename = file.split('.')[0] if into_own_subdirs else ''
+        return GUM._os_makedirs(path_root, filename, file)
 
     @staticmethod
     def get_subdirname_starting_with(path, starting_with):
@@ -443,7 +444,7 @@ class GUM(object):
     # Returns full list of pdbfiles or fastafiles from one of two subdirectories that should be in REPO_PDB_FASTA.
     @staticmethod
     def get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas):
-        file_ext = '.pdb' if (Paths.DIR_FASTAS.value in path_repo_pdbs_or_fastas) else '.fasta'
+        file_ext = '.pdb' if (Paths.DIR_PDBS.value in path_repo_pdbs_or_fastas) else '.fasta'
         filelist = glob.glob(path_repo_pdbs_or_fastas + '/*' + file_ext)
         return filelist
 
