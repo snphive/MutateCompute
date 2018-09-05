@@ -23,25 +23,28 @@ class Main(object):
     # All algorithmic analyses start from here.
     # IdentifyProtein.py which runs Blast analyses is the only program that currently runs independently.
     #
-    # use_cluster       Boolean     True if program(s) should run on the cluster (whereupon paths are set to zeus
-    #                               paths). Currently set to false by default.
-    # use_multithread   Boolean     True if program(s) should be spawned on separate threads/processes.
-    # path_repo_pdbs    String      Abs path to repo of pdbfiles.
-    # path_repo_fastas  String      Abs path to repo of fastafiles.
+    # use_cluster                   Boolean     True if program(s) should run on the cluster (whereupon paths are set
+    #                                           to zeus paths). Currently set to false by default.
+    # operations                    Dict        Operations flagged True to run, False to not run.
+    # use_multithread               Boolean     True if program(s) should be spawned on separate threads/processes.
+    # path_input                    String      Abs path to input root dir
+    # path_output                   String      Abs path to output root dir
+    # path_wanted_pdbfile_list      String      Abs path to repo of pdbfiles.
+    # path_wanted_fastafile_list    String      Abs path to repo of fastafiles.
+    # mutant_aa_list                List        All amino acids that mutation operations will mutate residues to.
     #
     # At the moment, this is set up to run either in local or on cluster, not both.
-    def __init__(self, use_cluster, use_multithread, path_repo_pdbs, path_repo_fastas):
-        # Paths.set_up_paths(use_cluster)
-        globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
-        wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
-        wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
-        operations = Main._determine_which_operations_to_perform(globaloptions_lines)
-        mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
-        path_dst = Paths.INPUT
-        wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
-        wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
-        Main._start_scheduler(operations, Paths.INPUT, Paths.OUTPUT, wanted_pdbfile_list, wanted_fastafile_list,
-                              mutant_aa_list, use_multithread, write_1_fasta_only=True, write_fasta_per_mut=False)
+    def __init__(self, use_cluster, operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
+                 path_wanted_fastafile_list, mutant_aa_list):
+        if operations == {}:
+            raise ValueError("All options in 'operations' were either set to FALSE or some typographical error. "
+                             "Check /configuration/global_options/global_options.txt was written correctly")
+        elif operations['do_mutate_fasta'] or operations['do_agadir'] or operations['do_foldx_repair'] \
+                or operations['do_foldx_buildmodel'] or operations['do_foldx_stability'] \
+                or operations['do_foldx_analysecomplex']:
+            Scheduler.start(use_cluster, operations, use_multithread, path_input, path_output,
+                            path_pdbfile_list=path_wanted_pdbfile_list, path_fastafile_list=path_wanted_fastafile_list,
+                            mutant_aa_list=mutant_aa_list, write_1_fasta_only=True, write_fasta_per_mut=False)
 
     # Reads the global_options.txt in /configuration/global_options breaking the text up according to newlines.
     #
@@ -89,7 +92,7 @@ class Main(object):
             if pdbs_or_fastas_option in line:
                 # Main.__validate_option_text(line)
                 pdb_or_fasta_option = Main.__get_text_after_colon_before_semi(line)
-                if pdb_or_fasta_option == '':
+                if pdb_or_fasta_option == '' or pdb_or_fasta_option == '0':
                     file_list = None
                     break
                 elif pdb_or_fasta_option.isdigit() and not pdb_or_fasta_option.isalpha():
@@ -164,27 +167,6 @@ class Main(object):
                         if aa in AA.LIST_ALL_20_AA.value:
                             mutant_aa_list.append(aa)
         return mutant_aa_list
-
-    # operations            Dictionary  Operations each paired with a flag, True to run the operation.
-    # path_input            String      Abs path to input_data root dir.
-    # path_output           String      Abs path to output_data root dir.
-    # pdb_list              List        Pdbfiles to run (incl. .pdb extension)
-    # fastafile_list        List        Fastafiles to run (incl. .fasta extension)
-    # mutant_aa_list        List        All amino acids that any mutations operations will use to mutate residues to.
-    # use_multithread       Boolean     True to employ parallel processing.
-    # write_1_fasta_only    Boolean     True to write any fasta output data to 1 fasta file, each separated by \n.
-    # write_fasta_per_mut   Boolean     True to write any fasta output data as 1 fasta file per mutant.
-    @staticmethod
-    def _start_scheduler(operations, path_input, path_output, pdb_list, fastafile_list, mutant_aa_list, use_multithread,
-                         write_1_fasta_only, write_fasta_per_mut):
-        if operations == {}:
-            raise ValueError("All options in 'operations' were either set to FALSE or there was a typo of some form. "
-                             "Check that /configuration/global_options/global_options.txt was written correctly")
-        elif operations['do_mutate_fasta'] or operations['do_agadir'] or operations['do_foldx_repair'] \
-                or operations['do_foldx_buildmodel'] or operations['do_foldx_stability'] \
-                or operations['do_foldx_analysecomplex']:
-            Scheduler.start(operations, path_input, path_output, pdb_list, fastafile_list, mutant_aa_list,
-                            use_multithread, write_1_fasta_only, write_fasta_per_mut)
 
     # line   String    Alphanumeric text line of the global options ending with "\n".
     #                  Must have format "option name:<option value>;\n"
