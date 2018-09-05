@@ -72,33 +72,36 @@ class Agadir(object):
                     print('Problem with linux cp command.')
                 # os.chdir(self.path_Results_pdbname)
 
-    # temp                      float
-    # pH                        float
-    # ion_strgth                float
-    # tfe                       float
-    # stab                      float
-    # conc                      float
-    # ntrm                      ?
-    # ctrm                      ?
-    # global_tot                String  true/false
-    # tango_wndw                String  true/false
-    # waltz_wndw                String  true/false
-    # limbo_wndw                String  true/false
-    # agadir_wndw               String  true/false
-    # csblnca_wndw              String  true/false
-    # complex_wndw              String  true/false
-    # repeat_wndw               String  true/false
-    # pat_tango_wndw             String  true/false
-    # tango_resid               String  true/false
-    # waltz_resid               String  true/false
-    # limbo_resid               String  true/false
-    # complex_resid             String  true/false
-    # agadir_resid              String  true/false
-    # csblnca_resid             String  true/false
-    # repeat_resid              String  true/false
-    # wndws_file_per_seq        String  true/false
-    # resid_file_per_seq        String  true/false
-    def write_agadir_options_file(self, temp=298, pH=7.5, ion_strgth=0.150, tfe=0, stab=0, conc=1, ntrm='#', ctrm='#',
+    # There are 3 types of calculations and xx algorithms which this can be applied to.
+    # 1) Global total; 2) Window calculation; 3) Residue calculation. Global is ..... Window is..... Residue is .....
+    #
+    # temp                      float   temperature in Kelvin. 298.0 by default (24.85 degC. 37 degC is 310.15 K).
+    # pH                        float   pH. 7.5 by default.
+    # ion_strgth                float   ionic strength in Molar. 0.150 M by default.
+    # tfe                       float   Trifluoroethanol concentration in Molar, 0 M by default.
+    # stab                      float   Stability .. ?
+    # conc                      float   Concentration of the peptide, 1.0 M by default.
+    # ntrm                      ?       ?
+    # ctrm                      ?       ?
+    # global_tot                String  'true' to include global total calculations.
+    # tango_wndw                "       'true' to include Tango window calculations.
+    # waltz_wndw                "       'true' to include Waltz window calculations.
+    # agadir_wndw               "       'true' to include Agadir window calculations.
+    # limbo_wndw                "       'true' to include Limbo window calculations.
+    # csblnca_wndw              "       'true' to include Casablanca window calculations. ??
+    # complex_wndw              "       'true' to include Complex window calculations. ??
+    # repeat_wndw               "       'true' to include Repeat window calculations. ??
+    # pat_tango_wndw            "       'true' to include Tango window calculations.
+    # tango_resid               "       'true' to include Tango window calculations.
+    # waltz_resid               "       'true' to include Tango window calculations.
+    # limbo_resid               "       'true' to include Tango window calculations.
+    # complex_resid             "       'true' to include Tango window calculations.
+    # agadir_resid              "       'true' to include Tango window calculations.
+    # csblnca_resid             "       'true' to include Tango window calculations.
+    # repeat_resid              "       'true' to include Tango window calculations.
+    # wndws_file_per_seq        "       'true' to include Tango window calculations.
+    # resid_file_per_seq        "       'true' to include Tango window calculations.
+    def write_agadir_options_file(self, temp=298, ph=7.5, ion_strgth=0.150, tfe=0, stab=0, conc=1, ntrm='#', ctrm='#',
                                   global_tot=Str.T.value, tango_wndw=Str.T.value, waltz_wndw=Str.T.value,
                                   limbo_wndw=Str.F.value, agadir_wndw=Str.F.value, csblnca_wndw=Str.F.value,
                                   complex_wndw=Str.F.value, repeat_wndw=Str.F.value,
@@ -110,7 +113,7 @@ class Agadir(object):
         options = []
         options.append('<TITLE>AGADIR_optionfile' + Str.SEMICO_NL.value)
         options.append('<Temperature>' + str(temp) + '.' + Str.SEMICO_NL.value)
-        options.append('<pH>' + str(pH) + Str.SEMICO_NL.value)
+        options.append('<pH>' + str(ph) + Str.SEMICO_NL.value)
         options.append('<IonStrength>' + str(ion_strgth) + Str.SEMICO_NL.value)
         options.append('<TfeConc>' + str(tfe) + '.' + Str.SEMICO_NL.value)
         options.append('<Stability>' + str(stab) + '.' + Str.SEMICO_NL.value)
@@ -119,22 +122,22 @@ class Agadir(object):
         options.append('<Cterm>' + ctrm + Str.SEMICO_NL.value)
         options.append('<global_total>' + global_tot + Str.SEMICO_NL.value)
         options.append('<tango_window>' + tango_wndw + Str.SEMICO_NL.value)
-        options.append('<waltz_window>true' + waltz_wndw + Str.SEMICO_NL.value)
-        options.append('<limbo_window>false' + limbo_wndw + Str.SEMICO_NL.value)
-        options.append('<agadir_window>false' + agadir_wndw + Str.SEMICO_NL.value)
-        options.append('<casablanca_window>false' + csblnca_wndw + Str.SEMICO_NL.value)
-        options.append('<complex_window>false' + complex_wndw + Str.SEMICO_NL.value)
-        options.append('<repeat_window>false' + repeat_wndw + Str.SEMICO_NL.value)
-        options.append('<patentTango_window>false' + pat_tango_wndw + Str.SEMICO_NL.value)
-        options.append('<tango_residue>false' + tango_resid + Str.SEMICO_NL.value)
-        options.append('<waltz_residue>false' + waltz_resid + Str.SEMICO_NL.value)
-        options.append('<limbo_residue>false' + limbo_resid + Str.SEMICO_NL.value)
-        options.append('<complex_residue>false' + complex_resid + Str.SEMICO_NL.value)
-        options.append('<agadir_residue>false' + agadir_resid + Str.SEMICO_NL.value)
-        options.append('<casablanca_residue>false' + csblnca_resid + Str.SEMICO_NL.value)
-        options.append('<repeat_residue>false' + repeat_resid + Str.SEMICO_NL.value)
-        options.append('<windows_file_per_sequence>false' + wndws_file_per_seq + Str.SEMICO_NL.value)
-        options.append('<residue_file_per_sequence>false' + resid_file_per_seq + Str.SEMICO_NL.value)
+        options.append('<waltz_window>' + waltz_wndw + Str.SEMICO_NL.value)
+        options.append('<limbo_window>' + limbo_wndw + Str.SEMICO_NL.value)
+        options.append('<agadir_window>' + agadir_wndw + Str.SEMICO_NL.value)
+        options.append('<casablanca_window>' + csblnca_wndw + Str.SEMICO_NL.value)
+        options.append('<complex_window>' + complex_wndw + Str.SEMICO_NL.value)
+        options.append('<repeat_window>' + repeat_wndw + Str.SEMICO_NL.value)
+        options.append('<patentTango_window>' + pat_tango_wndw + Str.SEMICO_NL.value)
+        options.append('<tango_residue>' + tango_resid + Str.SEMICO_NL.value)
+        options.append('<waltz_residue>' + waltz_resid + Str.SEMICO_NL.value)
+        options.append('<limbo_residue>' + limbo_resid + Str.SEMICO_NL.value)
+        options.append('<complex_residue>' + complex_resid + Str.SEMICO_NL.value)
+        options.append('<agadir_residue>' + agadir_resid + Str.SEMICO_NL.value)
+        options.append('<casablanca_residue>' + csblnca_resid + Str.SEMICO_NL.value)
+        options.append('<repeat_residue>' + repeat_resid + Str.SEMICO_NL.value)
+        options.append('<windows_file_per_sequence>' + wndws_file_per_seq + Str.SEMICO_NL.value)
+        options.append('<residue_file_per_sequence>' + resid_file_per_seq + Str.SEMICO_NL.value)
         options.append('<END>' + Str.NEWLN.value)
         with open(Paths.CONFIG_AGAD + '/Options.txt', 'w') as agadir_options:
             options_str = ''.join(options)
