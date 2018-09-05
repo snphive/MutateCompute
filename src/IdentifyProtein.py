@@ -19,7 +19,7 @@ class IdProt(object):
     # (This method relies on the presence of fastafiles in the specified dir, in order for them to be run on Blastp.
     # This transfer is currently done manually)
     #
-    # path_input_fastas         String      Abs path of root dir for input fastafiles (e.g. /input_data/fastas_10).
+    # path_input_fastas_dir     String      Abs path of root dir for input fastafiles (e.g. /input_data/fastas_10).
     # path_output               String      Abs path of root dir for output blastp files (..../output_data/).
     # write_idmaps_for_mysqldb  Boolean     True to build dict mapping RvdK ids to swsprt acc & write files.
     # write_csv                 Boolean     True to write csvfiles.
@@ -28,9 +28,8 @@ class IdProt(object):
     #
     # Returns a list of dictionary data structure representations of each parsed & filtered Blastp run result.
     @staticmethod
-    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir, path_output,
-                                                 write_idmaps_for_mysldb, write_csv=True, write_xml=True,
-                                                 write_json=False):
+    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir, path_output, write_idmaps_for_mysldb,
+                                                 write_csv=True, write_xml=True, write_json=False):
         try:
             path_input_fastas_dir_list = path_input_fastas_dir.split('/')
             if '.fasta' in path_input_fastas_dir_list[-1]:
@@ -83,8 +82,8 @@ class IdProt(object):
                 blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
                 blastp_dict_list.append(blastp_dict)
                 if write_idmaps_for_mysldb:
-                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv,
-                                                     write_xml=write_xml, write_json=write_json)
+                    IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
+                                                     write_json=write_json)
         return blastp_dict_list
 
     # Writes the blastp result file to an xml file in a output_data subdir called blastp.
