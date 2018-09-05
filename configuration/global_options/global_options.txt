@@ -2,13 +2,13 @@
 #
 ## All means all PDBs in the specified source directory
 #
-PDBs: 4;
+PDBs: 0;
 #
 ######## NUMBER OF FASTA FILES TO ANALYSE ########################################################################
 #
 ## All means all FASTA files in specified source directory
 #
-FASTAs: 10;
+FASTAs: 1000;
 #
 ######## OPERATIONS YOU WANT TO RUN ##############################################################################
 #
@@ -19,8 +19,8 @@ FASTAs: 10;
 ## FOLDX_STABILITY = determine DDG of pdb with FoldX Stability algorithm
 ## FOLDX_ANALYSECOMPLEX = determine DDG of pdb with FoldX Stability algorithm
 #
-MUTATE_FASTA: TRUE
-AGADIR: FALSE
+MUTATE_FASTA: FALSE
+AGADIR: TRUE
 FOLDX_REPAIR: FALSE
 FOLDX_BUILDMODEL: FALSE
 FOLDX_STABILITY: FALSE
