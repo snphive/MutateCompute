@@ -1,16 +1,38 @@
 from src.Main import Main
 from src.Paths import Paths
-import site
-import sys
-print('user site-packages is at: ' + site.getusersitepackages())
-print('global site-packages is at: ' + ''.join(site.getsitepackages()))
-print('python version is at: ' + str(sys.version_info[0]))
+from src.GeneralUtilityMethods import GUM
+import os
+import time
 
-use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
-Paths.set_up_paths(use_cluster=True)
+# use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
+use_cluster = False
+use_multithread = False
+Paths.set_up_paths(use_cluster=use_cluster)
 path_repo_pdbs = Paths.REPO_PDBS + '_10'
-path_repo_fastas = Paths.REPO_FASTAS + '_10'
-main = Main(use_cluster=False, use_multithread=False, path_repo_pdbs=path_repo_pdbs, path_repo_fastas=path_repo_fastas)
+startnum = 1
+endnum = 1000
+
+for i in range(39):
+
+    path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + '...' + str(endnum))
+    globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
+    wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
+    wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
+    operations = Main._determine_which_operations_to_perform(globaloptions_lines)
+    mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
+    path_dst = Paths.INPUT
+    path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
+    path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
+    path_input = Paths.INPUT
+    path_output = Paths.OUTPUT
+    main = Main(use_cluster, operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
+                path_wanted_fastafile_list, mutant_aa_list)
+    if i == 39:
+        break
+    time.sleep(120)
+    startnum += 1000
+    endnum += 1000
+
 
 # In all cases, the start of operations begins with identifying which or how many pdb and/or fasta files are to be
 # analysed. These must then be copied over from either the repository directory (REPO_PDB_FASTA) or the output_data
@@ -29,6 +51,7 @@ main = Main(use_cluster=False, use_multithread=False, path_repo_pdbs=path_repo_p
 # PROGRAM       INPUT FILES & DIRECTORIES                           OUTPUT FILES & DIRECTORIES
 # -------------------------------------------------------------------------------------------------------------------
 # MutateFasta   input_data/<fastafilename>/                         output_data/<fastafilename>/mutants/
+# (completed calculations 05.09.18)
 #
 # Agadir        configuration/agadir_config/Options.txt
 #               input_data/<fastafilename>/                         output_data/<fastafilename>/agadir/
