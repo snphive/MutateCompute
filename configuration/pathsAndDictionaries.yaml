@@ -11,6 +11,7 @@ ROOT:
     # absolute paths to root directories on cluster and local directory trees
     path_zeus_snpeffect: '/switchlab/group/shazib/SnpEffect'
     path_local_mutatecompute: '/Users/u0120577/PycharmProjects/MutateCompute'
+    path_local_io_root: '/Users/u0120577/PycharmProjects'
 
     # absolute path to local pdb and fasta data repositories
     path_local_pdb_fasta_repository: '/Users/u0120577/REPO_PDB_FASTA'
