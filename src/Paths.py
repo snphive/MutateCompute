@@ -34,6 +34,7 @@ class Paths(Enum):
 
             # ABSOLUTE PATHS - ROOTS LOCAL AND CLUSTER
             LOCAL_MUTATECOMPUTE = paths_and_dictionaries['ROOT']['path_local_mutatecompute']
+            LOCAL_IO_ROOT = paths_and_dictionaries['ROOT']['path_local_io_root']
             ZEUS_SNPEFFECT = paths_and_dictionaries['ROOT']['path_zeus_snpeffect']
 
             #  DIRECTORY NAMES (USED TO CONSTRUCT ABSOLUTE PATHS BELOW)
@@ -77,10 +78,13 @@ class Paths(Enum):
             MC_INPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_INPUT)
             MC_INPUT_FASTAS = os.path.join(MC_INPUT, DIR_FASTAS)
             MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_OUTPUT)
+            IO_OUTPUT = os.path.join(LOCAL_IO_ROOT, DIR_OUTPUT)
             MC_BASH = os.path.join(LOCAL_MUTATECOMPUTE, DIR_BASH)
             MC_SRC = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC)
             MC_OUTPUT_FASTAS = os.path.join(MC_OUTPUT, DIR_FASTAS)
+            IO_OUTPUT_FASTAS = os.path.join(IO_OUTPUT, DIR_FASTAS)
             MC_OUTPUT_BLASTP = os.path.join(MC_OUTPUT, DIR_BLASTP)
+            IO_OUTPUT_BLASTP = os.path.join(IO_OUTPUT, DIR_BLASTP)
             # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_local_pdb_fasta_repository']
             MC_REPO_PDBS = os.path.join(MC_REPO_PDB_FASTA, DIR_PDBS)
@@ -123,9 +127,12 @@ class Paths(Enum):
         Paths.CONFIG_FX_BMRUNSCRIPT = Paths.SE_CONFIG_FX_BMRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_FX_BMRUNSCRIPT.value
         Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
         Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.MC_INPUT_FASTAS.value
-        Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.MC_OUTPUT.value
-        Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.MC_OUTPUT_FASTAS.value
-        Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.MC_OUTPUT_BLASTP.value
+        # Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.MC_OUTPUT.value
+        Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.IO_OUTPUT.value
+        # Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.MC_OUTPUT_FASTAS.value
+        Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.IO_OUTPUT_FASTAS.value
+        # Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.MC_OUTPUT_BLASTP.value
+        Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.IO_OUTPUT_BLASTP.value
         Paths.REPO_PDB_FASTA = Paths.SE_REPO_PDB_FASTA.value if use_cluster else Paths.MC_REPO_PDB_FASTA.value
         Paths.REPO_PDBS = Paths.SE_REPO_PDBS.value if use_cluster else Paths.MC_REPO_PDBS.value
         Paths.REPO_FASTAS = Paths.SE_REPO_FASTAS.value if use_cluster else Paths.MC_REPO_FASTAS.value
@@ -134,6 +141,7 @@ class Paths(Enum):
         Paths.AGADIR_EXE = Paths.ZEUS_AGADIR_EXE.value if use_cluster else Paths.LOCAL_AGADIR_EXE.value
         Paths.BASH = Paths.SE_BASH.value if use_cluster else Paths.MC_BASH.value
         Paths.SRC = Paths.SE_SRC.value if use_cluster else Paths.MC_SRC.value
+
 
 
 
