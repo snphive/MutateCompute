@@ -49,6 +49,7 @@ class Paths(Enum):
             DIR_SRC = paths_and_dictionaries['ROOT']['dir_src']
             DIR_INPUT = paths_and_dictionaries['ROOT']['dir_input']
             DIR_MUTANTS = paths_and_dictionaries['ROOT']['dir_mutants']
+            DIR_MUTANTS_FASTAS = paths_and_dictionaries['ROOT']['dir_mutants_fastas']
             DIR_FOLDX = paths_and_dictionaries['ROOT']['dir_fx']
             DIR_AGADIR = paths_and_dictionaries['ROOT']['dir_agadir']
             DIR_OUTPUT = paths_and_dictionaries['ROOT']['dir_output']
@@ -82,6 +83,7 @@ class Paths(Enum):
             MC_INPUT_FASTAS = os.path.join(MC_INPUT, DIR_FASTAS)
             MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_OUTPUT)
             IO_OUTPUT = os.path.join(LOCAL_IO_ROOT, DIR_OUTPUT)
+            IO_INPUT = os.path.join(LOCAL_IO_ROOT, DIR_INPUT)
             MC_BASH = os.path.join(LOCAL_MUTATECOMPUTE, DIR_BASH)
             MC_SRC = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC)
             MC_OUTPUT_FASTAS = os.path.join(MC_OUTPUT, DIR_FASTAS)
@@ -134,7 +136,8 @@ class Paths(Enum):
         Paths.CONFIG_FX_ACRUNSCRIPT_JOBQ = Paths.SE_CONFIG_FX_ACRUNSCRIPT_JOBQ.value if use_cluster else Paths.MC_CONFIG_FX_ACRUNSCRIPT_JOBQ.value
         Paths.CONFIG_FX_BMRUNSCRIPT = Paths.SE_CONFIG_FX_BMRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_FX_BMRUNSCRIPT.value
         Paths.CONFIG_FX_BMRUNSCRIPT_JOBQ = Paths.SE_CONFIG_FX_BMRUNSCRIPT_JOBQ.value if use_cluster else Paths.MC_CONFIG_FX_BMRUNSCRIPT_JOBQ.value
-        Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
+        # Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
+        Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.IO_INPUT.value
         Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.MC_INPUT_FASTAS.value
         # Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.MC_OUTPUT.value
         Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.IO_OUTPUT.value

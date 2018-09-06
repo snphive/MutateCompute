@@ -28,6 +28,7 @@ ROOT:
     dir_src: 'src'
     dir_input: 'input_data'
     dir_mutants: 'mutants'
+    dir_mutants_fastas: 'mutants_fastas'
     dir_output: 'output_data'
     dir_agadir: 'agadir'
     dir_fx: 'foldx'
