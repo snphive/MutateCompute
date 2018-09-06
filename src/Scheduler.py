@@ -32,13 +32,12 @@ class Scheduler(object):
     @staticmethod
     def start(use_cluster, operations, use_multithread, path_input, path_output, path_pdbfile_list, path_fastafile_list,
               mutant_aa_list, write_1_fasta_only, write_fasta_per_mut):
-        print('#########################STARTING SCHEDULER#########################')
-        print('#########################STARTING SCHEDULER#########################')
+        print('STARTING SCHEDULER')
         start_time = time.perf_counter()
         mutate_fasta = MutateFasta(mutant_aa_list)
         if path_fastafile_list:
             if use_cluster:
-                Cluster.write_job_q_bash(job_name='testMutateFasta', path_job_q_dir=Paths.SE_CONFIG_JOBQ.value,
+                Cluster.write_job_q_bash(job_name='test', path_job_q_dir=Paths.SE_CONFIG_JOBQ.value,
                                          python_script_with_paths=Paths.ZEUS_SNPEFFECT + 'src/run_MutCompZeus.py ' +
                                          path_fastafile_list, queue='', n_slots='', total_memory_GB='',
                                          memory_limit_GB='3', cluster_node='')
