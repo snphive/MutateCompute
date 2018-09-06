@@ -15,9 +15,11 @@ from src.Paths import Paths
 
 class GUM(object):
 
+    # def __init__(self):
+    #     self.space = ' '
+    #     self.fslash = '/'
     space = ' '
     fslash = '/'
-
     # The runscript.txt is an input file for FoldX indicating which pdbs to analyse and which programs to run on them.
     # path_runscript        String      Absolute path for runscript.txt file being written.
     # pdbs                  String      pdb(s) (incl. .pdb extension) inputs for FoldX.
@@ -60,6 +62,20 @@ class GUM(object):
             runscript_str = ''.join(runscript)
             runscript_file.write(runscript_str)
         return runscript_str
+
+    @staticmethod
+    def make_fastas_list_from_multifastafile(multifastafile):
+        fastafile_list = []
+        first_line = True
+        with open(multifastafile, 'r') as f:
+            for line in f:
+                if first_line:
+                    first_line = False
+                    continue
+                if '>' in line and not firstline:
+                    fastafile_list.append(line)
+                    fasta_str = line
+
 
     # Extracts and writes a FASTA file for each chain described in the pdb.
     # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
@@ -273,6 +289,68 @@ class GUM(object):
     def _make_path_3dot_dir(path_dst_dir, start_num, end_num):
         return GUM._os_makedirs(path_dst_dir, str(start_num) + '...' + str(end_num))
 
+    # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dots subdir.
+    # This method is currently only used for building output dir for MutateFasta.
+    # Expects path_fastafile to be: ~/PycharmProjects/MutateCompute/input_data/fastas/1...1000/1_A/1_A.fasta
+    # As such it builds path of child subdirs of /fastas upto but not including /<filename>/filename.fasta
+    @staticmethod
+    def make_root_fastas_3dots_dirs(path_root, path_fastafile):
+        path_fastafile_list = path_fastafile.split('/')
+        path_fastas_3dots_dirs = []
+        copy_from_here = False
+        for path_dir in path_fastafile_list[:-2]:
+            if path_dir == '':
+                continue
+            if copy_from_here or path_dir == Paths.DIR_FASTAS.value:
+                copy_from_here = True
+                if path_dir == Paths.DIR_FASTAS.value:
+                    path_dir = 'mutants_' + path_dir
+                path_fastas_3dots_dirs.append(path_dir)
+        return GUM._os_makedirs(path_root, '/'.join(path_fastas_3dots_dirs))
+
+    # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
+    # This method is currently only used for building output dir for Agadir.
+    # Expects path_fastafile to be: ~/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/mutants/1_A_mutants.fasta
+    # As such it builds path of child subdirs of /mutant_fastas upto but not including /1_A/mutants/1_A_mutants.fasta
+    @staticmethod
+    def make_root_agadir_3dots_dirs(path_root, path_fastafile):
+        path_fastafile_list = path_fastafile.split('/')
+        path_agadir_3dots_dirs = []
+        copy_from_here = False
+        for path_dir in path_fastafile_list[:-3]:
+            if path_dir == '':
+                continue
+            if path_dir == Paths.DIR_MUTANTS_FASTAS.value:
+                copy_from_here = True
+                path_agadir_3dots_dirs.append(Paths.DIR_AGADIR.value)
+                continue
+            if copy_from_here:
+                path_agadir_3dots_dirs.append(path_dir)
+        return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
+
+    # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
+    # This method is currently only used for building input dir for individual fastafiles.
+    # Expects path_fastafile to be: ~/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/mutants/1_A_mutants.fasta
+    # As such it builds path of child subdirs of output_data/mutant_fastas upto but not including
+    # /1_A/mutants/1_A_mutants.fasta
+    @staticmethod
+    def make_root_input_3dots_dirs(path_root, path_fastafile):
+        path_fastafile_list = path_fastafile.split('/')
+        path_input_3dots_dirs = []
+        copy_from_here = False
+        for path_dir in path_fastafile_list[:-1]:
+            if path_dir == '':
+                continue
+            if path_dir == Paths.DIR_MUTANTS.value:
+                break
+            if path_dir == Paths.DIR_OUTPUT.value:
+                copy_from_here = True
+                path_input_3dots_dirs.append(Paths.DIR_INPUT.value)
+                continue
+            if copy_from_here:
+                path_input_3dots_dirs.append(path_dir)
+        return GUM._os_makedirs(path_root, '/'.join(path_input_3dots_dirs))
+
     # THESE LINUX COPY METHODS WILL BE COMBINED INTO ONE WITH FLAGS FOR CREATING OWN SUBDIRS BASED ON FILE NAMES AND
     # AND FOR DOING THE COPY RECURSIVELY. A FILELIST WILL ALSO BE INCLUDED BUT CAN BE EMPTY. IT MIGHT ALSO BE WORTH
     # ENFORCING THAT THERE IS A PATH TO THE LOCATION OF THE FILES WITHOUT THE ACTUAL ABS PATH INCLUDING THE FILES
@@ -368,17 +446,12 @@ class GUM(object):
     #     run(COMMAND)
 
     # Copy files from a source repository subdirectory to destination directory.
-    # (Src dir is typically dirs like ~/REPO_PDB_FASTA/pdbs_10 and ~/REPO_PDB_FASTA/fastas_100.
-    # Dst dirs are typically MutateCompute/input_data/<pdbname> directories and
-    # MutateCompute/input_data/fastas/<fastaname> directories).
+    # Src dir typically               ~/REPO_PDB_FASTA/fastas/fastas_1000/1...1000/filename.fasta
+    # Dst dir typically ~/PycharmProjects/MutateCompute/input_data/fastas/1...1000/<filename>/filename.fasta
     #
-    # 1. Remove any files from wanted list that are not found in the source directory.
-    # 2. Create /input_data/<pdbname> or input_data/fastas/<fastaname> subdirectories in dst dir for each pdb or fasta
-    #    to be copied in to.
-    # 3. Copy the pdbfiles or fastafiles to their corresponding subdirectories.
-    #
-    # E.g. file1.pdb will be copied to /input_data/file1/file.pdb
-    # E.g. file1_A.fasta will be copied to /input_data/fastas/file1_A/file1_A.fasta
+    # 1. Removes any files from wanted list that are not found in the source directory.
+    # 2. Creates new <filename> subdir for each file: e.g. /input_data/<filename> subdirs in dst dir for each file
+    # 3. Copies each file to its new corresponding subdir.
     #
     # path_repo_pdbs_or_fastas      String      Abs path of repository subdir from which to copy pdb or fasta files.
     #                                           It is a subdir of REPO_PDB_FASTA which itself contains only directories
@@ -417,6 +490,33 @@ class GUM(object):
                 GUM.linux_copy_files(path_file_to_copy, path_dst_dir, into_own_subdirs)
                 path_input_fastafile_list.append(GUM._build_path_filelist(path_dst_dir, wanted_file, into_own_subdirs))
         return path_input_fastafile_list
+
+    # Currently only used for Agadir.
+    # Reads the multi-fastafiles that are in output_data (to which MutateFasta wrote them), and writes the fastafiles
+    # as individual fastafiles in the (because that's how I assume agadirwrapper expects them, though I could be wrong).
+    # The dst dir is ~/PycharmProjects/input_data/mutants_fastas/1...1000/1_A
+    @staticmethod
+    def write_1_fastafile_per_fasta_from_multifastafile(path_fastafile):
+        path_output_filename = GUM.make_root_input_3dots_dirs(Paths.LOCAL_IO_ROOT.value, path_fastafile)
+        with open(path_fastafile) as f:
+            fasta_str = ''
+            # fasta_str_list = []
+            is_first_line = True
+            for line in f.readlines():
+                # fasta_str_list = []
+                if '>' in line:
+                    if not is_first_line:
+                        # fasta_str_list.append(fasta_str)
+                        fastafile = line.split('>')[-1].split('\n')[0] + '.fasta'
+                        with open(os.path.join(path_output_filename, fastafile), 'w') as f_to_write:
+                            f_to_write.write(fasta_str)
+                    fasta_str = line
+                    is_first_line = False
+                else:
+                    fasta_str += line
+            # fasta_str_list = fasta_str_list[1:]
+        # return fasta_str_list
+
 
     @staticmethod
     def _build_path_filelist(path_root, file, into_own_subdirs):

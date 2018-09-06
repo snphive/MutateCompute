@@ -9,7 +9,7 @@ from src.AminoAcids import AA
 class MutateFasta(object):
 
     def __init__(self, mutant_aa_list):
-        self.mutant_aa_list = mutant_aa_list
+        self.__MUTANT_AA_LIST = mutant_aa_list
 
     # Mutates FASTA (typically wild-type) sequences at every position, to every residue specified (typically all other
     # 19 residues.)
@@ -32,25 +32,13 @@ class MutateFasta(object):
                              write_csv=False, write_txt=False):
         titleSeq = self.make_titleSeqDict_from_fastafile(path_fastafile)
         title_titleSeq = self.convert_titleSeqDict_to_titleTitleSeqDictDict(titleSeq)
-        title_titleSeq_w_mutants = self._populate_title_titleSeq_with_mutants(title_titleSeq, self.mutant_aa_list)
+        title_titleSeq_w_mutants = self._populate_title_titleSeq_with_mutants(title_titleSeq)
         self._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only, write_fasta_per_mut, path_output_3dots,
                             write_csv, write_txt)
         return title_titleSeq_w_mutants
 
-    def _make_root_fastas_3dots_dirs(self, path_root, path_fastafile):
-        path_fastafile_list = path_fastafile.split('/')
-        path_fastas_3dots_dirs = []
-        copy_from_here = False
-        for path_dir in path_fastafile_list[:-2]:
-            if path_dir == '':
-                continue
-            if copy_from_here or path_dir == Paths.DIR_FASTAS.value:
-                copy_from_here = True
-                path_fastas_3dots_dirs.append(path_dir)
-        return GUM._os_makedirs(path_root, '/'.join(path_fastas_3dots_dirs))
-
     def mutate_every_residue_to_every_aa_write_1_file(self, path_fastafile):
-        path_output_3dots = self._make_root_fastas_3dots_dirs(Paths.OUTPUT, path_fastafile)
+        path_output_3dots = GUM.make_root_fastas_3dots_dirs(Paths.OUTPUT, path_fastafile)
         self.mutate_every_residue(path_fastafile=path_fastafile, write_1_fasta_only=True, write_fasta_per_mut=False,
                                   path_output_3dots=path_output_3dots)
 
@@ -59,12 +47,12 @@ class MutateFasta(object):
     # mutant_aa_list       List         All residues that the sequence(s) should be mutated to.
     #
     # Returns wt-title: mutant-title:mutant-sequence
-    def _populate_title_titleSeq_with_mutants(self, title_titleSeq, mutant_aa_list):
+    def _populate_title_titleSeq_with_mutants(self, title_titleSeq):
         title_titleSeq_w_mutants = title_titleSeq
         for wt_title in list(title_titleSeq.keys()):
             wt_seq = title_titleSeq[wt_title][wt_title]
             title_titleSeq_w_mutants[wt_title] = self._add_mutantTitle_mutatedSeq_to_dict(
-                title_titleSeq[wt_title], wt_title, wt_seq, mutant_aa_list)
+                title_titleSeq[wt_title], wt_title, wt_seq)
         return title_titleSeq_w_mutants
 
     # A sequence is mutated at every position to every residue that is included in the list (mutant_aa_list).
@@ -80,11 +68,11 @@ class MutateFasta(object):
     #
     # Returns a dictionary of sequence name as key, FASTA sequence itself as value, starting with wild-type and
     # followed by every mutant according to a specified list of residues.
-    def _add_mutantTitle_mutatedSeq_to_dict(self, titleSeq, wt_title, wt_seq, mutant_aa_list):
+    def _add_mutantTitle_mutatedSeq_to_dict(self, titleSeq, wt_title, wt_seq):
         titleSeqDict_w_mutants = {wt_title: titleSeq[wt_title]}
         mutable_seq = MutableSeq(wt_seq, IUPAC.protein)
         for i, wt_aa in enumerate(mutable_seq):
-            for mutant_aa in mutant_aa_list:
+            for mutant_aa in self.__MUTANT_AA_LIST:
                 mutant_title = wt_aa + str(i + 1) + mutant_aa
                 wt_aa_at_i = mutable_seq[i]
                 if not mutant_aa == wt_aa_at_i:
