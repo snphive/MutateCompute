@@ -71,10 +71,13 @@ class Paths(Enum):
             MC_CONFIG = os.path.join(LOCAL_MUTATECOMPUTE, DIR_CONFIG)
             MC_CONFIG_AGAD = os.path.join(MC_CONFIG, DIR_AGAD_CONFIG)
             MC_CONFIG_JOBQ = os.path.join(MC_CONFIG, DIR_JOBQ)
+            MC_CONFIG_AGAD_JOBQ = os.path.join(MC_CONFIG_AGAD, DIR_JOBQ)
             MC_CONFIG_FX = os.path.join(MC_CONFIG, DIR_FXCONFIG)
             MC_CONFIG_GLOBAL_OPTIONS = os.path.join(MC_CONFIG, DIR_GLOBAL_OPTIONS)
             MC_CONFIG_FX_ACRUNSCRIPT = os.path.join(MC_CONFIG, DIR_ACRUNSCRIPT)
+            MC_CONFIG_FX_ACRUNSCRIPT_JOBQ = os.path.join(MC_CONFIG_FX_ACRUNSCRIPT, DIR_JOBQ)
             MC_CONFIG_FX_BMRUNSCRIPT = os.path.join(MC_CONFIG, DIR_BMRUNSCRIPT)
+            MC_CONFIG_FX_BMRUNSCRIPT_JOBQ = os.path.join(MC_CONFIG_FX_BMRUNSCRIPT, DIR_JOBQ)
             MC_INPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_INPUT)
             MC_INPUT_FASTAS = os.path.join(MC_INPUT, DIR_FASTAS)
             MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_OUTPUT)
@@ -94,10 +97,13 @@ class Paths(Enum):
             SE_CONFIG = os.path.join(ZEUS_SNPEFFECT, DIR_CONFIG)
             SE_CONFIG_AGAD = os.path.join(SE_CONFIG, DIR_AGAD_CONFIG)
             SE_CONFIG_JOBQ = os.path.join(SE_CONFIG, DIR_JOBQ)
+            SE_CONFIG_AGAD_JOBQ = os.path.join(SE_CONFIG_AGAD, DIR_JOBQ)
             SE_CONFIG_FX = os.path.join(SE_CONFIG, DIR_FXCONFIG)
             SE_CONFIG_GLOBAL_OPTIONS = os.path.join(SE_CONFIG, DIR_GLOBAL_OPTIONS)
             SE_CONFIG_FX_ACRUNSCRIPT = os.path.join(SE_CONFIG, DIR_ACRUNSCRIPT)
+            SE_CONFIG_FX_ACRUNSCRIPT_JOBQ = os.path.join(SE_CONFIG_FX_ACRUNSCRIPT, DIR_JOBQ)
             SE_CONFIG_FX_BMRUNSCRIPT = os.path.join(SE_CONFIG, DIR_BMRUNSCRIPT)
+            SE_CONFIG_FX_BMRUNSCRIPT_JOBQ = os.path.join(SE_CONFIG_FX_BMRUNSCRIPT, DIR_JOBQ)
             SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
             SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
@@ -120,11 +126,14 @@ class Paths(Enum):
     def set_up_paths(use_cluster):
         Paths.CONFIG = Paths.SE_CONFIG.value if use_cluster else Paths.MC_CONFIG.value
         Paths.CONFIG_AGAD = Paths.SE_CONFIG_AGAD.value if use_cluster else Paths.MC_CONFIG_AGAD.value
+        Paths.CONFIG_AGAD_JOBQ = Paths.SE_CONFIG_AGAD_JOBQ.value if use_cluster else Paths.MC_CONFIG_AGAD_JOBQ.value
         Paths.CONFIG_JOBQ = Paths.SE_CONFIG_JOBQ.value if use_cluster else Paths.MC_CONFIG_JOBQ.value
         Paths.CONFIG_FX = Paths.SE_CONFIG_FX.value if use_cluster else Paths.MC_CONFIG_FX.value
         Paths.CONFIG_GLOBAL_OPTIONS = Paths.SE_CONFIG_GLOBAL_OPTIONS.value if use_cluster else Paths.MC_CONFIG_GLOBAL_OPTIONS.value
         Paths.CONFIG_FX_ACRUNSCRIPT = Paths.SE_CONFIG_FX_ACRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_FX_ACRUNSCRIPT.value
+        Paths.CONFIG_FX_ACRUNSCRIPT_JOBQ = Paths.SE_CONFIG_FX_ACRUNSCRIPT_JOBQ.value if use_cluster else Paths.MC_CONFIG_FX_ACRUNSCRIPT_JOBQ.value
         Paths.CONFIG_FX_BMRUNSCRIPT = Paths.SE_CONFIG_FX_BMRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_FX_BMRUNSCRIPT.value
+        Paths.CONFIG_FX_BMRUNSCRIPT_JOBQ = Paths.SE_CONFIG_FX_BMRUNSCRIPT_JOBQ.value if use_cluster else Paths.MC_CONFIG_FX_BMRUNSCRIPT_JOBQ.value
         Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
         Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.MC_INPUT_FASTAS.value
         # Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.MC_OUTPUT.value
