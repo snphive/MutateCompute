@@ -12,7 +12,7 @@ path_repo_pdbs = Paths.REPO_PDBS + '_10'
 startnum = 1
 endnum = 1000
 
-for i in range(39):
+for i in range(79):
 
     path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + '...' + str(endnum))
     globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
@@ -27,7 +27,7 @@ for i in range(39):
     path_output = Paths.OUTPUT
     main = Main(use_cluster, operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
                 path_wanted_fastafile_list, mutant_aa_list)
-    if i == 39:
+    if i == 79:
         break
     time.sleep(120)
     startnum += 1000
