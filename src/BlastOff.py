@@ -17,8 +17,8 @@ path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=Paths.INP
 path_repo = Paths.REPO_FASTAS + '_10'
 wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas=path_repo,
                                                           path_dst_dir=path_input_fastas, wanted_file_list=None)
-Scheduler.startBlast(path_input_fastas_dir=Paths.INPUT_FASTAS, path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
-                     write_csv=True, write_xml=True, write_json=False)
+Scheduler.start_blast(path_input_fastas_dir=Paths.INPUT_FASTAS, path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
+                      write_csv=True, write_xml=True, write_json=False)
 
 # IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas, path_output=Paths.OUTPUT,
 #                                                 write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
