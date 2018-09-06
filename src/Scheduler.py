@@ -1,7 +1,9 @@
 from src.MutateFasta import MutateFasta
 from src.Agadir import Agadir
+from src.Agadir import AgadCndtns
 from src.FoldX import FoldX
 from src.IdentifyProtein import IdProt
+from src.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 from src.Paths import Paths
 import time
@@ -24,8 +26,8 @@ class Scheduler(object):
     # use_multithread       Boolean     True to employ parallel processing.
     # path_input            String      Abs path to input_data root dir.
     # path_output           String      Abs path to output_data root dir.
-    # path_pdbfile_list          List        Pdbfiles to run (incl. .pdb extension)
-    # path_fastafile_list        List        Fastafiles to run (incl. .fasta extension)
+    # path_pdbfile_list     List        Pdbfiles to run (incl. .pdb extension)
+    # path_fastafile_list   List        Fastafiles to run (incl. .fasta extension)
     # mutant_aa_list        List        All amino acids that any mutations operations will use to mutate residues to.
     # write_1_fasta_only    Boolean     True to write any fasta output data to 1 fasta file, each separated by \n.
     # write_fasta_per_mut   Boolean     True to write any fasta output data as 1 fasta file per mutant.
@@ -34,45 +36,49 @@ class Scheduler(object):
               mutant_aa_list, write_1_fasta_only, write_fasta_per_mut):
         print('STARTING SCHEDULER')
         start_time = time.perf_counter()
-        mutate_fasta = MutateFasta(mutant_aa_list)
         if path_fastafile_list:
-            if use_cluster:
-                Cluster.write_job_q_bash(job_name='test', path_job_q_dir=Paths.SE_CONFIG_JOBQ.value,
-                                         python_script_with_paths=Paths.ZEUS_SNPEFFECT + 'src/run_MutCompZeus.py ' +
-                                         path_fastafile_list, queue='', n_slots='', total_memory_GB='',
-                                         memory_limit_GB='3', cluster_node='')
-                Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_JOBQ.value)
-            else:
-                if use_multithread:
-                    # Scheduler._launch_process_threadpool(mutate_fasta.mutate_every_residue_to_every_aa_write_1_file,
-                    #                                          path_fastafile_list)
-                    for path_fastafile in path_fastafile_list:
-                        path_output_3dots = mutate_fasta._make_root_fastas_3dots_dirs(path_output, path_fastafile)
-                        if operations['do_mutate_fasta']:
-                            if use_multithread:
-                                print('')
-                                Scheduler._launch_thread(target=mutate_fasta.mutate_every_residue,
-                                                         args=[path_fastafile, write_1_fasta_only, write_fasta_per_mut,
-                                                               path_output_3dots])
+            if operations['do_mutate_fasta']:
+                path_output_fastas_3dots = GUM.make_root_fastas_3dots_dirs(path_output, path_fastafile_list[0])
+                mutate_fasta = MutateFasta(mutant_aa_list)
+                for path_fastafile in path_fastafile_list:
+                    if use_multithread:
+                        # Scheduler._launch_thread(target=mutate_fasta.mutate_every_residue,
+                        #                          args=[path_fastafile, write_1_fasta_only, write_fasta_per_mut,
+                        #                                path_output_3dots])
+                        Scheduler._launch_process(target=mutate_fasta.mutate_every_residue,
+                                                  args=[path_fastafile, write_1_fasta_only, write_fasta_per_mut,
+                                                        path_output_fastas_3dots])
+                    elif not use_multithread:
+                        mutate_fasta.mutate_every_residue(path_fastafile, write_1_fasta_only, write_fasta_per_mut,
+                                                              path_output_fastas_3dots)
+                    if use_cluster:
+                        jobname = path_fastafile.split('/')[-1]
+                        # Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.SE_CONFIG_JOBQ.value,
+                        #                          python_script_with_paths=Paths.ZEUS_SNPEFFECT +
+                        #                           'src/run_MutCompZeus.py ' + path_fastafile_list, queue='',
+                        #                           n_slots='', total_memory_GB='', memory_limit_GB='3',
+                        #                           cluster_node='')
+                        # Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_JOBQ.value)
 
-                            # Scheduler._launch_process(target=mutate_fasta.mutate_every_residue,
-                            #                           args=[path_fastafile, write_1_fasta_only, write_fasta_per_mut,
-                            #                                 path_output_3dots])
-                        # else:
-                #     mutate_fasta.mutate_every_residue(path_fastafile, write_1_fasta_only,
-                        #                                       write_fasta_per_mut, path_output_3dots)
+            if operations['do_agadir']:
+                path_output_agadir_3dots = GUM.make_root_agadir_3dots_dirs(path_output, path_fastafile_list[0])
+                agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+                for path_fastafile in path_fastafile_list:
+                    if use_cluster:
+                        # jobname = path_fastafile.split('/')[-1]
+                        # Cluster.write_job_q_bash(job_name=Paths.PREFIX_AGADIR.value + jobname,
+                        #                          path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
+                        # Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
+                        agadir.compute(path_fastafile, path_output_agadir_3dots)
+                    if use_multithread:
+                        # Scheduler._launch_thread(target=agadir.compute(,
+                        #                          args=[path_fastafile, write_1_fasta_only, write_fasta_per_mut,
+                        #                                path_output_3dots])
+                        Scheduler._launch_process(target=agadir.compute,
+                                                  args=[path_fastafile, path_output_agadir_3dots])
+                    elif not use_multithread:
+                        agadir.compute(path_fastafile, path_output_agadir_3dots)
 
-                else:
-                    for path_fastafile in path_fastafile_list:
-                        path_output_3dots = mutate_fasta._make_root_fastas_3dots_dirs(path_output, path_fastafile)
-                        mutate_fasta.mutate_every_residue(path_fastafile, write_1_fasta_only,
-                                                          write_fasta_per_mut, path_output_3dots)
-                    # if operations['do_agadir']:
-                    #     agadir = Agadir(use_cluster=True, use_multithread=False)
-                    #     if use_multithread:
-                    #         Scheduler._launch_thread(target=agadir.compute, args=fastafile)
-                    #     else:
-                    #         agadir.compute(fastafile)
         elapsed = time.perf_counter() - start_time
         print('Time taken to complete iterating through fasta_list (after methods have been called): ' + str(elapsed))
         if path_pdbfile_list:
@@ -105,17 +111,15 @@ class Scheduler(object):
                         analysecomplex.calculate_complex_energies(path_pdbfile)
 
     @staticmethod
-    def startBlast(path_input_fastas_dir, path_output, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
-                   write_json=False, use_multithread=True):
+    def start_blast(path_input_fastas_dir, path_output, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
+                    write_json=False, use_multithread=True):
         if use_multithread:
             print('')
             # Scheduler._launch_thread(target=IdProt.map_seq_to_swsprt_acc_id_and_write_files,
             #                          args=[path_input_fastas_dir, path_output, write_idmaps_for_mysldb, write_csv,
             #                                write_xml, write_json])
 
-
             # Scheduler._launch_process_threadpool(target=IdProt., args=)
-
 
         else:
             IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas_dir,
@@ -132,9 +136,8 @@ class Scheduler(object):
         t.join()
 
     @staticmethod
-    def _launch_process(target, args, in_background=False):
+    def _launch_process(target, args):
         p = mp.Process(target=target, args=args)
-        p.daemon = in_background
         p.start()
         p.join()
 
@@ -146,5 +149,8 @@ class Scheduler(object):
         pool.close()
         pool.join()
         return results
+    # Scheduler._launch_process_threadpool(mutate_fasta.mutate_every_residue_to_every_aa_write_1_file,
+    #                                          path_fastafile_list)
 
+    # Note: try pool.imap and pool.map_async in place of pool.map
 
