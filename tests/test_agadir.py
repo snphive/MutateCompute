@@ -1,7 +1,9 @@
 from unittest import TestCase
 from src.Agadir import Agadir
+from src.Agadir import AgadCndtns
 from tests.TestPathsAndListsSeqs import TPLS
 from src.GeneralUtilityMethods import GUM
+from src.Paths import Paths
 import os
 import glob
 
@@ -9,7 +11,7 @@ import glob
 class TestAgadir(TestCase):
 
     def setUp(self):
-        self.agadir = Agadir(use_cluster=False, use_multithread=False)
+        self.agadir = Agadir(AgadCndtns.INCELL_MAML.value)
 
     def tearDown(self):
         self.agadir = None
@@ -39,4 +41,10 @@ class TestAgadir(TestCase):
         self.agadir.compute(path_input_fastas=TPLS.MC_TESTS_INPUT_FASTAS.value, path_output=TPLS.MC_TESTS_OUTPUT.value)
         # assert
 
-
+    def test_write_1_fastafile_per_fasta_from_multifastafile(self):
+        # arrange
+        Paths.set_up_paths(use_cluster=False)
+        path_fastafile = '/Users/u0120577/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/mutants/' \
+                         '1_A_mutants.fasta'
+        # act
+        self.agadir.write_1_fastafile_per_fasta_from_multifastafile(path_fastafile)
