@@ -1,5 +1,9 @@
 from src.Main import Main
 from src.Paths import Paths
+import glob
+import natsort
+from src.Agadir import Agadir
+from src.Agadir import AgadCndtns
 from src.GeneralUtilityMethods import GUM
 import os
 import time
@@ -9,10 +13,13 @@ use_cluster = False
 use_multithread = False
 Paths.set_up_paths(use_cluster=use_cluster)
 path_repo_pdbs = Paths.REPO_PDBS + '_10'
-startnum = 1
-endnum = 1000
+startnum = 1001
+endnum = 2000
 
-for i in range(79):
+# NOTE: Ideally, if use_cluster is True, this script would set up an ssh tunnel to zeus and copy all src and config
+# files to SnpEffect in zeus cluster before running the code therein.
+
+for i in range(78):
 
     path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + '...' + str(endnum))
     globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
@@ -21,15 +28,25 @@ for i in range(79):
     operations = Main._determine_which_operations_to_perform(globaloptions_lines)
     mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
     path_dst = Paths.INPUT
-    path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
-    path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
+    # path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
+    # path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
+
     path_input = Paths.INPUT
     path_output = Paths.OUTPUT
-    main = Main(use_cluster, operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
-                path_wanted_fastafile_list, mutant_aa_list)
-    if i == 79:
+    path_output_mutants = os.path.join(Paths.IO_OUTPUT.value, Paths.DIR_MUTANTS_FASTAS.value, str(startnum) + '...' + str(endnum))
+    path_fastafile_list = natsort.natsorted(glob.glob(path_output_mutants + '/**/*.fasta', recursive=True))
+    agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+    for path_fastafile in path_fastafile_list:
+        time.sleep(1)
+        GUM.write_1_fastafile_per_fasta_from_multifastafile(path_fastafile)
+    # main = Main(use_cluster, operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
+    #             path_wanted_fastafile_list, mutant_aa_list)
+
+    # main = Main(use_cluster, operations, use_multithread, path_input, path_output, wanted_pdbfile_list,
+    #             wanted_fastafile_list, mutant_aa_list)
+    if i == 78:
         break
-    time.sleep(120)
+    time.sleep(60)
     startnum += 1000
     endnum += 1000
 
