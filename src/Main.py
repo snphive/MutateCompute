@@ -34,9 +34,9 @@ class Main(object):
     # mutant_aa_list                List        All amino acids that mutation operations will mutate residues to.
     #
     # At the moment, this is set up to run either in local or on cluster, not both.
-    def __init__(self, use_cluster, operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
+    def __init__(self, use_cluster: bool, operations: dict, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
                  path_wanted_fastafile_list, mutant_aa_list):
-        if operations == {}:
+        if operations == {} or Main._all_ops_are_false(operations):
             raise ValueError("All options in 'operations' were either set to FALSE or some typographical error. "
                              "Check /configuration/global_options/global_options.txt was written correctly")
         elif operations['do_mutate_fasta'] or operations['do_agadir'] or operations['do_foldx_repair'] \
@@ -45,6 +45,18 @@ class Main(object):
             Scheduler.start(use_cluster, operations, use_multithread, path_input, path_output,
                             path_pdbfile_list=path_wanted_pdbfile_list, path_fastafile_list=path_wanted_fastafile_list,
                             mutant_aa_list=mutant_aa_list, write_1_fasta_only=True, write_fasta_per_mut=False)
+
+    @staticmethod
+    def _all_ops_are_false(operations):
+        if not operations['do_mutate_fasta'] \
+                and not operations['do_agadir'] \
+                and not operations['do_foldx_repair'] \
+                and not operations['do_foldx_buildmodel'] \
+                and not operations['do_foldx_stability'] \
+                and not operations['do_foldx_analysecomplex']:
+            return True
+        else:
+            return False
 
     # Reads the global_options.txt in /configuration/global_options breaking the text up according to newlines.
     #
