@@ -4,22 +4,24 @@ import glob
 import natsort
 from src.Agadir import Agadir
 from src.Agadir import AgadCndtns
+from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
+from src.Str import Str
 import os
 import time
 
 # use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
-use_cluster = False
+use_cluster = True
 use_multithread = False
 Paths.set_up_paths(use_cluster=use_cluster)
 path_repo_pdbs = Paths.REPO_PDBS + '_10'
-startnum = 1001
-endnum = 2000
+startnum = 29001
+endnum = 30000
 
 # NOTE: Ideally, if use_cluster is True, this script would set up an ssh tunnel to zeus and copy all src and config
 # files to SnpEffect in zeus cluster before running the code therein.
 
-for i in range(78):
+for i in range(50):
 
     path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + '...' + str(endnum))
     globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
@@ -33,20 +35,29 @@ for i in range(78):
 
     path_input = Paths.INPUT
     path_output = Paths.OUTPUT
-    path_output_mutants = os.path.join(Paths.IO_OUTPUT.value, Paths.DIR_MUTANTS_FASTAS.value, str(startnum) + '...' + str(endnum))
+    path_output_mutants = os.path.join(Paths.IO_OUTPUT, Paths.DIR_MUTANTS_FASTAS.value, str(startnum) + '...' +
+                                       str(endnum))
     path_fastafile_list = natsort.natsorted(glob.glob(path_output_mutants + '/**/*.fasta', recursive=True))
     agadir = Agadir(AgadCndtns.INCELL_MAML.value)
     for path_fastafile in path_fastafile_list:
-        time.sleep(1)
-        GUM.write_1_fastafile_per_fasta_from_multifastafile(path_fastafile)
+        time.sleep(50)
+        if use_cluster:
+            jobname = 'W1_' + path_fastafile
+            Cluster.write_job_q_bash(jobname, path_job_q_dir=Paths.CONFIG_JOBQ,
+                    python_script_with_paths='run_write_1fastafile_per_fasta_from_multifastafile_zeus.py' +
+                                             Str.SPCE.value + path_fastafile)
+            Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
+        else:
+            GUM.write_1_fastafile_per_fasta_from_multifastafile(path_fastafile)
+
     # main = Main(use_cluster, operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
     #             path_wanted_fastafile_list, mutant_aa_list)
 
     # main = Main(use_cluster, operations, use_multithread, path_input, path_output, wanted_pdbfile_list,
     #             wanted_fastafile_list, mutant_aa_list)
-    if i == 78:
+    if i == 50:
         break
-    time.sleep(60)
+    time.sleep(30)
     startnum += 1000
     endnum += 1000
 
