@@ -500,13 +500,10 @@ class GUM(object):
         path_output_filename = GUM.make_root_input_3dots_dirs(Paths.LOCAL_IO_ROOT.value, path_fastafile)
         with open(path_fastafile) as f:
             fasta_str = ''
-            # fasta_str_list = []
             is_first_line = True
             for line in f.readlines():
-                # fasta_str_list = []
                 if '>' in line:
                     if not is_first_line:
-                        # fasta_str_list.append(fasta_str)
                         fastafile = line.split('>')[-1].split('\n')[0] + '.fasta'
                         with open(os.path.join(path_output_filename, fastafile), 'w') as f_to_write:
                             f_to_write.write(fasta_str)
@@ -514,9 +511,6 @@ class GUM(object):
                     is_first_line = False
                 else:
                     fasta_str += line
-            # fasta_str_list = fasta_str_list[1:]
-        # return fasta_str_list
-
 
     @staticmethod
     def _build_path_filelist(path_root, file, into_own_subdirs):
