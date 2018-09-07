@@ -1,3 +1,4 @@
+import sys
 from src.Main import Main
 from src.Paths import Paths
 import glob
@@ -9,11 +10,12 @@ from src.GeneralUtilityMethods import GUM
 from src.Str import Str
 import os
 import time
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import multiprocessing as mp
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
-# use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
-use_cluster = True
+print('This computer has ' + str(mp.cpu_count()) + ' cpus')
+use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
 use_multithread = False
 Paths.set_up_paths(use_cluster)
 path_repo_pdbs = Paths.REPO_PDBS + '_10'
@@ -33,7 +35,8 @@ for i in range(50):
     # mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
     # path_dst = Paths.INPUT
     # path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
-    # path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
+    # path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_
+    # list)
 
     # path_input = Paths.INPUT
     # path_output = Paths.OUTPUT
@@ -102,4 +105,4 @@ for i in range(50):
 #
 # To start this script from cmd line, sh KickOff.sh
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
