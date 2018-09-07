@@ -15,7 +15,7 @@ pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=Tru
 # use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
 use_cluster = True
 use_multithread = False
-Paths.set_up_paths(use_cluster=use_cluster)
+Paths.set_up_paths(use_cluster)
 path_repo_pdbs = Paths.REPO_PDBS + '_10'
 startnum = 29001
 endnum = 30000
@@ -37,18 +37,19 @@ for i in range(50):
 
     # path_input = Paths.INPUT
     # path_output = Paths.OUTPUT
+
     path_output_mutants = os.path.join(Paths.OUTPUT, Paths.DIR_MUTANTS_FASTAS.value, str(startnum) + Str.DOTS3.value +
                                        str(endnum))
-    path_fastafile_list = natsort.natsorted(glob.glob(path_output_mutants + '/**/*' + Str.FSTAEXT.value,
-                                                      recursive=True))
+    path_to_fastas = path_output_mutants + '/**/*' + Str.FSTAEXT.value
+    path_fastafile_list = natsort.natsorted(glob.glob(path_to_fastas, recursive=True))
     agadir = Agadir(AgadCndtns.INCELL_MAML.value)
     for path_fastafile in path_fastafile_list:
-        time.sleep(50)
+        time.sleep(1)
         if use_cluster:
-            jobname = 'W1_' + path_fastafile
-            Cluster.write_job_q_bash(jobname, path_job_q_dir=Paths.CONFIG_JOBQ,
-                    python_script_with_paths='run_write_1fastafile_per_fasta_from_multifastafile_zeus.py' +
-                                             Str.SPCE.value + path_fastafile)
+            jobname = 'wr_' + path_fastafile.split('/')[-1]
+            path_to_script = os.path.join(Paths.SRC, 'run_write_1fastafile_per_fasta_from_multifastafile_zeus.py')
+            Cluster.write_job_q_bash(jobname, path_job_q_dir=Paths.CONFIG_JOBQ, python_script_with_paths=path_to_script
+                                                                                    + Str.SPCE.value + path_fastafile)
             Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
         else:
             GUM.write_1_fastafile_per_fasta_from_multifastafile(path_fastafile)
