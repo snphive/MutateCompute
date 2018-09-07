@@ -4,6 +4,7 @@ from Bio.Seq import MutableSeq
 from Bio.Alphabet import IUPAC
 from src.Paths import Paths
 from src.AminoAcids import AA
+from src.Str import Str
 
 
 class MutateFasta(object):
@@ -115,7 +116,7 @@ class MutateFasta(object):
                     path_1_fastafile_open.write('>' + wt_title + '\n' + title_seq[wt_title] + '\n')
                 if write_fasta_per_mut and path_fastafilepermut is None:
                     path_fastafilepermut = GUM._os_makedirs(path_output_3dots, Paths.DIR_FASTAS.value, wt_title)
-                    path_fastafilepermut = os.path.join(path_fastafilepermut, wt_title + '.fasta')
+                    path_fastafilepermut = os.path.join(path_fastafilepermut, wt_title + Str.FSTAEXT.value)
                     path_fastafilepermut_open = open(path_fastafilepermut, 'w')
                     path_fastafilepermut_open.write('>' + wt_title + '\n' + title_seq[wt_title] + '\n')
                     path_fastafilepermut_open.close()
@@ -134,7 +135,7 @@ class MutateFasta(object):
                         path_1_fastafile_open.write('>' + mut_title + '\n' + mut_seq + '\n')
                     if write_fasta_per_mut and path_fastafilepermut is not None:
                         path_fastafilepermut = os.path.join(path_output_3dots, Paths.DIR_FASTAS.value, wt_title,
-                                                            Paths.DIR_MUTANTS.value, mut_title + '.fasta')
+                                                            Paths.DIR_MUTANTS.value, mut_title + Str.FSTAEXT.value)
                         path_fastafilepermut_open = open(path_fastafilepermut, 'w')
                         path_fastafilepermut_open.write('>' + mut_title + '\n' + mut_seq + '\n')
                         path_fastafilepermut_open.close()

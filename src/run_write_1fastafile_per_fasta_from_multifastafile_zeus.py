@@ -2,6 +2,7 @@ import sys
 import os
 from src.GeneralUtilityMethods import GUM
 from src.Paths import Paths
+from src.Str import Str
 
 path_fastafile = sys.argv[1]
 
@@ -12,7 +13,7 @@ with open(path_fastafile) as f:
     for line in f.readlines():
         if '>' in line:
             if not is_first_line:
-                fastafile = line.split('>')[-1].split('\n')[0] + '.fasta'
+                fastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
                 with open(os.path.join(path_output_filename, fastafile), 'w') as f_to_write:
                     f_to_write.write(fasta_str)
             fasta_str = line

@@ -6,5 +6,8 @@ class Str(Enum):
     F = 'false'
     NEWLN = '\n'
     SEMICO_NL = ';\n'
-
-
+    SPCE = ' '
+    FSLSH = '/'
+    FSTAEXT = '.fasta'
+    PDBEXT = '.pdb'
+    DOTS3 = '...'

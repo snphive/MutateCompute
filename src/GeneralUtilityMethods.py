@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import time
 import warnings
+from src.Str import Str
 from natsort import natsort
 
 from src.AminoAcids import AA
@@ -16,10 +17,7 @@ from src.Paths import Paths
 class GUM(object):
 
     # def __init__(self):
-    #     self.space = ' '
-    #     self.fslash = '/'
-    space = ' '
-    fslash = '/'
+
     # The runscript.txt is an input file for FoldX indicating which pdbs to analyse and which programs to run on them.
     # path_runscript        String      Absolute path for runscript.txt file being written.
     # pdbs                  String      pdb(s) (incl. .pdb extension) inputs for FoldX.
@@ -62,20 +60,6 @@ class GUM(object):
             runscript_str = ''.join(runscript)
             runscript_file.write(runscript_str)
         return runscript_str
-
-    @staticmethod
-    def make_fastas_list_from_multifastafile(multifastafile):
-        fastafile_list = []
-        first_line = True
-        with open(multifastafile, 'r') as f:
-            for line in f:
-                if first_line:
-                    first_line = False
-                    continue
-                if '>' in line and not firstline:
-                    fastafile_list.append(line)
-                    fasta_str = line
-
 
     # Extracts and writes a FASTA file for each chain described in the pdb.
     # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
@@ -142,7 +126,7 @@ class GUM(object):
         for pdbname_chain, fasta_sequence in pdbname_chain_fasta_dict.items():
             path_output_pdb_pdbchain = GUM.create_dir_tree(path_to_write_fastafile_root, pdbname_chain.split('_')[0],
                                                            pdbname_chain)
-            with open(path_output_pdb_pdbchain + pdbname_chain + '.fasta', 'w') as fastafile:
+            with open(path_output_pdb_pdbchain + pdbname_chain + Str.FSTAEXT.value, 'w') as fastafile:
                 fastafile.write('>' + pdbname_chain + '\n')
                 fastafile.write(fasta_sequence)
 
@@ -277,7 +261,7 @@ class GUM(object):
         for i, path_file in enumerate(path_sorted_file_list):
             if i % num_to_copy_per_subdir == 0:
                 path_dst_3dot_dir = GUM._make_path_3dot_dir(path_dst_dir, starting_num + i, num_to_copy_per_subdir + i)
-            cmd = 'cp -n' + GUM.space + path_file + GUM.space + path_dst_3dot_dir
+            cmd = 'cp -n' + Str.SPCE.value + path_file + Str.SPCE.value + path_dst_3dot_dir
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
@@ -366,8 +350,8 @@ class GUM(object):
     # NOTE: current cp command specifies not to overwrite existing files
     @staticmethod
     def linux_copy_all_files_in_dir(path_src_dir, path_dst_dir, recursively=False):
-        recurse_cmd = (GUM.space + '-r') if recursively else ''
-        cmd = 'cp -n' + recurse_cmd + GUM.space + path_src_dir + '/.' + GUM.space + path_dst_dir
+        recurse_cmd = (Str.SPCE.value + '-r') if recursively else ''
+        cmd = 'cp -n' + recurse_cmd + Str.SPCE.value + path_src_dir + '/.' + Str.SPCE.value + path_dst_dir
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
@@ -382,9 +366,9 @@ class GUM(object):
             if into_own_subdirs:
                 filename = path_src_file.split('/')[-1].split('.')[0]
                 path_dst_filenamedir = GUM._os_makedirs(path_dst, filename)
-                cmd = 'cp -n' + GUM.space + path_src_file + GUM.space + path_dst_filenamedir
+                cmd = 'cp -n' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst_filenamedir
             else:
-                cmd = 'cp -n' + GUM.space + path_src_file + GUM.space + path_dst
+                cmd = 'cp -n' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
@@ -401,7 +385,7 @@ class GUM(object):
             if os.path.isfile(path_file_in_dir):
                 filename = path_file_in_dir.split('/')[-1].split('.')[0]
                 path_dir_filename = GUM._os_makedirs(path_dir, filename)
-                cmd = 'mv' + GUM.space + path_file_in_dir + GUM.space + path_dir_filename
+                cmd = 'mv' + Str.SPCE.value + path_file_in_dir + Str.SPCE.value + path_dir_filename
                 try:
                     subprocess.call(cmd, shell=True)
                 except OSError:
@@ -409,7 +393,7 @@ class GUM(object):
 
     @staticmethod
     def linux_remove_files_in_dir(path_dir):
-        cmd = 'rm' + GUM.space + path_dir + "/*"
+        cmd = 'rm' + Str.SPCE.value + path_dir + "/*"
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
@@ -472,7 +456,7 @@ class GUM(object):
         for path_repo_pdbs_or_fastas_dir in path_repo_pdbs_or_fastas_list:
             if '' == path_repo_pdbs_or_fastas_dir:
                 continue
-            if '...' in path_repo_pdbs_or_fastas_dir:
+            if Str.DOTS3.value in path_repo_pdbs_or_fastas_dir:
                 path_dst_subdirs.append(path_repo_pdbs_or_fastas_dir)
             if Paths.DIR_FASTAS.value == path_repo_pdbs_or_fastas_dir or \
                     Paths.DIR_PDBS.value == path_repo_pdbs_or_fastas_dir:
@@ -504,7 +488,7 @@ class GUM(object):
             for line in f.readlines():
                 if '>' in line:
                     if not is_first_line:
-                        fastafile = line.split('>')[-1].split('\n')[0] + '.fasta'
+                        fastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
                         with open(os.path.join(path_output_filename, fastafile), 'w') as f_to_write:
                             f_to_write.write(fasta_str)
                     fasta_str = line
@@ -538,7 +522,7 @@ class GUM(object):
     # Returns full list of pdbfiles or fastafiles from one of two subdirectories that should be in REPO_PDB_FASTA.
     @staticmethod
     def get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas):
-        file_ext = '.pdb' if (Paths.DIR_PDBS.value in path_repo_pdbs_or_fastas) else '.fasta'
+        file_ext = Str.PDBEXT.value if (Paths.DIR_PDBS.value in path_repo_pdbs_or_fastas) else Str.FSTAEXT.value
         filelist = glob.glob(path_repo_pdbs_or_fastas + '/*' + file_ext)
         return filelist
 

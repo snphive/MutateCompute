@@ -1,6 +1,7 @@
 import glob
 from src.Scheduler import Scheduler
 from src.GeneralUtilityMethods import GUM
+from src.Str import Str
 from src.Paths import Paths
 from src.AminoAcids import AA
 import natsort
@@ -92,10 +93,10 @@ class Main(object):
     @staticmethod
     def _build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs_or_fastas):
         file_list = []
-        file_extension = '.pdb'
+        file_extension = Str.PDBEXT.value
         pdbs_or_fastas_option = 'PDBs'
         if Paths.DIR_FASTAS.value in path_repo_pdbs_or_fastas:
-            file_extension = '.fasta'
+            file_extension = Str.FSTAEXT.value
             pdbs_or_fastas_option = 'FASTAs'
         path_repo_files = path_repo_pdbs_or_fastas + '/*' + file_extension
         for line in globaloptions_lines:

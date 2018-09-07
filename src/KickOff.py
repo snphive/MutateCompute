@@ -9,6 +9,8 @@ from src.GeneralUtilityMethods import GUM
 from src.Str import Str
 import os
 import time
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 # use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
 use_cluster = True
@@ -23,21 +25,22 @@ endnum = 30000
 
 for i in range(50):
 
-    path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + '...' + str(endnum))
-    globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
-    wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
-    wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
-    operations = Main._determine_which_operations_to_perform(globaloptions_lines)
-    mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
-    path_dst = Paths.INPUT
+    # path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + '...' + str(endnum))
+    # globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
+    # wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
+    # wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
+    # operations = Main._determine_which_operations_to_perform(globaloptions_lines)
+    # mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
+    # path_dst = Paths.INPUT
     # path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
     # path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
 
-    path_input = Paths.INPUT
-    path_output = Paths.OUTPUT
-    path_output_mutants = os.path.join(Paths.IO_OUTPUT, Paths.DIR_MUTANTS_FASTAS.value, str(startnum) + '...' +
+    # path_input = Paths.INPUT
+    # path_output = Paths.OUTPUT
+    path_output_mutants = os.path.join(Paths.OUTPUT, Paths.DIR_MUTANTS_FASTAS.value, str(startnum) + Str.DOTS3.value +
                                        str(endnum))
-    path_fastafile_list = natsort.natsorted(glob.glob(path_output_mutants + '/**/*.fasta', recursive=True))
+    path_fastafile_list = natsort.natsorted(glob.glob(path_output_mutants + '/**/*' + Str.FSTAEXT.value,
+                                                      recursive=True))
     agadir = Agadir(AgadCndtns.INCELL_MAML.value)
     for path_fastafile in path_fastafile_list:
         time.sleep(50)
@@ -97,3 +100,5 @@ for i in range(50):
 #
 #
 # To start this script from cmd line, sh KickOff.sh
+
+pydevd.stoptrace()

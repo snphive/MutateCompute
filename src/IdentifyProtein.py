@@ -6,6 +6,7 @@ import glob
 from src.Cluster import Cluster
 import threading
 from src.GeneralUtilityMethods import GUM
+from src.Str import Str
 
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
@@ -32,7 +33,7 @@ class IdProt(object):
                                                  write_csv=True, write_xml=True, write_json=False):
         try:
             path_input_fastas_dir_list = path_input_fastas_dir.split('/')
-            if '.fasta' in path_input_fastas_dir_list[-1]:
+            if Str.FSTAEXT.value in path_input_fastas_dir_list[-1]:
                 path_input_fastas_dir_list = path_input_fastas_dir_list[:-1]
                 path_input_fastas_dir = '/'.join(path_input_fastas_dir_list)
             if not os.listdir(path_input_fastas_dir):

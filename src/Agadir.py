@@ -27,8 +27,8 @@ class Agadir(object):
     def copy_files_output_to_input_fastasubdirs(self, path_output_fastas, path_input_fastas, filename_list=None,
                                                 into_own_subdirs=True):
         if filename_list is not None:
-            path_fastas_filelist = [path_output_fastas + '/' + filename + '/' + filename + '.fasta' for filename in
-                                    filename_list]
+            path_fastas_filelist = [os.path.join(path_output_fastas, filename, filename + Str.FSTAEXT.value) for
+                                    filename in filename_list]
             GUM.linux_copy_files(path_fastas_filelist, path_input_fastas, into_own_subdirs)
         else:
             path_input_fastas_list = path_input_fastas.split('/')
@@ -64,13 +64,13 @@ class Agadir(object):
                     #         print('Problem with linux cp command.')
 
                     # os.chdir(path_output_agadir_fastaname)
-                    # cmd = Paths.AGADIR_EXE + '/agadirwrapper' + GUM.space + path_input_fastafile + GUM.space + \
+                    # cmd = Paths.AGADIR_EXE + '/agadirwrapper' + Str.SPCE.value + path_input_fastafile + Str.SPCE.value + \
                     #       Paths.CONFIG_AGAD + '/Options.txt'
 
                     # # path_bash_agadir_sh = os.path.join(Paths.BASH, 'agadirexe.sh')
                     # with open(path_bash_agadir_sh, 'w') as f:
                     #     f.write(execute)
-                    # cmd = 'sh' + GUM.space + path_bash_agadir_sh
+                    # cmd = 'sh' + Str.SPCE.value + path_bash_agadir_sh
 
                     # try:
                     #     subprocess.call(cmd, shell=True)
