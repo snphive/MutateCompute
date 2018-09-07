@@ -478,10 +478,11 @@ class GUM(object):
     # Currently only used for Agadir.
     # Reads the multi-fastafiles that are in output_data (to which MutateFasta wrote them), and writes the fastafiles
     # as individual fastafiles in the (because that's how I assume agadirwrapper expects them, though I could be wrong).
-    # The dst dir is ~/PycharmProjects/input_data/mutants_fastas/1...1000/1_A
+    # The dst dir (path_dst_filename) is ~/PycharmProjects/input_data/mutants_fastas/1...1000/1_A if local;
+    #  /switchlab/group/shazib/SnpEffect/input_data/mutants_fastas/1...1000/1_A if on zeus cluster.
     @staticmethod
     def write_1_fastafile_per_fasta_from_multifastafile(path_fastafile):
-        path_output_filename = GUM.make_root_input_3dots_dirs(Paths.LOCAL_IO_ROOT.value, path_fastafile)
+        path_dst_filename = GUM.make_root_input_3dots_dirs(Paths.INPUT, path_fastafile)
         with open(path_fastafile) as f:
             fasta_str = ''
             is_first_line = True
@@ -489,7 +490,7 @@ class GUM(object):
                 if '>' in line:
                     if not is_first_line:
                         fastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
-                        with open(os.path.join(path_output_filename, fastafile), 'w') as f_to_write:
+                        with open(os.path.join(path_dst_filename, fastafile), 'w') as f_to_write:
                             f_to_write.write(fasta_str)
                     fasta_str = line
                     is_first_line = False
