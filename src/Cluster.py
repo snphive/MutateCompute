@@ -55,7 +55,7 @@ class Cluster(object):
     # job_name                 N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
     # path_job_q_dir           Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
     # using_runscript          True/False using runscript (hence running FoldX).
-    # python_script_with_paths Which script to run with python command to run it.
+    # python_script_with_paths Which script to run followed by paths to relevant executables, such as to Qsub.
     # queue                    q specifies which oge queue you want to use, e.g. 'all.q' for all queues.
     # n_slots                  serial is number of slots you want your job to use. There are 8 slots per cluster node.
     # total_memory_GB          mem_free is the total amount of memory (here as GB) you expect your job will need.
@@ -93,8 +93,8 @@ class Cluster(object):
         if cluster_node != '':
             job_q.append('#$ -l hostname=' + cluster_node + '\n')
 
-        job_q.append('#$ -cwd\n' + 'source ~/.bash_profile\n')
-
+        job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles\n')
+        job_q.append('source ~/.bash_profile\n')
         if using_runscript:
             job_q.append(Paths.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt\n')
 
@@ -122,3 +122,12 @@ class Cluster(object):
             time.sleep(10)
             check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
             output_qstat = check_qstat.stdout.read()
+
+    from enum import Enum
+
+    class OPTNS(Enum):
+        ALLQ = 'all.q'
+        NODE_HDR1 = 'hodor1.vib'
+        NODE_HDR2 = 'hodor2.vib'
+        NODE_ODN1 = 'odin1.vib'
+        NODE_ODN2 = 'odin2.vib'
