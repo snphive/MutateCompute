@@ -318,7 +318,7 @@ class GUM(object):
     # As such it builds path of child subdirs of output_data/mutant_fastas upto but not including
     # /1_A/mutants/1_A_mutants.fasta
     @staticmethod
-    def make_root_input_3dots_dirs(path_root, path_fastafile):
+    def make_root_3dots_dirs(path_root, path_fastafile):
         path_fastafile_list = path_fastafile.split('/')
         path_input_3dots_dirs = []
         copy_from_here = False
@@ -327,12 +327,10 @@ class GUM(object):
                 continue
             if path_dir == Paths.DIR_MUTANTS.value:
                 break
-            if path_dir == Paths.DIR_OUTPUT.value:
-                copy_from_here = True
-                path_input_3dots_dirs.append(Paths.DIR_INPUT.value)
-                continue
             if copy_from_here:
                 path_input_3dots_dirs.append(path_dir)
+            elif path_dir == Paths.DIR_OUTPUT.value:
+                copy_from_here = True
         return GUM._os_makedirs(path_root, '/'.join(path_input_3dots_dirs))
 
     # THESE LINUX COPY METHODS WILL BE COMBINED INTO ONE WITH FLAGS FOR CREATING OWN SUBDIRS BASED ON FILE NAMES AND
@@ -482,7 +480,7 @@ class GUM(object):
     #  /switchlab/group/shazib/SnpEffect/input_data/mutants_fastas/1...1000/1_A if on zeus cluster.
     @staticmethod
     def write_1_fastafile_per_fasta_from_multifastafile(path_fastafile):
-        path_dst_filename = GUM.make_root_input_3dots_dirs(Paths.INPUT, path_fastafile)
+        path_dst_filename = GUM.make_root_3dots_dirs(Paths.INPUT, path_fastafile)
         with open(path_fastafile) as f:
             fasta_str = ''
             is_first_line = True
