@@ -1,5 +1,6 @@
 import os
 import sys
+from src.Str import Str
 import subprocess
 from src.Paths import Paths
 import time
@@ -69,10 +70,11 @@ class Cluster(object):
         except FileExistsError:
             print("Some or all of the directories in the this path already exist. It's no problem.")
         job_q = []
-        job_q.append('#!/bin/bash\n'+'#$ -N '+job_name+'\n'+'#$ -V\n')
-
+        job_q.append('#!/bin/bash' + Str.NEWLN.value)
+        job_q.append('#$ -N '+job_name+'' + Str.NEWLN.value)
+        job_q.append('#$ -V' + Str.NEWLN.value)
         if queue != '':
-            job_q.append('#$ -q ' + queue + '\n')
+            job_q.append('#$ -q ' + queue + Str.NEWLN.value)
 
         multicore_memory_command = ''
         if n_slots != '' and total_memory_GB == '':
@@ -85,21 +87,21 @@ class Cluster(object):
             memory_limit_GB = int(memory_limit_GB) / int(n_slots)
 
             if multicore_memory_command != '':
-                multicore_memory_command += ',h_vmem=' + str(memory_limit_GB) + 'G\n'
+                multicore_memory_command += ',h_vmem=' + str(memory_limit_GB) + 'G' + Str.NEWLN.value
                 job_q.append(multicore_memory_command)
             else:
-                job_q.append('#$ -l h_vmem=' + str(memory_limit_GB) + 'G\n')
+                job_q.append('#$ -l h_vmem=' + str(memory_limit_GB) + 'G' + Str.NEWLN.value)
 
         if cluster_node != '':
-            job_q.append('#$ -l hostname=' + cluster_node + '\n')
+            job_q.append('#$ -l hostname=' + cluster_node + Str.NEWLN.value)
 
-        job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles\n')
-        job_q.append('source ~/.bash_profile\n')
+        job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles' + Str.NEWLN.value)
+        job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
         if using_runscript:
-            job_q.append(Paths.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt\n')
+            job_q.append(Paths.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt' + Str.NEWLN.value)
 
         if python_script_with_paths != '':
-            job_q.append('python3 ' + python_script_with_paths + '\n')
+            job_q.append('python3 ' + python_script_with_paths + Str.NEWLN.value)
 
         with open(path_job_q_dir + '/job.q', 'w') as job_q_file:
             job_q_str = ''.join(job_q)
@@ -131,3 +133,4 @@ class Cluster(object):
         NODE_HDR2 = 'hodor2.vib'
         NODE_ODN1 = 'odin1.vib'
         NODE_ODN2 = 'odin2.vib'
+
