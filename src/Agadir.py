@@ -6,6 +6,7 @@ from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
 from src.Paths import Paths
 from enum import Enum
+import natsort
 
 
 class Agadir(object):
@@ -40,44 +41,56 @@ class Agadir(object):
 
     # Runs Agadirwrapper according to the options specified in /configuration/agadir_config/Options.txt file.
     # Expecting path_fastafile to potentially contain more than 1 sequence.
-    def compute(self, path_fastafile, path_output_agadir_3dots):
-        with open(path_fastafile, 'r') as f:
-            fasta_str = ''
-            end_of_fasta = False
+    # path_dst_fastafile    String      Abs path of where the single fastafile is written (from the multifastafile)
+    def compute(self, path_dst_fastafile):
+        path_list = path_dst_fastafile.split('/')
+        path_agadir_dst_dir = '/'.join(path_list[:-1])
+        os.chdir(path_agadir_dst_dir)
+        if GUM.using_cluster():
+            jobname = Paths.PREFIX_AGADIR.value + path_dst_fastafile.split('/')[-1].split('.')[0]
+            # Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.CONFIG_AGAD_JOBQ)
+            Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
+            Cluster.wait_for_grid_engine_job_to_complete(grid_engine_jobname=jobname)
+        else:
+            cmd = 'chmod 100 agadirwrapper'
+            # cmd = 'chmod +x agadirwrapper'
+            try:
+                subprocess.call(cmd, shell=True)
+            except OSError:
+                print('Problem with linux cp command.')
+        cmd = Paths.AGADIR_EXE + '/agadirwrapper' + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \
+              Paths.CONFIG_AGAD + '/Options.txt'
+        try:
+            subprocess.call(cmd, shell=True)
+        except OSError:
+            print('Problem with linux cp command.')
 
-            # self.write_1_fastafile_per_fasta_from_multifastafile(path_fastafile)
-            #         fastaname = path_input_fastafile.split('/')[-1].split('.')[0]
-            #         path_output_agadir_fastaname = GUM._os_makedirs(path_output_agadir_3dots, fastaname)
-            #         os.chdir(Paths.AGADIR_EXE)
-            #
-
-                    # if GUM.using_cluster():
-                    #     Cluster.write_job_q_bash(job_name=fastaname, path_job_q_dir=Paths.CONFIG_JOBQ)
-                    #     Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
-                    #     Cluster.wait_for_grid_engine_job_to_complete(grid_engine_jobname=fastaname)
-                    # else:
-                    #     cmd = 'chmod 100 agadirwrapper'
-                    #     # cmd = 'chmod +x agadirwrapper'
-                    #     try:
-                    #         subprocess.call(cmd, shell=True)
-                    #     except OSError:
-                    #         print('Problem with linux cp command.')
-
-                    # os.chdir(path_output_agadir_fastaname)
-                    # cmd = Paths.AGADIR_EXE + '/agadirwrapper' + Str.SPCE.value + path_input_fastafile + Str.SPCE.value + \
-                    #       Paths.CONFIG_AGAD + '/Options.txt'
-
-                    # # path_bash_agadir_sh = os.path.join(Paths.BASH, 'agadirexe.sh')
-                    # with open(path_bash_agadir_sh, 'w') as f:
-                    #     f.write(execute)
-                    # cmd = 'sh' + Str.SPCE.value + path_bash_agadir_sh
-
-                    # try:
-                    #     subprocess.call(cmd, shell=True)
-                    # except OSError:
-                    #     print('Problem with linux cp command.')
-
-                    # # os.chdir(self.path_Results_pdbname)
+    def run_agadir_on_multifastas(self, path_output_root, path_multifastas_3dots):
+        path_to_input_fastas = path_multifastas_3dots + '/**/*' + Str.FSTAEXT.value
+        path_fastafile_list = natsort.natsorted(glob.glob(path_to_input_fastas, recursive=True))
+        for path_fastafile in path_fastafile_list:
+            # filename = path_fastafile.split('/')[-1].split('.')[0]
+            path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_output_root, path_fastafile)
+            # time.sleep(1)
+            with open(path_fastafile) as f:
+                # path_dst_mutant_file = ''
+                fasta_str = ''
+                is_first_line = True
+                mutantfastafile = ''
+                for line in f.readlines():
+                    if '>' in line:
+                        if not is_first_line:
+                            path_dst_mutant_file = os.path.join(path_dst, mutantfastafile)
+                            with open(path_dst_mutant_file, 'w') as temp_fastafile:
+                                temp_fastafile.write(fasta_str)
+                            agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+                            agadir.compute(path_dst_mutant_file)
+                            GUM.linux_remove_file(path_dst_mutant_file)
+                        fasta_str = line
+                        is_first_line = False
+                        mutantfastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
+                    else:
+                        fasta_str += line
 
     # There are 3 types of calculations and xx algorithms which this can be applied to.
     # 1) Global total; 2) Window calculation; 3) Residue calculation. Global is ..... Window is..... Residue is .....
@@ -119,12 +132,12 @@ class Agadir(object):
                                   resid_file_per_seq=Str.F.value):
         options = []
         options.append('<TITLE>AGADIR_optionfile' + Str.SEMICO_NL.value)
-        options.append('<Temperature>' + str(temp=self.temp) + '.' + Str.SEMICO_NL.value)
-        options.append('<pH>' + str(ph=self.ph) + Str.SEMICO_NL.value)
-        options.append('<IonStrength>' + str(ion_strgth=self.ion_strgth) + Str.SEMICO_NL.value)
-        options.append('<TfeConc>' + str(tfe=self.tfe) + '.' + Str.SEMICO_NL.value)
-        options.append('<Stability>' + str(stab=self.stab) + '.' + Str.SEMICO_NL.value)
-        options.append('<Concentration>' + str(conc=self.conc) + '.' + Str.SEMICO_NL.value)
+        options.append('<Temperature>' + str(self.temp) + '.' + Str.SEMICO_NL.value)
+        options.append('<pH>' + str(self.ph) + Str.SEMICO_NL.value)
+        options.append('<IonStrength>' + str(self.ion_strgth) + Str.SEMICO_NL.value)
+        options.append('<TfeConc>' + str(self.tfe) + '.' + Str.SEMICO_NL.value)
+        options.append('<Stability>' + str(self.stab) + '.' + Str.SEMICO_NL.value)
+        options.append('<Concentration>' + str(self.conc) + '.' + Str.SEMICO_NL.value)
         options.append('<Nterm>' + ntrm + Str.SEMICO_NL.value)
         options.append('<Cterm>' + ctrm + Str.SEMICO_NL.value)
         options.append('<global_total>' + global_tot + Str.SEMICO_NL.value)
