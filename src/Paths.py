@@ -50,6 +50,7 @@ class Paths(Enum):
             DIR_INPUT = paths_and_dictionaries['ROOT']['dir_input']
             DIR_MUTANTS = paths_and_dictionaries['ROOT']['dir_mutants']
             DIR_MUTANTS_FASTAS = paths_and_dictionaries['ROOT']['dir_mutants_fastas']
+            DIR_MUTANTS_MULTIFASTAS = paths_and_dictionaries['ROOT']['dir_mutants_multifastas']
             DIR_FOLDX = paths_and_dictionaries['ROOT']['dir_fx']
             DIR_AGADIR = paths_and_dictionaries['ROOT']['dir_agadir']
             DIR_OUTPUT = paths_and_dictionaries['ROOT']['dir_output']
@@ -87,9 +88,11 @@ class Paths(Enum):
             MC_BASH = os.path.join(LOCAL_MUTATECOMPUTE, DIR_BASH)
             MC_SRC = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC)
             MC_OUTPUT_FASTAS = os.path.join(MC_OUTPUT, DIR_FASTAS)
+            MC_OUTPUT_AGADIR = os.path.join(MC_OUTPUT, DIR_AGADIR)
             IO_OUTPUT_FASTAS = os.path.join(IO_OUTPUT, DIR_FASTAS)
             MC_OUTPUT_BLASTP = os.path.join(MC_OUTPUT, DIR_BLASTP)
             IO_OUTPUT_BLASTP = os.path.join(IO_OUTPUT, DIR_BLASTP)
+            IO_OUTPUT_AGADIR = os.path.join(IO_OUTPUT, DIR_AGADIR)
             # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_local_pdb_fasta_repository']
             MC_REPO_PDBS = os.path.join(MC_REPO_PDB_FASTA, DIR_PDBS)
@@ -113,6 +116,7 @@ class Paths(Enum):
             SE_SRC = os.path.join(ZEUS_SNPEFFECT, DIR_SRC)
             SE_OUTPUT_FASTAS = os.path.join(SE_OUTPUT, DIR_FASTAS)
             SE_OUTPUT_BLASTP = os.path.join(SE_OUTPUT, DIR_BLASTP)
+            SE_OUTPUT_AGADIR = os.path.join(SE_OUTPUT, DIR_AGADIR)
             # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM ZEUS ROOT AND DIRECTORY NAMES
             SE_REPO_PDB_FASTA = os.path.join(ZEUS_SNPEFFECT, DIR_REPO_PDB_FASTA)
             SE_REPO_PDBS = os.path.join(SE_REPO_PDB_FASTA, DIR_PDBS)
@@ -145,6 +149,7 @@ class Paths(Enum):
         Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.IO_OUTPUT_FASTAS.value
         # Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.MC_OUTPUT_BLASTP.value
         Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.IO_OUTPUT_BLASTP.value
+        Paths.OUTPUT_AGADIR = Paths.SE_OUTPUT_AGADIR.value if use_cluster else Paths.IO_OUTPUT_AGADIR.value
         Paths.REPO_PDB_FASTA = Paths.SE_REPO_PDB_FASTA.value if use_cluster else Paths.MC_REPO_PDB_FASTA.value
         Paths.REPO_PDBS = Paths.SE_REPO_PDBS.value if use_cluster else Paths.MC_REPO_PDBS.value
         Paths.REPO_FASTAS = Paths.SE_REPO_FASTAS.value if use_cluster else Paths.MC_REPO_FASTAS.value
@@ -153,8 +158,5 @@ class Paths(Enum):
         Paths.AGADIR_EXE = Paths.ZEUS_AGADIR_EXE.value if use_cluster else Paths.LOCAL_AGADIR_EXE.value
         Paths.BASH = Paths.SE_BASH.value if use_cluster else Paths.MC_BASH.value
         Paths.SRC = Paths.SE_SRC.value if use_cluster else Paths.MC_SRC.value
-
-
-
 
 # pydevd.stoptrace()
