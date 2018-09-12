@@ -29,6 +29,7 @@ ROOT:
     dir_input: 'input_data'
     dir_mutants: 'mutants'
     dir_mutants_fastas: 'mutants_fastas'
+    dir_mutants_multifastas: 'mutants_multifastas'
     dir_output: 'output_data'
     dir_agadir: 'agadir'
     dir_fx: 'foldx'
@@ -43,10 +44,10 @@ ROOT:
     dir_bash: 'bash'
 
     # jobq job name prefixes
-    prefix_blastp: 'BLSTP_'
-    prefix_agadir: 'AGADIR_'
-    prefix_foldx_buildmodel: 'FXBM_'
-    prefix_foldx_analysecomplex: 'FXAC_'
+    prefix_blastp: 'BP_'
+    prefix_agadir: 'AG_'
+    prefix_foldx_buildmodel: 'BM_'
+    prefix_foldx_analysecomplex: 'AC_'
 
     # dictionaries & lists (amino acids)
     dict_aa_1to3:
