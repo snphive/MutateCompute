@@ -1,12 +1,12 @@
 ROOT:
     # absoluate paths to executables on cluster and local directory tress
-    path_zeus_r_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
-    path_zeus_fx_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
-    path_zeus_agad_exe: '/switchlab/group/tools/agadir_10042012'
+    path_zeus_r_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript/'
+    path_zeus_fx_exe: '/switchlab/group/tools/FoldX_2015/FoldX/'
+    path_zeus_agad_exe: '/switchlab/group/tools/agadir_10042012/'
     path_zeus_qsub_exe: '/opt/sge/bin/lx-amd64/'
-    path_local_r_exe: '/usr/local/bin/R'
-    path_local_fx_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX'
-    path_local_agad_exe: '/Users/u0120577/SNPEFFECT/executables/agadir_10042012'
+    path_local_r_exe: '/usr/local/bin/R/'
+    path_local_fx_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX/'
+    path_local_agad_exe: '/Users/u0120577/SNPEFFECT/executables/agadir_10042012/'
 
     # absolute paths to root directories on cluster and local directory trees
     path_zeus_snpeffect: '/switchlab/group/shazib/SnpEffect'
