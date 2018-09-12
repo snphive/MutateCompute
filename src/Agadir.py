@@ -43,22 +43,19 @@ class Agadir(object):
     # Expecting path_fastafile to potentially contain more than 1 sequence.
     # path_dst_fastafile    String      Abs path of where the single fastafile is written (from the multifastafile)
     def compute(self, path_dst_fastafile):
-        path_list = path_dst_fastafile.split('/')
-        path_agadir_dst_dir = '/'.join(path_list[:-1])
+        path_agadir_dst_dir = '/'.join(path_dst_fastafile.split('/')[:-1])
         os.chdir(path_agadir_dst_dir)
         if GUM.using_cluster():
-            jobname = Paths.PREFIX_AGADIR.value + path_dst_fastafile.split('/')[-1].split('.')[0]
-            # Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.CONFIG_AGAD_JOBQ)
-            Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
-            Cluster.wait_for_grid_engine_job_to_complete(grid_engine_jobname=jobname)
+            Cluster.wait_for_grid_engine_job_to_complete(Paths.PREFIX_AGADIR.value)
         else:
             cmd = 'chmod 100 agadirwrapper'
             # cmd = 'chmod +x agadirwrapper'
+            # cmd = 'chmod u=x agadirwrapper'
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
                 print('Problem with linux cp command.')
-        cmd = Paths.AGADIR_EXE + '/agadirwrapper' + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \
+        cmd = 'agadirwrapper' + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \
               Paths.CONFIG_AGAD + '/Options.txt'
         try:
             subprocess.call(cmd, shell=True)
@@ -69,7 +66,6 @@ class Agadir(object):
         path_to_input_fastas = path_multifastas_3dots + '/**/*' + Str.FSTAEXT.value
         path_fastafile_list = natsort.natsorted(glob.glob(path_to_input_fastas, recursive=True))
         for path_fastafile in path_fastafile_list:
-            # filename = path_fastafile.split('/')[-1].split('.')[0]
             path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_output_root, path_fastafile)
             # time.sleep(1)
             with open(path_fastafile) as f:
@@ -80,7 +76,8 @@ class Agadir(object):
                 for line in f.readlines():
                     if '>' in line:
                         if not is_first_line:
-                            path_dst_mutant_file = os.path.join(path_dst, mutantfastafile)
+                            path_dst_mutant_filename = GUM._os_makedirs(path_dst, mutantfastafile.split('.')[0])
+                            path_dst_mutant_file = os.path.join(path_dst_mutant_filename, mutantfastafile)
                             with open(path_dst_mutant_file, 'w') as temp_fastafile:
                                 temp_fastafile.write(fasta_str)
                             agadir = Agadir(AgadCndtns.INCELL_MAML.value)
