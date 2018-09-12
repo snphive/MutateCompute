@@ -1,6 +1,7 @@
 import sys
 from src.Main import Main
 from src.Paths import Paths
+from src.AminoAcids import AA
 import glob
 import natsort
 from src.Agadir import Agadir
@@ -11,63 +12,77 @@ from src.Str import Str
 import os
 import time
 import multiprocessing as mp
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 print('This computer has ' + str(mp.cpu_count()) + ' cpus')
-use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
-use_multithread = False
+if len(sys.argv) < 2:
+    use_cluster = False
+else:
+    use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
+
 Paths.set_up_paths(use_cluster)
-path_repo_pdbs = Paths.REPO_PDBS + '_10'
-startnum = 29001
-endnum = 30000
+# path_repo_pdbs = Paths.REPO_PDBS + '_10'
 
 # NOTE: Ideally, if use_cluster is True, this script would set up an ssh tunnel to zeus and copy all src and config
-# files to SnpEffect in zeus cluster before running the code therein.
+# files to SnpEffect in zeus cluster before running the code therein - but this is not currently set up.
+# You must manually copy over the scripts to the cluster, make an ssh tunnel and run the code on the cluster.
 
-for i in range(50):
+# for i in range(1):
 
-    # path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + '...' + str(endnum))
-    # globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
-    # wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
-    # wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
-    # operations = Main._determine_which_operations_to_perform(globaloptions_lines)
-    # mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
-    # path_dst = Paths.INPUT
-    # path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
-    # path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_
-    # list)
+# THE FOLLOWING ARE ONLY NECESSARY IF YOU WANT TO RUN THE WHOLE THING FROM VALUES IN THE GLOBAL OPTIONS TEXT FILE.
+# path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + Str.DOTS3.value + str(endnum))
+# globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
+# wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
+# wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
+# operations = Main._determine_which_operations_to_perform(globaloptions_lines)
+# mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
+# path_dst = Paths.INPUT
+# path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
+# path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
 
-    # path_input = Paths.INPUT
-    # path_output = Paths.OUTPUT
+# path_input = Paths.INPUT
+# path_output = Paths.OUTPUT
+startnum = 1
+endnum = 10
+dir_3dots = str(startnum) + Str.DOTS3.value + str(endnum)
+path_to_mutants = os.path.join(Paths.INPUT, Paths.DIR_MUTANTS_MULTIFASTAS.value, dir_3dots)
+path_to_fastas = path_to_mutants + '/**/*' + Str.FSTAEXT.value
+path_fastafile_list = natsort.natsorted(glob.glob(path_to_fastas, recursive=True))
 
-    path_output_mutants = os.path.join(Paths.OUTPUT, Paths.DIR_MUTANTS_FASTAS.value, str(startnum) + Str.DOTS3.value +
-                                       str(endnum))
-    path_to_fastas = path_output_mutants + '/**/*' + Str.FSTAEXT.value
-    path_fastafile_list = natsort.natsorted(glob.glob(path_to_fastas, recursive=True))
-    agadir = Agadir(AgadCndtns.INCELL_MAML.value)
-    for path_fastafile in path_fastafile_list:
-        time.sleep(1)
-        if use_cluster:
-            jobname = 'wr_' + path_fastafile.split('/')[-1]
-            path_to_script = os.path.join(Paths.SRC, 'run_write_1fastafile_per_fasta_from_multifastafile_zeus.py')
-            Cluster.write_job_q_bash(jobname, path_job_q_dir=Paths.CONFIG_JOBQ, python_script_with_paths=path_to_script
-                                                                                    + Str.SPCE.value + path_fastafile)
-            Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
-        else:
-            GUM.write_1_fastafile_per_fasta_from_multifastafile(path_fastafile)
+operations = {'do_mutate_fasta': False, 'do_agadir': True, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
+              'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
+use_multithread = False
+path_pdbfile_list = None
+main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile_list, path_fastafile_list,
+            AA.LIST_ALL_20_AA.value)
 
-    # main = Main(use_cluster, operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
-    #             path_wanted_fastafile_list, mutant_aa_list)
+# main = Main(use_cluster, operations, use_multithread, path_input, path_output, wanted_pdbfile_list,
+#             wanted_fastafile_list, mutant_aa_list)
 
-    # main = Main(use_cluster, operations, use_multithread, path_input, path_output, wanted_pdbfile_list,
-    #             wanted_fastafile_list, mutant_aa_list)
-    if i == 50:
-        break
-    time.sleep(30)
-    startnum += 1000
-    endnum += 1000
+# if i == 50:
+#     break
+# time.sleep(10)
+# startnum += 1000
+# endnum += 1000
 
+#
+# def run_agadir_on_1000_fastas():
+#     path_output_mutants = os.path.join(Paths.OUTPUT, Paths.DIR_MUTANTS_FASTAS.value,
+# str(startnum) + Str.DOTS3.value + str(endnum))
+#     path_to_fastas = path_output_mutants + '/**/*' + Str.FSTAEXT.value
+#     path_fastafile_list = natsort.natsorted(glob.glob(path_to_fastas, recursive=True))
+#     agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+#     for path_fastafile in path_fastafile_list:
+#         time.sleep(1)
+#         if use_cluster:
+#             jobname = 'wr_' + path_fastafile.split('/')[-1]
+#             path_to_script = os.path.join(Paths.SRC, 'run_write_1fastafile_per_fasta_from_multifastafile_zeus.py')
+#             Cluster.write_job_q_bash(jobname, path_job_q_dir=Paths.CONFIG_JOBQ,
+# python_script_with_paths=path_to_script + Str.SPCE.value + path_fastafile)
+#             Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
+#         else:
+#             GUM.write_1_fastafile_per_fasta_from_multifastafile(path_dst=Paths.INPUT, path_fastafile=path_fastafile)
 
 # In all cases, the start of operations begins with identifying which or how many pdb and/or fasta files are to be
 # analysed. These must then be copied over from either the repository directory (REPO_PDB_FASTA) or the output_data
@@ -105,4 +120,4 @@ for i in range(50):
 #
 # To start this script from cmd line, sh KickOff.sh
 
-# pydevd.stoptrace()
+pydevd.stoptrace()
