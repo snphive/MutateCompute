@@ -271,7 +271,7 @@ class GUM(object):
     # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
     @staticmethod
     def _make_path_3dot_dir(path_dst_dir, start_num, end_num):
-        return GUM._os_makedirs(path_dst_dir, str(start_num) + '...' + str(end_num))
+        return GUM._os_makedirs(path_dst_dir, str(start_num) + Str.DOTS3.value + str(end_num))
 
     # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dots subdir.
     # This method is currently only used for building output dir for MutateFasta.
@@ -294,8 +294,8 @@ class GUM(object):
 
     # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
     # This method is currently only used for building output dir for Agadir.
-    # Expects path_fastafile to be: ~/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/mutants/1_A_mutants.fasta
-    # As such it builds path of child subdirs of /mutant_fastas upto but not including /1_A/mutants/1_A_mutants.fasta
+    # Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
+    # It builds: path_root/agadir/<3dots dir>/<any other subdirs between 3dots_dir and [-3] although none are expected.
     @staticmethod
     def make_root_agadir_3dots_dirs(path_root, path_fastafile):
         path_fastafile_list = path_fastafile.split('/')
@@ -304,9 +304,32 @@ class GUM(object):
         for path_dir in path_fastafile_list[:-3]:
             if path_dir == '':
                 continue
-            if path_dir == Paths.DIR_MUTANTS_FASTAS.value:
-                copy_from_here = True
+            if Str.DOTS3.value in path_dir:
                 path_agadir_3dots_dirs.append(Paths.DIR_AGADIR.value)
+                path_agadir_3dots_dirs.append(path_dir)
+                copy_from_here = True
+                continue
+            if copy_from_here:
+                path_agadir_3dots_dirs.append(path_dir)
+        return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
+
+    # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
+    # This method is currently only used for building output dir for Agadir.
+    # Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
+    # It builds: path_root/agadir/<3dots dir>/<filename>/<mutants>
+    # (includes <any other subdirs between 3dots_dir and [-3] although none are expected.)
+    @staticmethod
+    def make_root_agadir_3dots_filename_mutants_dirs(path_root, path_fastafile):
+        path_fastafile_list = path_fastafile.split('/')
+        path_agadir_3dots_dirs = []
+        copy_from_here = False
+        for path_dir in path_fastafile_list[:-1]:
+            if path_dir == '':
+                continue
+            if Str.DOTS3.value in path_dir:
+                path_agadir_3dots_dirs.append(Paths.DIR_AGADIR.value)
+                path_agadir_3dots_dirs.append(path_dir)
+                copy_from_here = True
                 continue
             if copy_from_here:
                 path_agadir_3dots_dirs.append(path_dir)
@@ -390,8 +413,16 @@ class GUM(object):
                     print('Problem with linux cp command.')
 
     @staticmethod
-    def linux_remove_files_in_dir(path_dir):
+    def linux_remove_all_files_in_dir(path_dir):
         cmd = 'rm' + Str.SPCE.value + path_dir + "/*"
+        try:
+            subprocess.call(cmd, shell=True)
+        except OSError:
+            print('Problem with linux cp command.')
+
+    @staticmethod
+    def linux_remove_file(path_dst_mutant_file):
+        cmd = 'rm' + Str.SPCE.value + path_dst_mutant_file
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
@@ -479,19 +510,20 @@ class GUM(object):
     # The dst dir (path_dst_filename) is ~/PycharmProjects/input_data/mutants_fastas/1...1000/1_A if local;
     #  /switchlab/group/shazib/SnpEffect/input_data/mutants_fastas/1...1000/1_A if on zeus cluster.
     @staticmethod
-    def write_1_fastafile_per_fasta_from_multifastafile(path_fastafile):
-        path_dst_filename = GUM.make_root_3dots_dirs(Paths.INPUT, path_fastafile)
+    def write_1_fastafile_per_fasta_from_multifastafile(path_dst, path_fastafile):
+        fasta_str = ''
+        fastafile = ''
+        is_first_line = True
+        path_dst_filename = GUM.make_root_agadir_3dots_dirs(path_dst, path_fastafile)
         with open(path_fastafile) as f:
-            fasta_str = ''
-            is_first_line = True
             for line in f.readlines():
                 if '>' in line:
                     if not is_first_line:
-                        fastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
-                        with open(os.path.join(path_dst_filename, fastafile), 'w') as f_to_write:
-                            f_to_write.write(fasta_str)
+                        with open(os.path.join(path_dst_filename, fastafile), 'w') as j:
+                            j.write(fasta_str)
                     fasta_str = line
                     is_first_line = False
+                    fastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
                 else:
                     fasta_str += line
 
@@ -525,6 +557,15 @@ class GUM(object):
         filelist = glob.glob(path_repo_pdbs_or_fastas + '/*' + file_ext)
         return filelist
 
+    @staticmethod
+    def get_3dots_dir(path_with_3dots):
+        dir_3dots = ''
+        for this_dir in path_with_3dots.split('/'):
+            if Str.DOTS3.value in this_dir:
+                dir_3dots = this_dir
+                break
+        return dir_3dots
+
     # Note use of list comprehension.
     @staticmethod
     def make_filelist_in_current_dir_and_subdirs_recursively(path_current_dir, dot_file_ext):
@@ -536,6 +577,7 @@ class GUM(object):
         return 'switchlab' in os.getcwd()
 
     ######################################################################################################################
+
     # Permanently removes input_data and all contents!
     @staticmethod
     def remove_inputdata_dir_tree():
