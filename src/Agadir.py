@@ -7,11 +7,15 @@ from src.GeneralUtilityMethods import GUM
 from src.Paths import Paths
 from enum import Enum
 import natsort
+import time
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 
 class Agadir(object):
 
     def __init__(self, conditions):
+        print('Agadir constructor is called.......')
         self.temp = conditions['temp']
         self.ph = conditions['ph']
         self.ion_strgth = conditions['ion_strgth']
@@ -43,40 +47,48 @@ class Agadir(object):
     # Expecting path_fastafile to potentially contain more than 1 sequence.
     # path_dst_fastafile    String      Abs path of where the single fastafile is written (from the multifastafile)
     def compute(self, path_dst_fastafile):
+        print('Agadir.compute is called on: ' + path_dst_fastafile)
         path_agadir_dst_dir = '/'.join(path_dst_fastafile.split('/')[:-1])
         os.chdir(path_agadir_dst_dir)
         if GUM.using_cluster():
-            Cluster.wait_for_grid_engine_job_to_complete(Paths.PREFIX_AGADIR.value)
+            # Cluster.wait_for_grid_engine_job_to_complete(Paths.PREFIX_AGADIR.value)
+            path_agadir_exe = Paths.ZEUS_AGADIR_EXE.value + 'agadirwrapper'
+            path_config_agad = Paths.SE_CONFIG_AGAD.value
         else:
-            cmd = 'chmod 100 agadirwrapper'
-            # cmd = 'chmod +x agadirwrapper'
-            # cmd = 'chmod u=x agadirwrapper'
-            try:
-                subprocess.call(cmd, shell=True)
-            except OSError:
-                print('Problem with linux cp command.')
-        cmd = 'agadirwrapper' + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \
-              Paths.CONFIG_AGAD + '/Options.txt'
+            print('Local agadir exe should be: /Users/u0120577/SNPEFFECT/executables/agadir_10042012')
+            # cmd = 'chmod 777 /Users/u0120577/SNPEFFECT/executables/agadir_10042012/agadir_wrapper'
+            # cmd = 'chmod +x agadir_wrapper'
+            # cmd = 'chmod u=x agadir_wrapper'
+            # try:
+            #     subprocess.call(cmd, shell=True)
+            # except OSError:
+            #     print('Problem with linux cp command.')
+            path_agadir_exe = Paths.LOCAL_AGADIR_EXE.value + 'agadir_wrapper'
+            path_config_agad = Paths.MC_CONFIG_AGAD.value
+        # cmd = Paths.AGADIR_EXE + agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \
+        #       Paths.CONFIG_AGAD + '/Options.txt'
+
+        cmd = path_agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + path_config_agad + '/Options.txt'
+
+        # cmd = '/switchlab/group/tools/agadir_10042012/' + agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \
+        #       '/switchlab/group/shazib/SnpEffect/configuration/agadir_config/Options.txt'
+
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
             print('Problem with linux cp command.')
 
-    def run_agadir_on_multifastas(self, path_output_root, path_multifastas_3dots):
-        path_to_input_fastas = path_multifastas_3dots + '/**/*' + Str.FSTAEXT.value
-        path_fastafile_list = natsort.natsorted(glob.glob(path_to_input_fastas, recursive=True))
-        for path_fastafile in path_fastafile_list:
+    def run_agadir_on_multifastas(self, path_fastafile, path_output_root):
             path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_output_root, path_fastafile)
-            # time.sleep(1)
             with open(path_fastafile) as f:
-                # path_dst_mutant_file = ''
-                fasta_str = ''
                 is_first_line = True
+                fasta_str = ''
+                mutantfastafilename = ''
                 mutantfastafile = ''
                 for line in f.readlines():
                     if '>' in line:
                         if not is_first_line:
-                            path_dst_mutant_filename = GUM._os_makedirs(path_dst, mutantfastafile.split('.')[0])
+                            path_dst_mutant_filename = GUM._os_makedirs(path_dst, mutantfastafilename)
                             path_dst_mutant_file = os.path.join(path_dst_mutant_filename, mutantfastafile)
                             with open(path_dst_mutant_file, 'w') as temp_fastafile:
                                 temp_fastafile.write(fasta_str)
@@ -85,7 +97,8 @@ class Agadir(object):
                             GUM.linux_remove_file(path_dst_mutant_file)
                         fasta_str = line
                         is_first_line = False
-                        mutantfastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
+                        mutantfastafilename = line.split('>')[-1].split('\n')[0]
+                        mutantfastafile = mutantfastafilename + Str.FSTAEXT.value
                     else:
                         fasta_str += line
 
@@ -168,3 +181,6 @@ class AgadCndtns(Enum):
     # OUTCELL_MAML = {'temp': 310.15, 'pH': 7?}
     INVITRO_COND1 = {'temp': 298.15, 'ph': 7.5, 'ion_strgth': 0.15, 'tfe': 0, 'stab': 0, 'conc': 1}
     # ETC
+
+
+# pydevd.stoptrace()
