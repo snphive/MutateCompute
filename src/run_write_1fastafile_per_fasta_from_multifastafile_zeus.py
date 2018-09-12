@@ -5,18 +5,20 @@ from src.Paths import Paths
 from src.Str import Str
 
 path_fastafile = sys.argv[1]
-path_dst_filename = GUM.make_root_3dots_dirs(Paths.SE_INPUT.value, path_fastafile)
+path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(Paths.OUTPUT, path_fastafile)
 
 with open(path_fastafile) as f:
     fasta_str = ''
     is_first_line = True
+    mutantfastafile = ''
     for line in f.readlines():
         if '>' in line:
             if not is_first_line:
-                fastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
-                with open(os.path.join(path_dst_filename, fastafile), 'w') as f_to_write:
-                    f_to_write.write(fasta_str)
+                path_dst_mutant_file = os.path.join(path_dst, mutantfastafile)
+                with open(path_dst_mutant_file, 'w') as temp_fastafile:
+                    temp_fastafile.write(fasta_str)
             fasta_str = line
             is_first_line = False
+            mutantfastafile = line.split('>')[-1].split('\n')[0] + Str.FSTAEXT.value
         else:
             fasta_str += line
