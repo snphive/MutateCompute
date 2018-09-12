@@ -55,6 +55,8 @@ class Cluster(object):
     #
     # job_name                 N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
     # path_job_q_dir           Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
+    # startnum                 Starting number for an array job. If either startnum or endnum are empty, no array job.
+    # endnum                   End number for an array job. If either startnum or endnum are empty, no array job.
     # using_runscript          True/False using runscript (hence running FoldX).
     # python_script_with_paths Which script to run followed by paths to relevant executables, such as to Qsub.
     # queue                    q specifies which oge queue you want to use, e.g. 'all.q' for all queues.
@@ -63,24 +65,27 @@ class Cluster(object):
     # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use.
     # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
     @staticmethod
-    def write_job_q_bash(job_name, path_job_q_dir, using_runscript=False, python_script_with_paths='', queue='',
-                         n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
+    def write_job_q_bash(job_name, path_job_q_dir, startnum='', endnum='', using_runscript=False,
+                         python_script_with_paths='', queue='', n_slots='', total_memory_GB='', memory_limit_GB='',
+                         cluster_node=''):
         try:
             os.makedirs(path_job_q_dir)
         except FileExistsError:
             print("Some or all of the directories in the this path already exist. It's no problem.")
         job_q = []
         job_q.append('#!/bin/bash' + Str.NEWLN.value)
-        job_q.append('#$ -N '+job_name+'' + Str.NEWLN.value)
+        job_q.append('#$ -N' + Str.SPCE.value + job_name + '' + Str.NEWLN.value)
+        if startnum != '' and endnum != '':
+            job_q.append('#$ -t' + Str.SPCE.value + str(startnum) + '-' + str(endnum) + Str.NEWLN.value)
         job_q.append('#$ -V' + Str.NEWLN.value)
         if queue != '':
-            job_q.append('#$ -q ' + queue + Str.NEWLN.value)
+            job_q.append('#$ -q' + Str.SPCE.value + queue + Str.NEWLN.value)
 
         multicore_memory_command = ''
         if n_slots != '' and total_memory_GB == '':
             raise ValueError('n_slots was specified but no total memory was given.')
         elif n_slots != '' and total_memory_GB != '':
-            multicore_memory_command = '#$ -pe serial ' + n_slots + ' '
+            multicore_memory_command = '#$ -pe serial' + Str.SPCE.value + n_slots + Str.SPCE.value
             multicore_memory_command += '-l mem_free=' + total_memory_GB + 'G'
 
         if n_slots != '' and memory_limit_GB != '':
@@ -98,11 +103,13 @@ class Cluster(object):
         job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles' + Str.NEWLN.value)
         job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
         if using_runscript:
-            job_q.append(Paths.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt' + Str.NEWLN.value)
+            job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + '-runfile runscript.txt' + Str.NEWLN.value)
 
         if python_script_with_paths != '':
-            job_q.append('python3 ' + python_script_with_paths + Str.NEWLN.value)
-
+            job_q.append('python3' + Str.SPCE.value + python_script_with_paths + Str.NEWLN.value)
+            # not sure if path to qsub is also needed, as it is present in Rob's scripts (OptProt has path/to/python
+            # script then space then the qsub path string, which seemed odd as the path/to/qsub is specified in the
+            # prefix to qsub command in subprocess.call())
         with open(path_job_q_dir + '/job.q', 'w') as job_q_file:
             job_q_str = ''.join(job_q)
             job_q_file.write(job_q_str)
@@ -111,16 +118,16 @@ class Cluster(object):
 
     @staticmethod
     def run_job_q(path_job_q_dir):
-        cmd = Paths.ZEUS_QSUB_EXE.value + 'qsub ' + os.path.join(path_job_q_dir, 'job.q')
+        cmd = Paths.ZEUS_QSUB_EXE.value + 'qsub' + Str.SPCE.value + os.path.join(path_job_q_dir, 'job.q')
         subprocess.call(cmd, shell=True)
 
     @staticmethod
-    def wait_for_grid_engine_job_to_complete(grid_engine_jobname):
+    def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix):
         check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
         output_qstat = check_qstat.stdout.read()
         # output_qstat = output_qstat.decode('utf-8')
-        while grid_engine_jobname.encode('utf-8') in output_qstat:
-            print('Waiting for ' + grid_engine_jobname + ' to finish.')
+        while grid_engine_job_prefix.encode('utf-8') in output_qstat:
+            print('Waiting for all ' + grid_engine_job_prefix + ' to finish.')
             time.sleep(10)
             check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
             output_qstat = check_qstat.stdout.read()
