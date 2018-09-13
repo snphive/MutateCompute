@@ -65,7 +65,7 @@ class Cluster(object):
     # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use.
     # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
     @staticmethod
-    def write_job_q_bash(job_name, path_job_q_dir, startnum='', endnum='', using_runscript=False,
+    def write_job_q_bash(job_name, path_job_q_dir, startnum='', endnum='', using_runscript=False, path_runscript_dir='',
                          python_script_with_paths='', queue='', n_slots='', total_memory_GB='', memory_limit_GB='',
                          cluster_node=''):
         try:
@@ -103,7 +103,8 @@ class Cluster(object):
         job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles' + Str.NEWLN.value)
         job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
         if using_runscript:
-            job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + '-runfile runscript.txt' + Str.NEWLN.value)
+            job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + '-runfile' + Str.SPCE.value + path_runscript_dir
+                         + 'runscript.txt' + Str.NEWLN.value)
 
         if python_script_with_paths != '':
             job_q.append('python3' + Str.SPCE.value + python_script_with_paths + Str.NEWLN.value)
@@ -123,6 +124,7 @@ class Cluster(object):
 
     @staticmethod
     def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix):
+        print('Cluster.wait_for_grid_ending..() is called.......')
         check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
         output_qstat = check_qstat.stdout.read()
         # output_qstat = output_qstat.decode('utf-8')
