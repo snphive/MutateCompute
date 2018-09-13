@@ -1,10 +1,9 @@
 import glob
+import natsort
 from src.Scheduler import Scheduler
-from src.GeneralUtilityMethods import GUM
 from src.Str import Str
 from src.Paths import Paths
 from src.AminoAcids import AA
-import natsort
 # The following 4 lines of commented-out code successfully connect to my mysql database and create a table.
 # import mysql.connector
 # cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
@@ -37,9 +36,9 @@ class Main(object):
         if operations == {} or Main._all_ops_are_false(operations):
             raise ValueError("All options in 'operations' were either set to FALSE or some typographical error. "
                              "Check /configuration/global_options/global_options.txt was written correctly")
-        elif operations['do_mutate_fasta'] or operations['do_agadir'] or operations['do_foldx_repair'] \
-                or operations['do_foldx_buildmodel'] or operations['do_foldx_stability'] \
-                or operations['do_foldx_analysecomplex']:
+        elif operations['do_mutate_fasta'] or operations['do_agadir'] or \
+                operations['do_foldx_repair'] or operations['do_foldx_buildmodel'] or \
+                operations['do_foldx_stability'] or operations['do_foldx_analysecomplex']:
             Scheduler.start(operations, use_multithread, path_input, path_output, path_pdbfiles,
                             path_fastafiles, amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False)
 
@@ -49,12 +48,9 @@ class Main(object):
         :param operations:
         :return: True indicates all oprations are set to False in global_options.txt.
         """
-        if not operations['do_mutate_fasta'] \
-                and not operations['do_agadir'] \
-                and not operations['do_foldx_repair'] \
-                and not operations['do_foldx_buildmodel'] \
-                and not operations['do_foldx_stability'] \
-                and not operations['do_foldx_analysecomplex']:
+        if not operations['do_mutate_fasta'] and not operations['do_agadir'] \
+                and not operations['do_foldx_repair'] and not operations['do_foldx_buildmodel'] \
+                and not operations['do_foldx_stability'] and not operations['do_foldx_analysecomplex']:
             return True
         else:
             return False
@@ -70,8 +66,6 @@ class Main(object):
             globaloptions_lines = globaloptions.readlines()
         return globaloptions_lines
 
-
-    #
     # Note the risk of inefficiency where the program spends a lot of time sorting the source directory to build the
     # list of available target files, but only a relatively small number of files will be used E.g. source dir sorts
     # about 30,000 pdbs for user to get access to first 5 only!
@@ -187,7 +181,7 @@ class Main(object):
         :param line: Alphanumeric text of global options ending with "\n". Expecting "option name:<option value>;\n"
         :return: True boolean if text string is "True", False if text is "False".
         """
-        return Main.__get_text_after_colon_before_semi(line) == 'TRUE'
+        return Main.__get_text_after_colon_before_semi(line).lower() == 'true'
 
     @staticmethod
     def __get_text_after_colon_before_semi(line: str):
@@ -196,16 +190,6 @@ class Main(object):
         :return: all text string after a colon and before a semi-colon, stripping out any white space.
         """
         return line.split(':')[-1].strip(';\n').strip()
-
-    # Validates the "PDBs:" or "FASTAs:" has expected values: "", "all", "filename", "<number within range 1 to 1000>"
-    # If the input for PDBs: or FASTAs happens to be "<name>.fasta" or "<name>.pdb", respectively, it is still accepted
-    # as the name of the file is the important thing and the extension is ignore anyway.
-    # It is also accepted if there was no ";" at the end of the value.
-    # Strangely enough, strip(';\n') removes any number of consecutive semi-colons from either side of "\n". However,
-    # the validation will fail is there are semi-colons or other non-dot punctuation marks within the value.
-    # @staticmethod
-    # def __validate_option_text(line):
-    #     re.match(['a-zA-Z0-9_'], line)
 
 
 # cnx is the mysql connector (see top of script)
