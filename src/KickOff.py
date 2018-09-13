@@ -1,19 +1,19 @@
+import os
 import sys
+import glob
+import natsort
+import time
 from src.Main import Main
 from src.Paths import Paths
 from src.AminoAcids import AA
-import glob
-import natsort
+from src.Str import Str
 from src.Agadir import Agadir
 from src.Agadir import AgadCndtns
 from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
-from src.Str import Str
-import os
-import time
 import multiprocessing as mp
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 print('This computer has ' + str(mp.cpu_count()) + ' cpus')
 if len(sys.argv) < 2:
@@ -43,22 +43,41 @@ Paths.set_up_paths(use_cluster)
 
 # path_input = Paths.INPUT
 # path_output = Paths.OUTPUT
+
+# startnum = 1
+# endnum = 10
+# dir_3dots = str(startnum) + Str.DOTS3.value + str(endnum)
+# path_multifastas_3dots = os.path.join(Paths.INPUT, Paths.DIR_MUTANTS_MULTIFASTAS.value, dir_3dots)
+# path_multifastafiles = path_multifastas_3dots + '/**/*' + Str.FSTAEXT.value
+#
+# operations = {'do_mutate_fasta': False, 'do_agadir': True, 'do_foldx_repair': False,'do_foldx_buildmodel': True,
+#              'do_foldx_stability': False,'do_foldx_analysecomplex': False}
+# use_multithread = False
+# path_pdbfile_list = []
+# path_fastafile_list = natsort.natsorted(glob.glob(path_multifastafiles, recursive=True))
+# main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile_list, path_fastafile_list,
+#             AA.LIST_ALL_20_AA.value)
+
+# main = Main(operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
+# path_wanted_fastafile_list, mutant_aa_list)
+
+
 startnum = 1
 endnum = 10
 dir_3dots = str(startnum) + Str.DOTS3.value + str(endnum)
-path_to_mutants = os.path.join(Paths.INPUT, Paths.DIR_MUTANTS_MULTIFASTAS.value, dir_3dots)
-path_to_fastas = path_to_mutants + '/**/*' + Str.FSTAEXT.value
-path_fastafile_list = natsort.natsorted(glob.glob(path_to_fastas, recursive=True))
+path_pdbs_3dots = os.path.join(Paths.INPUT, Paths.DIR_PDBS.value, dir_3dots)
+path_pdbfiles = path_pdbs_3dots + '/**/*' + Str.PDBEXT.value
 
-operations = {'do_mutate_fasta': False, 'do_agadir': True, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
+operations = {'do_mutate_fasta': False, 'do_agadir': False,
+              'do_foldx_repair': False, 'do_foldx_buildmodel': True,
               'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
 use_multithread = False
-path_pdbfile_list = None
+path_pdbfile_list = natsort.natsorted(glob.glob(path_pdbfiles, recursive=True))
+path_fastafile_list = []
 main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile_list, path_fastafile_list,
             AA.LIST_ALL_20_AA.value)
 
-# main = Main(use_cluster, operations, use_multithread, path_input, path_output, wanted_pdbfile_list,
-#             wanted_fastafile_list, mutant_aa_list)
+
 
 # if i == 50:
 #     break
@@ -120,4 +139,4 @@ main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile
 #
 # To start this script from cmd line, sh KickOff.sh
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
