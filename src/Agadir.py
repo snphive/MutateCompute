@@ -70,8 +70,8 @@ class Agadir(object):
 
         cmd = path_agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + path_config_agad + '/Options.txt'
 
-        # cmd = '/switchlab/group/tools/agadir_10042012/' + agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \
-        #       '/switchlab/group/shazib/SnpEffect/configuration/agadir_config/Options.txt'
+        # cmd = '/switchlab/group/tools/agadir_10042012/' + agadir_exe + Str.SPCE.value + path_dst_fastafile +
+        # Str.SPCE.value + '/switchlab/group/shazib/SnpEffect/configuration/agadir_config/Options.txt'
 
         try:
             subprocess.call(cmd, shell=True)
@@ -132,14 +132,14 @@ class Agadir(object):
     # wndws_file_per_seq        "       'true' to include Tango window calculations.
     # resid_file_per_seq        "       'true' to include Tango window calculations.
     def write_agadir_options_file(self, temp, ph, ion_strgth, tfe, stab, conc, ntrm='#', ctrm='#',
-                                  global_tot=Str.T.value, tango_wndw=Str.T.value, waltz_wndw=Str.T.value,
-                                  limbo_wndw=Str.F.value, agadir_wndw=Str.F.value, csblnca_wndw=Str.F.value,
-                                  complex_wndw=Str.F.value, repeat_wndw=Str.F.value,
-                                  pat_tango_wndw=Str.F.value, tango_resid=Str.F.value,
-                                  waltz_resid=Str.F.value, limbo_resid=Str.F.value, complex_resid=Str.F.value,
-                                  agadir_resid=Str.F.value, csblnca_resid=Str.F.value,
-                                  repeat_resid=Str.F.value, wndws_file_per_seq=Str.F.value,
-                                  resid_file_per_seq=Str.F.value):
+                                  global_tot=Str.TRUE.value, tango_wndw=Str.TRUE.value, waltz_wndw=Str.TRUE.value,
+                                  limbo_wndw=Str.FALSE.value, agadir_wndw=Str.FALSE.value, csblnca_wndw=Str.FALSE.value,
+                                  complex_wndw=Str.FALSE.value, repeat_wndw=Str.FALSE.value,
+                                  pat_tango_wndw=Str.FALSE.value, tango_resid=Str.FALSE.value,
+                                  waltz_resid=Str.FALSE.value, limbo_resid=Str.FALSE.value, complex_resid=Str.FALSE.value,
+                                  agadir_resid=Str.FALSE.value, csblnca_resid=Str.FALSE.value,
+                                  repeat_resid=Str.FALSE.value, wndws_file_per_seq=Str.FALSE.value,
+                                  resid_file_per_seq=Str.FALSE.value):
         options = []
         options.append('<TITLE>AGADIR_optionfile' + Str.SEMICO_NL.value)
         options.append('<Temperature>' + str(self.temp) + '.' + Str.SEMICO_NL.value)
