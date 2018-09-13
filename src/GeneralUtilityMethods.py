@@ -68,15 +68,15 @@ class GUM(object):
     # E.g. return value might look like:
     # {'RepairPDB_1_A': 'RVYLTFDELRETK..etc', 'RepairPDB_2_A': 'RVYLTFDELRETK..etc', etc}
     #
-    # pdbfiles                  String OR List of Strings   The pdb file (including ".pdb") or files (no path).
-    # path_input                String                      Path to where the pdb subdirectories can be found.
-    # write_fastafile           Boolean                     True to write fasta string incl. >title to new fasta file.
-    # path_fastafile            String                      Absolute path of root for fasta file (without >title) that
-    #                                                       will be written if write_fastafile is True.
-    #
+    # path_input                str                 Path to where the pdb subdirectories can be found.
+    # pdbfiles                  str OR List of str  The pdb file (including ".pdb") or files (no path).
+    # path_fastafile            str                 Absolute path of root for fasta file (without >title) that
+    #                                               will be written if write_fastafile is True.
+    # write_fastafile           bool                True to write fasta string incl. >title to new fasta file.
+    #                                               False by default.
     # Returns a dictionary of the pdbname_chain and the protein sequence in FASTA format.
     @staticmethod
-    def extract_pdbname_chain_fasta_from_pdbs(pdbfiles, path_input, write_fastafile, path_fastafile):
+    def extract_pdbname_chain_fasta_from_pdbs(path_input, pdbfiles, path_fastafile, write_fastafile=True):
         # pdbname_chain_fastaseq_dict: dict = {} version 3 only
         pdbname_chain_fastaseq_dict = {}
         if isinstance(pdbfiles, str):
