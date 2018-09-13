@@ -1,3 +1,11 @@
+import os
+import time
+from multiprocessing import Process
+from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool
+import multiprocessing as mp
+# import concurrent.futures.ThreadPoolExecutor
+from threading import Thread
 from src.MutateFasta import MutateFasta
 from src.Agadir import Agadir
 from src.Agadir import AgadCndtns
@@ -6,15 +14,7 @@ from src.IdentifyProtein import IdProt
 from src.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 from src.Paths import Paths
-import time
 from src.Str import Str
-import multiprocessing as mp
-from threading import Thread
-from multiprocessing import Process
-from multiprocessing import Pool
-from multiprocessing.dummy import Pool as ThreadPool
-# import concurrent.futures.ThreadPoolExecutor
-import os
 
 
 class Scheduler(object):
@@ -42,6 +42,8 @@ class Scheduler(object):
                 path_output_fastas_3dots = GUM.make_root_fastas_3dots_dirs(path_output, path_fastafile_list[0])
                 mutate_fasta = MutateFasta(mutant_aa_list)
                 for path_fastafile in path_fastafile_list:
+                    sleep_secs = 0 if len(path_fastafile_list) < 200 else len(path_fastafile_list) / 1000
+                    time.sleep(sleep_secs)
                     if use_multithread:
                         # Scheduler._launch_thread(target=mutate_fasta.mutate_every_residue,
                         #                          args=[path_fastafile, write_1_fasta_only, write_fasta_per_mut,
@@ -62,26 +64,25 @@ class Scheduler(object):
                         # Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_JOBQ.value)
 
             if operations['do_agadir']:
-                path_output_agadir_3dots = GUM.make_root_agadir_3dots_dirs(path_output, path_fastafile_list[0])
-                dir_3dots = GUM.get_3dots_dir(path_output_agadir_3dots)
-                path_input_multifastas_3dots = os.path.join(path_input, Paths.DIR_MUTANTS_MULTIFASTAS.value, dir_3dots)
                 agadir = Agadir(AgadCndtns.INCELL_MAML.value)
                 for path_fastafile in path_fastafile_list:
+                    sleep_secs = 0 if len(path_fastafile_list) < 200 else len(path_fastafile_list) / 1000
+                    time.sleep(sleep_secs)
                     if GUM.using_cluster():
+                        print('Calling scheduler.do_agadir using_cluster condition')
                         jobname = Paths.PREFIX_AGADIR.value + path_fastafile.split('/')[-1]
-                        Cluster.write_job_q_bash(job_name=jobname,
-                                                 path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value,
+                        Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value,
                                                  python_script_with_paths=os.path.join(Paths.SRC,
-                                    'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile +
+                                                                                       'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile +
                                                                                        Str.SPCE.value + Paths.OUTPUT))
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
                     if use_multithread:
                         # Scheduler._launch_thread(target=agadir.run_agadir_on_multifastas,
-                        #                          args=[path_output, path_input_multifastas_3dots])
+                        #                          args=[path_fastafile, path_output])
                         Scheduler._launch_process(target=agadir.run_agadir_on_multifastas,
-                                                  args=[path_output, path_input_multifastas_3dots])
-                    # elif not use_multithread:
-                    #     agadir.run_agadir_on_multifastas(path_output, path_input_multifastas_3dots)
+                                                  args=[path_fastafile, path_output])
+                    elif not GUM.using_cluster() and not use_multithread:
+                        agadir.run_agadir_on_multifastas(path_fastafile, path_output)
 
         elapsed = time.perf_counter() - start_time
         print('Time taken to complete iterating through fasta_list (after methods have been called): ' + str(elapsed))
@@ -94,13 +95,12 @@ class Scheduler(object):
                     else:
                         repair.do_repair(path_pdbfile)
                 if operations['do_foldx_buildmodel']:
-                    write_wt_fastafiles = True
                     buildmodel = FoldX().BuildModel()
                     if use_multithread:
-                        Scheduler._launch_thread(target=buildmodel.mutate_residues_of_pdb,
-                                                 args=[path_pdbfile, mutant_aa_list, write_wt_fastafiles])
+                        Scheduler._launch_thread(target=buildmodel.mutate_all_pdb,
+                                                 args=[path_input, path_pdbfile, mutant_aa_list, path_output])
                     else:
-                        buildmodel.mutate_residues_of_pdb(path_pdbfile, mutant_aa_list, write_wt_fastafiles)
+                        buildmodel.mutate_all_pdb(path_input, path_pdbfile, mutant_aa_list, path_output)
                 if operations['do_foldx_stability']:
                     stability = FoldX().Stability()
                     if use_multithread:
