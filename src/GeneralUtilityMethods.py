@@ -18,49 +18,6 @@ class GUM(object):
 
     # def __init__(self):
 
-    # The runscript.txt is an input file for FoldX indicating which pdbs to analyse and which programs to run on them.
-    # path_runscript        String      Absolute path for runscript.txt file being written.
-    # pdbs                  String      pdb(s) (incl. .pdb extension) inputs for FoldX.
-    # show_sequence_detail  Boolean     True will provide extra information in output.
-    # action                String      FoldX computation to be performed (e.g. BuildModel, AnalyseComplex, etc).
-    # print_networks        Boolean     True to output network data on .. ?
-    # calculate_stability   Boolean     True include a stability calculation.
-    #
-    # 30.07.18 Redesigned the directory structure such that runscripts will go in configuration/foldx/ & maybe another
-    # level such as analyse_complex or build_model or stability etc.
-    @staticmethod
-    def write_runscript_for_pdbs(path_runscript, pdbs, action, show_sequence_detail=False, print_networks=False,
-                                 calculate_stability=False):
-        runscript = []
-        runscript.append('<TITLE>FOLDX_runscript;\n')
-        runscript.append('<JOBSTART>#;\n')
-        runscript.append('<PDBS>' + pdbs + ';\n')
-        runscript.append('<BATCH>#;\n')
-        runscript.append('<COMMANDS>FOLDX_commandfile;\n')
-        if show_sequence_detail:
-            runscript.append('<SequenceDetail>#;\n')
-        runscript.append(action + ';\n')
-        if print_networks:
-            runscript.append('<PrintNetworks>#;\n')
-        if calculate_stability:
-            runscript.append('<Stability>#;\n')
-        runscript.append('<END>#;\n')
-        runscript.append('<OPTIONS>FOLDX_optionfile;\n')
-        runscript.append('<Temperature>298;\n')
-        runscript.append('<IonStrength>0.05;\n')
-        runscript.append('<ph>7;\n')
-        runscript.append('<moveNeighbours>true;\n')
-        runscript.append('<VdWDesign>2;\n')
-        runscript.append('<numberOfRuns>3;\n')
-        runscript.append('<OutPDB>#;\n')
-        runscript.append('<END>#;\n')
-        runscript.append('<JOBEND>#;\n')
-        runscript.append('<ENDFILE>#;\n')
-        with open(path_runscript + '/runscript.txt', 'w') as runscript_file:
-            runscript_str = ''.join(runscript)
-            runscript_file.write(runscript_str)
-        return runscript_str
-
     # Extracts and writes a FASTA file for each chain described in the pdb.
     # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
     # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
@@ -410,7 +367,7 @@ class GUM(object):
                 try:
                     subprocess.call(cmd, shell=True)
                 except OSError:
-                    print('Problem with linux cp command.')
+                    print('Problem with linux mv command.')
 
     @staticmethod
     def linux_remove_all_files_in_dir(path_dir):
@@ -418,7 +375,7 @@ class GUM(object):
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
-            print('Problem with linux cp command.')
+            print('Problem with linux rm command.')
 
     @staticmethod
     def linux_remove_file(path_dst_mutant_file):
@@ -426,7 +383,7 @@ class GUM(object):
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
-            print('Problem with linux cp command.')
+            print('Problem with linux rm command.')
 
     # Might be better to log in manually, as this can hang if mulitplexing is used.
     # @staticmethod
