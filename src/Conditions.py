@@ -1,12 +1,14 @@
 from enum import Enum
 
 
-class Conditions(Enum):
+class Cond(Enum):
     # cytoplasm and nucleus had a pH of ≈7.3, mitochondria ≈8.0, ER ≈7.5 and Golgi ≈6.6
     INCELL_MAML_FX = {'temp': 298.0, 'ph': 7.0, 'ion_strgth': 0.15, 'tfe': 0, 'stab': 0, 'conc': 1}
     # cytoplasm and nucleus had a pH of ≈7.3, mitochondria ≈8.0, ER ≈7.5 and Golgi ≈6.6
+    # 310.15 K == 37 degC
     INCELL_MAML_AG = {'temp': 310.15, 'ph': 7.4, 'ion_strgth': 0.15, 'tfe': 0, 'stab': 0, 'conc': 1}
     # OUTCELL_MAML = {'temp': 310.15, 'pH': 7?}
+    # 298.15 K == 25 degC
     INVITRO_COND1 = {'temp': 298.15, 'ph': 7.5, 'ion_strgth': 0.15, 'tfe': 0, 'stab': 0, 'conc': 1}
     # REFERENCE FOR THE ABOVE VALUES?
     # ETC
@@ -54,3 +56,5 @@ class Conditions(Enum):
 
 # Concentration of Na and K ions in mammalian cells is about 150mM
 # http://book.bionumbers.org/what-are-the-concentrations-of-different-ions-in-cells/
+
+# Concentration of protein is a tricky one. Effective and actual protein concentrations? nanoMolars upto microMolars.
