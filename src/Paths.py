@@ -77,9 +77,9 @@ class Paths(Enum):
             MC_CONFIG_FX = os.path.join(MC_CONFIG, DIR_FXCONFIG)
             MC_CONFIG_GLOBAL_OPTIONS = os.path.join(MC_CONFIG, DIR_GLOBAL_OPTIONS)
             MC_CONFIG_FX_ACRUNSCRIPT = os.path.join(MC_CONFIG, DIR_ACRUNSCRIPT)
-            MC_CONFIG_FX_ACRUNSCRIPT_JOBQ = os.path.join(MC_CONFIG_FX_ACRUNSCRIPT, DIR_JOBQ)
+            MC_CONFIG_JOBQ_AC = os.path.join(MC_CONFIG_JOBQ, DIR_AC)
             MC_CONFIG_FX_BMRUNSCRIPT = os.path.join(MC_CONFIG, DIR_BMRUNSCRIPT)
-            MC_CONFIG_FX_BMRUNSCRIPT_JOBQ = os.path.join(MC_CONFIG_FX_BMRUNSCRIPT, DIR_JOBQ)
+            MC_CONFIG_JOBQ_BM = os.path.join(MC_CONFIG_JOBQ, DIR_BM)
             MC_INPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_INPUT)
             MC_INPUT_FASTAS = os.path.join(MC_INPUT, DIR_FASTAS)
             MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_OUTPUT)
@@ -106,9 +106,9 @@ class Paths(Enum):
             SE_CONFIG_FX = os.path.join(SE_CONFIG, DIR_FXCONFIG)
             SE_CONFIG_GLOBAL_OPTIONS = os.path.join(SE_CONFIG, DIR_GLOBAL_OPTIONS)
             SE_CONFIG_FX_ACRUNSCRIPT = os.path.join(SE_CONFIG, DIR_ACRUNSCRIPT)
-            SE_CONFIG_FX_ACRUNSCRIPT_JOBQ = os.path.join(SE_CONFIG_FX_ACRUNSCRIPT, DIR_JOBQ)
+            SE_CONFIG_JOBQ_AC = os.path.join(SE_CONFIG_JOBQ, DIR_AC)
             SE_CONFIG_FX_BMRUNSCRIPT = os.path.join(SE_CONFIG, DIR_BMRUNSCRIPT)
-            SE_CONFIG_FX_BMRUNSCRIPT_JOBQ = os.path.join(SE_CONFIG_FX_BMRUNSCRIPT, DIR_JOBQ)
+            SE_CONFIG_JOBQ_BM = os.path.join(SE_CONFIG_JOBQ, DIR_BM)
             SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
             SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
@@ -137,9 +137,9 @@ class Paths(Enum):
         Paths.CONFIG_FX = Paths.SE_CONFIG_FX.value if use_cluster else Paths.MC_CONFIG_FX.value
         Paths.CONFIG_GLOBAL_OPTIONS = Paths.SE_CONFIG_GLOBAL_OPTIONS.value if use_cluster else Paths.MC_CONFIG_GLOBAL_OPTIONS.value
         Paths.CONFIG_FX_ACRUNSCRIPT = Paths.SE_CONFIG_FX_ACRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_FX_ACRUNSCRIPT.value
-        Paths.CONFIG_FX_ACRUNSCRIPT_JOBQ = Paths.SE_CONFIG_FX_ACRUNSCRIPT_JOBQ.value if use_cluster else Paths.MC_CONFIG_FX_ACRUNSCRIPT_JOBQ.value
+        Paths.CONFIG_JOBQ_AC = Paths.SE_CONFIG_JOBQ_AC.value if use_cluster else Paths.MC_CONFIG_JOBQ_AC.value
         Paths.CONFIG_FX_BMRUNSCRIPT = Paths.SE_CONFIG_FX_BMRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_FX_BMRUNSCRIPT.value
-        Paths.CONFIG_FX_BMRUNSCRIPT_JOBQ = Paths.SE_CONFIG_FX_BMRUNSCRIPT_JOBQ.value if use_cluster else Paths.MC_CONFIG_FX_BMRUNSCRIPT_JOBQ.value
+        Paths.CONFIG_JOBQ_BM = Paths.SE_CONFIG_JOBQ_BM.value if use_cluster else Paths.MC_CONFIG_JOBQ_BM.value
         # Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
         Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.IO_INPUT.value
         Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.MC_INPUT_FASTAS.value
@@ -153,8 +153,8 @@ class Paths(Enum):
         Paths.REPO_PDB_FASTA = Paths.SE_REPO_PDB_FASTA.value if use_cluster else Paths.MC_REPO_PDB_FASTA.value
         Paths.REPO_PDBS = Paths.SE_REPO_PDBS.value if use_cluster else Paths.MC_REPO_PDBS.value
         Paths.REPO_FASTAS = Paths.SE_REPO_FASTAS.value if use_cluster else Paths.MC_REPO_FASTAS.value
-        Paths.R_EXE = Paths.ZEUS_R_EXE.value if use_cluster else Paths.LOCAL_R_EXE
-        Paths.FOLDX_EXE = Paths.ZEUS_FOLDX_EXE.value if use_cluster else Paths.LOCAL_FOLDX_EXE
+        Paths.R_EXE = Paths.ZEUS_R_EXE.value if use_cluster else Paths.LOCAL_R_EXE.value
+        Paths.FOLDX_EXE = Paths.ZEUS_FOLDX_EXE.value if use_cluster else Paths.LOCAL_FOLDX_EXE.value
         Paths.AGADIR_EXE = Paths.ZEUS_AGADIR_EXE.value if use_cluster else Paths.LOCAL_AGADIR_EXE.value
         Paths.BASH = Paths.SE_BASH.value if use_cluster else Paths.MC_BASH.value
         Paths.SRC = Paths.SE_SRC.value if use_cluster else Paths.MC_SRC.value
