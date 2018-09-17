@@ -132,12 +132,12 @@ class Paths(Enum):
     def set_up_paths(use_cluster):
         Paths.CONFIG = Paths.SE_CONFIG.value if use_cluster else Paths.MC_CONFIG.value
         Paths.CONFIG_AGAD = Paths.SE_CONFIG_AGAD.value if use_cluster else Paths.MC_CONFIG_AGAD.value
-        Paths.CONFIG_AGAD_JOBQ = Paths.SE_CONFIG_AGAD_JOBQ.value if use_cluster else Paths.MC_CONFIG_AGAD_JOBQ.value
-        Paths.CONFIG_BM_JOBQ = Paths.SE_CONFIG_BM_JOBQ.value if use_cluster else Paths.MC_CONFIG_BM_JOBQ.value
+        Paths.CONFIG_AGAD_JOBQ = Paths.SE_CONFIG_AGAD_JOBQ.value
+        Paths.CONFIG_BM_JOBQ = Paths.SE_CONFIG_BM_JOBQ.value
         Paths.CONFIG_FX = Paths.SE_CONFIG_FX.value if use_cluster else Paths.MC_CONFIG_FX.value
         Paths.CONFIG_GLOBAL_OPTIONS = Paths.SE_CONFIG_GLOBAL_OPTIONS.value if use_cluster else Paths.MC_CONFIG_GLOBAL_OPTIONS.value
         Paths.CONFIG_ACRUNSCRIPT = Paths.SE_CONFIG_ACRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_ACRUNSCRIPT.value
-        Paths.CONFIG_AC_JOBQ = Paths.SE_CONFIG_AC_JOBQ.value if use_cluster else Paths.MC_CONFIG_AC_JOBQ.value
+        Paths.CONFIG_AC_JOBQ = Paths.SE_CONFIG_AC_JOBQ.value
         Paths.CONFIG_BMRUNSCRIPT = Paths.SE_CONFIG_BMRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_BMRUNSCRIPT.value
         # Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
         Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.IO_INPUT.value
