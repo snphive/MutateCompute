@@ -10,6 +10,7 @@ from src.MutateFasta import MutateFasta
 from src.Agadir import Agadir
 from src.Agadir import AgadCndtns
 from src.FoldX import FoldX
+from src.Conditions import Cond
 from src.IdentifyProtein import IdProt
 from src.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
@@ -73,8 +74,7 @@ class Scheduler(object):
                         jobname = Paths.PREFIX_AGADIR.value + path_fastafile.split('/')[-1]
                         Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value,
                                                  python_script_with_paths=os.path.join(Paths.SRC,
-                                                                                       'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile +
-                                                                                       Str.SPCE.value + Paths.OUTPUT))
+                'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile + Str.SPCE.value + Paths.OUTPUT))
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
                     if use_multithread:
                         # Scheduler._launch_thread(target=agadir.run_agadir_on_multifastas,
@@ -89,26 +89,26 @@ class Scheduler(object):
         if path_pdbfile_list:
             for path_pdbfile in path_pdbfile_list:
                 if operations['do_foldx_repair']:
-                    repair = FoldX().Repair()
+                    repair = FoldX().Repair(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=repair.do_repair, args=path_pdbfile)
                     else:
                         repair.do_repair(path_pdbfile)
                 if operations['do_foldx_buildmodel']:
-                    buildmodel = FoldX().BuildModel()
+                    buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
-                        Scheduler._launch_thread(target=buildmodel.mutate_all_pdb,
-                                                 args=[path_input, path_pdbfile, mutant_aa_list, path_output])
+                        Scheduler._launch_thread(target=buildmodel.mutate_protein_structure,
+                                                 args=[path_pdbfile, mutant_aa_list])
                     else:
-                        buildmodel.mutate_all_pdb(path_input, path_pdbfile, mutant_aa_list, path_output)
+                        buildmodel.mutate_protein_structure(path_pdbfile, mutant_aa_list)
                 if operations['do_foldx_stability']:
-                    stability = FoldX().Stability()
+                    stability = FoldX().Stability(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=stability.calculate_stability, args=path_pdbfile)
                     else:
                         stability.calculate_stability(path_pdbfile)
                 if operations['do_foldx_analysecomplex']:
-                    analysecomplex = FoldX().AnalyseComplex()
+                    analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=analysecomplex.calculate_complex_energies, args=path_pdbfile)
                     else:
