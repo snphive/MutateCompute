@@ -43,6 +43,7 @@ class Paths(Enum):
             DIR_AGAD_JOBQ = paths_and_dictionaries['ROOT']['dir_agadir_jobq']
             DIR_BM_JOBQ = paths_and_dictionaries['ROOT']['dir_bm_jobq']
             DIR_AC_JOBQ = paths_and_dictionaries['ROOT']['dir_ac_jobq']
+            DIR_BLST_JOBQ = paths_and_dictionaries['ROOT']['dir_blst_jobq']
             DIR_GLOBAL_OPTIONS = paths_and_dictionaries['ROOT']['dir_globoptions']
             DIR_FXCONFIG = paths_and_dictionaries['ROOT']['dir_fxconfig']
             DIR_ACRUNSCRIPT = paths_and_dictionaries['ROOT']['dir_acrunscript']
@@ -74,13 +75,10 @@ class Paths(Enum):
             # ABSOLUTE PATHS BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_CONFIG = os.path.join(LOCAL_MUTATECOMPUTE, DIR_CONFIG)
             MC_CONFIG_AGAD = os.path.join(MC_CONFIG, DIR_AGAD_CONFIG)
-            MC_CONFIG_AGAD_JOBQ = os.path.join(MC_CONFIG, DIR_AGAD_JOBQ)
             MC_CONFIG_FX = os.path.join(MC_CONFIG, DIR_FXCONFIG)
             MC_CONFIG_GLOBAL_OPTIONS = os.path.join(MC_CONFIG, DIR_GLOBAL_OPTIONS)
             MC_CONFIG_ACRUNSCRIPT = os.path.join(MC_CONFIG, DIR_ACRUNSCRIPT)
-            MC_CONFIG_AC_JOBQ = os.path.join(MC_CONFIG, DIR_AC_JOBQ)
             MC_CONFIG_BMRUNSCRIPT = os.path.join(MC_CONFIG, DIR_BMRUNSCRIPT)
-            MC_CONFIG_BM_JOBQ = os.path.join(MC_CONFIG, DIR_BM_JOBQ)
             MC_INPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_INPUT)
             MC_INPUT_FASTAS = os.path.join(MC_INPUT, DIR_FASTAS)
             MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_OUTPUT)
@@ -109,6 +107,7 @@ class Paths(Enum):
             SE_CONFIG_AC_JOBQ = os.path.join(SE_CONFIG, DIR_AC_JOBQ)
             SE_CONFIG_BMRUNSCRIPT = os.path.join(SE_CONFIG, DIR_BMRUNSCRIPT)
             SE_CONFIG_BM_JOBQ = os.path.join(SE_CONFIG, DIR_BM_JOBQ)
+            SE_CONFIG_BLST_JOBQ = os.path.join(SE_CONFIG, DIR_BLST_JOBQ)
             SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
             SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
@@ -138,6 +137,7 @@ class Paths(Enum):
         Paths.CONFIG_GLOBAL_OPTIONS = Paths.SE_CONFIG_GLOBAL_OPTIONS.value if use_cluster else Paths.MC_CONFIG_GLOBAL_OPTIONS.value
         Paths.CONFIG_ACRUNSCRIPT = Paths.SE_CONFIG_ACRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_ACRUNSCRIPT.value
         Paths.CONFIG_AC_JOBQ = Paths.SE_CONFIG_AC_JOBQ.value
+        Paths.CONFIG_BLST_JOBQ = Paths.SE_CONFIG_BLST_JOBQ.value
         Paths.CONFIG_BMRUNSCRIPT = Paths.SE_CONFIG_BMRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_BMRUNSCRIPT.value
         # Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
         Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.IO_INPUT.value
