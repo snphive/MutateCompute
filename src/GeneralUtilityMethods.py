@@ -26,21 +26,21 @@ class GUM(object):
     # {'RepairPDB_1_A': 'RVYLTFDELRETK..etc', 'RepairPDB_2_A': 'RVYLTFDELRETK..etc', etc}
     #
     # path_input                str                 Path to where the pdb subdirectories can be found.
-    # pdbfiles                  str OR List of str  The pdb file (including ".pdb") or files (no path).
+    # path_pdbfiles             str OR List of str  The pdb file (including ".pdb") or files (no path).
     # path_fastafile            str                 Absolute path of root for fasta file (without >title) that
     #                                               will be written if write_fastafile is True.
     # write_fastafile           bool                True to write fasta string incl. >title to new fasta file.
     #                                               False by default.
     # Returns a dictionary of the pdbname_chain and the protein sequence in FASTA format.
     @staticmethod
-    def extract_pdbname_chain_fasta_from_pdbs(path_input, pdbfiles, path_fastafile, write_fastafile=True):
+    def extract_pdbname_chain_fasta_from_pdbs(path_pdbfiles, path_fastafile='', write_fastafile=False):
         # pdbname_chain_fastaseq_dict: dict = {} version 3 only
         pdbname_chain_fastaseq_dict = {}
-        if isinstance(pdbfiles, str):
-            pdbfiles = [pdbfiles]
-        for pdbfile in pdbfiles:
-            with open(os.path.join(path_input, pdbfile.split('.')[0], pdbfile)) as pdbfile_opened:
-                pdbfile_lines = pdbfile_opened.readlines()
+        if isinstance(path_pdbfiles, str):
+            path_pdbfiles = [path_pdbfiles]
+        for path_pdbfile in path_pdbfiles:
+            with open(path_pdbfile) as f:
+                pdbfile_lines = f.readlines()
             pdbfile_lines_with_atom = []
             protein_chains = []
             for pdbfile_line in pdbfile_lines:
@@ -62,14 +62,16 @@ class GUM(object):
                             fasta_list.append(AA.DICT_AA_3TO1.value[amino_acid_on_this_line])
                         else:
                             print('This 3-letter word is not recognised as 1 of the 20 amino acids! '
-                                  'Cannot extract FASTA from ' + pdbfile + ' !')
+                                  'Cannot extract FASTA from ' + path_pdbfile + ' !')
 
                 fasta_sequence = "".join(fasta_list)
-                pdbname = GUM._remove_prefix_and_suffix(pdbfile.split('/')[-1].split('.')[0], 'RepairPDB_', '_1_0')
+                pdbname = GUM._remove_prefix_and_suffix(path_pdbfile.split('/')[-1].split('.')[0], 'RepairPDB_', '_1_0')
                 pdbname_chain = pdbname + '_' + protein_chain
                 print(pdbname_chain + ' : ' + fasta_sequence)
                 pdbname_chain_fastaseq_dict[pdbname_chain] = fasta_sequence
                 if write_fastafile:
+                    if path_fastafile == '':
+                        raise ValueError('write_fastafile is True but no path for fastafile to be written to is given.')
                     GUM.write_fastafile_to_name_chain_dir(pdbname_chain_fastaseq_dict, path_fastafile)
         return pdbname_chain_fastaseq_dict
 
@@ -325,11 +327,13 @@ class GUM(object):
     # path_dst_dir      String      Abs path of destination directory to copy files to.
     # recursively       Boolean     True to copy all files in current directory and all files in all subdirectories.
     #
-    # NOTE: current cp command specifies not to overwrite existing files
+    # NOTE: current cp command specifies not to overwrite existing files, not recursively
     @staticmethod
-    def linux_copy_all_files_in_dir(path_src_dir, path_dst_dir, recursively=False):
+    def linux_copy_all_files_in_dir(path_src_dir, path_dst_dir, overwrite=True, recursively=False):
         recurse_cmd = (Str.SPCE.value + '-r') if recursively else ''
-        cmd = 'cp -n' + recurse_cmd + Str.SPCE.value + path_src_dir + '/.' + Str.SPCE.value + path_dst_dir
+        overwrite_cmd = (Str.SPCE.value + '-n') if overwrite else ''
+        cmd = 'cp' + overwrite_cmd + recurse_cmd + Str.SPCE.value + path_src_dir + Str.FSLSH_ASTRX.value + \
+              Str.SPCE.value + path_dst_dir
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
@@ -347,6 +351,17 @@ class GUM(object):
                 cmd = 'cp -n' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst_filenamedir
             else:
                 cmd = 'cp -n' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst
+            try:
+                subprocess.call(cmd, shell=True)
+            except OSError:
+                print('Problem with linux cp command.')
+
+    @staticmethod
+    def linux_copy_specified_files(path_src_files, path_dst_dir):
+        if isinstance(path_src_files, str):
+            path_src_files = [path_src_files]
+        for path_src_file in path_src_files:
+            cmd = 'cp' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst_dir
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
