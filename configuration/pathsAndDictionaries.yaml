@@ -1,11 +1,11 @@
 ROOT:
     # absoluate paths to executables on cluster and local directory tress
     path_zeus_r_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript/'
-    path_zeus_fx_exe: '/switchlab/group/tools/FoldX_2015/FoldX/'
+    path_zeus_fx_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
     path_zeus_agad_exe: '/switchlab/group/tools/agadir_10042012/'
     path_zeus_qsub_exe: '/opt/sge/bin/lx-amd64/'
     path_local_r_exe: '/usr/local/bin/R/'
-    path_local_fx_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX/'
+    path_local_fx_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX/foldx'
     path_local_agad_exe: '/Users/u0120577/SNPEFFECT/executables/agadir_10042012/'
 
     # absolute paths to root directories on cluster and local directory trees
@@ -19,7 +19,10 @@ ROOT:
     # directory names common to local and cluster dir trees. Used to construct absolute paths at runtime.
     dir_config: 'configuration'
     dir_agadconfig: 'agadir_config'
-    dir_clustjobq: 'cluster_jobq'
+    dir_agadir_jobq: 'agadir_jobq'
+    dir_bm_jobq: 'bm_jobq'
+    dir_ac_jobq: 'ac_jobq'
+    dir_blst_jobq: 'blst_jobq'
     dir_globoptions: 'global_options'
     dir_fxconfig: 'foldx_config'
     dir_acrunscript: 'ac_runscript'
