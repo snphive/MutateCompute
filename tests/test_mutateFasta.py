@@ -89,8 +89,9 @@ class TestMutateFasta(TestCase):
         path_output = TPLS.MC_TESTS_OUTPUT.value
         expected_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         # act
-        mutants = self.mutateFasta.mutate_every_residue(path_input, fastafile_list, fastafile, mutant_aa_list,
-                write_1_fasta_only=write_1_fasta_only, write_fasta_per_mut=write_fasta_per_mut, path_output=path_output)
+        mutants = self.mutateFasta.mutate_every_residue(fastafile, mutant_aa_list,
+                                                        write_fasta_per_mut=write_fasta_per_mut,
+                                                        path_output_3dots=path_output)
         # assert
         self.assertDictEqual(expected_mutants, mutants)
 
@@ -99,12 +100,12 @@ class TestMutateFasta(TestCase):
         # arrange
         path_tests_output_fastas_wtsci_mutants = os.path.join(TPLS.MC_TESTS_OUTPUT_FASTAS.value, 'WT_SCI',
                                                              TPLS.DIR_MUTANTS.value)
-        GUM.linux_remove_files_in_dir(path_tests_output_fastas_wtsci_mutants)
+        GUM.linux_remove_all_files_in_dir(path_tests_output_fastas_wtsci_mutants)
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         expected_all_mutants_single_fastafile = '>WT_SCI\nSCI\n>S1A\nACI\n>C2A\nSAI\n>I3A\nSCA\n'
         # act
         self.mutateFasta._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only=True, write_fasta_per_mut=False,
-                                        path_output=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=False)
+                                        path_output_3dots=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=False)
         # assert
         self.assertTrue(os.path.exists(path_tests_output_fastas_wtsci_mutants),
             msg=path_tests_output_fastas_wtsci_mutants + ' folder was not found.')
@@ -122,12 +123,12 @@ class TestMutateFasta(TestCase):
     def test_write_mutants_2(self):
         # arrange
         path_tests_output_fastas_wtsci = os.path.join(TPLS.MC_TESTS_OUTPUT_FASTAS.value, 'WT_SCI')
-        GUM.linux_remove_files_in_dir(path_tests_output_fastas_wtsci)
+        GUM.linux_remove_all_files_in_dir(path_tests_output_fastas_wtsci)
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         expected_mutant_fastafile_list = ['WT_SCI.fasta', 'S1A.fasta', 'C2A.fasta', 'I3A.fasta']
         # act
         self.mutateFasta._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only=False, write_fasta_per_mut=True,
-                                        path_output=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=False)
+                                        path_output_3dots=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=False)
         path_tests_output_fastas_wtsci_mutants = os.path.join(TPLS.MC_TESTS_OUTPUT.value, TPLS.DIR_FASTAS.value,
                                                              'WT_SCI', TPLS.DIR_MUTANTS.value)
         # mutant_fastafile_list = glob.glob(path_tests_output_fastas_wtsci + '/**/*.fasta', recursive=True)
@@ -144,12 +145,12 @@ class TestMutateFasta(TestCase):
     def test_write_mutants_3(self):
         # arrange
         path_tests_output_seqs_wtsci = os.path.join(TPLS.MC_TESTS_OUTPUT.value, TPLS.DIR_SEQS_TXT_CSV.value, 'WT_SCI')
-        GUM.linux_remove_files_in_dir(path_tests_output_seqs_wtsci)
+        GUM.linux_remove_all_files_in_dir(path_tests_output_seqs_wtsci)
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         expected_txt_file_str = 'WT_SCI:SCI\nS1A:ACI\nC2A:SAI\nI3A:SCA\n'
         # act
         self.mutateFasta._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only=False, write_fasta_per_mut=False,
-                                        path_output=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=True)
+                                        path_output_3dots=TPLS.MC_TESTS_OUTPUT.value, write_csv=False, write_txt=True)
         # assert
         self.assertTrue(path_tests_output_seqs_wtsci, msg=path_tests_output_seqs_wtsci + ' folder not found.')
         path_tests_output_seqs_wtsci_mutstxt = os.path.join(path_tests_output_seqs_wtsci, 'WT_SCI_mutants.txt')
@@ -163,12 +164,12 @@ class TestMutateFasta(TestCase):
     def test_write_mutants_4(self):
         # arrange
         path_tests_output_seqs_wtsci = os.path.join(TPLS.MC_TESTS_OUTPUT.value, TPLS.DIR_SEQS_TXT_CSV.value, 'WT_SCI')
-        GUM.linux_remove_files_in_dir(path_tests_output_seqs_wtsci)
+        GUM.linux_remove_all_files_in_dir(path_tests_output_seqs_wtsci)
         title_titleSeq_w_mutants = {'WT_SCI': {'WT_SCI': 'SCI', 'S1A': 'ACI', 'C2A': 'SAI', 'I3A': 'SCA'}}
         expected_csv_file_str = 'WT_SCI:SCI,S1A:ACI,C2A:SAI,I3A:SCA,'
         # act
         self.mutateFasta._write_mutants(title_titleSeq_w_mutants, write_1_fasta_only=False, write_fasta_per_mut=False,
-                                        path_output=TPLS.MC_TESTS_OUTPUT.value, write_csv=True, write_txt=False)
+                                        path_output_3dots=TPLS.MC_TESTS_OUTPUT.value, write_csv=True, write_txt=False)
         # assert
         self.assertTrue(path_tests_output_seqs_wtsci, msg=path_tests_output_seqs_wtsci + ' folder not found')
         path_tests_output_seqs_wtscimutscsv = os.path.join(path_tests_output_seqs_wtsci, 'WT_SCI_mutants.csv')

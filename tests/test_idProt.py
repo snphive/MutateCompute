@@ -157,8 +157,8 @@ class TestIdProt(TestCase):
 
     def test__write_raw_blast_xml(self):
         # arrange
-        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A +
-                                                   self.UNDR_SCR_ID_MAPS))
+        GUM.linux_remove_all_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A +
+                                                       self.UNDR_SCR_ID_MAPS))
         path_ref_blast_output_file = os.path.join(TPLS.MC_TESTS_REFFILES.value, TPLS.DIR_BLASTP.value, self.XML_FILE_1_A)
         with open(path_ref_blast_output_file) as ref_xml_1_A_open:
             id_map_fasta_dir = self.DIR_1_A + self.UNDR_SCR_ID_MAPS
@@ -177,8 +177,8 @@ class TestIdProt(TestCase):
     # an identical jsonfile that has been read in.
     def test__write_idmaps_for_mysqldb(self):
         # arrange
-        GUM.linux_remove_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A +
-                                                   self.UNDR_SCR_ID_MAPS))
+        GUM.linux_remove_all_files_in_dir(os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A +
+                                                       self.UNDR_SCR_ID_MAPS))
         fastafile_name = self.DIR_1_A
         query_length = 538
         database_used = 'swissprot'

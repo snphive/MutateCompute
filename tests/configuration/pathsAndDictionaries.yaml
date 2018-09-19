@@ -1,5 +1,5 @@
 ROOT:
-    # path to executables on cluster and local
+    # absoluate paths to executables on cluster and local directory tress
     path_zeus_r_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
     path_zeus_fx_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
     path_zeus_agad_exe: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
@@ -8,32 +8,35 @@ ROOT:
     path_local_fx_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX'
     path_local_agad_exe: '/Users/u0120577/SNPEFFECT/executables/agadirwrapper'
 
-    # root directories of cluster and local trees
+    # absolute paths to root directories on cluster and local directory trees
     path_zeus_snpeffect: '/switchlab/group/shazib/SnpEffect'
     path_local_mutatecompute: '/Users/u0120577/PycharmProjects/MutateCompute'
 
-    # path to local datasets
-    path_local_pdb_repository: '/Users/u0120577/PDB_repository'
+    # absolute path to local pdb and fasta data repositories
+    path_local_pdb_fasta_repository: '/Users/u0120577/REPO_PDB_FASTA'
 
-    # relative paths - common to both cluster and local trees
-    path_rel_config: '/configuration'
-    path_rel_config_agadconfig: '/configuration/agadir_config'
-    path_rel_config_clustjobq: '/configuration/cluster_jobq'
-    path_rel_config_fxconfig: '/configuration/foldx_config'
-    path_rel_config_globoptions: '/configuration/global_options'
-    path_rel_config_fxconf_acrunscript: '/configuration/foldx_config/ac_runscript'
-    path_rel_config_fxconf_bmrunscript: '/configuration/foldx_config/bm_runscript'
-    path_rel_config_fxconf_reprunscript: '/configuration/foldx_config/repair_runscript'
-    path_rel_src: '/src'
-    path_rel_input: '/input_data'
-    path_rel_allmutants: '/all_mutants'
-    path_rel_output: '/output_data/'
-    path_rel_fx_ac: '/foldx/analyse_complex'
-    path_rel_fx_bm: '/foldx/build_model'
-    path_rel_fx_rep: '/foldx/repair'
-    path_rel_mutatefasta: '/mutate_fasta'
-    path_rel_pdb_repository: '/PDB_repository'
-
+    # directory names common to local and cluster dir trees. Used to construct absolute paths at runtime.
+    dir_config: 'configuration'
+    dir_agadconfig: 'agadir_config'
+    dir_clustjobq: 'cluster_jobq'
+    dir_globoptions: 'global_options'
+    dir_fxconfig: 'foldx_config'
+    dir_acrunscript: 'ac_runscript'
+    dir_bmrunscript: 'bm_runscript'
+    dir_reprunscript: 'repair_runscript'
+    dir_src: 'src'
+    dir_input: 'input_data'
+    dir_mutants: 'mutants'
+    dir_output: 'output_data'
+    dir_fx: 'foldx'
+    dir_ac: 'analyse_complex'
+    dir_bm: 'build_model'
+    dir_rep: 'repair'
+    dir_fastas: 'fastas'
+    dir_sequences: 'sequences'
+    dir_pdb_fasta_repo: 'REPO_PDB_FASTA'
+    dir_pdbs: 'pdbs'
+    dir_blastp: 'blastp'
 
     # dictionaries & lists (amino acids)
     dict_aa_1to3:

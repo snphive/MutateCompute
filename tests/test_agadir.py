@@ -25,7 +25,7 @@ class TestAgadir(TestCase):
                              '5_B.fasta', '5_C.fasta', '5_D.fasta']
         path_input_fastas = os.path.join(TPLS.MC_TESTS_INPUT.value, TPLS.DIR_FASTAS.value)
         expected_path_filelist = [path_input_fastas + '/' + file for file in expected_filelist]
-        GUM.linux_remove_files_in_dir(path_input_fastas)
+        GUM.linux_remove_all_files_in_dir(path_input_fastas)
         # act
         self.agadir.copy_files_output_to_input_fastasubdirs(path_output_fastas, path_input_fastas, filename_list=None,
                                                             into_own_subdirs=True)
@@ -38,13 +38,14 @@ class TestAgadir(TestCase):
         # arrange
 
         # act
-        self.agadir.compute(path_input_fastas=TPLS.MC_TESTS_INPUT_FASTAS.value, path_output=TPLS.MC_TESTS_OUTPUT.value)
+        self.agadir.compute()
         # assert
 
-    def test_write_1_fastafile_per_fasta_from_multifastafile(self):
+    def test_run_agadir_on_multifastafiles(self):
         # arrange
-        Paths.set_up_paths(use_cluster=False)
-        path_fastafile = '/Users/u0120577/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/mutants/' \
-                         '1_A_mutants.fasta'
+        Paths.set_up_paths(use_cluster=True)
         # act
-        self.agadir.write_1_fastafile_per_fasta_from_multifastafile(path_fastafile)
+        agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+        agadir.run_agadir_on_multifastas(path_output_root=TPLS.MC_TESTS_OUTPUT.value,
+                                    path_multifastas_3dots=TPLS.MC_TESTS_INPUT.value + '/mutants_multifastas/1...2')
+

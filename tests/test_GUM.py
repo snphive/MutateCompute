@@ -3,6 +3,7 @@ from src.GeneralUtilityMethods import GUM
 from tests.HelperMethods import HM
 import os
 import glob
+from src.Paths import Paths
 from unittest.mock import patch
 from tests.TestPathsAndListsSeqs import TPLS
 import subprocess
@@ -20,35 +21,6 @@ class TestGUM(TestCase):
         if not os.path.exists(TPLS.MC_TESTS_INPUT.value):
             GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.INPUT_FOR_READ_ONLY.value, path_dst_dir=TPLS.MC_TESTS.value,
                                             recursively=True)
-
-    # Write_runscript_for_pdbs() takes 6 arguments. The last 3 (namely show_sequence_detail, print_networks,
-    # calculate_stability) are keyword (named) arguments. All have default values assigned in the method argument so
-    # that when the method is called without supplying a (keyword-named) value, the default value is applied.
-    # (The default values for all 3 are False).
-    #
-    # 30.07.18 Have redesigned the directory structure such that runscripts will go in /configuration /foldx_config
-    # /ac_runscript or /bm_runscript (and others).
-    def test_write_runscript_for_pdbs(self):
-        # arrange
-        pdb = 'RepairPDB_1.pdb'
-        path_runscript = TPLS.MC_TESTS_CONFIG_FXCONFIG_BMRUNSCRIPT.value
-        try:
-            os.makedirs(path_runscript)
-        except FileExistsError:
-            print('Part of all of path already exists. This is absolutely fine.')
-        action = '<BuildModel>#,individual_list.txt'
-        expected_runscript = '<TITLE>FOLDX_runscript;\n' + '<JOBSTART>#;\n' + '<PDBS>' + pdb + ';\n' + \
-                             '<BATCH>#;\n' + '<COMMANDS>FOLDX_commandfile;\n' + action + ';\n' + '<END>#;\n' + \
-                             '<OPTIONS>FOLDX_optionfile;\n' + '<Temperature>298;\n' + '<IonStrength>0.05;\n' + \
-                             '<ph>7;\n' + '<moveNeighbours>true;\n' + '<VdWDesign>2;\n' + '<numberOfRuns>3;\n' + \
-                             '<OutPDB>#;\n' + '<END>#;\n' + '<JOBEND>#;\n' + '<ENDFILE>#;\n'
-        single_space = ' '
-        not_expected_runscript = single_space + expected_runscript
-        # act
-        actual_runscript = GUM.write_runscript_for_pdbs(path_runscript, pdb, action)
-        # assert
-        self.assertEqual(actual_runscript, expected_runscript)
-        self.assertNotEqual(actual_runscript, not_expected_runscript)
 
     # CHECK WHAT HAPPENS IF THERE ARE FEWER FILES THAN SPECIFIED TO MOVE BY TOTAL_NUM_TO_COPY
     # @patch.object(GUM, '_make_subfoldername')
@@ -114,8 +86,9 @@ class TestGUM(TestCase):
         '1_B': TPLS.FASTA_SEQ_1_B.value,
         '2_A': TPLS.FASTA_SEQ_2_A.value}
         # act
-        pdbname_chain_fastaseq_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(pdbfiles, path_input, write_fastafile,
-                                                                            path_to_write_fastafile)
+        pdbname_chain_fastaseq_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(path_input, pdbfiles,
+                                                                                path_to_write_fastafile='',
+                                                                                write_fastafile=False)
         # assert
         # self.maxDiff = None
         self.assertDictEqual(expected_pdbname_chain_fastaseq_dict, pdbname_chain_fastaseq_dict)
@@ -160,3 +133,40 @@ class TestGUM(TestCase):
         GUM._move_files_into_own_subdirs(path_dir=TPLS.MC_TESTS_INPUT_FASTAS.value)
         # assert
         print('nothing')
+
+    def test_copy_files_to_3dot_dir_1(self):
+        # act
+        Paths.set_up_paths(use_cluster=False)
+        GUM.copy_files_to_3dot_dir(path_src_dir='/Users/u0120577/ROB_HOMOLOGY_HUMAN/Fasta',
+                                   path_dst_dir=Paths.REPO_FASTAS, file_extension='.fasta', starting_num=1,
+                                   num_to_copy_per_subdir=1000)
+        # assert
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000')),
+                        'No folder at  ~/REPO_PDB_FASTA/fastas/fastas_1000 found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000', '1...1000')),
+                        'No folder at  ~/REPO_PDB_FASTA/fastas/fastas_1000/1...1000 found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000', '2001...3000')),
+                        'No folder at  ~/REPO_PDB_FASTA/fastas/fastas_1000/2001...3000 found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000', '1...1000', '1_A.fasta')),
+                        'No file at  ~/REPO_PDB_FASTA/fastas/fastas_1000/1...1000/1_A.fasta found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000', '2001...3000', '1131_A.fasta')),
+                        'No file at  ~/REPO_PDB_FASTA/fastas/fastas_1000/2001...3000/1131_A.fasta found')
+
+    def test_copy_files_to_3dot_dir_2(self):
+        # act
+        Paths.set_up_paths(use_cluster=False)
+        GUM.copy_files_to_3dot_dir(path_src_dir='/Users/u0120577/ROB_HOMOLOGY_HUMAN/RepairPDBs',
+                                   path_dst_dir=Paths.REPO_PDBS, file_extension='.pdb', starting_num=1,
+                                   num_to_copy_per_subdir=1000)
+        # assert
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_PDBS, 'pdbs_1000', '2001...3000', 'RepairPDB_2031.pdb')),
+                        'No file at  ~/REPO_PDB_FASTA/pdbs/pdbs_1000/2001...3000/RepairPDB_2031.pdb found')
+
+    def test_write_1_fastafile_per_fasta_from_multifastafile(self):
+        # arrange
+        path_dst = TPLS.MC_TESTS_INPUT.value
+        Paths.set_up_paths(use_cluster=False)
+        path_fastafile = os.path.join(TPLS.MC_TESTS_INPUT.value, 'mutants_fastas_multifastafiles', '1...10', '1_A',
+                                      'mutants', '1_A_mutants.fasta')
+        # act
+        GUM.write_1_fastafile_per_fasta_from_multifastafile(path_dst, path_fastafile)

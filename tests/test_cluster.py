@@ -63,6 +63,7 @@ class TestCluster(TestCase):
         self.assertTrue(os.path.exists(path_job_q_dir), 'path to job.q directory (which should contain the job.q file) '
                                                         'does not exist: ' + path_job_q_dir)
         if os.path.exists(path_job_q_dir):
-            self.assertTrue(os.path.exists(path_job_q_file), '(Absolute path to) job.q file does not exist: ' + path_job_q_file)
+            self.assertTrue(os.path.exists(path_job_q_file), '(Absolute path to) job.q file does not exist: '
+                            + path_job_q_file)
             self.assertTrue(os.path.isfile(path_job_q_file))
 
