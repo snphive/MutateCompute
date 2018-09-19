@@ -3,7 +3,7 @@ from enum import Enum
 
 class Cond(Enum):
     # cytoplasm and nucleus had a pH of ≈7.3, mitochondria ≈8.0, ER ≈7.5 and Golgi ≈6.6
-    INCELL_MAML_FX = {'temp': 298.0, 'ph': 7.0, 'ion_strgth': 0.15, 'tfe': 0, 'stab': 0, 'conc': 1}
+    INCELL_MAML_FX = {'temp': 298, 'ph': 7, 'ion_strgth': 0.15, 'tfe': 0, 'stab': 0, 'conc': 1}
     # cytoplasm and nucleus had a pH of ≈7.3, mitochondria ≈8.0, ER ≈7.5 and Golgi ≈6.6
     # 310.15 K == 37 degC
     INCELL_MAML_AG = {'temp': 310.15, 'ph': 7.4, 'ion_strgth': 0.15, 'tfe': 0, 'stab': 0, 'conc': 1}
