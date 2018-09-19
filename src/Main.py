@@ -4,11 +4,6 @@ from src.Scheduler import Scheduler
 from src.Str import Str
 from src.Paths import Paths
 from src.AminoAcids import AA
-# The following 4 lines of commented-out code successfully connect to my mysql database and create a table.
-# import mysql.connector
-# cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
-# cur = cnx.cursor()
-# cur.execute("CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
 
 
 # Everything, other than the Blast program, runs from here, via the constructor of Main().
@@ -194,3 +189,4 @@ class Main(object):
 
 # cnx is the mysql connector (see top of script)
 # cnx.close()
+
