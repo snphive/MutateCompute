@@ -12,10 +12,9 @@ from src.Agadir import AgadCndtns
 from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
 import multiprocessing as mp
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
-print('This computer has ' + str(mp.cpu_count()) + ' cpus')
 if len(sys.argv) < 2:
     use_cluster = False
 else:
@@ -61,22 +60,22 @@ Paths.set_up_paths(use_cluster)
 # main = Main(operations, use_multithread, path_input, path_output, path_wanted_pdbfile_list,
 # path_wanted_fastafile_list, mutant_aa_list)
 
-
-startnum = 1
-endnum = 10
-dir_3dots = str(startnum) + Str.DOTS3.value + str(endnum)
-path_pdbs_3dots = os.path.join(Paths.INPUT, Paths.DIR_PDBS.value, dir_3dots)
-path_pdbfiles = path_pdbs_3dots + '/**/*' + Str.PDBEXT.value
+#
+# startnum = 1
+# endnum = 10
+# dir_3dots = str(startnum) + Str.DOTS3.value + str(endnum)
+# path_pdbs_3dots = os.path.join(Paths.INPUT, Paths.DIR_PDBS.value, dir_3dots)
+# path_pdbfiles = path_pdbs_3dots + '/**/*' + Str.PDBEXT.value
 
 operations = {'do_mutate_fasta': False, 'do_agadir': False,
               'do_foldx_repair': False, 'do_foldx_buildmodel': True,
               'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
 use_multithread = False
-path_pdbfile_list = natsort.natsorted(glob.glob(path_pdbfiles, recursive=True))
+# path_pdbfile_list = natsort.natsorted(glob.glob(path_pdbfiles, recursive=True))
+path_pdbfile_list = ['/switchlab/group/shazib/SnpEffect/tests/input_data/pdbs/RepairPDBtest_1.pdb']
 path_fastafile_list = []
-main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile_list, path_fastafile_list,
-            AA.LIST_ALL_20_AA.value)
-
+main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile_list, path_fastafile_list, ['A', 'C'])
+            # AA.LIST_ALL_20_AA.value)
 
 
 # if i == 50:
@@ -139,4 +138,4 @@ main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile
 #
 # To start this script from cmd line, sh KickOff.sh
 
-# pydevd.stoptrace()
+pydevd.stoptrace()
