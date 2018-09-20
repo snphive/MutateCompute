@@ -99,8 +99,10 @@ class Cluster(object):
 
         if cluster_node != '':
             job_q.append('#$ -l hostname=' + cluster_node + Str.NEWLN.value)
-
-        job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles' + Str.NEWLN.value)
+        if 'agadir' in python_script_with_paths.lower():
+            job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles' + Str.NEWLN.value)
+        else:
+            job_q.append('#$ -cwd')
         job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
         if using_runscript:
             job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + '-runfile' + Str.SPCE.value + path_runscript_dir
