@@ -17,3 +17,4 @@ class Str(Enum):
     PDBS = Paths.DIR_PDBS.value
     FASTAS = Paths.DIR_FASTAS.value
     HASH = '#'
+    JOBQ = 'job.q'
