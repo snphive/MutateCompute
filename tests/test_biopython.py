@@ -49,7 +49,7 @@ class TestBiopython(TestCase):
         path_actual = os.path.join(TPLS.MC_TESTS_OUTPUT.value, self.DIR_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
         path_expected = os.path.join(TPLS.MC_TESTS_REFFILES.value, self.DIR_BLASTP, self.XML_1_A_BLASTP_OUTPUT_FILE)
         # act
-        result_handle_1_A = Biopy.run_blastp(fasta_str=self.FASTA_STR_1_A)
+        result_handle_1_A = Biopy.run_blastp(fasta=self.FASTA_STR_1_A)
         blastp_output_xml = self.XML_1_A_BLASTP_OUTPUT_FILE
         HM.write_blastp_to_tests_dir(path_tests=TPLS.MC_TESTS_OUTPUT.value, blastp_dir=self.DIR_BLASTP,
                                      result_handle=result_handle_1_A, blastp_output_xmlfile=blastp_output_xml)
