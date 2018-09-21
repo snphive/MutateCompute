@@ -38,9 +38,9 @@ class FoldX(object):
             runscript.append('<Stability>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<END>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<OPTIONS>' + self.Strs.FXOPTFILE.value + Str.SEMICO_NL.value)
-        runscript.append('<Temperature>' + str(conditions['temp']) + Str.SEMICO_NL.value)
-        runscript.append('<IonStrength>' + str(conditions['ion_strgth']) + Str.SEMICO_NL.value)
-        runscript.append('<ph>' + str(conditions['ph']) + Str.SEMICO_NL.value)
+        runscript.append('<Temperature>' + str(conditions[Str.TEMP.value]) + Str.SEMICO_NL.value)
+        runscript.append('<IonStrength>' + str(conditions[Str.ION_STRNGTH.value]) + Str.SEMICO_NL.value)
+        runscript.append('<ph>' + str(conditions[Str.PH.value]) + Str.SEMICO_NL.value)
         runscript.append('<moveNeighbours>' + Str.TRUE_lc.value + Str.SEMICO_NL.value)
         runscript.append('<VdWDesign>2' + Str.SEMICO_NL.value)
         runscript.append('<numberOfRuns>3' + Str.SEMICO_NL.value)
@@ -87,27 +87,34 @@ class FoldX(object):
             pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(path_pdbfile)
             fx_mutant_name_list = self._make_fx_mutant_name_list(amino_acids, pdbname_chain_fasta_dict)
             action = FoldX().Strs.BM.value + Str.HASH.value + ',' + FoldX().Strs.indiv_list_txt.value
-            FoldX().write_runscript_file(Paths.CONFIG_BMRUNSCRIPT, pdbfile, self.conditions, action)
-            path_runscript_file = os.path.join(Paths.CONFIG_BMRUNSCRIPT, FoldX().Strs.runscrpt_txt.value)
+            path_runscript_dir = os.path.join(Paths.CONFIG_BMRUNSCRIPT, pdbname)
+            FoldX().write_runscript_file(path_runscript_dir, pdbfile, self.conditions, action)
+            path_runscript_file = os.path.join(path_runscript_dir, FoldX().Strs.runscrpt_txt.value)
 
             for fx_mutant_name in fx_mutant_name_list:
                 path_output_pdbname_mutant = self._make_output_dir_and_copy_fxconfig_files_in(Paths.OUTPUT, pdbname,
                                                                                               fx_mutant_name)
                 self._write_individual_list_for_mutant(path_output_pdbname_mutant)
                 os.chdir(path_output_pdbname_mutant)
-                path_files_to_copy = [path_runscript_file, path_pdbfile]
-                GUM.linux_copy_specified_files(path_files_to_copy, path_output_pdbname_mutant)
+                path_files_to_copy = [path_pdbfile]
+                # path_files_to_copy = [path_runscript_file, path_pdbfile]
+                GUM.linux_copy_specified_files(path_files_to_copy, path_dst_dir=path_output_pdbname_mutant)
                 if GUM.using_cluster():
                     path_jobq = GUM._os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fx_mutant_name)
+                    # Cluster.write_job_q_bash(job_name=Paths.PREFIX_FX_BM.value + fx_mutant_name,
+                    #                          path_job_q_dir=path_jobq, path_runscript_dir=Paths.CONFIG_BMRUNSCRIPT,
+                    #                          using_runscript=True)
                     Cluster.write_job_q_bash(job_name=Paths.PREFIX_FX_BM.value + fx_mutant_name,
-                                             path_job_q_dir=path_jobq, path_runscript_dir=Paths.CONFIG_BMRUNSCRIPT,
-                                             using_runscript=True)
-                    if os.path.exists(os.path.join(Paths.CONFIG_BMRUNSCRIPT, FoldX().Strs.runscrpt_txt.value)):
+                                             path_job_q_dir=path_jobq, path_dst_dir=path_output_pdbname_mutant,
+                                             path_runscript_dir=path_runscript_dir, using_runscript=True)
+                    # path_jobq_file = os.path.join(path_jobq, Str.JOBQ.value)
+                    # GUM.linux_copy_specified_files(path_jobq_file, path_dst_dir=path_output_pdbname_mutant)
+                    if os.path.exists(path_runscript_file):
                         Cluster.run_job_q(path_job_q_dir=path_jobq)
                     else:
-                        raise ValueError('No runscript file was found')
+                        raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
                 else:
-                    cmd = 'chmod 777 /Users/u0120577/SNPEFFECT/executables/FoldX/foldx'
+                    cmd = 'chmod 777' + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
                     try:
                         subprocess.call(cmd, shell=True)
                     except OSError:
@@ -117,9 +124,49 @@ class FoldX(object):
                     if os.path.exists(path_runscript_file):
                         subprocess.call(cmd, shell=True)
                     else:
-                        raise ValueError('No runscript file was found')
+                        raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
 
-        def _make_output_dir_and_copy_fxconfig_files_in(self, path_output, pdbname, fx_mutant_name):
+                self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
+
+        def _write_ddG_csv_file(self, path_output_pdbname_mutant: str, pdbname: str, fx_mutant_name: str):
+            """
+            :param path_output_pdbname_mutant:
+            :param pdbname:
+            :param fx_mutant_name:
+            :return:
+            """
+            ddG_average = ''
+            ddG_1 = ''
+            ddG_2 = ''
+            ddG_3 = ''
+            path_output_dif_file = os.path.join(path_output_pdbname_mutant, FoldX().Strs.DIF_FXOUTFILE.value)
+            with open(path_output_dif_file) as f:
+                dif_fxoutfile_lines = f.readlines()
+            for line in dif_fxoutfile_lines:
+                if ddG_average != '':
+                    break
+                if not pdbname + '_' in line:
+                    continue
+                else:
+                    ddG = float(line.split(Str.TAB.value)[1])
+                    if ddG_1 == '':
+                        ddG_1 = ddG
+                    elif ddG_2 == '':
+                        ddG_2 = ddG
+                    elif ddG_3 == '':
+                        ddG_3 = ddG
+            ddG_average = (ddG_1 + ddG_2 + ddG_3) / 3
+            with open(os.path.join(path_output_pdbname_mutant, FoldX().Strs.DDG_CSVFILE.value), 'w') as f:
+                f.write(pdbname + ',' + fx_mutant_name + ',' + str(ddG_average))
+            return ddG_average
+
+        def _make_output_dir_and_copy_fxconfig_files_in(self, path_output: str, pdbname: str, fx_mutant_name: str):
+            """
+            :param path_output:
+            :param pdbname:
+            :param fx_mutant_name:
+            :return:
+            """
             path_output_pdbname_mutant = GUM._os_makedirs(path_output, Paths.DIR_BM.value, pdbname, fx_mutant_name)
             GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_pdbname_mutant, overwrite=False)
             return path_output_pdbname_mutant
@@ -173,6 +220,10 @@ class FoldX(object):
             print('TODO')
 
         def _prepare_for_FoldX_AnalyseComplex(self, repair_pdbname):
+            """
+            :param repair_pdbname:
+            :return:
+            """
             _0_1_2_pdbs = ['0.pdb,', '1.pdb,', '2.pdb,']
             repair_pdbname_1_ = repair_pdbname + '_1_'
             wt_repair_pdbname_1_ = 'WT_' + repair_pdbname_1_
@@ -197,8 +248,11 @@ class FoldX(object):
         FXRUNSCRPT = 'FOLDX_runscript'
         FXCMDFILE = 'FOLDX_commandfile'
         FXOPTFILE = 'FOLDX_optionfile'
-        runscrpt_txt = 'runscript.txt'
+        runscrpt_txt = Str.runscrpt_txt.value
+        NO_RUNSCRPT_FILE_MSG = 'No runscript file was found'
         DSH_RUNFILE = '-runfile'
+        DIF_FXOUTFILE = 'Dif_BuildModel_RepairPDBtest_1.fxout'
+        DDG_CSVFILE = 'ddG.csv'
 
 
 
