@@ -51,29 +51,41 @@ class Biopy(object):
     #
     # Returns what biopython's NCBIWWW.qblast returns. (Data type is _io.TextIOWrapper.)
     @staticmethod
-    def run_blastp(fasta_str):
+    def run_blastp(fasta: str):
+        """
+        Using alignments restricted to a fixed number (currently 20) and hitlist restricted to a fixed number (currently
+        20), it takes about 21 seconds to run this qblast remotely.
+        However, using smaller number of alignments than the default (of 50), the output which is parsed to an xml file
+        is reduced in size from ~77 KB to ~53 KB. Any reduction could be important when you consider that there are
+        78,586 fasta files to run (that's likely over 1.5 GB in total).
+        We are only interested in 100% identity hits, so unless a sequence has over 20 isoforms which all include that
+        sequence, the remaining hits on the blast_record are not used anyway.
+        NOTE: occasionally the qblast took about 4 or more minutes.
+        :param fasta: Fasta as a string.
+        :return: Result of Biopython.NCBIWWW.qblast() method call.
+        """
         return NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
                               database=Biopy.BlastParam.SWSPRT.value,
-                              sequence=fasta_str,
+                              sequence=fasta,
                               entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
                               alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
                               hitlist_size=Biopy.BlastParam.MAX_HIT_20.value)
 
-    # Parses qblast result and filters (assigns to a data structure) only those fields that are of interest.
-    #
-    # NCBIXML.read() takes the _io.TextIOTextWrapper (which is created when xml file is opened).
-    # NCBIXML.read() returns a Bio.Blast.Record.Blast object that has assigned various values in the qblast record as
-    # fields that can be directly accessed.
-    # NOTE: Time taken for this remote qblast for sequence 1_A.fasta was about 20 seconds.
-    # NOTE: The query sequence id is also the filename and is used here for the name of the output xml.
-    #
-    # path_qblast_result    String      Abs path to the output xml file.
-    # fastafile_name        String      Name of fastafile (without .fasta extension).
-    # path_fastafile        String      Abs path to fastafile (used downstream to spot any seq length anomalies).
-    #
-    # Returns a data structure of the elements of the qblast result that are considered here to be pertinent.
     @staticmethod
     def parse_filter_blastp_xml_to_dict(path_qblast, fastafile_name, path_fastafile):
+        """
+        Parses qblast result and filters (assigns to a data structure) only those fields that are of interest.
+        #
+        # NCBIXML.read() takes the _io.TextIOTextWrapper (which is created when xml file is opened).
+        # NCBIXML.read() returns a Bio.Blast.Record.Blast object that has assigned various values in the qblast record as
+        # fields that can be directly accessed.
+        # NOTE: Time taken for this remote qblast for sequence 1_A.fasta was about 20 seconds.
+        # NOTE: The query sequence id is also the filename and is used here for the name of the output xml.
+        :param path_qblast: Absolute path to the output xml file.
+        :param fastafile_name: Name of fastafile (without .fasta extension).
+        :param path_fastafile: Abs path to fastafile (used downstream to spot any seq length anomalies).
+        :return: Data structure of the elements of the qblast result that are considered here to be pertinent.
+        """
         with open(path_qblast) as f:
             blast_record = NCBIXML.read(f)
             query_length = blast_record.query_length
@@ -91,23 +103,24 @@ class Biopy(object):
         Biopy._warn_if_discrepancies_in_query_seq_length(qblast_dict, query_length, query_letters, path_fastafile)
         return qblast_dict
 
-    # Builds a list_of_dictionaries of relevant info for each high-scoring pair (hsp) alignment where there are zero
-    # gaps and the alignment length is exactly the same as the query length, hence it is a 100% identity match.
-    #
-    # However, the hit fasta may still be longer than the query fasta. This info is stored in sbjct_start and sbjct_end.
-    #
-    # query_length      int     qblast output value, refers to length of the input fasta sequence.
-    # alignments        List    Objects with values, (including hsps, also a list of objects with values) from qblast.
-    #
-    # Returns a list of identical alignment hits. The hit may still be longer.
     @staticmethod
-    def _make_list_of_dicts_of_hsps_w_0gaps_and_queryLen_equal_alignLen(query_length, alignments):
+    def _make_list_of_dicts_of_hsps_w_0gaps_and_queryLen_equal_alignLen(query_length: int, alignments: list):
+        """
+        Builds a list_of_dictionaries of relevant info for each high-scoring pair (hsp) alignment where there are zero
+        gaps and the alignment length is exactly the same as the query length, hence it is a 100% identity match.
+        However, the hit fasta may still be longer than the query fasta. This info is stored in sbjct_start and sbjct_end.
+        Builds a list_of_dictionaries of relevant info for each high-scoring pair (hsp) alignment where there are zero
+        gaps and the alignment length is exactly the same as the query length, hence it is a 100% identity match.
+        :param query_length: Qblast output value, refers to length of the input fasta sequence.
+        :param alignments: Objects with values, (including hsps, also a list of objects with values) from qblast.
+        :return: List of identical alignment hits. The hit may still be longer.
+        """
         identical_aligns_list = []
         is_identical = False
         for alignment in alignments:
             alignment_dict = {'accession_num': 0, 'length': 0, 'hit_def': '', 'hsp_dict': {}}
             for hsp in alignment.hsps:
-                is_identical = hsp.expect < 1e-50 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities
+                is_identical = hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities
                 if is_identical:
                     alignment_dict['accession_num'] = alignment.accession
                     alignment_dict['length'] = alignment.length
@@ -123,13 +136,16 @@ class Biopy(object):
                 identical_aligns_list.append(alignment_dict)
         return identical_aligns_list
 
-    # qblast_result_dict    Dictionary  Built of relevant elements from qblast return object.
-    # query_length          int         qblast output value, refers to length of the input fasta sequence.
-    # query_letters         int         qblast letters value, refers to number of input fasta sequence characters.
-    # path_fastafile        String      FASTA file (with extension) and absolute path.
-    # len_hit               int         length of protein that blast hit
     @staticmethod
-    def _warn_if_discrepancies_in_query_seq_length(qblast_dict, query_length, query_letters, path_fastafile):
+    def _warn_if_discrepancies_in_query_seq_length(qblast_dict: dict, query_length: int, query_letters: int,
+                                                   path_fastafile: str):
+        """
+        :param qblast_dict: Built of relevant elements from qblast return object.
+        :param query_length: Qblast output value, refers to length of the input fasta sequence.
+        :param query_letters: Qblast letters value, refers to number of input fasta sequence characters.
+        :param path_fastafile: FASTA file (with extension) and absolute path.
+        :return:
+        """
         for alignment in qblast_dict['identical_aligns_list']:
             len_sbjct_prot = alignment['hsp_dict']['sbjct_end'] - alignment['hsp_dict']['sbjct_start'] + 1
 
