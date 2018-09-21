@@ -1,12 +1,12 @@
 import os
 import json
+import glob
+import natsort
+import threading
 from src.Biopython import Biopy
 from src.Paths import Paths
-import glob
 from src.Cluster import Cluster
-import threading
 from src.GeneralUtilityMethods import GUM
-from src.Str import Str
 
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
@@ -16,34 +16,22 @@ from src.Str import Str
 # mapping whatever identifier the input has with the recognised identifiers (1_A to 32431_A from RvdK's repaired pdbs)
 class IdProt(object):
 
-    # Expects a directory location of fastafiles (not a fastafile itself).
-    # (This method relies on the presence of fastafiles in the specified dir, in order for them to be run on Blastp.
-    # This transfer is currently done manually)
-    #
-    # path_input_fastas_dir     String      Abs path of root dir for input fastafiles (e.g. /input_data/fastas_10).
-    # path_output               String      Abs path of root dir for output blastp files (..../output_data/).
-    # write_idmaps_for_mysqldb  Boolean     True to build dict mapping RvdK ids to swsprt acc & write files.
-    # write_csv                 Boolean     True to write csvfiles.
-    # write_xml                 Boolean     True to write xmlfiles.
-    # write_json                Boolean     True to write jsonfiles.
-    #
-    # Returns a list of dictionary data structure representations of each parsed & filtered Blastp run result.
     @staticmethod
-    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir, path_output, write_idmaps_for_mysldb,
+    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir: str, path_output: str, write_idmaps_for_mysqldb: bool,
                                                  write_csv=True, write_xml=True, write_json=False):
-        try:
-            path_input_fastas_dir_list = path_input_fastas_dir.split('/')
-            if Str.FSTAEXT.value in path_input_fastas_dir_list[-1]:
-                path_input_fastas_dir_list = path_input_fastas_dir_list[:-1]
-                path_input_fastas_dir = '/'.join(path_input_fastas_dir_list)
-            if not os.listdir(path_input_fastas_dir):
-                raise ValueError('There are no subdirectories in your specified /input_data/fastas/ directory. '
-                                 'Typically expecting /input_data/fastas/<fastafilenames>/, each containing a '
-                                 'fastafile. It seems that no fastafiles were copied over from the repository '
-                                 'directory. Therefore cannot proceed.')
-        except NotADirectoryError:
-            raise NotADirectoryError('The input path received: ' + path_input_fastas_dir + ' is is not a directory.')
-        path_input_fastafile_list = glob.glob(path_input_fastas_dir + '/*.fasta')
+        """
+        Expects a directory location of fastafiles (not a fastafile itself).
+        (This method relies on the presence of fastafiles in the specified dir, in order for them to be run on Blastp.
+        This transfer is currently done manually)
+        :param path_input_fastas_dir: Abs path of root dir for input fastafiles (e.g. /input_data/fastas_10).
+        :param path_output: Abs path of root dir for output blastp files (..../output_data/).
+        :param write_idmaps_for_mysqldb: True to build dict mapping RvdK ids to swsprt acc & write files.
+        :param write_csv: True to write csvfiles.
+        :param write_xml: True to write xmlfiles.
+        :param write_json: True to write jsonfiles.
+        :return: List of dictionary data structure representations of each parsed & filtered Blastp run result.
+        """
+        path_input_fastafile_list = natsort.natsorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
         blastp_dict_list = []
         # There are problems with using Biopython.Blast on the cluster that I have not yet solved. I may use the
         # blast module that is loaded on the cluster (v 2.5.0+) instead of via Biopython.
@@ -61,66 +49,66 @@ class IdProt(object):
             #                                                 blastp_result=Biopy.run_blastp(fastafile_opened.read()))
             #         blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
             #         # blastp_dict_list.append(blastp_dict)
-            #         if write_idmaps_for_mysldb:
+            #         if write_idmaps_for_mysqldb:
             #             IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv,
             #                                              write_xml=write_xml,
             #                                              write_json=write_json)
 
             python_script_w_paths = os.path.join(Paths.SRC, 'run_BlstpZeus.py') + ' ' + path_input_fastas_dir + ' ' \
                                     + path_output + ' ' + Paths.CONFIG_BLST_JOBQ + ' ' + Paths.OUTPUT_BLASTP + ' ' + \
-                                    str(write_idmaps_for_mysldb) + ' ' + str(write_csv) + ' ' + str(write_xml) + \
+                                    str(write_idmaps_for_mysqldb) + ' ' + str(write_csv) + ' ' + str(write_xml) + \
                                     ' ' + str(write_json)
             Cluster.write_job_q_bash(job_name='IdProtJobs', path_job_q_dir=Paths.CONFIG_BLST_JOBQ,
                                      python_script_with_paths=python_script_w_paths)
             Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_BLST_JOBQ)
         else:
             for path_fastafile in path_input_fastafile_list:
-                with open(path_fastafile) as fastafile_opened:
-                    fasta_str = fastafile_opened.read()
+                with open(path_fastafile) as f:
+                    fasta_str = f.read()
                     fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
                 blastp_result = Biopy.run_blastp(fasta_str)
                 path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
                 blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
                 blastp_dict_list.append(blastp_dict)
-                if write_idmaps_for_mysldb:
+                if write_idmaps_for_mysqldb:
                     IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
                                                      write_json=write_json)
         return blastp_dict_list
 
-    # Writes the blastp result file to an xml file in a output_data subdir called blastp.
-    #
-    # path_output       String              Absolute path to output root dir, typically /output_data.
-    # fastafile_name    String              Used for naming the xml file.
-    # blastp_result     io.TextIOWrapper    Biopython's raw blastp output. (Is a buffered text stream).
-    #
-    # Returns path to the newly-written xml file.
     @staticmethod
-    def _write_raw_blast_xml(path_output, fastafile_name, blastp_result):
+    def _write_raw_blast_xml(path_output: str, fastafile_name: str, blastp_result):
+        """
+        Writes the blastp result file to an xml file in a output_data subdir called blastp.
+        :param path_output: Absolute path to output root dir, typically /output_data.
+        :param fastafile_name: Used for naming the xml file.
+        :param blastp_result: Biopython's raw blastp output. (Is a buffered text stream).
+        :return: Path to the newly-written xml file.
+        """
         if blastp_result is None:
             raise ValueError('Blastp result is none. Something went wrong!')
         path_output_blastp = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
                                                                       intermed_dir=Paths.DIR_BLASTP.value,
                                                                       fastadir=fastafile_name)
         path_output_blastp_xmlfile = os.path.join(path_output_blastp, fastafile_name + ".xml")
-        with open(path_output_blastp_xmlfile, 'w') as out_handle:
-            out_handle.write(blastp_result.read())
+        with open(path_output_blastp_xmlfile, 'w') as f:
+            blstp_read = blastp_result.read()
+            f.write(blstp_read)
             blastp_result.close()
-
         if os.stat(path_output_blastp_xmlfile).st_size > IdProt.Strng.EST_MAX_SZE_BLSTP_RUN_200_KB.value:
             raise ValueError("blast xml output size is over 200 KB in size. Something may have gone wrong with the "
                              "blastp run.")
-
         return path_output_blastp_xmlfile
 
-    # Write to file the result of blastp run (that has already been parsed & filtered from the raw blastp result).
-    #
-    # path_output   String          Absolute path to the output_data dir.
-    # blastp_dict   Dictionary      Data structure parsed and filtered from Blastp run.
-    # write_xml     Boolean         True to write xmlfile represetation of blastp_dict, True by default.
-    # write_csv     Boolean         True to write csvfile represetation of blastp_dict, True by default.
-    # write_json    Boolean         True to write jsonfile represetation of blastp_dict, False by default.
     @staticmethod
-    def _write_idmaps_for_mysqldb(path_output, blastp_dict, write_xml=True, write_csv=True, write_json=False):
+    def _write_idmaps_for_mysqldb(path_output: str, blastp_dict: dict, write_xml=True, write_csv=True, write_json=False):
+        """
+        Write to file the result of blastp run (that has already been parsed & filtered from the raw blastp result).
+        :param path_output: Absolute path to the output_data dir.
+        :param blastp_dict: Data structure parsed and filtered from Blastp run.
+        :param write_xml: True to write xmlfile represetation of blastp_dict, True by default.
+        :param write_csv: True to write csvfile represetation of blastp_dict, True by default.
+        :param write_json: True to write jsonfile represetation of blastp_dict, False by default.
+        """
         idmap = {IdProt.Strng.SEQ_ID.value: blastp_dict[IdProt.Strng.QRY_SEQ_ID.value]}
         for alignment in blastp_dict[IdProt.Strng.IDENT_ALIGN_LST.value]:
             idmap[IdProt.Strng.ACC_NUM.value] = alignment[IdProt.Strng.ACC_NUM.value]
@@ -150,14 +138,14 @@ class IdProt(object):
         if write_json:
             IdProt._write_idmap_jsonfile(path_output, idmap)
 
-    # Converts data passed in a dictionary data structure to csv format and writes it to the blastp directory.
-    #
-    # path_output   String          Abs path of output_data dir, destination for xml file.
-    # idmap         Dictionary      Data structure of values taken from blastp run that are parsed to a csv format.
-    #
-    # Returns the xml elements (with one attribute value for id) and newlines in their own element in a list.
     @staticmethod
-    def _write_idmap_xml(path_output, idmap):
+    def _write_idmap_xml(path_output: str, idmap: dict):
+        """
+        Converts data passed in a dictionary data structure to csv format and writes it to the blastp directory.
+        :param path_output: Absolute path of output_data dir, destination for xml file.
+        :param idmap: Data structure of values taken from blastp run that are parsed to a csv format.
+        :return: Xml elements (with one attribute value for id) and newlines in their own element in a list.
+        """
         xml_list = [IdProt.Strng.XML_PROLOG.value, '\n']
         for tagname, value in idmap.items():
             if tagname == IdProt.Strng.SEQ_ID.value:
@@ -177,14 +165,14 @@ class IdProt(object):
             idmap_file.write(''.join(xml_str))
         return xml_list
 
-    # Converts data passed in a dictionary data structure to csv format and writes it to the blastp directory.
-    #
-    # path_output   String          Abs path of output_data dir, destination for csv file.
-    # idmap         Dictionary      Data structure of values taken from blastp run that are parsed to a csv format.
-    #
-    # Returns the values and commas and newlines in their own element in a list.
     @staticmethod
-    def _write_idmap_csv(path_output, idmap):
+    def _write_idmap_csv(path_output: str, idmap: dict):
+        """
+        Converts data passed in a dictionary data structure to csv format and writes it to the blastp directory.
+        :param path_output: Abs path of output_data dir, destination for csv file.
+        :param idmap: Data structure of values taken from blastp run that are parsed to a csv format.
+        :return: The values and commas and newlines in their own element in a list.
+        """
         csv_list = []
         for title in idmap.keys():
             csv_list.append(title)
@@ -205,12 +193,13 @@ class IdProt(object):
             idmap_file.write(''.join(csv_str))
         return csv_list
 
-    # Writes out a json file of the idmap (dictionary) using an imported library method from 'json' module.
-    #
-    # path_output   String      Abs path of output_data dir, destination for json file.
-    # idmap         Dictionary  Data structure representation of parsed & filtered Blastp runnresult.
     @staticmethod
-    def _write_idmap_jsonfile(path_output, idmap):
+    def _write_idmap_jsonfile(path_output: str, idmap: dict):
+        """
+        Writes out a json file of the idmap (dictionary) using an imported library method from 'json' module.
+        :param path_output: Abs path of the output dir.
+        :param idmap:
+        """
         path_output_blastp_fastaname = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
                                                                             intermed_dir=Paths.DIR_BLASTP.value,
                                                                             fastadir=idmap[IdProt.Strng.SEQ_ID.value])
@@ -218,14 +207,16 @@ class IdProt(object):
         with open(path_output_blastp_fastaname_jsonfile, 'w') as f:
             f.write(json.dumps(idmap))
 
-    # To make directory and all intermediate directories, encapsulated in try/except clause as pre-existing result in
-    # exceptions being thrown.
-    #
-    # path_root     String      Abs path of root dir of tree to be built here (.../input_data/ or .../output/data/).
-    # intermed_dir  String      Abs path of intermediate dir of tree, subdir to root, in which filename subdir will be.
-    # fastadirname  String      Name of fastafile (without extension).
     @staticmethod
-    def _build_dir_tree_with_intermed_dir(path_root, intermed_dir, fastadir):
+    def _build_dir_tree_with_intermed_dir(path_root: str, intermed_dir: str, fastadir: str):
+        """
+        To make directory and all intermediate directories, encapsulated in try/except clause as pre-existing result in
+        exceptions being thrown.
+        :param path_root: Abs path of the root of this dir tree.
+        :param intermed_dir: Name of intermediate directory.
+        :param fastadir: Name of Fasta directory.
+        :return: Path of new directory and subdirectories.
+        """
         if fastadir is None:
             path_root_subdirs = os.path.join(path_root, intermed_dir)
         elif intermed_dir is Paths.DIR_BLASTP.value:
@@ -239,15 +230,16 @@ class IdProt(object):
             print('Part or all of path already exists. This is absolutely fine.')
         return path_root_subdirs
 
-    # NOTE: This method assumes that the 'Recname', 'Altname', 'Flags' are always written in this order. It also
-    # assumes that the Flag is the last string of any form in the line.
-    # I don't know yet if these assumptions are correct.
-    #
-    # hit_def           String      A value from Blastp result, typically includes semi-colon separated text regarding
-    #                               names and flags.
-    # *search_strngs    List        Search strings, typically name, altname, flags.
     @staticmethod
-    def _extract_names_flags(hit_def, *search_strngs):
+    def _extract_names_flags(hit_def: str, *search_strngs: str):
+        """
+        NOTE: This method assumes that the 'Recname', 'Altname', 'Flags' are always written in this order. It also
+        assumes that the Flag is the last string of any form in the line.
+        I don't know yet if these assumptions are correct.
+        :param hit_def: A value from Blastp result, typically includes semi-colon separated text regarding names & flags.
+        :param search_strngs: Search strings, typically name, altname, flags.
+        :return:
+        """
         full_alt_names_flag = {}
         for search_str in search_strngs:
             try:
@@ -266,12 +258,13 @@ class IdProt(object):
                 print('Did not find ' + search_str + ' in this hit_def: ' + hit_def)
         return full_alt_names_flag
 
-    # name_or_flag      String      Text to be tested for length
-    #
-    # Returns True if text passed is between 2 and 30 characters long. I cannot say for sure that there are no names
-    # or flags that are 1 character long or more than 30 characters long - this is running assumption.
     @staticmethod
-    def __is_reasonable_length(name_or_flag):
+    def __is_reasonable_length(name_or_flag: str):
+        """
+        :param name_or_flag: Text to be tested for length.
+        :return: True if text passed is between 2 and 30 characters long. I cannot say for sure that there are no names
+        or flags that are 1 character long or more than 30 characters long - this is running assumption.
+        """
         reasonable_max_name_or_flag_len = 70
         if len(name_or_flag) < 2 | len(name_or_flag) > reasonable_max_name_or_flag_len:
             raise ValueError('Full name, altname or flag is either not there at all or seems too long.')
