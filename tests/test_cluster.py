@@ -14,12 +14,12 @@ class TestCluster(TestCase):
     @classmethod
     def setUpClass(cls):
         if not os.path.exists(TPLS.MC_TESTS_CONFIG.value):
-            GUM.linux_copy(path_src=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS_CONFIG.value,
-                           do_recursively=True)
+            GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.CONFIG_FOR_READ_ONLY.value,
+                                            path_dst_dir=TPLS.MC_TESTS_CONFIG.value)
 
         if not os.path.exists(TPLS.MC_TESTS_INPUT.value):
-            GUM.linux_copy(path_src=TPLS.INPUT_FOR_READ_ONLY.value, path_dst=TPLS.MC_TESTS_INPUT.value,
-                           do_recursively=True)
+            GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.INPUT_FOR_READ_ONLY.value,
+                                            path_dst_dir=TPLS.MC_TESTS_INPUT.value)
 
     # @classmethod
     # def tearDownClass(cls):
@@ -42,16 +42,18 @@ class TestCluster(TestCase):
         jobname = fxbm_jobname_prefix + fx_mutant_name
         expected_job_q = '#!/bin/bash\n' + '#$ -N ' + jobname + '\n' + '#$ -V\n' + '#$ -cwd\n' + \
                               'source ~/.bash_profile\n' + TPLS.ZEUS_FOLDX_EXE.value + ' -runfile runscript.txt\n'
+        # not_expected_job_q is just the same as expected_job_q but has an extra single single
         single_space = ' '
         not_expected_job_q = '#!/bin/bash' + single_space + '\n' + '#$ -N ' + jobname + '\n' + '#$ -V\n' + \
                              '#$ -cwd\n' + 'source ~/.bash_profile\n' + TPLS.ZEUS_FOLDX_EXE.value + \
                              ' -runfile runscript.txt\n'
+        # not_expected_job_q is just the same as expected_job_q but is missing a \n
         missing_new_line = ''
         not_expected_job_q_2 = '#!/bin/bash\n' + '#$ -N ' + jobname + missing_new_line + '#$ -V\n' + \
                              '#$ -cwd\n' + 'source ~/.bash_profile\n' + TPLS.ZEUS_FOLDX_EXE.value + \
                              ' -runfile runscript.txt\n'
         # act
-        actual_job_q = self.cluster.write_job_q_bash(jobname, TPLS.MC_TESTS_CONFIG_JOBQ.value)
+        actual_job_q = self.cluster.write_job_q_bash(jobname, TPLS.MC_TESTS_CONFIG_JOBQ.value, using_runscript=True)
         # assert
         self.assertEqual(expected_job_q, actual_job_q)
         self.assertNotEqual(not_expected_job_q, actual_job_q)
