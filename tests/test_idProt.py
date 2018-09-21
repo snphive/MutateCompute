@@ -108,12 +108,12 @@ class TestIdProt(TestCase):
                                              result_handle, blast_out_xml)
 
     # This test is a currently a sort of pretend test. I'm currently just using it to run blastp and see if there any
-    # errors.
+    # error messages generated.
     def test_map_seq_to_swsprt_acc_id_and_write_files(self):
         # act
         IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=self.PATH_TESTS_INPUT_FASTA_1_A,
                                                         path_output=TPLS.MC_TESTS_OUTPUT.value,
-                                                        write_idmaps_for_mysldb=False, write_csv=False,
+                                                        write_idmaps_for_mysqldb=False, write_csv=False,
                                                         write_xml=False, write_json=False)
 
     # I wanted to mock open().read(). Not quite managed it yet, but even so, it prevents the method throwing an
@@ -149,7 +149,7 @@ class TestIdProt(TestCase):
         # act
         result_dict_list = IdProt.map_seq_to_swsprt_acc_id_and_write_files(
             path_input_fastas_dir=self.PATH_TESTS_INPUT_FASTA_1_A, path_output=path_output_blastp_1_A,
-            write_idmaps_for_mysldb=False, write_csv=False, write_xml=False, write_json=False)
+            write_idmaps_for_mysqldb=False, write_csv=False, write_xml=False, write_json=False)
         # assert
         self.maxDiff = None
         self.assertListEqual(expected_qblast_dict_list_1_A, result_dict_list)
