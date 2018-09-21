@@ -8,6 +8,7 @@ from src.Str import Str
 path_fastafile = sys.argv[1]
 path_output_root = sys.argv[2]
 
+print('run_agadir_on_multifastasZeus.py is called  ###################################')
 agadir = Agadir(AgadCndtns.INCELL_MAML.value)
 path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_output_root, path_fastafile)
 with open(path_fastafile) as f:

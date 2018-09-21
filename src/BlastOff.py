@@ -5,19 +5,20 @@ from src.Scheduler import Scheduler
 import sys
 import pydevd
 import threading
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
-print('(For debugging purposes) python version is: ' + str(sys.version_info[0]))
-
-use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
+if len(sys.argv) < 2:
+    use_cluster = False
+else:
+    use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
 
 Paths.set_up_paths(use_cluster=use_cluster)
 path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=Paths.INPUT,
                                                              intermed_dir=Paths.DIR_FASTAS.value, fastadir=None)
-path_repo = Paths.REPO_FASTAS + '_10'
-wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas=path_repo,
-                                                          path_dst_dir=path_input_fastas, wanted_file_list=None)
-Scheduler.start_blast(path_input_fastas_dir=Paths.INPUT_FASTAS, path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
+path_repo = Paths.MC_REPO_FASTAS.value + '/fastas_100_rest'
+# wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas=path_repo,
+#                                                           path_dst_dir=path_input_fastas, wanted_file_list=None)
+Scheduler.start_blast(path_input_fastas_dir=path_repo, path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
                       write_csv=True, write_xml=True, write_json=False)
 
 # IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas, path_output=Paths.OUTPUT,
@@ -41,4 +42,4 @@ Scheduler.start_blast(path_input_fastas_dir=Paths.INPUT_FASTAS, path_output=Path
 # IdentifyProtein   input_data/<fastafilename>/                         output_data/blastp/
 #                                                                       output_data/blastp/<fastafilename>_idmaps/
 
-pydevd.stoptrace()
+# pydevd.stoptrace()

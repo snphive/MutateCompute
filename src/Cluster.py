@@ -65,9 +65,9 @@ class Cluster(object):
     # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use.
     # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
     @staticmethod
-    def write_job_q_bash(job_name, path_job_q_dir, path_dst_dir='', startnum='', endnum='', using_runscript=False, path_runscript_dir='',
-                         python_script_with_paths='', queue='', n_slots='', total_memory_GB='', memory_limit_GB='',
-                         cluster_node=''):
+    def write_job_q_bash(job_name, path_job_q_dir, path_dst_dir='', startnum='', endnum='', using_runscript=False,
+                         path_runscript_dir='', python_script_with_paths='', queue='', n_slots='', total_memory_GB='',
+                         memory_limit_GB='', cluster_node=''):
         try:
             os.makedirs(path_job_q_dir)
         except FileExistsError:

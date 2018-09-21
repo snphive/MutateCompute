@@ -72,7 +72,10 @@ operations = {'do_mutate_fasta': False, 'do_agadir': False,
               'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
 use_multithread = False
 # path_pdbfile_list = natsort.natsorted(glob.glob(path_pdbfiles, recursive=True))
-path_pdbfile_list = ['/switchlab/group/shazib/SnpEffect/tests/input_data/pdbs/RepairPDBtest_1.pdb']
+if use_cluster:
+    path_pdbfile_list = ['/switchlab/group/shazib/SnpEffect/tests/input_data/pdbs/RepairPDBtest_1.pdb']
+else:
+    path_pdbfile_list = ['/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/pdbs/RepairPDBtest_1.pdb']
 path_fastafile_list = []
 main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile_list, path_fastafile_list, ['A', 'C'])
             # AA.LIST_ALL_20_AA.value)
