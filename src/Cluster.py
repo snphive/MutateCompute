@@ -65,7 +65,7 @@ class Cluster(object):
     # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use.
     # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
     @staticmethod
-    def write_job_q_bash(job_name, path_job_q_dir, startnum='', endnum='', using_runscript=False, path_runscript_dir='',
+    def write_job_q_bash(job_name, path_job_q_dir, path_dst_dir='', startnum='', endnum='', using_runscript=False, path_runscript_dir='',
                          python_script_with_paths='', queue='', n_slots='', total_memory_GB='', memory_limit_GB='',
                          cluster_node=''):
         try:
@@ -101,19 +101,22 @@ class Cluster(object):
             job_q.append('#$ -l hostname=' + cluster_node + Str.NEWLN.value)
         if 'agadir' in python_script_with_paths.lower():
             job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles' + Str.NEWLN.value)
+        # else:
+        #     job_q.append('#$ -wd' + Str.SPCE.value + path_dst_dir + Str.NEWLN.value)
         else:
-            job_q.append('#$ -cwd')
+            job_q.append('#$ -cwd' + Str.NEWLN.value)
         job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
         if using_runscript:
-            job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + '-runfile' + Str.SPCE.value + path_runscript_dir
-                         + 'runscript.txt' + Str.NEWLN.value)
+            job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + Cluster.CLSTR.RNFL.value + Str.SPCE.value +
+                         os.path.join(path_runscript_dir, Str.runscrpt_txt.value) + Str.NEWLN.value)
 
         if python_script_with_paths != '':
             job_q.append('python3' + Str.SPCE.value + python_script_with_paths + Str.NEWLN.value)
             # not sure if path to qsub is also needed, as it is present in Rob's scripts (OptProt has path/to/python
             # script then space then the qsub path string, which seemed odd as the path/to/qsub is specified in the
             # prefix to qsub command in subprocess.call())
-        with open(path_job_q_dir + '/job.q', 'w') as job_q_file:
+
+        with open(os.path.join(path_job_q_dir, Cluster.CLSTR.JOBQ.value), 'w') as job_q_file:
             job_q_str = ''.join(job_q)
             job_q_file.write(job_q_str)
 
@@ -127,21 +130,25 @@ class Cluster(object):
     @staticmethod
     def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix):
         print('Cluster.wait_for_grid_ending..() is called.......')
-        check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
+        check_qstat = subprocess.Popen(Cluster.CLSTR.QSTAT.value, stdout=subprocess.PIPE)
         output_qstat = check_qstat.stdout.read()
         # output_qstat = output_qstat.decode('utf-8')
         while grid_engine_job_prefix.encode('utf-8') in output_qstat:
             print('Waiting for all ' + grid_engine_job_prefix + ' to finish.')
             time.sleep(10)
-            check_qstat = subprocess.Popen('qstat', stdout=subprocess.PIPE)
+            check_qstat = subprocess.Popen(Cluster.CLSTR.QSTAT.value, stdout=subprocess.PIPE)
             output_qstat = check_qstat.stdout.read()
 
     from enum import Enum
 
-    class OPTNS(Enum):
+    class CLSTR(Enum):
         ALLQ = 'all.q'
         NODE_HDR1 = 'hodor1.vib'
         NODE_HDR2 = 'hodor2.vib'
         NODE_ODN1 = 'odin1.vib'
         NODE_ODN2 = 'odin2.vib'
+        JOBQ = Str.JOBQ.value
+        QSTAT = 'qstat'
+        QSUB = 'qsub'
+        RNFL = '-runfile'
 
