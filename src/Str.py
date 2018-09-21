@@ -7,6 +7,7 @@ class Str(Enum):
     TRUE_lc = 'true'
     FALSE_lc = 'false'
     NEWLN = '\n'
+    TAB = "\t"
     SEMICO_NL = ';' + NEWLN
     SPCE = ' '
     FSLSH = '/'
@@ -18,3 +19,10 @@ class Str(Enum):
     FASTAS = Paths.DIR_FASTAS.value
     HASH = '#'
     JOBQ = 'job.q'
+    runscrpt_txt = 'runscript.txt'
+    TEMP = 'temp'
+    ION_STRGTH = 'ion_strgth'
+    PH = 'ph'
+    TFE = 'tfe'
+    STAB = 'stab'
+    CONC = 'conc'
