@@ -116,7 +116,7 @@ class Scheduler(object):
 
     @staticmethod
     def start_blast(path_input_fastas_dir, path_output, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
-                    write_json=False, use_multithread=True):
+                    write_json=False, use_multithread=False):
         if use_multithread:
             print('')
             # Scheduler._launch_thread(target=IdProt.map_seq_to_swsprt_acc_id_and_write_files,
@@ -128,7 +128,7 @@ class Scheduler(object):
         else:
             IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas_dir,
                                                             path_output=path_output,
-                                                            write_idmaps_for_mysldb=write_idmaps_for_mysldb,
+                                                            write_idmaps_for_mysqldb=write_idmaps_for_mysldb,
                                                             write_csv=write_csv, write_xml=write_xml,
                                                             write_json=write_json)
 
