@@ -39,7 +39,7 @@ class FoldX(object):
         runscript.append('<END>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<OPTIONS>' + self.Strs.FXOPTFILE.value + Str.SEMICO_NL.value)
         runscript.append('<Temperature>' + str(conditions[Str.TEMP.value]) + Str.SEMICO_NL.value)
-        runscript.append('<IonStrength>' + str(conditions[Str.ION_STRNGTH.value]) + Str.SEMICO_NL.value)
+        runscript.append('<IonStrength>' + str(conditions[Str.ION_STRGTH.value]) + Str.SEMICO_NL.value)
         runscript.append('<ph>' + str(conditions[Str.PH.value]) + Str.SEMICO_NL.value)
         runscript.append('<moveNeighbours>' + Str.TRUE_lc.value + Str.SEMICO_NL.value)
         runscript.append('<VdWDesign>2' + Str.SEMICO_NL.value)
