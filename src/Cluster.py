@@ -71,7 +71,7 @@ class Cluster(object):
         try:
             os.makedirs(path_job_q_dir)
         except FileExistsError:
-            print("Some or all of the directories in the this path already exist. It's no problem.")
+            print(Str.PARTALLPATHEXISTS_MSG.value)
         job_q = []
         job_q.append('#!/bin/bash' + Str.NEWLN.value)
         job_q.append('#$ -N' + Str.SPCE.value + job_name + '' + Str.NEWLN.value)

@@ -202,7 +202,7 @@ class GUM(object):
         try:
             os.makedirs(path_root_newdirs)
         except FileExistsError:
-            print('(part/all path already exists)')
+            print(Str.PARTALLPATHEXISTS_MSG.value)
         return path_root_newdirs
 
     # path_src_dir          String      Absoluate path of source for files to copy from.
@@ -224,7 +224,7 @@ class GUM(object):
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
-                print('Problem with linux cp command.')
+                print(Str.PROBLNXCMD_MSG.value + cmd)
 
     # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
     # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
@@ -337,7 +337,7 @@ class GUM(object):
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
-            print('Problem with linux cp command.')
+            print(Str.PROBLNXCMD_MSG.value + cmd)
 
     # NOTE: current cp command specifies not to overwrite existing files.
     @staticmethod
@@ -354,7 +354,7 @@ class GUM(object):
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
-                print('Problem with linux cp command.')
+                print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
     def linux_copy_specified_files(path_src_files, path_dst_dir):
@@ -365,7 +365,7 @@ class GUM(object):
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
-                print('Problem with linux cp command.')
+                print(Str.PROBLNXCMD_MSG.value + cmd)
 
     # Finds files in the immediate specified directory, creates a subdir with same name as the file and moves the file
     # into this new subdirectory.
@@ -382,7 +382,7 @@ class GUM(object):
                 try:
                     subprocess.call(cmd, shell=True)
                 except OSError:
-                    print('Problem with linux mv command.')
+                    print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
     def linux_remove_all_files_in_dir(path_dir):
@@ -390,7 +390,7 @@ class GUM(object):
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
-            print('Problem with linux rm command.')
+            print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
     def linux_remove_file(path_dst_mutant_file):
@@ -398,7 +398,7 @@ class GUM(object):
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
-            print('Problem with linux rm command.')
+            print(Str.PROBLNXCMD_MSG.value + cmd)
 
     # Might be better to log in manually, as this can hang if mulitplexing is used.
     # @staticmethod

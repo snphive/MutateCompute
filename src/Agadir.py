@@ -15,13 +15,12 @@ import time
 class Agadir(object):
 
     def __init__(self, conditions):
-        print('Agadir constructor is called.......')
-        self.temp = str(conditions['temp'])
-        self.ph = str(conditions['ph'])
-        self.ion_strgth = str(conditions['ion_strgth'])
-        self.tfe = str(conditions['tfe'])
-        self.stab = str(conditions['stab'])
-        self.conc = str(conditions['conc'])
+        self.temp = str(conditions[Str.COND_TEMP.value])
+        self.ph = str(conditions[Str.COND_PH.value])
+        self.ion_strgth = str(conditions[Str.COND_ION_STRGTH.value])
+        self.tfe = str(conditions[Str.COND_TFE.value])
+        self.stab = str(conditions[Str.COND_STAB.value])
+        self.conc = str(conditions[Str.COND_CONC.value])
 
     def copy_files_output_to_input_fastasubdirs(self, path_output_fastas: str, path_input_fastas: str,
                                                 filename_list=None, into_own_subdirs=True):
@@ -64,7 +63,7 @@ class Agadir(object):
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
-                print('Problem with linux chmod command.')
+                print(Str.PROBLNXCMD_MSG.value + cmd)
             path_agadir_exe = Paths.LOCAL_AGADIR_EXE.value + 'agadir_wrapper'
             path_config_agad = Paths.MC_CONFIG_AGAD.value
         # cmd = Paths.AGADIR_EXE + agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \

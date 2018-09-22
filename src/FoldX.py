@@ -38,9 +38,9 @@ class FoldX(object):
             runscript.append('<Stability>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<END>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<OPTIONS>' + self.Strs.FXOPTFILE.value + Str.SEMICO_NL.value)
-        runscript.append('<Temperature>' + str(conditions[Str.TEMP.value]) + Str.SEMICO_NL.value)
-        runscript.append('<IonStrength>' + str(conditions[Str.ION_STRGTH.value]) + Str.SEMICO_NL.value)
-        runscript.append('<ph>' + str(conditions[Str.PH.value]) + Str.SEMICO_NL.value)
+        runscript.append('<Temperature>' + str(conditions[Str.COND_TEMP.value]) + Str.SEMICO_NL.value)
+        runscript.append('<IonStrength>' + str(conditions[Str.COND_ION_STRGTH.value]) + Str.SEMICO_NL.value)
+        runscript.append('<ph>' + str(conditions[Str.COND_PH.value]) + Str.SEMICO_NL.value)
         runscript.append('<moveNeighbours>' + Str.TRUE_lc.value + Str.SEMICO_NL.value)
         runscript.append('<VdWDesign>2' + Str.SEMICO_NL.value)
         runscript.append('<numberOfRuns>3' + Str.SEMICO_NL.value)
@@ -118,7 +118,7 @@ class FoldX(object):
                     try:
                         subprocess.call(cmd, shell=True)
                     except OSError:
-                        print('Problem with this linux cmd: ' + cmd)
+                        print(Str.PROBLNXCMD_MSG.value + cmd)
                     cmd = Paths.FOLDX_EXE + Str.SPCE.value + FoldX().Strs.DSH_RUNFILE.value + Str.SPCE.value + \
                           path_runscript_file
                     if os.path.exists(path_runscript_file):

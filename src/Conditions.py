@@ -4,16 +4,16 @@ from enum import Enum
 
 class Cond(Enum):
     # cytoplasm and nucleus had a pH of ≈7.3, mitochondria ≈8.0, ER ≈7.5 and Golgi ≈6.6
-    INCELL_MAML_FX = {Str.TEMP.value: 298, Str.PH.value: 7, Str.ION_STRGTH.value: 0.05, Str.TFE.value: 0,
-                      Str.STAB.value: 0, Str.CONC.value: 1}
+    INCELL_MAML_FX = {Str.COND_TEMP.value: 298, Str.COND_PH.value: 7, Str.COND_ION_STRGTH.value: 0.05, Str.COND_TFE.value: 0,
+                      Str.COND_STAB.value: 0, Str.COND_CONC.value: 1}
     # cytoplasm and nucleus had a pH of ≈7.3, mitochondria ≈8.0, ER ≈7.5 and Golgi ≈6.6
     # 310.15 K == 37 degC
-    INCELL_MAML_AG = {Str.TEMP.value: 310.15, Str.PH.value: 7.4, Str.ION_STRGTH.value: 0.15, Str.TFE.value: 0,
-                      Str.STAB.value: 0, Str.CONC.value: 1}
+    INCELL_MAML_AG = {Str.COND_TEMP.value: 310.15, Str.COND_PH.value: 7.4, Str.COND_ION_STRGTH.value: 0.15, Str.COND_TFE.value: 0,
+                      Str.COND_STAB.value: 0, Str.COND_CONC.value: 1}
     # OUTCELL_MAML = {'temp': 310.15, 'pH': 7?}
     # 298.15 K == 25 degC
-    INVITRO_COND1 = {Str.TEMP.value: 298.15, Str.PH.value: 7.5, Str.ION_STRGTH.value: 0.15, Str.TFE.value: 0,
-                     Str.STAB.value: 0, Str.CONC.value: 1}
+    INVITRO_COND1 = {Str.COND_TEMP.value: 298.15, Str.COND_PH.value: 7.5, Str.COND_ION_STRGTH.value: 0.15, Str.COND_TFE.value: 0,
+                     Str.COND_STAB.value: 0, Str.COND_CONC.value: 1}
     # REFERENCE FOR THE ABOVE VALUES?
     # ETC
 

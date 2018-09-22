@@ -3,6 +3,7 @@ import json
 import glob
 import natsort
 import threading
+from src.Str import Str
 from src.Biopython import Biopy
 from src.Paths import Paths
 from src.Cluster import Cluster
@@ -23,9 +24,9 @@ class IdProt(object):
         Expects a directory location of fastafiles (not a fastafile itself).
         (This method relies on the presence of fastafiles in the specified dir, in order for them to be run on Blastp.
         This transfer is currently done manually)
-        :param path_input_fastas_dir: Abs path of root dir for input fastafiles (e.g. /input_data/fastas_10).
-        :param path_output: Abs path of root dir for output blastp files (..../output_data/).
-        :param write_idmaps_for_mysqldb: True to build dict mapping RvdK ids to swsprt acc & write files.
+        :param path_input_fastas_dir: Absolute path of root directory for input fastafiles (e.g. /input_data/fastas_10).
+        :param path_output: Absolute path of root directory for blastp output files (..../output_data/).
+        :param write_idmaps_for_mysqldb: True (by default) builds dictionary mapping RvdK's ids to swsprt accession nos & write files.
         :param write_csv: True to write csvfiles.
         :param write_xml: True to write xmlfiles.
         :param write_json: True to write jsonfiles.
@@ -79,10 +80,10 @@ class IdProt(object):
     def _write_raw_blast_xml(path_output: str, fastafile_name: str, blastp_result):
         """
         Writes the blastp result file to an xml file in a output_data subdir called blastp.
-        :param path_output: Absolute path to output root dir, typically /output_data.
+        :param path_output: Absolute path of output_data root directory, typically ../output_data.
         :param fastafile_name: Used for naming the xml file.
-        :param blastp_result: Biopython's raw blastp output. (Is a buffered text stream).
-        :return: Path to the newly-written xml file.
+        :param blastp_result: Biopython's raw blastp output. (Buffered text stream (io.StringIO).
+        :return: Path to the new raw blastp xml file written by this method.
         """
         if blastp_result is None:
             raise ValueError('Blastp result is none. Something went wrong!')
@@ -94,8 +95,9 @@ class IdProt(object):
             blstp_read = blastp_result.read()
             f.write(blstp_read)
             blastp_result.close()
-        if os.stat(path_output_blastp_xmlfile).st_size > IdProt.Strng.EST_MAX_SZE_BLSTP_RUN_200_KB.value:
-            raise ValueError("blast xml output size is over 200 KB in size. Something may have gone wrong with the "
+        if os.stat(path_output_blastp_xmlfile).st_size > IdProt.Strng.EST_MAX_SZE_BLSTP_RUN_300_KB.value:
+            # Not sure this needs to raise ValueError, rather than exception so that it can continue rather than halt execution.
+            raise ValueError("blast xml output size is over 300 KB in size. Something may have gone wrong with the "
                              "blastp run.")
         return path_output_blastp_xmlfile
 
@@ -103,11 +105,11 @@ class IdProt(object):
     def _write_idmaps_for_mysqldb(path_output: str, blastp_dict: dict, write_xml=True, write_csv=True, write_json=False):
         """
         Write to file the result of blastp run (that has already been parsed & filtered from the raw blastp result).
-        :param path_output: Absolute path to the output_data dir.
-        :param blastp_dict: Data structure parsed and filtered from Blastp run.
-        :param write_xml: True to write xmlfile represetation of blastp_dict, True by default.
-        :param write_csv: True to write csvfile represetation of blastp_dict, True by default.
-        :param write_json: True to write jsonfile represetation of blastp_dict, False by default.
+        :param path_output: Absolute path of output_data root directory.
+        :param blastp_dict: Parsed and selected attributes of Blastp result.
+        :param write_xml: True (by default) writes xml file representation of blastp_dict.
+        :param write_csv: True (by default) writes csv file representation of blastp_dict.
+        :param write_json: True (by default) writes json file representation of blastp_dict.
         """
         idmap = {IdProt.Strng.SEQ_ID.value: blastp_dict[IdProt.Strng.QRY_SEQ_ID.value]}
         for alignment in blastp_dict[IdProt.Strng.IDENT_ALIGN_LST.value]:
@@ -227,7 +229,7 @@ class IdProt(object):
         try:
             os.makedirs(path_root_subdirs)
         except FileExistsError:
-            print('Part or all of path already exists. This is absolutely fine.')
+            print(Str.PARTALLPATHEXISTS_MSG.value)
         return path_root_subdirs
 
     @staticmethod
@@ -273,7 +275,7 @@ class IdProt(object):
     from enum import Enum
 
     class Strng(Enum):
-        EST_MAX_SZE_BLSTP_RUN_200_KB = 200000
+        EST_MAX_SZE_BLSTP_RUN_300_KB = 300000
         SEQ_ID = 'sequence_id'
         QRY_SEQ_ID = 'query_seq_id'
         NAME_SRCH_STR = 'RecName: Full='
