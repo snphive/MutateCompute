@@ -3,6 +3,7 @@ import json
 import glob
 import natsort
 import threading
+import time
 from src.Str import Str
 from src.Biopython import Biopy
 from src.Paths import Paths
@@ -18,13 +19,13 @@ from src.GeneralUtilityMethods import GUM
 class IdProt(object):
 
     @staticmethod
-    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir: str, path_output: str, write_idmaps_for_mysqldb: bool,
+    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastafiles: str, path_output: str, write_idmaps_for_mysqldb: bool,
                                                  write_csv=True, write_xml=True, write_json=False):
         """
         Expects a directory location of fastafiles (not a fastafile itself).
         (This method relies on the presence of fastafiles in the specified dir, in order for them to be run on Blastp.
         This transfer is currently done manually)
-        :param path_input_fastas_dir: Absolute path of root directory for input fastafiles (e.g. /input_data/fastas_10).
+        :param path_input_fastafiles: Absolute path of root directory for input fastafiles (e.g. /input_data/fastas_10).
         :param path_output: Absolute path of root directory for blastp output files (..../output_data/).
         :param write_idmaps_for_mysqldb: True (by default) builds dictionary mapping RvdK's ids to swsprt accession nos & write files.
         :param write_csv: True to write csvfiles.
@@ -32,7 +33,8 @@ class IdProt(object):
         :param write_json: True to write jsonfiles.
         :return: List of dictionary data structure representations of each parsed & filtered Blastp run result.
         """
-        path_input_fastafile_list = natsort.natsorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
+        if isinstance(path_input_fastafiles, str):
+            path_input_fastafiles = [path_input_fastafiles]
         blastp_dict_list = []
         # There are problems with using Biopython.Blast on the cluster that I have not yet solved. I may use the
         # blast module that is loaded on the cluster (v 2.5.0+) instead of via Biopython.
@@ -55,7 +57,7 @@ class IdProt(object):
             #                                              write_xml=write_xml,
             #                                              write_json=write_json)
 
-            python_script_w_paths = os.path.join(Paths.SRC, 'run_BlstpZeus.py') + ' ' + path_input_fastas_dir + ' ' \
+            python_script_w_paths = os.path.join(Paths.SRC, 'run_BlstpZeus.py') + ' ' + path_input_fastafiles + ' ' \
                                     + path_output + ' ' + Paths.CONFIG_BLST_JOBQ + ' ' + Paths.OUTPUT_BLASTP + ' ' + \
                                     str(write_idmaps_for_mysqldb) + ' ' + str(write_csv) + ' ' + str(write_xml) + \
                                     ' ' + str(write_json)
@@ -63,7 +65,7 @@ class IdProt(object):
                                      python_script_with_paths=python_script_w_paths)
             Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_BLST_JOBQ)
         else:
-            for path_fastafile in path_input_fastafile_list:
+            for path_fastafile in path_input_fastafiles:
                 with open(path_fastafile) as f:
                     fasta_str = f.read()
                     fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
@@ -112,7 +114,9 @@ class IdProt(object):
         :param write_json: True (by default) writes json file representation of blastp_dict.
         """
         idmap = {IdProt.Strng.SEQ_ID.value: blastp_dict[IdProt.Strng.QRY_SEQ_ID.value]}
+        # time.sleep(1)
         for alignment in blastp_dict[IdProt.Strng.IDENT_ALIGN_LST.value]:
+            # time.sleep(1)
             idmap[IdProt.Strng.ACC_NUM.value] = alignment[IdProt.Strng.ACC_NUM.value]
             idmap[IdProt.Strng.LEN.value] = alignment[IdProt.Strng.LEN.value]
             full_alt_names_flags = IdProt._extract_names_flags(alignment[IdProt.Strng.HIT_DEF.value],

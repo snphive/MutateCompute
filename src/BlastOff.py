@@ -1,8 +1,10 @@
-from src.IdentifyProtein import IdProt
-from src.Paths import Paths
-from src.GeneralUtilityMethods import GUM
-from src.Scheduler import Scheduler
 import sys
+import natsort
+import glob
+from src.Paths import Paths
+from src.Scheduler import Scheduler
+from src.IdentifyProtein import IdProt
+from src.GeneralUtilityMethods import GUM
 import pydevd
 import threading
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
@@ -15,10 +17,18 @@ else:
 Paths.set_up_paths(use_cluster=use_cluster)
 path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=Paths.INPUT,
                                                              intermed_dir=Paths.DIR_FASTAS.value, fastadir=None)
-path_repo = Paths.MC_REPO_FASTAS.value + '/fastas_100_rest'
+# path_repo = Paths.MC_REPO_FASTAS.value + '/fastas_1000_rest'
 # wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas=path_repo,
 #                                                           path_dst_dir=path_input_fastas, wanted_file_list=None)
-Scheduler.start_blast(path_input_fastas_dir=path_repo, path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
+# path_fastafiles = '/Users/u0120577/REPO_PDB_FASTA/fastas_10/5_C.fasta'
+
+path_input_fastas_dir = Paths.MC_REPO_FASTAS.value + '/fastas_1000_rest'
+# /Users/u0120577/REPO_PDB_FASTA/fastas/fastas_1000_rest
+path_fastafiles = natsort.natsorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
+
+if not path_fastafiles:
+    raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
+Scheduler.start_blast(path_input_fastafiles=path_fastafiles, path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
                       write_csv=True, write_xml=True, write_json=False)
 
 # IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas, path_output=Paths.OUTPUT,
