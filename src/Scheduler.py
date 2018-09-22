@@ -115,7 +115,7 @@ class Scheduler(object):
                         analysecomplex.calculate_complex_energies(path_pdbfile)
 
     @staticmethod
-    def start_blast(path_input_fastas_dir, path_output, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
+    def start_blast(path_input_fastafiles, path_output, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
                     write_json=False, use_multithread=False):
         if use_multithread:
             print('')
@@ -126,7 +126,7 @@ class Scheduler(object):
             # Scheduler._launch_process_threadpool(target=IdProt., args=)
 
         else:
-            IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=path_input_fastas_dir,
+            IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastafiles=path_input_fastafiles,
                                                             path_output=path_output,
                                                             write_idmaps_for_mysqldb=write_idmaps_for_mysldb,
                                                             write_csv=write_csv, write_xml=write_xml,
