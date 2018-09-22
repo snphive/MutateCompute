@@ -33,6 +33,7 @@ from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 from Bio import SeqIO
 import warnings
+import time
 
 
 class Biopy(object):
@@ -68,11 +69,11 @@ class Biopy(object):
                               database=Biopy.BlastParam.SWSPRT.value,
                               sequence=fasta,
                               entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
-                              alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
-                              hitlist_size=Biopy.BlastParam.MAX_HIT_20.value)
+                              alignments=Biopy.BlastParam.MAX_ALIGN_5.value,
+                              hitlist_size=Biopy.BlastParam.MAX_HIT_5.value)
 
     @staticmethod
-    def parse_filter_blastp_xml_to_dict(path_qblast, fastafile_name, path_fastafile):
+    def parse_filter_blastp_xml_to_dict(path_qblast: str, fastafile_name: str, path_fastafile: str):
         """
         Parses qblast result and filters (assigns to a data structure) only those fields that are of interest.
         #
@@ -98,13 +99,13 @@ class Biopy(object):
                         'query_length': query_length,
                         'database': database_used,
                         'database_seqs_num': database_seqs_num,
-                        'identical_aligns_list': Biopy._make_list_of_dicts_of_hsps_w_0gaps_and_queryLen_equal_alignLen(
+                        'identical_aligns_list': Biopy._build_identical_alignments_list(
                         query_length, alignments)}
         Biopy._warn_if_discrepancies_in_query_seq_length(qblast_dict, query_length, query_letters, path_fastafile)
         return qblast_dict
 
     @staticmethod
-    def _make_list_of_dicts_of_hsps_w_0gaps_and_queryLen_equal_alignLen(query_length: int, alignments: list):
+    def _build_identical_alignments_list(query_length: int, alignments: list):
         """
         Builds a list_of_dictionaries of relevant info for each high-scoring pair (hsp) alignment where there are zero
         gaps and the alignment length is exactly the same as the query length, hence it is a 100% identity match.
@@ -120,7 +121,9 @@ class Biopy(object):
         for alignment in alignments:
             alignment_dict = {'accession_num': 0, 'length': 0, 'hit_def': '', 'hsp_dict': {}}
             for hsp in alignment.hsps:
+                # time.sleep(1)
                 is_identical = hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities
+                # time.sleep(1)
                 if is_identical:
                     alignment_dict['accession_num'] = alignment.accession
                     alignment_dict['length'] = alignment.length
