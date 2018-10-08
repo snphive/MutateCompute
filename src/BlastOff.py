@@ -15,8 +15,8 @@ else:
     use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
 
 Paths.set_up_paths(use_cluster=use_cluster)
-path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=Paths.INPUT,
-                                                             intermed_dir=Paths.DIR_FASTAS.value, fastadir=None)
+# path_input_fastas = IdProt._build_dir_tree_with_intermed_dir(path_root=Paths.INPUT,
+#                                                              intermed_dir=Paths.DIR_FASTAS.value, fastadir=None)
 # path_repo = Paths.MC_REPO_FASTAS.value + '/fastas_1000_rest'
 # wanted_file_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas=path_repo,
 #                                                           path_dst_dir=path_input_fastas, wanted_file_list=None)
