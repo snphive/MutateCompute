@@ -73,13 +73,14 @@ class Agadir(object):
         # Str.SPCE.value + '/switchlab/group/shazib/SnpEffect/configuration/agadir_config/Options.txt'
         subprocess.call(cmd, shell=True)
 
-    def run_agadir_on_multifastas(self, path_fastafile: str, path_output_root: str):
+    def run_agadir_on_multifastas(self, path_fastafile: str, path_dst: str):
         """
-        To run agadir on file that has multiple fasta sequences.
+        To run agadir on file that has multiple fasta sequences. Iterate through the list, write the sequence to an
+        individual text file passing this to agadir.compute(). This newly-written individual text file is then deleted,
+        crucial to prevent too much memory taken up by each file when running large numbers of sequences.
         :param path_fastafile: Abs path to fasta file.
-        :param path_output_root: Abs path to output root dir.
+        :param path_dst: Abs path to output root dir.
         """
-        path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_output_root, path_fastafile)
         with open(path_fastafile) as f:
             is_first_line = True
             fasta_str = ''
