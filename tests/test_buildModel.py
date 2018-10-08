@@ -34,11 +34,11 @@ class TestBuildModel(TestCase):
         mock__make_fx_mutant_name_list.return_value = ['RA1A', 'RA1C', 'VA2A', 'VA2C', 'YA3A', 'YA3C', 'LA4A', 'LA4C',
                                                        'TA5A', 'TA5C', 'RB1A', 'RB1C', 'VB2A', 'VB2C', 'YB3A', 'YB3C',
                                                        'LB4A', 'LB4C', 'TB5A', 'TB5C']
-        mutant_aa_list = ['A', 'C']
+        amino_acids = ['A', 'C']
         # path_pdb = '/Users/u0120577/PycharmProjects/input_data/pdbs/1...10/RepairPDB_1.pdb'
         path_pdb = '/Users/u0120577/PycharmProjects/input_data/pdbs/1...10/RepairPDB_1.pdb'
         # act
-        self.buildModel.mutate_protein_structure(path_pdbfile=path_pdb, amino_acids=mutant_aa_list)
+        self.buildModel.mutate_protein_structure(path_pdbfile=path_pdb, amino_acids=amino_acids)
         # assert
         expected_call_count_1 = 1
         self.assertEqual(expected_call_count_1, mock_extract_pdbname_chain_fasta_from_pdbs.call_count)
@@ -64,10 +64,10 @@ class TestBuildModel(TestCase):
                                                        'LB4A', 'LB4C', 'TB5A', 'TB5C']
         mock_os_chdir.return_value = None
         write_wt_fastafiles = False
-        mutant_aa_list = ['A', 'C']
+        amino_acids = ['A', 'C']
         path_pdb = '/Users/u0120577/PycharmProjects/input_data/pdbs/1...10/RepairPDB_1.pdb'
         # act
-        self.buildModel.mutate_protein_structure(path_pdbfile=path_pdb, amino_acids=mutant_aa_list)
+        self.buildModel.mutate_protein_structure(path_pdbfile=path_pdb, amino_acids=amino_acids)
         # assert
         expected_call_count_1 = 1
         expected_call_count_20 = len(mock__make_fx_mutant_name_list.return_value)
@@ -84,8 +84,8 @@ class TestBuildModel(TestCase):
     # Variable names for values with this format are denoted with '_fx_'
     def test_make_fx_mutant_name_list(self):
         pdbname_chain_fasta_dict = {'Test1Residue_A': 'R', 'Test1Residue_B': 'R'}
-        mutant_aa_list = ['A', 'C', 'D']
-        fx_mutant_name_list = self.buildModel._make_fx_mutant_name_list(mutant_aa_list, pdbname_chain_fasta_dict)
+        amino_acids = ['A', 'C', 'D']
+        fx_mutant_name_list = self.buildModel._make_fx_mutant_name_list(amino_acids, pdbname_chain_fasta_dict)
         expected_fx_mutant_name_list = ['RA1A', 'RA1C', 'RA1D', 'RB1A', 'RB1C', 'RB1D']
         self.assertEqual(fx_mutant_name_list, expected_fx_mutant_name_list)
 
@@ -122,7 +122,7 @@ class TestBuildModel(TestCase):
         try:
             os.makedirs(path_runscript)
         except FileExistsError:
-            print('Part of all of path already exists. This is absolutely fine.')
+            print('Part/all dir tree already exists. No probs.')
         action = '<BuildModel>#,individual_list.txt'
         expected_runscript = '<TITLE>FOLDX_runscript;\n' + '<JOBSTART>#;\n' + '<PDBS>' + pdb + ';\n' + \
                              '<BATCH>#;\n' + '<COMMANDS>FOLDX_commandfile;\n' + action + ';\n' + '<END>#;\n' + \
