@@ -108,14 +108,3 @@ class TestMain(TestCase):
         # assert
         self.assertListEqual(expected_residues, residues)
 
-    @patch.object(Scheduler, 'start')
-    def test__start_scheduler(self, mock_start):
-        mock_start.return_value = True
-        expected = True
-        # act
-        actual = Main._start_scheduler(operations={'do_mutate_fasta': True}, path_input=TPLS.MC_TESTS_INPUT.value,
-                                       path_output=TPLS.MC_TESTS_OUTPUT, pdb_list=['RepairPDB_1.pdb'],
-                                       fastafile_list=['1_A.fasta'], mutant_aa_list=['A'], use_multithread=False,
-                                       write_1_fasta_only=True, write_fasta_per_mut=True)
-        # assert
-        self.assertEqual(expected, actual)
