@@ -53,11 +53,11 @@ class TestMutateFasta(TestCase):
         titleSeqDict = {'WT_SCI': 'SCI'}
         wt_title = 'WT_SCI'
         wt_seq = TPLS.FASTA_TRIPEP_SEQ_WILDTYPE.value
-        mutant_aa_list = TPLS.LIST_ALL_20_AA.value
+        amino_acids = TPLS.LIST_ALL_20_AA.value
         expected_mutantTitle_SeqDict = TPLS.FASTA_TRIPEP_TITLE_TITLE_SEQ_DICT_ALL_20_INCL_WT.value
         # act
         mutantTitle_SeqDict = self.mutateFasta._add_mutantTitle_mutatedSeq_to_dict(titleSeqDict, wt_title, wt_seq,
-                                                                                   mutant_aa_list)
+                                                                                   amino_acids)
         # assert
         # self.maxDiff = None
         self.assertEqual(len(expected_mutantTitle_SeqDict.keys()), len(mutantTitle_SeqDict.keys()))
