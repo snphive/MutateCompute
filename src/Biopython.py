@@ -94,7 +94,7 @@ class Biopy(object):
             database_used = blast_record.database
             database_seqs_num = blast_record.database_sequences
             alignments = blast_record.alignments
-
+        print('\n' + fastafile_name + '..._build_identical_alignments_list###########')
         qblast_dict = {'query_seq_id': fastafile_name,
                         'query_length': query_length,
                         'database': database_used,
@@ -135,6 +135,13 @@ class Biopy(object):
                     alignment_dict['hsp_dict']['query_start'] = hsp.query_start
                     alignment_dict['hsp_dict']['sbjct_end'] = hsp.sbjct_end
                     alignment_dict['hsp_dict']['sbjct_start'] = hsp.sbjct_start
+                    print('\nis_identical is True with these values: \nhsp.expect:' + str(hsp.expect) + '\nhsp.gaps:' +
+                          str(hsp.gaps) + '\nquery_length:' + str(query_length) + '\nhsp.align_length:' +
+                          str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities))
+                else:
+                    print('\nis_identical is False with these values: \nhsp.expect:' + str(hsp.expect) + '\nhsp.gaps:'
+                          + str(hsp.gaps) + '\nquery_length:' + str(query_length) + '\nhsp.align_length:' +
+                          str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities))
             if is_identical:
                 identical_aligns_list.append(alignment_dict)
         return identical_aligns_list
