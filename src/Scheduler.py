@@ -20,22 +20,23 @@ from src.Str import Str
 
 class Scheduler(object):
 
-    # Not sure yet if I should instantiate the objects once at beginning rather than a new instance for every and every
-    # fasta or pdb.
-    # (NOTE: argument list is identical as those of the calling method _start_scheduler())
-    #
-    # operations            Dictionary  Operations each paired with a flag, True to run the operation.
-    # use_multithread       Boolean     True to employ parallel processing.
-    # path_input            String      Abs path to input_data root dir.
-    # path_output           String      Abs path to output_data root dir.
-    # path_pdbfile_list     List        Pdbfiles to run (incl. .pdb extension)
-    # path_fastafile_list   List        Fastafiles to run (incl. .fasta extension)
-    # mutant_aa_list        List        All amino acids that any mutations operations will use to mutate residues to.
-    # write_1_fasta_only    Boolean     True to write any fasta output data to 1 fasta file, each separated by \n.
-    # write_fasta_per_mut   Boolean     True to write any fasta output data as 1 fasta file per mutant.
     @staticmethod
-    def start(operations, use_multithread, path_input, path_output, path_pdbfile_list, path_fastafile_list,
-              mutant_aa_list, write_1_fasta_only, write_fasta_per_mut):
+    def start(operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfile_list: list, path_fastafile_list: list,
+              mutant_aa_list: list, write_1_fasta_only: bool, write_fasta_per_mut: bool):
+        """
+        Not sure yet if I should instantiate the objects once at beginning rather than a new instance for each and
+        every fasta or pdb. (NOTE: argument list is identical as those of the calling method _start_scheduler())
+        :param operations: Operations each paired with a flag, True to run the operation.
+        :param use_multithread: True to employ parallel processing.
+        :param path_input: Absolute path to input_data root dir.
+        :param path_output: Absolute path to output_data root dir.
+        :param path_pdbfile_list: Pdbfiles to run (incl. .pdb extension)
+        :param path_fastafile_list: Fastafiles to run (incl. .fasta extension)
+        :param mutant_aa_list: All amino acids that any mutations operations will use to mutate residues to.
+        :param write_1_fasta_only: True to write any fasta output data to 1 fasta file, each separated by \n.
+        :param write_fasta_per_mut: True to write any fasta output data as 1 fasta file per mutant.
+        :return:
+        """
         print('STARTING SCHEDULER')
         start_time = time.perf_counter()
         if path_fastafile_list:
@@ -76,13 +77,15 @@ class Scheduler(object):
                                                  python_script_with_paths=os.path.join(Paths.SRC,
                 'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile + Str.SPCE.value + Paths.OUTPUT))
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
+
+                    path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_output, path_fastafile)
                     if use_multithread:
                         # Scheduler._launch_thread(target=agadir.run_agadir_on_multifastas,
                         #                          args=[path_fastafile, path_output])
                         Scheduler._launch_process(target=agadir.run_agadir_on_multifastas,
-                                                  args=[path_fastafile, path_output])
+                                                  args=[path_fastafile, path_dst])
                     elif not GUM.using_cluster() and not use_multithread:
-                        agadir.run_agadir_on_multifastas(path_fastafile, path_output)
+                        agadir.run_agadir_on_multifastas(path_fastafile, path_dst)
 
         elapsed = time.perf_counter() - start_time
         print('Time taken to complete iterating through fasta_list (after methods have been called): ' + str(elapsed))
@@ -115,8 +118,19 @@ class Scheduler(object):
                         analysecomplex.calculate_complex_energies(path_pdbfile)
 
     @staticmethod
-    def start_blast(path_input_fastafiles, path_output, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
+    def start_blast(path_input_fastafiles: str, path_output: str, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
                     write_json=False, use_multithread=False):
+        """
+
+        :param path_input_fastafiles:
+        :param path_output:
+        :param write_idmaps_for_mysldb:
+        :param write_csv:
+        :param write_xml:
+        :param write_json:
+        :param use_multithread:
+        :return:
+        """
         if use_multithread:
             print('')
             # Scheduler._launch_thread(target=IdProt.map_seq_to_swsprt_acc_id_and_write_files,
@@ -133,21 +147,40 @@ class Scheduler(object):
                                                             write_json=write_json)
 
     @staticmethod
-    def _launch_thread(target, args, in_background=False):
+    def _launch_thread(target: callable(object), args: tuple, in_background=False):
+        """
+
+        :param target:
+        :param args:
+        :param in_background:
+        :return:
+        """
         t = Thread(target=target, args=args)
         t.daemon = in_background
         t.start()
         t.join()
 
     @staticmethod
-    def _launch_process(target, args):
+    def _launch_process(target: callable(object), args: tuple):
+        """
+
+        :param target:
+        :param args:
+        :return:
+        """
         p = mp.Process(target=target, args=args)
         p.start()
         p.join()
 
     # no pool size given to ThreadPool(x), defaults to number of CPUs (which is 4 on my macbook).
     @staticmethod
-    def _launch_process_threadpool(methodname, arg_list):
+    def _launch_process_threadpool(methodname: str, arg_list: list):
+        """
+
+        :param methodname:
+        :param arg_list:
+        :return:
+        """
         pool = ThreadPool(4)
         results = pool.map(func=methodname, iterable=arg_list)
         pool.close()
