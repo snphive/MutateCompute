@@ -46,6 +46,6 @@ class TestAgadir(TestCase):
         Paths.set_up_paths(use_cluster=True)
         # act
         agadir = Agadir(AgadCndtns.INCELL_MAML.value)
-        agadir.run_agadir_on_multifastas(path_output_root=TPLS.MC_TESTS_OUTPUT.value,
-                                    path_multifastas_3dots=TPLS.MC_TESTS_INPUT.value + '/mutants_multifastas/1...2')
-
+        agadir.run_agadir_on_multifastas(path_fastafile=TPLS.MC_TESTS_INPUT.value +
+                                        '/mutants_multifastas/1...2/1_A/mutants/1_A_mutants.fasta',
+                                         path_dst=TPLS.MC_TESTS_OUTPUT.value)
