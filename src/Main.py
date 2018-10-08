@@ -34,8 +34,8 @@ class Main(object):
         elif operations['do_mutate_fasta'] or operations['do_agadir'] or \
                 operations['do_foldx_repair'] or operations['do_foldx_buildmodel'] or \
                 operations['do_foldx_stability'] or operations['do_foldx_analysecomplex']:
-            Scheduler.start(operations, use_multithread, path_input, path_output, path_pdbfiles,
-                            path_fastafiles, amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False)
+            Scheduler.start(operations, use_multithread, path_input, path_output, path_pdbfiles, path_fastafiles,
+                            amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False)
 
     @staticmethod
     def _all_ops_are_false(operations: dict):
