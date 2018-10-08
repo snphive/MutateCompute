@@ -111,7 +111,7 @@ class TestIdProt(TestCase):
     # error messages generated.
     def test_map_seq_to_swsprt_acc_id_and_write_files(self):
         # act
-        IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastas_dir=self.PATH_TESTS_INPUT_FASTA_1_A,
+        IdProt.map_seq_to_swsprt_acc_id_and_write_files(path_input_fastafiles=self.PATH_TESTS_INPUT_FASTA_1_A,
                                                         path_output=TPLS.MC_TESTS_OUTPUT.value,
                                                         write_idmaps_for_mysqldb=False, write_csv=False,
                                                         write_xml=False, write_json=False)
@@ -148,7 +148,7 @@ class TestIdProt(TestCase):
         path_output_blastp_1_A = os.path.join(TPLS.MC_TESTS_OUTPUT_BLASTP.value, self.DIR_1_A)
         # act
         result_dict_list = IdProt.map_seq_to_swsprt_acc_id_and_write_files(
-            path_input_fastas_dir=self.PATH_TESTS_INPUT_FASTA_1_A, path_output=path_output_blastp_1_A,
+            path_input_fastafiles=self.PATH_TESTS_INPUT_FASTA_1_A, path_output=path_output_blastp_1_A,
             write_idmaps_for_mysqldb=False, write_csv=False, write_xml=False, write_json=False)
         # assert
         self.maxDiff = None
