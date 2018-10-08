@@ -51,23 +51,28 @@ import time
 
 class Cluster(object):
 
-    # Note that only the first two arguments are needed, the rest have default named arguments that can be overwritten.
-    #
-    # job_name                 N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
-    # path_job_q_dir           Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
-    # startnum                 Starting number for an array job. If either startnum or endnum are empty, no array job.
-    # endnum                   End number for an array job. If either startnum or endnum are empty, no array job.
-    # using_runscript          True/False using runscript (hence running FoldX).
-    # python_script_with_paths Which script to run followed by paths to relevant executables, such as to Qsub.
-    # queue                    q specifies which oge queue you want to use, e.g. 'all.q' for all queues.
-    # n_slots                  serial is number of slots you want your job to use. There are 8 slots per cluster node.
-    # total_memory_GB          mem_free is the total amount of memory (here as GB) you expect your job will need.
-    # memory_limit_GB          h_vmem is the max memory (here as GB) you want to allow your job to use.
-    # cluster_node             hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
+
     @staticmethod
-    def write_job_q_bash(job_name, path_job_q_dir, path_dst_dir='', startnum='', endnum='', using_runscript=False,
-                         path_runscript_dir='', python_script_with_paths='', queue='', n_slots='', total_memory_GB='',
-                         memory_limit_GB='', cluster_node=''):
+    def write_job_q_bash(job_name: str, path_job_q_dir: str, path_dst_dir='', startnum='', endnum='',
+                         using_runscript=False, path_runscript_dir='', python_script_with_paths='', queue='',
+                         n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
+        """
+        Note that only 1st 2 arguments are required, the rest have default named arguments that can be overwritten.
+        :param job_name: N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
+        :param path_job_q_dir: Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
+        :param path_dst_dir:
+        :param startnum: Starting number for an array job. If either startnum or endnum are empty, no array job.
+        :param endnum: End number for an array job. If either startnum or endnum are empty, no array job.
+        :param using_runscript: True/False using runscript (hence running FoldX).
+        :param path_runscript_dir: Which script to run followed by paths to relevant executables, such as to Qsub.
+        :param python_script_with_paths:
+        :param queue: q specifies which oge queue you want to use, e.g. 'all.q' for all queues.
+        :param n_slots: serial is number of slots you want your job to use. There are 8 slots per cluster node.
+        :param total_memory_GB: mem_free is the total amount of memory (here as GB) you expect your job will need.
+        :param memory_limit_GB: h_vmem is the max memory (here as GB) you want to allow your job to use.
+        :param cluster_node: hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
+        :return:
+        """
         try:
             os.makedirs(path_job_q_dir)
         except FileExistsError:
@@ -123,12 +128,22 @@ class Cluster(object):
         return job_q_str
 
     @staticmethod
-    def run_job_q(path_job_q_dir):
+    def run_job_q(path_job_q_dir: str):
+        """
+
+        :param path_job_q_dir:
+        :return:
+        """
         cmd = Paths.ZEUS_QSUB_EXE.value + 'qsub' + Str.SPCE.value + os.path.join(path_job_q_dir, 'job.q')
         subprocess.call(cmd, shell=True)
 
     @staticmethod
-    def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix):
+    def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix: str):
+        """
+
+        :param grid_engine_job_prefix:
+        :return:
+        """
         print('Cluster.wait_for_grid_ending..() is called.......')
         check_qstat = subprocess.Popen(Cluster.CLSTR.QSTAT.value, stdout=subprocess.PIPE)
         output_qstat = check_qstat.stdout.read()
