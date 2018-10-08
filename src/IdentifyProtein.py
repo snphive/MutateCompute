@@ -69,6 +69,10 @@ class IdProt(object):
                 with open(path_fastafile) as f:
                     fasta_str = f.read()
                     fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
+                if IdProt._has_all_A_sequence(path_fastafile):
+                    print('This sequence has all As, BLAST would think it is a nucleotide sequence and fail. So it is '
+                          'not being run: ' + path_fastafile)
+                    continue
                 blastp_result = Biopy.run_blastp(fasta_str)
                 path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
                 blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
@@ -77,6 +81,16 @@ class IdProt(object):
                     IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
                                                      write_json=write_json)
         return blastp_dict_list
+
+    @staticmethod
+    def _has_all_A_sequence(path_fastafile):
+        is_all_A = True
+        fasta_str = GUM.get_sequenceOnly_from_fastafile(path_fastafile)
+        for aa in fasta_str:
+            if aa != 'A':
+                is_all_A = False
+                break
+        return is_all_A
 
     @staticmethod
     def _write_raw_blast_xml(path_output: str, fastafile_name: str, blastp_result):
