@@ -104,10 +104,11 @@ class Agadir(object):
                     fasta_str += line
 
     def write_agadir_options_file(self, ntrm='#', ctrm='#', global_tot=Str.TRUE_lc.value, tango_wndw=Str.TRUE_lc.value,
-                                  waltz_wndw=Str.TRUE_lc.value, limbo_wndw=Str.FALSE_lc.value, agadir_wndw=Str.FALSE_lc.value,
-                                  csblnca_wndw=Str.FALSE_lc.value, complex_wndw=Str.FALSE_lc.value,
-                                  repeat_wndw=Str.FALSE_lc.value, pat_tango_wndw=Str.FALSE_lc.value,
-                                  tango_resid=Str.FALSE_lc.value, waltz_resid=Str.FALSE_lc.value, limbo_resid=Str.FALSE_lc.value,
+                                  waltz_wndw=Str.TRUE_lc.value, limbo_wndw=Str.FALSE_lc.value,
+                                  agadir_wndw=Str.FALSE_lc.value, csblnca_wndw=Str.FALSE_lc.value,
+                                  complex_wndw=Str.FALSE_lc.value, repeat_wndw=Str.FALSE_lc.value,
+                                  pat_tango_wndw=Str.FALSE_lc.value, tango_resid=Str.FALSE_lc.value,
+                                  waltz_resid=Str.FALSE_lc.value, limbo_resid=Str.FALSE_lc.value,
                                   complex_resid=Str.FALSE_lc.value, agadir_resid=Str.FALSE_lc.value,
                                   csblnca_resid=Str.FALSE_lc.value, repeat_resid=Str.FALSE_lc.value,
                                   wndws_file_per_seq=Str.FALSE_lc.value, resid_file_per_seq=Str.FALSE_lc.value):
