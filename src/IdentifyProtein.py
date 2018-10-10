@@ -19,7 +19,7 @@ from src.GeneralUtilityMethods import GUM
 class IdProt(object):
 
     @staticmethod
-    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastafiles: str, path_output: str, write_idmaps_for_mysqldb: bool,
+    def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastafiles: list, path_output: str, write_idmaps_for_mysqldb: bool,
                                                  write_csv=True, write_xml=True, write_json=False):
         """
         Expects a directory location of fastafiles (not a fastafile itself).
