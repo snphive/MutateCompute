@@ -126,6 +126,8 @@ main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile
 # Agadir        configuration/agadir_config/Options.txt
 #               input_data/<fastafilename>/                         output_data/<fastafilename>/agadir/
 #               input_data/<fastafilename>/mutants/                 output_data/<fastafilename>/agadir/<mutantfilename>/
+# Tested on PSB cluster and locally on Macbook - both work. 13:35 10th Oct 2018 (Git revision number:
+# 3f56bc782eecab941aeb29377541166f0c636c08)
 #
 # FoldX BM      configuration/foldx_config/commands_buildmodel.txt
 #               configuration/foldx_config/options_buildmodel.txt
