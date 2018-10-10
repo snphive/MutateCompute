@@ -6,11 +6,19 @@ from src.Agadir import AgadCndtns
 from src.Str import Str
 
 path_fastafile = sys.argv[1]
-path_output_root = sys.argv[2]
+path_dst = sys.argv[2]
 
-print('run_agadir_on_multifastasZeus.py is called  ###################################')
+"""
+To run agadir on file that has multiple fasta sequences. Iterate through the list, write the sequence to an
+individual text file passing this to agadir.compute(). This newly-written individual text file is then deleted,
+crucial to prevent too much memory taken up by each file when running large numbers of sequences.
+:sys.argv[1] path_fastafile: Abs path to fasta file.
+:sys.argv[2] path_dst: Abs path to output root dir.
+"""
+
+print('run_agadir_on_multifastasZeus.py ###################################')
 agadir = Agadir(AgadCndtns.INCELL_MAML.value)
-path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_output_root, path_fastafile)
+path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_dst, path_fastafile)
 with open(path_fastafile) as f:
     is_first_line = True
     fasta_str = ''
