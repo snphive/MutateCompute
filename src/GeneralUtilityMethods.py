@@ -18,22 +18,21 @@ class GUM(object):
 
     # def __init__(self):
 
-    # Extracts and writes a FASTA file for each chain described in the pdb.
-    # Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
-    # and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
-    # if these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
-    # E.g. return value might look like:
-    # {'RepairPDB_1_A': 'RVYLTFDELRETK..etc', 'RepairPDB_2_A': 'RVYLTFDELRETK..etc', etc}
-    #
-    # path_input                str                 Path to where the pdb subdirectories can be found.
-    # path_pdbfiles             str OR List of str  The pdb file (including ".pdb") or files (no path).
-    # path_fastafile            str                 Absolute path of root for fasta file (without >title) that
-    #                                               will be written if write_fastafile is True.
-    # write_fastafile           bool                True to write fasta string incl. >title to new fasta file.
-    #                                               False by default.
-    # Returns a dictionary of the pdbname_chain and the protein sequence in FASTA format.
     @staticmethod
-    def extract_pdbname_chain_fasta_from_pdbs(path_pdbfiles, path_fastafile='', write_fastafile=False):
+    def extract_pdbname_chain_fasta_from_pdbs(path_pdbfiles, path_fastafiles_to_be_written=''):
+        """
+        Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
+        and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
+        if these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
+        E.g. return value might look like:
+        {'RepairPDB_1_A': 'RVYLTFDELRETK..etc', 'RepairPDB_2_A': 'RVYLTFDELRETK..etc', etc}
+
+        Extract the pdbname and chain and fasta sequence from a pdb file. Can also write fasta file to specified dst.
+        :param path_pdbfiles: str OR List of str    Absolute path to pdbfile(s) (including '.pdb') .
+        :param path_fastafiles_to_be_written: Absolute path of fastafiles to be written. Empty string indicates no
+        fasta files will be written.
+        :return: dict, 'pdbname_chain' is key, fasta sequence is value.
+        """
         # pdbname_chain_fastaseq_dict: dict = {} version 3 only
         pdbname_chain_fastaseq_dict = {}
         if isinstance(path_pdbfiles, str):
@@ -69,34 +68,34 @@ class GUM(object):
                 pdbname_chain = pdbname + '_' + protein_chain
                 print(pdbname_chain + ' : ' + fasta_sequence)
                 pdbname_chain_fastaseq_dict[pdbname_chain] = fasta_sequence
-                if write_fastafile:
-                    if path_fastafile == '':
-                        raise ValueError('write_fastafile is True but no path for fastafile to be written to is given.')
-                    GUM.write_fastafile_to_name_chain_dir(pdbname_chain_fastaseq_dict, path_fastafile)
+                if path_fastafiles_to_be_written != '':
+                    GUM.write_fastafile_to_name_chain_dir(pdbname_chain_fastaseq_dict, path_fastafiles_to_be_written)
         return pdbname_chain_fastaseq_dict
 
-    # Write the fasta file (with >title) to a new subdirectory in the specified directory. The subdirectory has the same
-    # name as the fasta file (which includes the protein chain).
-    #
-    # pdbname_chain_fasta_dict  Dictionary  The pdbname_chain is the key, the amino acid sequence is the value.
-    # path_fasta_root           String      Absolute path of root for fasta sequence file (without >title).
     @staticmethod
-    def write_fastafile_to_name_chain_dir(pdbname_chain_fasta_dict, path_to_write_fastafile_root):
-        for pdbname_chain, fasta_sequence in pdbname_chain_fasta_dict.items():
+    def write_fastafile_to_name_chain_dir(pdbname_chain_fasta: dict, path_to_write_fastafile_root: str):
+        """
+        Write the fasta file (with >title) to a new subdirectory in the specified directory. The subdirectory has the
+        same name as the fasta file (which includes the protein chain).
+        :param pdbname_chain_fasta: The pdbname_chain is the key, the amino acid sequence is the value.
+        :param path_to_write_fastafile_root: Absolute path of root for fasta sequence file (without >title).
+        :return:
+        """
+        for pdbname_chain, fasta_sequence in pdbname_chain_fasta.items():
             path_output_pdb_pdbchain = GUM.create_dir_tree(path_to_write_fastafile_root, pdbname_chain.split('_')[0],
                                                            pdbname_chain)
             with open(path_output_pdb_pdbchain + pdbname_chain + Str.FSTAEXT.value, 'w') as fastafile:
                 fastafile.write('>' + pdbname_chain + '\n')
                 fastafile.write(fasta_sequence)
 
-    # For the pdb passed here, all chains are read from the pdb file.
-    #
-    # pdbfile           String      String name of pdb file (incl. '.pdb' extension).
-    # path_pdbfile      String      Absolute path to directory where the target pdbfile is.
-    #
-    # Returns list of protein chains in the pdbfile (as alphabetic single-letter characters).
     @staticmethod
-    def extract_all_chains_from_pdb(pdbfile, path_pdbfile):
+    def extract_all_chains_from_pdb(pdbfile: str, path_pdbfile: str):
+        """
+        For the pdb passed here, all chains are read from the pdb file.
+        :param pdbfile: String name of pdb file (incl. '.pdb' extension).
+        :param path_pdbfile: Absolute path to directory where the target pdbfile is.
+        :return: list of str, protein chains
+        """
         with open(os.path.join(path_pdbfile, pdbfile)) as pdbfile_opened:
             pdbfile_lines = pdbfile_opened.readlines()
         protein_chains = []
@@ -205,14 +204,20 @@ class GUM(object):
             print(Str.PARTALLPATHEXISTS_MSG.value)
         return path_root_newdirs
 
-    # path_src_dir          String      Absoluate path of source for files to copy from.
-    # path_dst_dir          String      Absolute path of destination for files to copy to.
-    # file_extension        String      T
-    # starting_num          int         Number of first file to copy from sorted src dir to dst subdir.
-    # total_num_to_copy     int         Total number of files to copy. Default of 1000.
     @staticmethod
-    def copy_files_to_3dot_dir(path_src_dir, path_dst_dir, file_extension, starting_num, num_to_copy_per_subdir=1000):
-        path_sorted_file_list = natsort.natsorted(glob.glob(path_src_dir + '/*' + file_extension))
+    def copy_files_to_3dot_dir(path_src_dir: str, path_dst_dir: str, file_extension: str, starting_num: int,
+                               num_to_copy_per_subdir=1000):
+        """
+        Copy a chosen number of files (1000 by default) of specified file type from a single, named src dir to a named
+        dst dir, but inside newly-made subfolders named '1...1000' for example to store the first 1000 files.
+        :param path_src_dir: Absolute path of source dir for files to copy from.
+        :param path_dst_dir: Absolute path of destination dir for files to copy to.
+        :param file_extension: File extension of files to copy.
+        :param starting_num: Number of first file to copy from sorted src dir to dst subdir.
+        :param num_to_copy_per_subdir: Number of files to copy. Default of 1000.
+        """
+        # path_sorted_file_list = natsort.natsorted(glob.glob(path_src_dir + '/*' + file_extension))
+        path_sorted_file_list = sorted(glob.glob(path_src_dir + '/*' + file_extension))
         subdir = file_extension.strip('.') + 's_'
         path_dst_dir = os.path.join(path_dst_dir, subdir + str(num_to_copy_per_subdir))
         if not path_sorted_file_list:
