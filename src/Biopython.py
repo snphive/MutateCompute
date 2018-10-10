@@ -47,10 +47,6 @@ class Biopy(object):
     # sequence, the remaining hits on the blast_record are not used anyway.
     #
     # NOTE: occasionally the qblast took about 4 minutes.
-    #
-    # fasta_Str     String     The text of a fasta file including >title/n and sequence (standard FASTA format).
-    #
-    # Returns what biopython's NCBIWWW.qblast returns. (Data type is _io.TextIOWrapper.)
     @staticmethod
     def run_blastp(fasta: str):
         """
@@ -63,7 +59,7 @@ class Biopy(object):
         sequence, the remaining hits on the blast_record are not used anyway.
         NOTE: occasionally the qblast took about 4 or more minutes.
         :param fasta: Fasta as a string.
-        :return: Result of Biopython.NCBIWWW.qblast() method call.
+        :return: Result of Biopython.NCBIWWW.qblast() method call (Data type is _io.TextIOWrapper)
         """
         return NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
                               database=Biopy.BlastParam.SWSPRT.value,
@@ -94,7 +90,8 @@ class Biopy(object):
             database_used = blast_record.database
             database_seqs_num = blast_record.database_sequences
             alignments = blast_record.alignments
-        print('\n' + fastafile_name + '..._build_identical_alignments_list###########')
+        print('\n..._build_identical_alignments_list for  #############################################################'
+              + fastafile_name)
         qblast_dict = {'query_seq_id': fastafile_name,
                         'query_length': query_length,
                         'database': database_used,
@@ -137,11 +134,13 @@ class Biopy(object):
                     alignment_dict['hsp_dict']['sbjct_start'] = hsp.sbjct_start
                     print('\nis_identical is True with these values: \nhsp.expect:' + str(hsp.expect) + '\nhsp.gaps:' +
                           str(hsp.gaps) + '\nquery_length:' + str(query_length) + '\nhsp.align_length:' +
-                          str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities))
+                          str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities) + '\nhsp.sbjct_end:' +
+                          str(hsp.sbjct_end) + '\nhsp.sbjct_start:' + str(hsp.sbjct_start))
                 else:
                     print('\nis_identical is False with these values: \nhsp.expect:' + str(hsp.expect) + '\nhsp.gaps:'
                           + str(hsp.gaps) + '\nquery_length:' + str(query_length) + '\nhsp.align_length:' +
-                          str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities))
+                          str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities) + '\nhsp.sbjct_end:' +
+                          str(hsp.sbjct_end) + '\nhsp.sbjct_start:' + str(hsp.sbjct_start))
             if is_identical:
                 identical_aligns_list.append(alignment_dict)
         return identical_aligns_list
@@ -154,7 +153,6 @@ class Biopy(object):
         :param query_length: Qblast output value, refers to length of the input fasta sequence.
         :param query_letters: Qblast letters value, refers to number of input fasta sequence characters.
         :param path_fastafile: FASTA file (with extension) and absolute path.
-        :return:
         """
         for alignment in qblast_dict['identical_aligns_list']:
             len_sbjct_prot = alignment['hsp_dict']['sbjct_end'] - alignment['hsp_dict']['sbjct_start'] + 1
