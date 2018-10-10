@@ -21,8 +21,8 @@ from src.Str import Str
 class Scheduler(object):
 
     @staticmethod
-    def start(operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfile_list: list, path_fastafile_list: list,
-              mutant_aa_list: list, write_1_fasta_only: bool, write_fasta_per_mut: bool):
+    def start(operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfile_list: list,
+              path_fastafile_list: list, mutant_aa_list: list, write_1_fasta_only: bool, write_fasta_per_mut: bool):
         """
         Not sure yet if I should instantiate the objects once at beginning rather than a new instance for each and
         every fasta or pdb. (NOTE: argument list is identical as those of the calling method _start_scheduler())
@@ -118,7 +118,7 @@ class Scheduler(object):
                         analysecomplex.calculate_complex_energies(path_pdbfile)
 
     @staticmethod
-    def start_blast(path_input_fastafiles: str, path_output: str, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
+    def start_blast(path_input_fastafiles: list, path_output: str, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
                     write_json=False, use_multithread=False):
         """
 
@@ -147,7 +147,7 @@ class Scheduler(object):
                                                             write_json=write_json)
 
     @staticmethod
-    def _launch_thread(target: callable(object), args: tuple, in_background=False):
+    def _launch_thread(target: callable(object), args: list, in_background=False):
         """
 
         :param target:
@@ -161,7 +161,7 @@ class Scheduler(object):
         t.join()
 
     @staticmethod
-    def _launch_process(target: callable(object), args: tuple):
+    def _launch_process(target: callable(object), args: list):
         """
 
         :param target:
