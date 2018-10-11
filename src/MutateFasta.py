@@ -9,8 +9,12 @@ from src.Str import Str
 
 class MutateFasta(object):
 
-    def __init__(self, mutant_aa_list):
-        self.__MUTANT_AA_LIST = mutant_aa_list
+    def __init__(self, amino_acids: list):
+        """
+        Constructor
+        :param amino_acids: all amino acids that sequence(s) will be mutated to.
+        """
+        self.__AAs = amino_acids
 
     def mutate_every_residue(self, path_fastafile: str, write_1_fasta_only: bool, write_fasta_per_mut: bool,
                              path_output_3dots: str, write_csv=False, write_txt=False):
@@ -38,7 +42,6 @@ class MutateFasta(object):
         """
 
         :param path_fastafile:
-        :return:
         """
         path_output_3dots = GUM.make_root_fastas_3dots_dirs(Paths.OUTPUT, path_fastafile)
         self.mutate_every_residue(path_fastafile=path_fastafile, write_1_fasta_only=True, write_fasta_per_mut=False,
@@ -71,7 +74,7 @@ class MutateFasta(object):
         titleSeqDict_w_mutants = {wt_title: titleSeq[wt_title]}
         mutable_seq = MutableSeq(wt_seq, IUPAC.protein)
         for i, wt_aa in enumerate(mutable_seq):
-            for mutant_aa in self.__MUTANT_AA_LIST:
+            for mutant_aa in self.__AAs:
                 mutant_title = wt_aa + str(i + 1) + mutant_aa
                 wt_aa_at_i = mutable_seq[i]
                 if not mutant_aa == wt_aa_at_i:
@@ -149,7 +152,7 @@ class MutateFasta(object):
         if path_seqscsv_open is not None:
             path_seqscsv_open.close()
 
-    def make_titleSeqDict_from_fastafile(self, path_input_fastafiles: str):
+    def make_titleSeqDict_from_fastafile(self, path_input_fastafiles):
         """
         Splits a fastafile's text contents into a dictionary. The key is fastafile's title, value is (amino acid)
         sequence. E.g. ">1_A\n'RVYLTFDELRETKTSEYFSLSHHPLDYRILLMDEDQDRIYVG...' etc" is saved as
@@ -161,7 +164,7 @@ class MutateFasta(object):
         The fasta file is assumed to be either two lines: 1st line ">title", 2nd line sequence, but the method also
         allows there to be either no title (i.e. sequence only) or an empty title (">" with no title after it). In these
         both scenarios, the title is created based on the name of the file itself.
-        :param path_input_fastafiles: Absolute path to the fasta file, including the file (incl. .fasta)
+        :param path_input_fastafiles: Str or List of Str, Absolute path to the fastafile(s) (incl. .fasta ext)
         e.g. ~/../input_data/fastas/1_A/1_A.fasta
         :return: title:sequence dictionary.
         """

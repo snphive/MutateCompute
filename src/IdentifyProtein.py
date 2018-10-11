@@ -61,7 +61,7 @@ class IdProt(object):
                                     + path_output + ' ' + Paths.CONFIG_BLST_JOBQ + ' ' + Paths.OUTPUT_BLASTP + ' ' + \
                                     str(write_idmaps_for_mysqldb) + ' ' + str(write_csv) + ' ' + str(write_xml) + \
                                     ' ' + str(write_json)
-            Cluster.write_job_q_bash(job_name='IdProtJobs', path_job_q_dir=Paths.CONFIG_BLST_JOBQ,
+            Cluster.write_job_q_bash(jobname='IdProtJobs', path_job_q_dir=Paths.CONFIG_BLST_JOBQ,
                                      python_script_with_paths=python_script_w_paths)
             Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_BLST_JOBQ)
         else:

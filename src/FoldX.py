@@ -104,7 +104,7 @@ class FoldX(object):
                     # Cluster.write_job_q_bash(job_name=Paths.PREFIX_FX_BM.value + fx_mutant_name,
                     #                          path_job_q_dir=path_jobq, path_runscript_dir=Paths.CONFIG_BMRUNSCRIPT,
                     #                          using_runscript=True)
-                    Cluster.write_job_q_bash(job_name=Paths.PREFIX_FX_BM.value + fx_mutant_name,
+                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_BM.value + fx_mutant_name,
                                              path_job_q_dir=path_jobq, path_dst_dir=path_output_pdbname_mutant,
                                              path_runscript_dir=path_runscript_dir, using_runscript=True)
                     # path_jobq_file = os.path.join(path_jobq, Str.JOBQ.value)

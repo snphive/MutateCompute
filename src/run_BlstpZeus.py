@@ -22,7 +22,7 @@ for path_fastafile in path_input_fastafile_list:
     with open(path_fastafile) as fastafile_opened:
         fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
         jobname = 'BLSTP_' + fastafile_name
-        Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=path_config_job, queue='all.q', memory_limit_GB='3',
+        Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=path_config_job, queue='all.q', memory_limit_GB='3',
                                  cluster_node='hodor1.vib')
         path_output_blastp_fastaname = GUM._os_makedirs(path_output_blastp, fastafile_name)
         os.chdir(path_output_blastp_fastaname)
