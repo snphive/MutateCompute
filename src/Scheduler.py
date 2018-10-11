@@ -21,8 +21,8 @@ from src.Str import Str
 class Scheduler(object):
 
     @staticmethod
-    def start(operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfile_list: list,
-              path_fastafile_list: list, mutant_aa_list: list, write_1_fasta_only: bool, write_fasta_per_mut: bool):
+    def start(operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfiles: list,
+              path_fastafiles: list, amino_acids: list, write_1_fasta_only: bool, write_fasta_per_mut: bool):
         """
         Not sure yet if I should instantiate the objects once at beginning rather than a new instance for each and
         every fasta or pdb. (NOTE: argument list is identical as those of the calling method _start_scheduler())
@@ -30,21 +30,20 @@ class Scheduler(object):
         :param use_multithread: True to employ parallel processing.
         :param path_input: Absolute path to input_data root dir.
         :param path_output: Absolute path to output_data root dir.
-        :param path_pdbfile_list: Pdbfiles to run (incl. .pdb extension)
-        :param path_fastafile_list: Fastafiles to run (incl. .fasta extension)
-        :param mutant_aa_list: All amino acids that any mutations operations will use to mutate residues to.
+        :param path_pdbfiles: Pdbfiles to run (incl. .pdb extension)
+        :param path_fastafiles: Fastafiles to run (incl. .fasta extension)
+        :param amino_acids: All amino acids that any mutations operations will use to mutate residues to.
         :param write_1_fasta_only: True to write any fasta output data to 1 fasta file, each separated by \n.
         :param write_fasta_per_mut: True to write any fasta output data as 1 fasta file per mutant.
-        :return:
         """
         print('STARTING SCHEDULER')
         start_time = time.perf_counter()
-        if path_fastafile_list:
+        if path_fastafiles:
             if operations['do_mutate_fasta']:
-                path_output_fastas_3dots = GUM.make_root_fastas_3dots_dirs(path_output, path_fastafile_list[0])
-                mutate_fasta = MutateFasta(mutant_aa_list)
-                for path_fastafile in path_fastafile_list:
-                    sleep_secs = 0 if len(path_fastafile_list) < 200 else len(path_fastafile_list) / 1000
+                path_output_fastas_3dots = GUM.make_root_fastas_3dots_dirs(path_output, path_fastafiles[0])
+                mutate_fasta = MutateFasta(amino_acids)
+                for path_fastafile in path_fastafiles:
+                    sleep_secs = 0 if len(path_fastafiles) < 200 else len(path_fastafiles) / 5000
                     time.sleep(sleep_secs)
                     if use_multithread:
                         # Scheduler._launch_thread(target=mutate_fasta.mutate_every_residue,
@@ -53,27 +52,32 @@ class Scheduler(object):
                         Scheduler._launch_process(target=mutate_fasta.mutate_every_residue,
                                                   args=[path_fastafile, write_1_fasta_only, write_fasta_per_mut,
                                                         path_output_fastas_3dots])
-                    elif not use_multithread:
+                    elif not GUM.using_cluster():
                         mutate_fasta.mutate_every_residue(path_fastafile, write_1_fasta_only, write_fasta_per_mut,
                                                               path_output_fastas_3dots)
                     if GUM.using_cluster():
-                        jobname = path_fastafile.split('/')[-1]
-                        # Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.SE_CONFIG_JOBQ.value,
-                        #                          python_script_with_paths=Paths.ZEUS_SNPEFFECT +
-                        #                           'src/run_MutCompZeus.py ' + path_fastafile_list, queue='',
-                        #                           n_slots='', total_memory_GB='', memory_limit_GB='3',
-                        #                           cluster_node='')
-                        # Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_JOBQ.value)
+                        jobname = Paths.PREFIX_MUTFSTA.value + path_fastafile.split('/')[-1]
+                        write_1_fasta_only = 'True'
+                        write_fasta_per_mut = 'False'
+                        Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value,
+                                                 python_script_with_paths=os.path.join(Paths.SE_SRC.value,
+                                                 'run_mutate_fasta_zeus.py') + Str.SPCE.value + 'all amino_acids' +
+                                                 Str.SPCE.value + path_fastafile + Str.SPCE.value + write_1_fasta_only +
+                                                 Str.SPCE.value + write_fasta_per_mut + Str.SPCE.value +
+                                                 path_output_fastas_3dots,
+                                                 queue='', n_slots='', total_memory_GB='', memory_limit_GB='3',
+                                                 cluster_node='')
+                        Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value)
 
             if operations['do_agadir']:
                 agadir = Agadir(AgadCndtns.INCELL_MAML.value)
-                for path_fastafile in path_fastafile_list:
-                    sleep_secs = 0 if len(path_fastafile_list) < 200 else len(path_fastafile_list) / 1000
+                for path_fastafile in path_fastafiles:
+                    sleep_secs = 0 if len(path_fastafiles) < 200 else len(path_fastafiles) / 1000
                     time.sleep(sleep_secs)
                     if GUM.using_cluster():
                         print('Calling scheduler.do_agadir using_cluster condition')
                         jobname = Paths.PREFIX_AGADIR.value + path_fastafile.split('/')[-1]
-                        Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value,
+                        Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value,
                                                  python_script_with_paths=os.path.join(Paths.SRC,
                 'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile + Str.SPCE.value + Paths.OUTPUT))
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
@@ -88,9 +92,9 @@ class Scheduler(object):
                         agadir.run_agadir_on_multifastas(path_fastafile, path_dst)
 
         elapsed = time.perf_counter() - start_time
-        print('Time taken to complete iterating through fasta_list (after methods have been called): ' + str(elapsed))
-        if path_pdbfile_list:
-            for path_pdbfile in path_pdbfile_list:
+        print('Time taken to complete iterating through fasta files (after methods have been called): ' + str(elapsed))
+        if path_pdbfiles:
+            for path_pdbfile in path_pdbfiles:
                 if operations['do_foldx_repair']:
                     repair = FoldX().Repair(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
@@ -101,9 +105,9 @@ class Scheduler(object):
                     buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=buildmodel.mutate_protein_structure,
-                                                 args=[path_pdbfile, mutant_aa_list])
+                                                 args=[path_pdbfile, amino_acids])
                     else:
-                        buildmodel.mutate_protein_structure(path_pdbfile, mutant_aa_list)
+                        buildmodel.mutate_protein_structure(path_pdbfile, amino_acids)
                 if operations['do_foldx_stability']:
                     stability = FoldX().Stability(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
@@ -187,7 +191,7 @@ class Scheduler(object):
         pool.join()
         return results
     # Scheduler._launch_process_threadpool(mutate_fasta.mutate_every_residue_to_every_aa_write_1_file,
-    #                                          path_fastafile_list)
+    #                                          path_fastafiles)
 
     # Note: try pool.imap and pool.map_async in place of pool.map
 
