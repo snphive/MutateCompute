@@ -20,6 +20,7 @@ ROOT:
     dir_config: 'configuration'
     dir_agadconfig: 'agadir_config'
     dir_agadir_jobq: 'agadir_jobq'
+    dir_mf_jobq: 'mutatefasta_jobq'
     dir_bm_jobq: 'bm_jobq'
     dir_ac_jobq: 'ac_jobq'
     dir_blst_jobq: 'blst_jobq'
@@ -47,6 +48,7 @@ ROOT:
     dir_bash: 'bash'
 
     # jobq job name prefixes
+    prefix_mutatefasta: 'MF_'
     prefix_blastp: 'BP_'
     prefix_agadir: 'AG_'
     prefix_foldx_buildmodel: 'BM_'
