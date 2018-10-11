@@ -39,6 +39,7 @@ class Paths(Enum):
 
             #  DIRECTORY NAMES (USED TO CONSTRUCT ABSOLUTE PATHS BELOW)
             DIR_CONFIG = paths_and_dictionaries['ROOT']['dir_config']
+            DIR_MUTFASTA_JOBQ = paths_and_dictionaries['ROOT']['dir_mf_jobq']
             DIR_AGAD_CONFIG = paths_and_dictionaries['ROOT']['dir_agadconfig']
             DIR_AGAD_JOBQ = paths_and_dictionaries['ROOT']['dir_agadir_jobq']
             DIR_BM_JOBQ = paths_and_dictionaries['ROOT']['dir_bm_jobq']
@@ -67,6 +68,7 @@ class Paths(Enum):
             DIR_BLASTP = paths_and_dictionaries['ROOT']['dir_blastp']
             DIR_BASH = paths_and_dictionaries['ROOT']['dir_bash']
             #  CLUSTER JOB NAME PREFIXES
+            PREFIX_MUTFSTA = paths_and_dictionaries['ROOT']['prefix_mutatefasta']
             PREFIX_BLSTP = paths_and_dictionaries['ROOT']['prefix_blastp']
             PREFIX_AGADIR = paths_and_dictionaries['ROOT']['prefix_agadir']
             PREFIX_FX_BM = paths_and_dictionaries['ROOT']['prefix_foldx_buildmodel']
@@ -99,6 +101,7 @@ class Paths(Enum):
 
             # ABSOLUTE PATHS BUILT FROM ZEUS ROOT AND DIRECTORY NAMES
             SE_CONFIG = os.path.join(ZEUS_SNPEFFECT, DIR_CONFIG)
+            SE_CONFIG_MUTFASTA_JOBQ = os.path.join(SE_CONFIG, DIR_MUTFASTA_JOBQ)
             SE_CONFIG_AGAD = os.path.join(SE_CONFIG, DIR_AGAD_CONFIG)
             SE_CONFIG_AGAD_JOBQ = os.path.join(SE_CONFIG, DIR_AGAD_JOBQ)
             SE_CONFIG_FX = os.path.join(SE_CONFIG, DIR_FXCONFIG)
