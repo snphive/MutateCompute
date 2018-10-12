@@ -62,6 +62,7 @@ class Paths(Enum):
             DIR_BM = paths_and_dictionaries['ROOT']['dir_bm']
             DIR_REP = paths_and_dictionaries['ROOT']['dir_rep']
             DIR_FASTAS = paths_and_dictionaries['ROOT']['dir_fastas']
+            DIR_29611_FASTAS_1000 = paths_and_dictionaries['ROOT']['dir_29611_fastas_1000']
             DIR_SEQS_TXT_CSV = paths_and_dictionaries['ROOT']['dir_seqs_txt_csv']
             DIR_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['dir_pdb_fasta_repo']
             DIR_PDBS = paths_and_dictionaries['ROOT']['dir_pdbs']
