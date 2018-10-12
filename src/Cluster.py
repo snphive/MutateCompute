@@ -128,21 +128,26 @@ class Cluster(object):
         return job_q_str
 
     @staticmethod
-    def run_job_q(path_job_q_dir: str):
+    def run_job_q(path_job_q_dir: str, run_in_background=False):
         """
-
-        :param path_job_q_dir:
-        :return:
+        :param path_job_q_dir: Absolute path of the job.q file of interest.
+        :param run_in_background: True if the job should run detached from the terminal.
         """
-        cmd = Paths.ZEUS_QSUB_EXE.value + 'qsub' + Str.SPCE.value + os.path.join(path_job_q_dir, 'job.q')
+        nohup = ''
+        ampersand = ''
+        if run_in_background:
+            nohup = 'nohup' + Str.SPCE.value
+            ampersand = Str.SPCE.value + '&'
+        cmd = nohup + Paths.ZEUS_QSUB_EXE.value + 'qsub' + Str.SPCE.value + os.path.join(path_job_q_dir, 'job.q') + \
+              ampersand
         subprocess.call(cmd, shell=True)
 
     @staticmethod
     def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix: str):
         """
-
-        :param grid_engine_job_prefix:
-        :return:
+        :param grid_engine_job_prefix: Typically two characters and underscore to be concatenated to a unique job
+        identifier. The prefix is likely an abbreviation of the type of computation being performed, e.g. 'BM_pdb123'
+        might be used for a FoldX BuildModel computation on a pdb file called 'pdb123'.
         """
         print('Cluster.wait_for_grid_ending..() is called.......')
         check_qstat = subprocess.Popen(Cluster.CLSTR.QSTAT.value, stdout=subprocess.PIPE)
