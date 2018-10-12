@@ -17,7 +17,7 @@ crucial to prevent too much memory taken up by each file when running large numb
 """
 
 print('run_agadir_on_multifastasZeus.py ###################################')
-agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+# agadir = Agadir(AgadCndtns.INCELL_MAML.value)
 path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_dst, path_fastafile)
 with open(path_fastafile) as f:
     is_first_line = True
