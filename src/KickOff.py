@@ -33,31 +33,26 @@ if GUM.using_cluster():
 else:
     path_input_fastas_dir_root = os.path.join(Paths.MC_REPO_PDB_FASTA.value, Paths.DIR_29611_FASTAS_1000.value)
 
-operations = {'do_mutate_fasta': True, 'do_agadir': False,
-              'do_foldx_repair': False, 'do_foldx_buildmodel': False,
+operations = {'do_mutate_fasta': True, 'do_agadir': False, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
               'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
 use_multithread = False
 path_pdbfiles = []
-
 startnum = 3001
 endnum = 4000
 
 for i in range(27):
     dir_3dots = str(startnum) + Str.DOTS3.value + str(endnum)
     path_input_fastas_dir = os.path.join(path_input_fastas_dir_root, dir_3dots)
-
     path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/**/*.fasta', recursive=True))
     if not path_fastafiles:
         raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
 
     main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles,
                 AA.LIST_ALL_20_AA.value)
-
     if i == 27:
         break
     startnum += 1000
     endnum += 1000
-
 
 # In all cases, the start of operations begins with identifying which or how many pdb and/or fasta files are to be
 # analysed. These must then be copied over from either the repository directory (REPO_PDB_FASTA) or the output_data
