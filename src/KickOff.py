@@ -76,12 +76,15 @@ for i in range(27):
 # PROGRAM       INPUT FILES & DIRECTORIES                           OUTPUT FILES & DIRECTORIES
 # -------------------------------------------------------------------------------------------------------------------
 # MutateFasta   input_data/<fastafilename>/                         output_data/<fastafilename>/mutants/
-# (completed calculations 05.09.18)
+# Tested on PSB cluster (and completed for pub_hg_fasta dataset in 29611_fastas_1000) and locally - both worked well
+# ~6:30pm Thu 11th Oct 2018, and locally ~13:00 Fri 11th Oct.
+# latest commit#: 667a7ccf921dc3d700de3e7616cabffacd9c2de8
 #
 # Agadir        configuration/agadir_config/Options.txt
 #               input_data/<fastafilename>/                         output_data/<fastafilename>/agadir/
 #               input_data/<fastafilename>/mutants/                 output_data/<fastafilename>/agadir/<mutantfilename>/
 # Tested on PSB cluster and locally on Macbook - both work well. 13:35 10th Oct 2018
+#
 # last commit#: 3f56bc782eecab941aeb29377541166f0c636c08
 #
 # FoldX BM      configuration/foldx_config/commands_buildmodel.txt
