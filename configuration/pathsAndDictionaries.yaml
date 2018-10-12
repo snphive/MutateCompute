@@ -42,6 +42,7 @@ ROOT:
     dir_rep: 'repair'
     dir_fastas: 'fastas'
     dir_29611_fastas_1000: '29611_fastas_1000'
+    dir_32431_repairedpdbs_1000: '32431_repairedpdbs_1000'
     dir_seqs_txt_csv: 'sequences_txt_csv'
     dir_pdb_fasta_repo: 'REPO_PDB_FASTA'
     dir_pdbs: 'pdbs'
