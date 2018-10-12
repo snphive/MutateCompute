@@ -33,7 +33,6 @@ from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 from Bio import SeqIO
 import warnings
-import time
 
 
 class Biopy(object):
