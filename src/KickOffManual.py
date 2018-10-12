@@ -8,8 +8,8 @@ from src.AminoAcids import AA
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 """
-This module is for doing manual runs, either to check something works or just to do a single input rather than a batch
-which is more for KickOff.py.
+This module is for doing manual runs, locally or on cluster, either to quickly check something works or just to do a 
+single input rather than a batch which is more for KickOff.py.
 I am manually setting the use_cluster and path_inputs.. variables here but this is not essential.  
 """
 
