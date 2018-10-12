@@ -36,7 +36,6 @@ class Scheduler(object):
         :param write_1_fasta_only: True to write any fasta output data to 1 fasta file, each separated by \n.
         :param write_fasta_per_mut: True to write any fasta output data as 1 fasta file per mutant.
         """
-        print('STARTING SCHEDULER')
         start_time = time.perf_counter()
         if path_fastafiles:
             if operations['do_mutate_fasta']:
@@ -57,14 +56,14 @@ class Scheduler(object):
                                                               path_output_fastas_3dots)
                     if GUM.using_cluster():
                         jobname = Paths.PREFIX_MUTFSTA.value + path_fastafile.split('/')[-1]
-                        write_1_fasta_only = 'True'
-                        write_fasta_per_mut = 'False'
+                        write_1_fasta_only = True
+                        write_fasta_per_mut = False
                         Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value,
                                                  python_script_with_paths=os.path.join(Paths.SE_SRC.value,
-                                                 'run_mutate_fasta_zeus.py') + Str.SPCE.value + 'all amino_acids' +
-                                                 Str.SPCE.value + path_fastafile + Str.SPCE.value + write_1_fasta_only +
-                                                 Str.SPCE.value + write_fasta_per_mut + Str.SPCE.value +
-                                                 path_output_fastas_3dots,
+                                                 'run_mutate_fasta_zeus.py') + Str.SPCE.value + path_fastafile +
+                                                 Str.SPCE.value + str(write_1_fasta_only) +
+                                                 Str.SPCE.value + str(write_fasta_per_mut) +
+                                                 Str.SPCE.value + path_output_fastas_3dots,
                                                  queue='', n_slots='', total_memory_GB='', memory_limit_GB='3',
                                                  cluster_node='')
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value)
