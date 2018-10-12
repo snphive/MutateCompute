@@ -73,8 +73,6 @@ class FoldX(object):
             """
             self.conditions = cond
 
-        # Mutate specified amino acids in this pdb to all listed amino acids using FoldX BuildModel,
-        # FoldX uses a runscript file, which must be written here.
         def mutate_protein_structure(self, path_pdbfile: str, amino_acids: list):
             """
             Mutate all amino acids in this pdb to all listed amino acids using FoldX BuildModel.
@@ -96,8 +94,8 @@ class FoldX(object):
                                                                                               fx_mutant_name)
                 self._write_individual_list_for_mutant(path_output_pdbname_mutant)
                 os.chdir(path_output_pdbname_mutant)
-                path_files_to_copy = [path_pdbfile]
-                # path_files_to_copy = [path_runscript_file, path_pdbfile]
+                # path_files_to_copy = [path_pdbfile]
+                path_files_to_copy = [path_runscript_file, path_pdbfile]
                 GUM.linux_copy_specified_files(path_files_to_copy, path_dst_dir=path_output_pdbname_mutant)
                 if GUM.using_cluster():
                     path_jobq = GUM._os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fx_mutant_name)
@@ -126,6 +124,8 @@ class FoldX(object):
                     else:
                         raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
 
+            for fx_mutant_name in fx_mutant_name_list:
+                path_output_pdbname_mutant = os.path.join(Paths.OUTPUT, pdbname, fx_mutant_name)
                 self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
 
         def _write_ddG_csv_file(self, path_output_pdbname_mutant: str, pdbname: str, fx_mutant_name: str):
