@@ -15,6 +15,14 @@ import multiprocessing as mp
 import pydevd
 pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
+"""
+This module is for doing batch runs, locally or on cluster, typically running a folder of 1,000 input files through a
+computation. 
+This instead of reading in > 10,000 files at a time, as the latter seems to cause problems with iterating through such 
+a large list in a for loop - (I experienced a delay on looping through a list of > 70,000, whereby the computations 
+missed out about half of the inputs, generating only half of the outputs).   
+"""
+
 if len(sys.argv) < 2:
     use_cluster = False
 else:
