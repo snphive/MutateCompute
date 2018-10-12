@@ -106,28 +106,29 @@ class GUM(object):
                     protein_chains.append(protein_chain)
         return protein_chains
 
-    # input_string      String      Any string that you want to trim.
-    # prefix            String      The prefix you want to remove from the input string.
-    # suffix            String      The suffix you want to remove from the input string.
-    #
-    # Returns the input string with the specified prefix and suffix trimmed off.
+    """
+    :param input: Any string that you want to trim.
+    :param prefix: The prefix you want to remove from the input string.
+    :param suffix: The suffix you want to remove from the input string.
+    :return: str, input with specified prefix/suffix removed.
+    """
     @staticmethod
-    def _remove_prefix_and_suffix(input_string, prefix, suffix):
-        trimmed = input_string
-        if input_string.startswith(prefix):
-            trimmed = input_string.replace(prefix, '')
+    def _remove_prefix_and_suffix(input: str, prefix: str, suffix: str):
+        trimmed = input
+        if input.startswith(prefix):
+            trimmed = input.replace(prefix, '')
         if trimmed.endswith(suffix):
             trimmed = trimmed.replace(suffix, '')
         return trimmed
 
-    # Originally used in solubis.py but not used at the moment in this project. Keeping as may be useful.
-    # Reads a fasta file for the sequence part only (not including the >title).
-    #s
-    # path_fastafile     String      Absolute path to the fasta file, including fasta file itself (incl. .fasta ext).
-    #
-    # Returns the (amino acid) sequence of the fasta file.
+    """
+    Originally used in solubis.py but not used at the moment in this project. Keeping as may be useful.
+    Reads a fastafile for the sequence part only (not including the >title).
+    :param path_fastafile: Absolute path to the fasta file, including fasta file itself (incl. .fasta ext).
+    :return: str, FASTA sequence
+    """
     @staticmethod
-    def get_sequenceOnly_from_fastafile(path_fastafile):
+    def get_sequenceOnly_from_fastafile(path_fastafile: str):
         with open(path_fastafile, 'r') as fastafile_opened:
             fastafile_lines = fastafile_opened.readlines()
             fasta_seq = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
@@ -142,11 +143,14 @@ class GUM(object):
     #   leaf1       leaf2       leaf3
     #
     #####################################################################################################
-    #
-    # path_root     String                      The path to the root (ideally absolute), "/path/of/root"
-    # *args         String or list of Strings   Name or list of names of directory to add to root only.
+    """
+    See above for description.
+    :param path_root: The path to the root (ideally absolute), "/path/of/root"
+    :param args: list or list of str. Name or list of names of directory to add to root only.
+    :return: list of str, complete paths of newly made directory tree.
+    """
     @staticmethod
-    def create_dir_tree_one_level(path_root, *args):
+    def create_dir_tree_one_level(path_root: str, *args):
         complete_paths = []
         if not os.path.exists(path_root):
             os.makedirs(path_root)
@@ -179,12 +183,15 @@ class GUM(object):
     # due to some bug when combining unittest.mock.patch with the pydevd debugger.
     # It does not create duplicates and does not raise any errors or exceptions.
     #
-    # path_root     String                      The path to the root (ideally absolute), "/path/of/root"
-    # *leaves       String or list of Strings   Name or list of names of directory to add to root, then root-leaf.
-    #
     # NOTE: os.makedirs(path) does the same thing but throws an exception if the path already exists.
+    """
+    See above for description.
+    :param path_root: The path to the root (ideally absolute), "/path/of/root"
+    :param leaves: list or list of str. Name or list of names of directory to add to root, then root-leaf.
+    :return: str, complete path of newly made directory tree.
+    """
     @staticmethod
-    def create_dir_tree(path_root, *leaves):
+    def create_dir_tree(path_root: str, *leaves):
         if not os.path.exists(path_root):
             os.makedirs(path_root)
         for leaf in leaves:
@@ -194,9 +201,14 @@ class GUM(object):
             path_root = path_root_leaf
         return path_root
 
-    # From 07Aug, started phasing in use os.makedirs() instead of my own create_dir_tree method (after discovering it!).
+    """
+    :param path_root:
+    :param new_dirs:
+    :return: str, newly-made directory tree.
+    """
+    # From 07Aug, started phasing in use os.makedirs() instead of my own create_dir_tree() method.
     @staticmethod
-    def _os_makedirs(path_root, *new_dirs):
+    def _os_makedirs(path_root: str, *new_dirs):
         path_root_newdirs = os.path.join(path_root, *new_dirs)
         try:
             os.makedirs(path_root_newdirs)
@@ -204,18 +216,18 @@ class GUM(object):
             print(Str.PARTALLPATHEXISTS_MSG.value)
         return path_root_newdirs
 
+    """
+    Copy a chosen number of files (1000 by default) of specified file type from a single, named src dir to a named
+    dst dir, but inside newly-made subfolders named '1...1000' for example to store the first 1000 files.
+    :param path_src_dir: Absolute path of source dir for files to copy from.
+    :param path_dst_dir: Absolute path of destination dir for files to copy to.
+    :param file_extension: File extension of files to copy.
+    :param starting_num: Number of first file to copy from sorted src dir to dst subdir.
+    :param num_to_copy_per_subdir: Number of files to copy. Default of 1000.
+    """
     @staticmethod
     def copy_files_to_3dot_dir(path_src_dir: str, path_dst_dir: str, file_extension: str, starting_num: int,
                                num_to_copy_per_subdir=1000):
-        """
-        Copy a chosen number of files (1000 by default) of specified file type from a single, named src dir to a named
-        dst dir, but inside newly-made subfolders named '1...1000' for example to store the first 1000 files.
-        :param path_src_dir: Absolute path of source dir for files to copy from.
-        :param path_dst_dir: Absolute path of destination dir for files to copy to.
-        :param file_extension: File extension of files to copy.
-        :param starting_num: Number of first file to copy from sorted src dir to dst subdir.
-        :param num_to_copy_per_subdir: Number of files to copy. Default of 1000.
-        """
         # path_sorted_file_list = natsort.natsorted(glob.glob(path_src_dir + '/*' + file_extension))
         path_sorted_file_list = sorted(glob.glob(path_src_dir + '/*' + file_extension))
         subdir = file_extension.strip('.') + 's_'
@@ -233,28 +245,40 @@ class GUM(object):
 
     # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
     # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
+    # :param path_dst_dir: Absolute path to destination directory.
+    # :param start_num: Starting number of 3dot dir, e.g. 1 in the dir name 1...100
+    # :param end_num: Ending number of 3dot dir, e.g. 100 in the dir name 1...100
+    # :return: str, Absolute path of newly made 3dot directory.
     @staticmethod
-    def _make_path_3dot_dir(path_dst_dir, start_num, end_num):
+    def _make_path_3dot_dir(path_dst_dir: str, start_num: int, end_num: int):
         return GUM._os_makedirs(path_dst_dir, str(start_num) + Str.DOTS3.value + str(end_num))
 
-    # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dots subdir.
-    # This method is currently only used for building output dir for MutateFasta.
+    # Copies the 3dot subdir from the source dir (path_fastafile) and builds a dst dir with the same 3dots subdir.
+    # This method is currently only used for bls -luilding output dir for MutateFasta.
     # Expects path_fastafile to be: ~/PycharmProjects/MutateCompute/input_data/fastas/1...1000/1_A/1_A.fasta
-    # As such it builds path of child subdirs of /fastas upto but not including /<filename>/filename.fasta
+    # or ~/PycharmProjects/MutateCompute/input_data/29611_fastas_1000/1...1000/00bdkjhi09234kjn3349_4234.fasta, for
+    # example.
+    # As such it builds path of child subdirs of /fastas upto the 1...1000 3dots folder name, not including any
+    # subdirs from there down, such as /<filename>/filename.fasta or just /filename.fasta.
+    # :param path_dst_root: Absolute path of root to new directory being made (destination dir).
+    # :param path_fastafile: Absolute path of file that contain the subdir names to be copied to dst dir.
+    # :return: str, Absolute path of newly-made directory tree.
     @staticmethod
-    def make_root_fastas_3dots_dirs(path_root, path_fastafile):
-        path_fastafile_list = path_fastafile.split('/')
+    def make_root_fastas_3dots_dirs(path_dst_root: str, path_fastafile: str):
+        dirs_in_path_fastafile = path_fastafile.split('/')
         path_fastas_3dots_dirs = []
         copy_from_here = False
-        for path_dir in path_fastafile_list[:-2]:
-            if path_dir == '':
+        for dir_in_path_fastafile in dirs_in_path_fastafile[:-1]:
+            if dir_in_path_fastafile == '':
                 continue
-            if copy_from_here or path_dir == Paths.DIR_FASTAS.value:
+            if copy_from_here or dir_in_path_fastafile == Paths.DIR_FASTAS.value:
                 copy_from_here = True
-                if path_dir == Paths.DIR_FASTAS.value:
-                    path_dir = 'mutants_' + path_dir
-                path_fastas_3dots_dirs.append(path_dir)
-        return GUM._os_makedirs(path_root, '/'.join(path_fastas_3dots_dirs))
+                if dir_in_path_fastafile == Paths.DIR_FASTAS.value:
+                    dir_in_path_fastafile = 'mutants_' + dir_in_path_fastafile
+                path_fastas_3dots_dirs.append(dir_in_path_fastafile)
+                if Str.DOTS3.value in dir_in_path_fastafile:
+                    break
+        return GUM._os_makedirs(path_dst_root, '/'.join(path_fastas_3dots_dirs))
 
     # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
     # This method is currently only used for building output dir for Agadir.
