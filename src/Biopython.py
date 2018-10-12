@@ -105,10 +105,13 @@ class Biopy(object):
     def _build_identical_alignments_list(query_length: int, alignments: list):
         """
         Builds a list_of_dictionaries of relevant info for each high-scoring pair (hsp) alignment where there are zero
-        gaps and the alignment length is exactly the same as the query length, hence it is a 100% identity match.
-        However, the hit fasta may still be longer than the query fasta. This info is stored in sbjct_start and sbjct_end.
-        Builds a list_of_dictionaries of relevant info for each high-scoring pair (hsp) alignment where there are zero
-        gaps and the alignment length is exactly the same as the query length, hence it is a 100% identity match.
+        gaps and the alignment length is exactly the same as the query length, hence it is a 100 % identity match.
+        The list is currently limited to two hits to save processing time. It is thought the top hit will always be the
+        relevant one.
+        However, the hit fasta may still be longer than the query fasta. This info is stored in sbjct_start and
+        sbjct_end. Builds a list_of_dictionaries of relevant info for each high-scoring pair (hsp) alignment where
+        there are zero gaps and the alignment length is exactly the same as the query length, hence it is a 100%
+        identity match.
         :param query_length: Qblast output value, refers to length of the input fasta sequence.
         :param alignments: Objects with values, (including hsps, also a list of objects with values) from qblast.
         :return: List of identical alignment hits. The hit may still be longer.
@@ -118,9 +121,9 @@ class Biopy(object):
         for alignment in alignments:
             alignment_dict = {'accession_num': 0, 'length': 0, 'hit_def': '', 'hsp_dict': {}}
             for hsp in alignment.hsps:
-                # time.sleep(1)
+                if len(identical_aligns_list) > 1:
+                    break
                 is_identical = hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities
-                # time.sleep(1)
                 if is_identical:
                     alignment_dict['accession_num'] = alignment.accession
                     alignment_dict['length'] = alignment.length
