@@ -22,9 +22,10 @@ Paths.set_up_paths(use_cluster=use_cluster)
 #                                                           path_dst_dir=path_input_fastas, wanted_file_list=None)
 # path_fastafiles = '/Users/u0120577/REPO_PDB_FASTA/fastas_10/5_C.fasta'
 
-path_input_fastas_dir = Paths.MC_REPO_FASTAS.value + '/fastas_1000_rest'
-# /Users/u0120577/REPO_PDB_FASTA/fastas/fastas_1000_rest
-path_fastafiles = natsort.natsorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
+# path_input_fastas_dir = Paths.MC_REPO_FASTAS.value + '/fastas_1000_rest'
+# path_fastafiles = natsort.natsorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
+# path_fastafiles = ['/Users/u0120577/REPO_PDB_FASTA/9_A.fasta']
+path_fastafiles = ['/Users/u0120577/REPO_PDB_FASTA/000d2401-64ba-db00-26f7-7dc06d820e7a.fasta']
 
 if not path_fastafiles:
     raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
