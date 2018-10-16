@@ -119,10 +119,10 @@ class FoldX(object):
                         subprocess.call(cmd, shell=True)
                     else:
                         raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
-            #
-            # for fx_mutant_name in fx_mutant_name_list:
-            #     path_output_pdbname_mutant = os.path.join(Paths.OUTPUT, pdbname, fx_mutant_name)
-            #     self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
+
+            for fx_mutant_name in fx_mutant_name_list:
+                path_output_pdbname_mutant = os.path.join(Paths.OUTPUT, pdbname, fx_mutant_name)
+                self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
 
         def _write_ddG_csv_file(self, path_output_pdbname_mutant: str, pdbname: str, fx_mutant_name: str):
             """
@@ -138,25 +138,46 @@ class FoldX(object):
             path_output_dif_file = os.path.join(path_output_pdbname_mutant, FoldX().Strs.DIF_FXOUTFILE.value)
             if not os.path.exists(path_output_dif_file):
                 print(path_output_dif_file + ' has not be written yet')
-            with open(path_output_dif_file) as f:
-                dif_fxoutfile_lines = f.readlines()
-            for line in dif_fxoutfile_lines:
-                if ddG_average != '':
-                    break
-                if not pdbname + '_' in line:
-                    continue
-                else:
-                    ddG = float(line.split(Str.TAB.value)[1])
-                    if ddG_1 == '':
-                        ddG_1 = ddG
-                    elif ddG_2 == '':
-                        ddG_2 = ddG
-                    elif ddG_3 == '':
-                        ddG_3 = ddG
-            ddG_average = (ddG_1 + ddG_2 + ddG_3) / 3
-            with open(os.path.join(path_output_pdbname_mutant, FoldX().Strs.DDG_CSVFILE.value), 'w') as f:
-                f.write(pdbname + ',' + fx_mutant_name + ',' + str(ddG_average))
+            else:
+                self._remove_config_files(path_output_pdbname_mutant)
+                with open(path_output_dif_file) as f:
+                    dif_fxoutfile_lines = f.readlines()
+                for line in dif_fxoutfile_lines:
+                    if ddG_average != '':
+                        break
+                    if not pdbname + '_' in line:
+                        continue
+                    else:
+                        ddG = float(line.split(Str.TAB.value)[1])
+                        if ddG_1 == '':
+                            ddG_1 = ddG
+                        elif ddG_2 == '':
+                            ddG_2 = ddG
+                        elif ddG_3 == '':
+                            ddG_3 = ddG
+                ddG_average = (ddG_1 + ddG_2 + ddG_3) / 3
+                with open(os.path.join(path_output_pdbname_mutant, FoldX().Strs.DDG_CSV.value), 'w') as f:
+                    f.write(pdbname + ',' + fx_mutant_name + ',' + str(ddG_average))
             return ddG_average
+
+        def _remove_config_files(self, path_output_pdbname_mutant: str):
+            """
+            Remove the copies of config files that had to be copied to the FoldX output dir, but once used serve no
+            purpose and only take up disk space.
+            :param path_output_pdbname_mutant: Absoluate path to output dir for each mutant housing the individual
+            copies of the config files to be deleted.
+            """
+            path_runscript_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.runscrpt_txt.value)
+            path_rotabase_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.ROTABASE_TXT.value)
+            path_cmds_bm_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.CMNDS_BM_TXT.value)
+            path_cmds_stab_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.CMNDS_STAB_TXT.value)
+            path_options_bm_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTIONS_BM_TXT.value)
+            path_options_stab_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTIONS_STAB_TXT.value)
+            path_indiv_list_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.indiv_list_txt.value)
+            files_to_remove = [path_runscript_txt, path_rotabase_txt, path_cmds_bm_txt, path_cmds_stab_txt,
+                               path_options_bm_txt, path_options_stab_txt, path_indiv_list_txt]
+            for file_to_remove in files_to_remove:
+                GUM.linux_remove_file(file_to_remove)
 
         def _make_output_dir_and_copy_fxconfig_files_in(self, path_output: str, pdbname: str, fx_mutant_name: str):
             """
@@ -251,7 +272,12 @@ class FoldX(object):
         NO_RUNSCRPT_FILE_MSG = 'No runscript file was found'
         DSH_RUNFILE = '-runfile'
         DIF_FXOUTFILE = 'Dif_BuildModel_RepairPDBtest_1.fxout'
-        DDG_CSVFILE = 'ddG.csv'
+        DDG_CSV = 'ddG.csv'
+        ROTABASE_TXT = 'rotabase.txt'
+        CMNDS_BM_TXT = 'commands_buildmodel.txt'
+        CMNDS_STAB_TXT = 'commands_stability.txt'
+        OPTNS_BM_TXT = 'options_buildmodel.txt'
+        OPTNS_STAB_TXT = 'options_stability.txt'
 
 
 
