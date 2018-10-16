@@ -426,11 +426,17 @@ class GUM(object):
 
     @staticmethod
     def linux_remove_file(path_dst_mutant_file):
-        cmd = 'rm' + Str.SPCE.value + path_dst_mutant_file
-        try:
-            subprocess.call(cmd, shell=True)
-        except OSError:
-            print(Str.PROBLNXCMD_MSG.value + cmd)
+        if not os.path.exists(path_dst_mutant_file):
+            print('Path: ' + path_dst_mutant_file + ' does not exist.')
+        else:
+            cmd = 'rm' + Str.SPCE.value + path_dst_mutant_file
+            try:
+                subprocess.call(cmd, shell=True)
+            except FileNotFoundError as fnf:
+                print('File not found: ' + path_dst_mutant_file)
+                print(fnf)
+            except OSError:
+                print(Str.PROBLNXCMD_MSG.value + cmd)
 
     # Might be better to log in manually, as this can hang if mulitplexing is used.
     # @staticmethod
