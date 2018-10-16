@@ -160,7 +160,7 @@ class FoldX(object):
                     f.write(pdbname + ',' + fx_mutant_name + ',' + str(ddG_average))
             return ddG_average
 
-        def _remove_config_files(self, path_output_pdbname_mutant: str):
+        def remove_config_files(self, path_output_pdbname_mutant: str):
             """
             Remove the copies of config files that had to be copied to the FoldX output dir, but once used serve no
             purpose and only take up disk space.
