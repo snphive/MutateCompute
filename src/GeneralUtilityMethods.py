@@ -19,22 +19,23 @@ class GUM(object):
     # def __init__(self):
 
     @staticmethod
-    def extract_pdbname_chain_fasta_from_pdbs(path_pdbfiles, path_fastafiles_to_be_written=''):
+    def extract_pdbname_chain_startpos_fasta_from_pdbs(path_pdbfiles, path_fastafiles_to_be_written=''):
         """
         Assumes standard pdb format with 'ATOM' as the first string at start of each line of atomic coordinates
         and with the chain at the 22nd character (index position 21) and the residue number within index 22 to 26.
-        if these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
-        E.g. return value might look like:
-        {'RepairPDB_1_A': 'RVYLTFDELRETK..etc', 'RepairPDB_2_A': 'RVYLTFDELRETK..etc', etc}
+        NOTE: If these very specific aspects are not exactly matching, the method will fail, i.e. it is not very robust.
+        Return value should look like:
+        {'RepairPDB_1_A_1': 'RVYLTFDELRETK..etc', 'RepairPDB_2_A': 'RVYLTFDELRETK..etc', etc}
 
-        Extract the pdbname and chain and fasta sequence from a pdb file. Can also write fasta file to specified dst.
+        Extract the pdbname, chain, position of starting residue and fasta sequence from a pdb file. Can also write
+        fasta file to specified dst.
         :param path_pdbfiles: str OR List of str    Absolute path to pdbfile(s) (including '.pdb') .
         :param path_fastafiles_to_be_written: Absolute path of fastafiles to be written. Empty string indicates no
         fasta files will be written.
-        :return: dict, 'pdbname_chain' is key, fasta sequence is value.
+        :return: dict, 'pdbname_chain_startpos' is key, fasta sequence is value.
         """
         # pdbname_chain_fastaseq_dict: dict = {} version 3 only
-        pdbname_chain_fastaseq_dict = {}
+        pdbname_chain_startpos_fastaseq_dict = {}
         if isinstance(path_pdbfiles, str):
             path_pdbfiles = [path_pdbfiles]
         for path_pdbfile in path_pdbfiles:
@@ -42,12 +43,14 @@ class GUM(object):
                 pdbfile_lines = f.readlines()
             pdbfile_lines_with_atom = []
             protein_chains = []
+            protein_chains_startpos = {}
             for pdbfile_line in pdbfile_lines:
                 if 'ATOM' == pdbfile_line[0:4]:
                     protein_chain = pdbfile_line[21]
                     pdbfile_lines_with_atom.append(pdbfile_line)
                     if protein_chain not in protein_chains:
                         protein_chains.append(protein_chain)
+                        protein_chains_startpos[protein_chain] = pdbfile_line[22:26].strip(' ')
             for protein_chain in protein_chains:
                 fasta_list = []
                 residue_num = '0'
@@ -65,12 +68,13 @@ class GUM(object):
 
                 fasta_sequence = "".join(fasta_list)
                 pdbname = GUM._remove_prefix_and_suffix(path_pdbfile.split('/')[-1].split('.')[0], 'RepairPDB_', '_1_0')
-                pdbname_chain = pdbname + '_' + protein_chain
-                print(pdbname_chain + ' : ' + fasta_sequence)
-                pdbname_chain_fastaseq_dict[pdbname_chain] = fasta_sequence
+                pdbname_chain_startpos = pdbname + '_' + protein_chain + '_' + protein_chains_startpos[protein_chain]
+                print(pdbname_chain_startpos + ' : ' + fasta_sequence)
+                pdbname_chain_startpos_fastaseq_dict[pdbname_chain_startpos] = fasta_sequence
                 if path_fastafiles_to_be_written != '':
-                    GUM.write_fastafile_to_name_chain_dir(pdbname_chain_fastaseq_dict, path_fastafiles_to_be_written)
-        return pdbname_chain_fastaseq_dict
+                    GUM.write_fastafile_to_name_chain_dir(pdbname_chain_startpos_fastaseq_dict,
+                                                          path_fastafiles_to_be_written)
+        return pdbname_chain_startpos_fastaseq_dict
 
     @staticmethod
     def write_fastafile_to_name_chain_dir(pdbname_chain_fasta: dict, path_to_write_fastafile_root: str):
@@ -358,11 +362,10 @@ class GUM(object):
     #
     # NOTE: current cp command specifies not to overwrite existing files, not recursively
     @staticmethod
-    def linux_copy_all_files_in_dir(path_src_dir, path_dst_dir, overwrite=True, recursively=False):
-        recurse_cmd = (Str.SPCE.value + '-r') if recursively else ''
-        overwrite_cmd = (Str.SPCE.value + '-n') if overwrite else ''
-        cmd = 'cp' + overwrite_cmd + recurse_cmd + Str.SPCE.value + path_src_dir + Str.FSLSH_ASTRX.value + \
-              Str.SPCE.value + path_dst_dir
+    def linux_copy_all_files_in_dir(path_src_dir, path_dst_dir, recursively=False, files_only=False):
+        recurse_option = '-r' if recursively else ''
+        path_src_dir = path_src_dir + Str.FSLSH_ASTRX.value if files_only else path_src_dir
+        cmd = 'cp' + Str.SPCE.value + recurse_option + Str.SPCE.value + path_src_dir + Str.SPCE.value + path_dst_dir
         try:
             subprocess.call(cmd, shell=True)
         except OSError:
