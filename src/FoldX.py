@@ -175,10 +175,11 @@ class FoldX(object):
             path_options_bm_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTNS_BM_TXT.value)
             path_options_stab_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTNS_STAB_TXT.value)
             path_indiv_list_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.indiv_list_txt.value)
-            files_to_remove = [path_runscript_txt, path_rotabase_txt, path_cmds_bm_txt, path_cmds_stab_txt,
-                               path_options_bm_txt, path_options_stab_txt, path_indiv_list_txt]
-            for file_to_remove in files_to_remove:
-                GUM.linux_remove_file(file_to_remove)
+            path_files_to_remove = [path_runscript_txt, path_rotabase_txt, path_cmds_bm_txt, path_cmds_stab_txt,
+                                    path_options_bm_txt, path_options_stab_txt, path_indiv_list_txt]
+            for path_file_to_remove in path_files_to_remove:
+                if os.path.exists(path_file_to_remove):
+                    GUM.linux_remove_file(path_file_to_remove)
 
         def _make_output_dir_and_copy_fxconfig_files_in(self, path_output: str, pdbname: str, fx_mutant_name: str):
             """
