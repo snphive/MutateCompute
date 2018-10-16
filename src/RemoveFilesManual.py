@@ -1,16 +1,23 @@
 from src.FoldX import FoldX
 from src.Paths import Paths
+from src.GeneralUtilityMethods import GUM
+from src.Conditions import Cond
 import os
 from os import walk
 import pydevd
 pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 fx_mutant_dirs = []
-for (dirpath, dirnames, filenames) in walk(os.path.join(Paths.SE_OUTPUT_BM.value, 'RepairPDB_1')):
+pdbname = 'RepairPDB_1'
+for (dirpath, dirnames, filenames) in walk(os.path.join(Paths.SE_OUTPUT_BM.value, pdbname)):
     fx_mutant_dirs.extend(dirnames)
     break
 
 for fx_mutant_dir in fx_mutant_dirs:
-    FoldX.BuildModel.remove_config_files(fx_mutant_dir)
+    bm = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
+    path_output_pdbname_mutant = os.path.join(Paths.SE_OUTPUT_BM.value, pdbname, fx_mutant_dir)
+    bm.remove_config_files(path_output_pdbname_mutant)
+    path_pdbfile = os.path.join(Paths.SE_OUTPUT_BM.value, pdbname + '.pdb')
+    GUM.linux_remove_file(path_pdbfile)
 
 pydevd.stoptrace()
