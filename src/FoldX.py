@@ -139,7 +139,8 @@ class FoldX(object):
             if not os.path.exists(path_output_dif_file):
                 print(path_output_dif_file + ' has not be written yet')
             else:
-                self._remove_config_files(path_output_pdbname_mutant)
+                self.remove_config_files(path_output_pdbname_mutant)
+                GUM.linux_remove_file(os.path.join(path_output_pdbname_mutant, pdbname + '.pdb'))
                 with open(path_output_dif_file) as f:
                     dif_fxoutfile_lines = f.readlines()
                 for line in dif_fxoutfile_lines:
@@ -171,8 +172,8 @@ class FoldX(object):
             path_rotabase_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.ROTABASE_TXT.value)
             path_cmds_bm_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.CMNDS_BM_TXT.value)
             path_cmds_stab_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.CMNDS_STAB_TXT.value)
-            path_options_bm_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTIONS_BM_TXT.value)
-            path_options_stab_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTIONS_STAB_TXT.value)
+            path_options_bm_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTNS_BM_TXT.value)
+            path_options_stab_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTNS_STAB_TXT.value)
             path_indiv_list_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.indiv_list_txt.value)
             files_to_remove = [path_runscript_txt, path_rotabase_txt, path_cmds_bm_txt, path_cmds_stab_txt,
                                path_options_bm_txt, path_options_stab_txt, path_indiv_list_txt]
