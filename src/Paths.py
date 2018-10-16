@@ -33,8 +33,8 @@ class Paths(Enum):
             ZEUS_QSUB_EXE = paths_and_dictionaries['ROOT']['path_zeus_qsub_exe']
 
             # ABSOLUTE PATHS - ROOTS LOCAL AND CLUSTER
-            LOCAL_MUTATECOMPUTE = paths_and_dictionaries['ROOT']['path_local_mutatecompute']
-            LOCAL_IO_ROOT = paths_and_dictionaries['ROOT']['path_local_io_root']
+            LOCAL_MUTATECOMPUTE = paths_and_dictionaries['ROOT']['path_local_pyproj_mutatecompute']
+            LOCAL_PYPROJ = paths_and_dictionaries['ROOT']['path_local_pyproj']
             ZEUS_SNPEFFECT = paths_and_dictionaries['ROOT']['path_zeus_snpeffect']
 
             #  DIRECTORY NAMES (USED TO CONSTRUCT ABSOLUTE PATHS BELOW)
@@ -55,12 +55,12 @@ class Paths(Enum):
             DIR_MUTANTS = paths_and_dictionaries['ROOT']['dir_mutants']
             DIR_MUTANTS_FASTAS = paths_and_dictionaries['ROOT']['dir_mutants_fastas']
             DIR_MUTANTS_MULTIFASTAS = paths_and_dictionaries['ROOT']['dir_mutants_multifastas']
-            DIR_FOLDX = paths_and_dictionaries['ROOT']['dir_fx']
+            DIR_FOLDX = paths_and_dictionaries['ROOT']['dir_foldx']
             DIR_AGADIR = paths_and_dictionaries['ROOT']['dir_agadir']
             DIR_OUTPUT = paths_and_dictionaries['ROOT']['dir_output']
-            DIR_AC = paths_and_dictionaries['ROOT']['dir_ac']
-            DIR_BM = paths_and_dictionaries['ROOT']['dir_bm']
-            DIR_REP = paths_and_dictionaries['ROOT']['dir_rep']
+            DIR_AC = paths_and_dictionaries['ROOT']['dir_analyse_complex']
+            DIR_BM = paths_and_dictionaries['ROOT']['dir_build_model']
+            DIR_REP = paths_and_dictionaries['ROOT']['dir_repair']
             DIR_FASTAS = paths_and_dictionaries['ROOT']['dir_fastas']
             DIR_29611_FASTAS_1000 = paths_and_dictionaries['ROOT']['dir_29611_fastas_1000']
             DIR_SEQS_TXT_CSV = paths_and_dictionaries['ROOT']['dir_seqs_txt_csv']
@@ -82,19 +82,17 @@ class Paths(Enum):
             MC_CONFIG_GLOBAL_OPTIONS = os.path.join(MC_CONFIG, DIR_GLOBAL_OPTIONS)
             MC_CONFIG_ACRUNSCRIPT = os.path.join(MC_CONFIG, DIR_ACRUNSCRIPT)
             MC_CONFIG_BMRUNSCRIPT = os.path.join(MC_CONFIG, DIR_BMRUNSCRIPT)
-            MC_INPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_INPUT)
-            MC_INPUT_FASTAS = os.path.join(MC_INPUT, DIR_FASTAS)
-            MC_OUTPUT = os.path.join(LOCAL_MUTATECOMPUTE, DIR_OUTPUT)
-            IO_OUTPUT = os.path.join(LOCAL_IO_ROOT, DIR_OUTPUT)
-            IO_INPUT = os.path.join(LOCAL_IO_ROOT, DIR_INPUT)
             MC_BASH = os.path.join(LOCAL_MUTATECOMPUTE, DIR_BASH)
             MC_SRC = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC)
-            MC_OUTPUT_FASTAS = os.path.join(MC_OUTPUT, DIR_FASTAS)
-            MC_OUTPUT_AGADIR = os.path.join(MC_OUTPUT, DIR_AGADIR)
-            IO_OUTPUT_FASTAS = os.path.join(IO_OUTPUT, DIR_FASTAS)
-            MC_OUTPUT_BLASTP = os.path.join(MC_OUTPUT, DIR_BLASTP)
-            IO_OUTPUT_BLASTP = os.path.join(IO_OUTPUT, DIR_BLASTP)
-            IO_OUTPUT_AGADIR = os.path.join(IO_OUTPUT, DIR_AGADIR)
+            LOCAL_INPUT = os.path.join(LOCAL_PYPROJ, DIR_INPUT)
+            LOCAL_INPUT_FASTAS = os.path.join(LOCAL_INPUT, DIR_FASTAS)
+            LOCAL_INPUT_29611_FASTAS_1000 = os.path.join(LOCAL_INPUT, DIR_29611_FASTAS_1000)
+            LOCAL_OUTPUT = os.path.join(LOCAL_PYPROJ, DIR_OUTPUT)
+            LOCAL_OUTPUT_FASTAS = os.path.join(LOCAL_OUTPUT, DIR_FASTAS)
+            LOCAL_OUTPUT_BLASTP = os.path.join(LOCAL_OUTPUT, DIR_BLASTP)
+            LOCAL_OUTPUT_AGADIR = os.path.join(LOCAL_OUTPUT, DIR_AGADIR)
+            LOCAL_OUTPUT_BM = os.path.join(LOCAL_OUTPUT, DIR_BM)
+
             # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_local_pdb_fasta_repository']
             MC_REPO_PDBS = os.path.join(MC_REPO_PDB_FASTA, DIR_PDBS)
@@ -112,14 +110,16 @@ class Paths(Enum):
             SE_CONFIG_BMRUNSCRIPT = os.path.join(SE_CONFIG, DIR_BMRUNSCRIPT)
             SE_CONFIG_BM_JOBQ = os.path.join(SE_CONFIG, DIR_BM_JOBQ)
             SE_CONFIG_BLST_JOBQ = os.path.join(SE_CONFIG, DIR_BLST_JOBQ)
-            SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
-            SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
-            SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
             SE_BASH = os.path.join(ZEUS_SNPEFFECT, DIR_BASH)
             SE_SRC = os.path.join(ZEUS_SNPEFFECT, DIR_SRC)
+            SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
+            SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
+            SE_INPUT_29611_FASTAS_1000 = os.path.join(SE_INPUT, DIR_29611_FASTAS_1000)
+            SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
             SE_OUTPUT_FASTAS = os.path.join(SE_OUTPUT, DIR_FASTAS)
             SE_OUTPUT_BLASTP = os.path.join(SE_OUTPUT, DIR_BLASTP)
             SE_OUTPUT_AGADIR = os.path.join(SE_OUTPUT, DIR_AGADIR)
+            SE_OUTPUT_BM = os.path.join(SE_OUTPUT, DIR_BM)
             # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM ZEUS ROOT AND DIRECTORY NAMES
             SE_REPO_PDB_FASTA = os.path.join(ZEUS_SNPEFFECT, DIR_REPO_PDB_FASTA)
             SE_REPO_PDBS = os.path.join(SE_REPO_PDB_FASTA, DIR_PDBS)
@@ -138,21 +138,23 @@ class Paths(Enum):
         Paths.CONFIG_AGAD_JOBQ = Paths.SE_CONFIG_AGAD_JOBQ.value
         Paths.CONFIG_BM_JOBQ = Paths.SE_CONFIG_BM_JOBQ.value
         Paths.CONFIG_FX = Paths.SE_CONFIG_FX.value if use_cluster else Paths.MC_CONFIG_FX.value
-        Paths.CONFIG_GLOBAL_OPTIONS = Paths.SE_CONFIG_GLOBAL_OPTIONS.value if use_cluster else Paths.MC_CONFIG_GLOBAL_OPTIONS.value
-        Paths.CONFIG_ACRUNSCRIPT = Paths.SE_CONFIG_ACRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_ACRUNSCRIPT.value
+        Paths.CONFIG_GLOBAL_OPTIONS = Paths.SE_CONFIG_GLOBAL_OPTIONS.value if use_cluster else \
+            Paths.MC_CONFIG_GLOBAL_OPTIONS.value
+        Paths.CONFIG_ACRUNSCRIPT = Paths.SE_CONFIG_ACRUNSCRIPT.value if use_cluster else \
+            Paths.MC_CONFIG_ACRUNSCRIPT.value
         Paths.CONFIG_AC_JOBQ = Paths.SE_CONFIG_AC_JOBQ.value
         Paths.CONFIG_BLST_JOBQ = Paths.SE_CONFIG_BLST_JOBQ.value
-        Paths.CONFIG_BMRUNSCRIPT = Paths.SE_CONFIG_BMRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_BMRUNSCRIPT.value
-        # Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.MC_INPUT.value
-        Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.IO_INPUT.value
+        Paths.CONFIG_BMRUNSCRIPT = Paths.SE_CONFIG_BMRUNSCRIPT.value if use_cluster else \
+            Paths.MC_CONFIG_BMRUNSCRIPT.value
+        Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.LOCAL_PYPROJ_INPUT.value
         Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.MC_INPUT_FASTAS.value
-        # Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.MC_OUTPUT.value
-        Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.IO_OUTPUT.value
-        # Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.MC_OUTPUT_FASTAS.value
-        Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.IO_OUTPUT_FASTAS.value
-        # Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.MC_OUTPUT_BLASTP.value
-        Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.IO_OUTPUT_BLASTP.value
-        Paths.OUTPUT_AGADIR = Paths.SE_OUTPUT_AGADIR.value if use_cluster else Paths.IO_OUTPUT_AGADIR.value
+        Paths.INPUT_29611_FASTAS_1000 = Paths.SE_INPUT_29611_FASTAS_1000.value if use_cluster else \
+            Paths.LOCAL_INPUT_29611_FASTAS_1000.value
+        Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT.value
+        Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT_FASTAS.value
+        Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT_BLASTP.value
+        Paths.OUTPUT_AGADIR = Paths.SE_OUTPUT_AGADIR.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT_AGADIR.value
+        Paths.OUTPUT_BM = Paths.SE_OUTPUT_BM.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT_BM.value
         Paths.REPO_PDB_FASTA = Paths.SE_REPO_PDB_FASTA.value if use_cluster else Paths.MC_REPO_PDB_FASTA.value
         Paths.REPO_PDBS = Paths.SE_REPO_PDBS.value if use_cluster else Paths.MC_REPO_PDBS.value
         Paths.REPO_FASTAS = Paths.SE_REPO_FASTAS.value if use_cluster else Paths.MC_REPO_FASTAS.value
