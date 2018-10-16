@@ -82,8 +82,8 @@ class FoldX(object):
             """
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
-            pdbname_chain_fasta_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(path_pdbfile)
-            fx_mutant_name_list = self._make_fx_mutant_name_list(amino_acids, pdbname_chain_fasta_dict)
+            pdbname_chain_startpos_fasta_dict = GUM.extract_pdbname_chain_startpos_fasta_from_pdbs(path_pdbfile)
+            fx_mutant_name_list = self._make_fx_mutant_name_list(amino_acids, pdbname_chain_startpos_fasta_dict)
             action = FoldX().Strs.BM.value + Str.HASH.value + ',' + FoldX().Strs.indiv_list_txt.value
             path_runscript_dir = os.path.join(Paths.CONFIG_BMRUNSCRIPT, pdbname)
             FoldX().write_runscript_file(path_runscript_dir, pdbfile, self.conditions, action)
@@ -94,14 +94,10 @@ class FoldX(object):
                                                                                               fx_mutant_name)
                 self._write_individual_list_for_mutant(path_output_pdbname_mutant)
                 os.chdir(path_output_pdbname_mutant)
-                # path_files_to_copy = [path_pdbfile]
                 path_files_to_copy = [path_runscript_file, path_pdbfile]
                 GUM.linux_copy_specified_files(path_files_to_copy, path_dst_dir=path_output_pdbname_mutant)
                 if GUM.using_cluster():
                     path_jobq = GUM._os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fx_mutant_name)
-                    # Cluster.write_job_q_bash(job_name=Paths.PREFIX_FX_BM.value + fx_mutant_name,
-                    #                          path_job_q_dir=path_jobq, path_runscript_dir=Paths.CONFIG_BMRUNSCRIPT,
-                    #                          using_runscript=True)
                     Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_BM.value + fx_mutant_name,
                                              path_job_q_dir=path_jobq, path_dst_dir=path_output_pdbname_mutant,
                                              path_runscript_dir=path_runscript_dir, using_runscript=True)
@@ -123,10 +119,10 @@ class FoldX(object):
                         subprocess.call(cmd, shell=True)
                     else:
                         raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
-
-            for fx_mutant_name in fx_mutant_name_list:
-                path_output_pdbname_mutant = os.path.join(Paths.OUTPUT, pdbname, fx_mutant_name)
-                self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
+            #
+            # for fx_mutant_name in fx_mutant_name_list:
+            #     path_output_pdbname_mutant = os.path.join(Paths.OUTPUT, pdbname, fx_mutant_name)
+            #     self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
 
         def _write_ddG_csv_file(self, path_output_pdbname_mutant: str, pdbname: str, fx_mutant_name: str):
             """
@@ -140,6 +136,8 @@ class FoldX(object):
             ddG_2 = ''
             ddG_3 = ''
             path_output_dif_file = os.path.join(path_output_pdbname_mutant, FoldX().Strs.DIF_FXOUTFILE.value)
+            if not os.path.exists(path_output_dif_file):
+                print(path_output_dif_file + ' has not be written yet')
             with open(path_output_dif_file) as f:
                 dif_fxoutfile_lines = f.readlines()
             for line in dif_fxoutfile_lines:
@@ -168,20 +166,21 @@ class FoldX(object):
             :return:
             """
             path_output_pdbname_mutant = GUM._os_makedirs(path_output, Paths.DIR_BM.value, pdbname, fx_mutant_name)
-            GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_pdbname_mutant, overwrite=False)
+            GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_pdbname_mutant, files_only=True)
             return path_output_pdbname_mutant
 
-        def _make_fx_mutant_name_list(self, amino_acids: list, pdbname_chain_fasta: dict):
+        def _make_fx_mutant_name_list(self, amino_acids: list, pdbname_chain_startpos_fasta: dict):
             """
             :param amino_acids: Amino acids that (every residue in) the protein will be mutated to.
-            :param pdbname_chain_fasta: pdbname_underscore_chain and fasta sequence as key-value pair.
+            :param pdbname_chain_startpos_fasta: pdbname_underscore_chain and fasta sequence as key-value pair.
             :return: List of fx_style mutant names: concatenation of wtaa, chain, position and mutantaa.
             """
             fx_mutant_name_list = []
-            for pdbname_chain, fasta_sequence in pdbname_chain_fasta.items():
-                chain = pdbname_chain.split('_')[-1]
+            for pdbname_chain_startpos, fasta_sequence in pdbname_chain_startpos_fasta.items():
+                chain = pdbname_chain_startpos.split('_')[-2]
+                startpos = pdbname_chain_startpos.split('_')[-1]
                 for index, wt_aa in enumerate(fasta_sequence):
-                    position = index + 1
+                    position = index + int(startpos)
                     for mutant_aa in amino_acids:
                         fx_mutant_name_list.append(wt_aa + chain + str(position) + mutant_aa)
             return fx_mutant_name_list
