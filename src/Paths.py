@@ -151,7 +151,7 @@ class Paths(Enum):
         Paths.CONFIG_BMRUNSCRIPT = Paths.SE_CONFIG_BMRUNSCRIPT.value if use_cluster else \
             Paths.MC_CONFIG_BMRUNSCRIPT.value
         Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.LOCAL_INPUT.value
-        Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.MC_INPUT_FASTAS.value
+        Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.LOCAL_INPUT_FASTAS.value
         Paths.INPUT_MUTS_MULTIFASTAS_29611_1000 = Paths.SE_INPUT_MUTS_MULTIFASTAS_29611_1000.value if use_cluster else \
             Paths.LOCAL_INPUT_MUTS_MULTIFASTAS_29611_1000.value
         Paths.INPUT_29611_FASTAS_1000 = Paths.SE_INPUT_29611_FASTAS_1000.value if use_cluster else \
