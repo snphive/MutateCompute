@@ -87,6 +87,8 @@ class Paths(Enum):
             LOCAL_INPUT = os.path.join(LOCAL_PYPROJ, DIR_INPUT)
             LOCAL_INPUT_FASTAS = os.path.join(LOCAL_INPUT, DIR_FASTAS)
             LOCAL_INPUT_29611_FASTAS_1000 = os.path.join(LOCAL_INPUT, DIR_29611_FASTAS_1000)
+            LOCAL_INPUT_MUTS_MULTIFASTAS_29611_1000 = os.path.join(LOCAL_INPUT, DIR_MUTANTS_MULTIFASTAS,
+                                                                   DIR_29611_FASTAS_1000)
             LOCAL_OUTPUT = os.path.join(LOCAL_PYPROJ, DIR_OUTPUT)
             LOCAL_OUTPUT_FASTAS = os.path.join(LOCAL_OUTPUT, DIR_FASTAS)
             LOCAL_OUTPUT_BLASTP = os.path.join(LOCAL_OUTPUT, DIR_BLASTP)
@@ -115,6 +117,8 @@ class Paths(Enum):
             SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
             SE_INPUT_29611_FASTAS_1000 = os.path.join(SE_INPUT, DIR_29611_FASTAS_1000)
+            SE_INPUT_MUTS_MULTIFASTAS_29611_1000 = os.path.join(SE_INPUT, DIR_MUTANTS_MULTIFASTAS,
+                                                                DIR_29611_FASTAS_1000)
             SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
             SE_OUTPUT_FASTAS = os.path.join(SE_OUTPUT, DIR_FASTAS)
             SE_OUTPUT_BLASTP = os.path.join(SE_OUTPUT, DIR_BLASTP)
@@ -146,15 +150,17 @@ class Paths(Enum):
         Paths.CONFIG_BLST_JOBQ = Paths.SE_CONFIG_BLST_JOBQ.value
         Paths.CONFIG_BMRUNSCRIPT = Paths.SE_CONFIG_BMRUNSCRIPT.value if use_cluster else \
             Paths.MC_CONFIG_BMRUNSCRIPT.value
-        Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.LOCAL_PYPROJ_INPUT.value
+        Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.LOCAL_INPUT.value
         Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.MC_INPUT_FASTAS.value
+        Paths.INPUT_MUTS_MULTIFASTAS_29611_1000 = Paths.SE_INPUT_MUTS_MULTIFASTAS_29611_1000.value if use_cluster else \
+            Paths.LOCAL_INPUT_MUTS_MULTIFASTAS_29611_1000.value
         Paths.INPUT_29611_FASTAS_1000 = Paths.SE_INPUT_29611_FASTAS_1000.value if use_cluster else \
             Paths.LOCAL_INPUT_29611_FASTAS_1000.value
-        Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT.value
-        Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT_FASTAS.value
-        Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT_BLASTP.value
-        Paths.OUTPUT_AGADIR = Paths.SE_OUTPUT_AGADIR.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT_AGADIR.value
-        Paths.OUTPUT_BM = Paths.SE_OUTPUT_BM.value if use_cluster else Paths.LOCAL_PYPROJ_OUTPUT_BM.value
+        Paths.OUTPUT = Paths.SE_OUTPUT.value if use_cluster else Paths.LOCAL_OUTPUT.value
+        Paths.OUTPUT_FASTAS = Paths.SE_OUTPUT_FASTAS.value if use_cluster else Paths.LOCAL_OUTPUT_FASTAS.value
+        Paths.OUTPUT_BLASTP = Paths.SE_OUTPUT_BLASTP.value if use_cluster else Paths.LOCAL_OUTPUT_BLASTP.value
+        Paths.OUTPUT_AGADIR = Paths.SE_OUTPUT_AGADIR.value if use_cluster else Paths.LOCAL_OUTPUT_AGADIR.value
+        Paths.OUTPUT_BM = Paths.SE_OUTPUT_BM.value if use_cluster else Paths.LOCAL_OUTPUT_BM.value
         Paths.REPO_PDB_FASTA = Paths.SE_REPO_PDB_FASTA.value if use_cluster else Paths.MC_REPO_PDB_FASTA.value
         Paths.REPO_PDBS = Paths.SE_REPO_PDBS.value if use_cluster else Paths.MC_REPO_PDBS.value
         Paths.REPO_FASTAS = Paths.SE_REPO_FASTAS.value if use_cluster else Paths.MC_REPO_FASTAS.value
