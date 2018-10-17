@@ -68,7 +68,7 @@ class Biopy(object):
                               hitlist_size=Biopy.BlastParam.MAX_HIT_5.value)
 
     @staticmethod
-    def parse_filter_blastp_xml_to_dict(path_qblast: str, fastafile_name: str, path_fastafile: str):
+    def parse_filter_blastp_xml_to_dict(path_qblast: str, fastafilename: str, path_fastafile: str):
         """
         Parses qblast result and filters (assigns to a data structure) only those fields that are of interest.
         #
@@ -78,7 +78,7 @@ class Biopy(object):
         # NOTE: Time taken for this remote qblast for sequence 1_A.fasta was about 20 seconds.
         # NOTE: The query sequence id is also the filename and is used here for the name of the output xml.
         :param path_qblast: Absolute path to the output xml file.
-        :param fastafile_name: Name of fastafile (without .fasta extension).
+        :param fastafilename: Name of fastafile (without .fasta extension).
         :param path_fastafile: Abs path to fastafile (used downstream to spot any seq length anomalies).
         :return: Data structure of the elements of the qblast result that are considered here to be pertinent.
         """
@@ -90,13 +90,12 @@ class Biopy(object):
             database_seqs_num = blast_record.database_sequences
             alignments = blast_record.alignments
         print('\n..._build_identical_alignments_list for  #############################################################'
-              + fastafile_name)
-        qblast_dict = {'query_seq_id': fastafile_name,
-                        'query_length': query_length,
-                        'database': database_used,
-                        'database_seqs_num': database_seqs_num,
-                        'identical_aligns_list': Biopy._build_identical_alignments_list(
-                        query_length, alignments)}
+              + fastafilename)
+        qblast_dict = {'query_seq_id': fastafilename,
+                       'query_length': query_length,
+                       'database': database_used,
+                       'database_seqs_num': database_seqs_num,
+                       'identical_aligns_list': Biopy._build_identical_alignments_list(query_length, alignments)}
         Biopy._warn_if_discrepancies_in_query_seq_length(qblast_dict, query_length, query_letters, path_fastafile)
         return qblast_dict
 
@@ -122,7 +121,8 @@ class Biopy(object):
             for hsp in alignment.hsps:
                 if len(identical_aligns_list) > 1:
                     break
-                is_identical = hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities
+                is_identical = hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == \
+                               hsp.identities
                 if is_identical:
                     alignment_dict['accession_num'] = alignment.accession
                     alignment_dict['length'] = alignment.length
