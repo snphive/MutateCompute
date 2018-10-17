@@ -110,14 +110,14 @@ class GUM(object):
                     protein_chains.append(protein_chain)
         return protein_chains
 
-    """
-    :param input: Any string that you want to trim.
-    :param prefix: The prefix you want to remove from the input string.
-    :param suffix: The suffix you want to remove from the input string.
-    :return: str, input with specified prefix/suffix removed.
-    """
     @staticmethod
     def _remove_prefix_and_suffix(input: str, prefix: str, suffix: str):
+        """
+        :param input: Any string that you want to trim.
+        :param prefix: The prefix you want to remove from the input string.
+        :param suffix: The suffix you want to remove from the input string.
+        :return: str, input with specified prefix/suffix removed.
+        """
         trimmed = input
         if input.startswith(prefix):
             trimmed = input.replace(prefix, '')
@@ -125,14 +125,14 @@ class GUM(object):
             trimmed = trimmed.replace(suffix, '')
         return trimmed
 
-    """
-    Originally used in solubis.py but not used at the moment in this project. Keeping as may be useful.
-    Reads a fastafile for the sequence part only (not including the >title).
-    :param path_fastafile: Absolute path to the fasta file, including fasta file itself (incl. .fasta ext).
-    :return: str, FASTA sequence
-    """
     @staticmethod
     def get_sequenceOnly_from_fastafile(path_fastafile: str):
+        """
+        Originally used in solubis.py but not used at the moment in this project. Keeping as may be useful.
+        Reads a fastafile for the sequence part only (not including the >title).
+        :param path_fastafile: Absolute path to the fasta file, including fasta file itself (incl. .fasta ext).
+        :return: str, FASTA sequence
+        """
         with open(path_fastafile, 'r') as fastafile_opened:
             fastafile_lines = fastafile_opened.readlines()
             fasta_seq = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
@@ -147,14 +147,14 @@ class GUM(object):
     #   leaf1       leaf2       leaf3
     #
     #####################################################################################################
-    """
-    See above for description.
-    :param path_root: The path to the root (ideally absolute), "/path/of/root"
-    :param args: list or list of str. Name or list of names of directory to add to root only.
-    :return: list of str, complete paths of newly made directory tree.
-    """
     @staticmethod
     def create_dir_tree_one_level(path_root: str, *args):
+        """
+        See above for description.
+        :param path_root: The path to the root (ideally absolute), "/path/of/root"
+        :param args: list or list of str. Name or list of names of directory to add to root only.
+        :return: list of str, complete paths of newly made directory tree.
+        """
         complete_paths = []
         if not os.path.exists(path_root):
             os.makedirs(path_root)
@@ -188,14 +188,14 @@ class GUM(object):
     # It does not create duplicates and does not raise any errors or exceptions.
     #
     # NOTE: os.makedirs(path) does the same thing but throws an exception if the path already exists.
-    """
-    See above for description.
-    :param path_root: The path to the root (ideally absolute), "/path/of/root"
-    :param leaves: list or list of str. Name or list of names of directory to add to root, then root-leaf.
-    :return: str, complete path of newly made directory tree.
-    """
     @staticmethod
     def create_dir_tree(path_root: str, *leaves):
+        """
+        See above for description.
+        :param path_root: The path to the root (ideally absolute), "/path/of/root"
+        :param leaves: list or list of str. Name or list of names of directory to add to root, then root-leaf.
+        :return: str, complete path of newly made directory tree.
+        """
         if not os.path.exists(path_root):
             os.makedirs(path_root)
         for leaf in leaves:
@@ -205,14 +205,14 @@ class GUM(object):
             path_root = path_root_leaf
         return path_root
 
-    """
-    :param path_root:
-    :param new_dirs:
-    :return: str, newly-made directory tree.
-    """
     # From 07Aug, started phasing in use os.makedirs() instead of my own create_dir_tree() method.
     @staticmethod
     def _os_makedirs(path_root: str, *new_dirs):
+        """
+        :param path_root:
+        :param new_dirs:
+        :return: str, newly-made directory tree.
+        """
         path_root_newdirs = os.path.join(path_root, *new_dirs)
         try:
             os.makedirs(path_root_newdirs)
@@ -220,18 +220,18 @@ class GUM(object):
             print(Str.PARTALLPATHEXISTS_MSG.value)
         return path_root_newdirs
 
-    """
-    Copy a chosen number of files (1000 by default) of specified file type from a single, named src dir to a named
-    dst dir, but inside newly-made subfolders named '1...1000' for example to store the first 1000 files.
-    :param path_src_dir: Absolute path of source dir for files to copy from.
-    :param path_dst_dir: Absolute path of destination dir for files to copy to.
-    :param file_extension: File extension of files to copy.
-    :param starting_num: Number of first file to copy from sorted src dir to dst subdir.
-    :param num_to_copy_per_subdir: Number of files to copy. Default of 1000.
-    """
     @staticmethod
     def copy_files_to_3dot_dir(path_src_dir: str, path_dst_dir: str, file_extension: str, starting_num: int,
                                num_to_copy_per_subdir=1000):
+        """
+        Copy a chosen number of files (1000 by default) of specified file type from a single, named src dir to a named
+        dst dir, but inside newly-made subfolders named '1...1000' for example to store the first 1000 files.
+        :param path_src_dir: Absolute path of source dir for files to copy from.
+        :param path_dst_dir: Absolute path of destination dir for files to copy to.
+        :param file_extension: File extension of files to copy.
+        :param starting_num: Number of first file to copy from sorted src dir to dst subdir.
+        :param num_to_copy_per_subdir: Number of files to copy. Default of 1000.
+        """
         # path_sorted_file_list = natsort.natsorted(glob.glob(path_src_dir + '/*' + file_extension))
         path_sorted_file_list = sorted(glob.glob(path_src_dir + '/*' + file_extension))
         subdir = file_extension.strip('.') + 's_'
@@ -247,28 +247,32 @@ class GUM(object):
             except OSError:
                 print(Str.PROBLNXCMD_MSG.value + cmd)
 
-    # Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
-    # Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
-    # :param path_dst_dir: Absolute path to destination directory.
-    # :param start_num: Starting number of 3dot dir, e.g. 1 in the dir name 1...100
-    # :param end_num: Ending number of 3dot dir, e.g. 100 in the dir name 1...100
-    # :return: str, Absolute path of newly made 3dot directory.
     @staticmethod
     def _make_path_3dot_dir(path_dst_dir: str, start_num: int, end_num: int):
+        """
+        Builds a subfolder to house the specified number of pdbs. E.g. if total num to copy is 100 and starting_num is 1:
+        Folder will be name "1...100". But if starting_num is 20025, folder will get name "20025...20125"
+        :param path_dst_dir: Absolute path to destination directory.
+        :param start_num: Starting number of 3dot dir, e.g. 1 in the dir name 1...100
+        :param end_num: Ending number of 3dot dir, e.g. 100 in the dir name 1...100
+        :return: str, Absolute path of newly made 3dot directory.
+        """
         return GUM._os_makedirs(path_dst_dir, str(start_num) + Str.DOTS3.value + str(end_num))
 
-    # Copies the 3dot subdir from the source dir (path_fastafile) and builds a dst dir with the same 3dots subdir.
-    # This method is currently only used for bls -luilding output dir for MutateFasta.
-    # Expects path_fastafile to be: ~/PycharmProjects/MutateCompute/input_data/fastas/1...1000/1_A/1_A.fasta
-    # or ~/PycharmProjects/MutateCompute/input_data/29611_fastas_1000/1...1000/00bdkjhi09234kjn3349_4234.fasta, for
-    # example.
-    # As such it builds path of child subdirs of /fastas upto the 1...1000 3dots folder name, not including any
-    # subdirs from there down, such as /<filename>/filename.fasta or just /filename.fasta.
-    # :param path_dst_root: Absolute path of root to new directory being made (destination dir).
-    # :param path_fastafile: Absolute path of file that contain the subdir names to be copied to dst dir.
-    # :return: str, Absolute path of newly-made directory tree.
     @staticmethod
     def make_root_fastas_3dots_dirs(path_dst_root: str, path_fastafile: str):
+        """
+        Copies the 3dot subdir from the source dir (path_fastafile) and builds a dst dir with the same 3dots subdir.
+        This method is currently only used for bls -luilding output dir for MutateFasta.
+        Expects path_fastafile to be: ~/PycharmProjects/MutateCompute/input_data/fastas/1...1000/1_A/1_A.fasta
+        or ~/PycharmProjects/MutateCompute/input_data/29611_fastas_1000/1...1000/00bdkjhi09234kjn3349_4234.fasta, for
+        example.
+        As such it builds path of child subdirs of /fastas upto the 1...1000 3dots folder name, not including any
+        subdirs from there down, such as /<filename>/filename.fasta or just /filename.fasta.
+        :param path_dst_root: Absolute path of root to new directory being made (destination dir).
+        :param path_fastafile: Absolute path of file that contain the subdir names to be copied to dst dir.
+        :return: str, Absolute path of newly-made directory tree.
+        """
         dirs_in_path_fastafile = path_fastafile.split('/')
         path_fastas_3dots_dirs = []
         copy_from_here = False
@@ -284,12 +288,14 @@ class GUM(object):
                     break
         return GUM._os_makedirs(path_dst_root, '/'.join(path_fastas_3dots_dirs))
 
-    # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
-    # This method is currently only used for building output dir for Agadir.
-    # Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
-    # It builds: path_root/agadir/<3dots dir>/<any other subdirs between 3dots_dir and [-3] although none are expected.
     @staticmethod
-    def make_root_agadir_3dots_dirs(path_root, path_fastafile):
+    def make_root_agadir_3dots_dirs(path_root: str, path_fastafile: str):
+        """
+        Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
+        This method is currently only used for building output dir for Agadir.
+        Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
+        It builds: path_root/agadir/<3dots dir>/<any other subdirs between 3dots_dir and [-3] although none are expected.
+        """
         path_fastafile_list = path_fastafile.split('/')
         path_agadir_3dots_dirs = []
         copy_from_here = False
@@ -305,13 +311,15 @@ class GUM(object):
                 path_agadir_3dots_dirs.append(path_dir)
         return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
 
-    # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
-    # This method is currently only used for building output dir for Agadir.
-    # Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
-    # It builds: path_root/agadir/<3dots dir>/<filename>/<mutants>
-    # (includes <any other subdirs between 3dots_dir and [-3] although none are expected.)
     @staticmethod
-    def make_root_agadir_3dots_filename_mutants_dirs(path_root, path_fastafile):
+    def make_root_agadir_3dots_filename_mutants_dirs(path_root: str, path_fastafile: str):
+        """
+        Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
+        This method is currently only used for building output dir for Agadir.
+        Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
+        It builds: path_root/agadir/<3dots dir>/<filename>/<mutants>
+        (includes <any other subdirs between 3dots_dir and [-3] although none are expected.)
+        """
         path_fastafile_list = path_fastafile.split('/')
         path_agadir_3dots_dirs = []
         copy_from_here = False
@@ -327,13 +335,18 @@ class GUM(object):
                 path_agadir_3dots_dirs.append(path_dir)
         return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
 
-    # Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
-    # This method is currently only used for building input dir for individual fastafiles.
-    # Expects path_fastafile to be: ~/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/mutants/1_A_mutants.fasta
-    # As such it builds path of child subdirs of output_data/mutant_fastas upto but not including
-    # /1_A/mutants/1_A_mutants.fasta
     @staticmethod
-    def make_root_3dots_dirs(path_root, path_fastafile):
+    def make_root_3dots_dirs(path_root: str, path_fastafile: str):
+        """
+        Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
+        This method is currently only used for building input dir for individual fastafiles.
+        Expects path_fastafile to be: ~/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/mutants/1_A_mutants.fasta
+        As such it builds path of child subdirs of output_data/mutant_fastas upto but not including
+        /1_A/mutants/1_A_mutants.fasta
+        :param path_root:
+        :param path_fastafile:
+        :return:
+        """
         path_fastafile_list = path_fastafile.split('/')
         path_input_3dots_dirs = []
         copy_from_here = False
@@ -354,15 +367,14 @@ class GUM(object):
     # THEMSELVES, I.E. THE GLOB.GLOB COULD BE DONE WITHIN THE LINUX COPY METHOD RATHER THAN OUTSIDE BUT THIS COULD
     # ALSO INDICATE THAT HAVING TWO SEPARATE LINUX COPY METHODS MIGHT STILL BE WORTH HAVING RATHER THAN JUST ONE.
 
-    # Copies all files inside specified src dir. Does not include the folder itself.
-    #
-    # path_src_dir      String      Abs path of source directory to copy files from.
-    # path_dst_dir      String      Abs path of destination directory to copy files to.
-    # recursively       Boolean     True to copy all files in current directory and all files in all subdirectories.
-    #
-    # NOTE: current cp command specifies not to overwrite existing files, not recursively
     @staticmethod
-    def linux_copy_all_files_in_dir(path_src_dir, path_dst_dir, recursively=False, files_only=False):
+    def linux_copy_all_files_in_dir(path_src_dir: str, path_dst_dir: str, recursively=False, files_only=False):
+        """
+        :param path_src_dir: Absolute path of source directory to copy files from.
+        :param path_dst_dir: Absolute path of destination directory to copy files to.
+        :param recursively: True to copy all files in current directory and all files in all subdirectories.
+        :param files_only: True to copy all files only, not with folders (not sure this is functional).
+        """
         recurse_option = '-r' if recursively else ''
         path_src_dir = path_src_dir + Str.FSLSH_ASTRX.value if files_only else path_src_dir
         cmd = 'cp' + Str.SPCE.value + recurse_option + Str.SPCE.value + path_src_dir + Str.SPCE.value + path_dst_dir
@@ -373,7 +385,12 @@ class GUM(object):
 
     # NOTE: current cp command specifies not to overwrite existing files.
     @staticmethod
-    def linux_copy_files(path_src_filelist, path_dst, into_own_subdirs):
+    def linux_copy_files(path_src_filelist: str, path_dst: str, into_own_subdirs: bool):
+        """
+        :param path_src_filelist:
+        :param path_dst:
+        :param into_own_subdirs:
+        """
         if isinstance(path_src_filelist, str):
             path_src_filelist = [path_src_filelist]
         for path_src_file in path_src_filelist:
@@ -389,7 +406,11 @@ class GUM(object):
                 print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
-    def linux_copy_specified_files(path_src_files, path_dst_dir):
+    def linux_copy_specified_files(path_src_files: str, path_dst_dir: str):
+        """
+        :param path_src_files:
+        :param path_dst_dir:
+        """
         if isinstance(path_src_files, str):
             path_src_files = [path_src_files]
         for path_src_file in path_src_files:
@@ -399,12 +420,13 @@ class GUM(object):
             except OSError:
                 print(Str.PROBLNXCMD_MSG.value + cmd)
 
-    # Finds files in the immediate specified directory, creates a subdir with same name as the file and moves the file
-    # into this new subdirectory.
-    #
-    # path_dir    String      Abs path of files that will each be moved into their own subdir with same name.
     @staticmethod
-    def _move_files_into_own_subdirs(path_dir):
+    def _move_files_into_own_subdirs(path_dir: str):
+        """
+        Finds files in the immediate specified directory, creates a subdir with same name as the file and moves the file
+        into this new subdirectory.
+        :param path_dir: Absolute path of files that will each be moved into their own subdir with same name.
+        """
         path_files_in_dir = glob.glob(path_dir + '/*.*')
         for path_file_in_dir in path_files_in_dir:
             if os.path.isfile(path_file_in_dir):
@@ -417,7 +439,10 @@ class GUM(object):
                     print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
-    def linux_remove_all_files_in_dir(path_dir):
+    def linux_remove_all_files_in_dir(path_dir: str):
+        """
+        :param path_dir:
+        """
         cmd = 'rm' + Str.SPCE.value + path_dir + "/*"
         try:
             subprocess.call(cmd, shell=True)
@@ -425,7 +450,11 @@ class GUM(object):
             print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
-    def linux_remove_file(path_dst_mutant_file):
+    def linux_remove_file(path_dst_mutant_file: str):
+        """
+        :param path_dst_mutant_file:
+        """
+
         if not os.path.exists(path_dst_mutant_file):
             print('Path: ' + path_dst_mutant_file + ' does not exist.')
         else:
@@ -468,27 +497,25 @@ class GUM(object):
     # def do_something():
     #     run(COMMAND)
 
-    # Copy files from a source repository subdirectory to destination directory.
-    # Src dir typically               ~/REPO_PDB_FASTA/fastas/fastas_1000/1...1000/filename.fasta
-    # Dst dir typically ~/PycharmProjects/MutateCompute/input_data/fastas/1...1000/<filename>/filename.fasta
-    #
-    # 1. Removes any files from wanted list that are not found in the source directory.
-    # 2. Creates new <filename> subdir for each file: e.g. /input_data/<filename> subdirs in dst dir for each file
-    # 3. Copies each file to its new corresponding subdir.
-    #
-    # path_repo_pdbs_or_fastas      String      Abs path of repository subdir from which to copy pdb or fasta files.
-    #                                           It is a subdir of REPO_PDB_FASTA which itself contains only directories
-    #                                           of files (not files).
-    # path_dst_dir                  String      Path of dest dir to which the specified pdbfiles or fastafiles are
-    #                                           copied, via (creating) individual subdirs for each, bearing same name.
-    #                                           Typically /input_data/fastas or just /input_data. If the latter, then
-    #                                           /fastas will be created as subdir of /input_data.
-    # wanted_file_list              List        A subset of files that you want, specified by name (incl. file ext).
-    #
-    # Returns wanted_file_list containing only those files that were found in, and copied from, the path_repo src dir.
     @staticmethod
-    def copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas, path_dst_dir, wanted_file_list):
-        if not wanted_file_list:
+    def copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas: str, path_dst_dir: str, wanted_files: list):
+        """
+        Copy files from a source repository subdirectory to destination directory.
+        Src dir typically               ~/REPO_PDB_FASTA/fastas/fastas_1000/1...1000/filename.fasta
+        Dst dir typically ~/PycharmProjects/MutateCompute/input_data/fastas/1...1000/<filename>/filename.fasta
+
+        1. Removes any files from wanted list that are not found in the source directory.
+        2. Creates new <filename> subdir for each file: e.g. /input_data/<filename> subdirs in dst dir for each file
+        3. Copies each file to its new corresponding subdir.
+        :param path_repo_pdbs_or_fastas: Absolute path of repository subdir from which to copy pdb or fasta files. It 
+        is a subdir of REPO_PDB_FASTA which itself contains only directories of files (not files).
+        :param path_dst_dir: Path of dest dir to which the specified pdbfiles or fastafiles are copied, via (creating)
+        individual subdirs for each, bearing same name. Typically /input_data/fastas or just /input_data. If the latter,
+        then /fastas will be created as subdir of /input_data.
+        :param wanted_files: A subset of files that you want, specified by name (incl. file ext).
+        :return: wanted_files containing only those files that were found in, and copied from, the path_repo src dir.
+        """
+        if not wanted_files:
             return
         path_repo_pdbs_or_fastas_list = path_repo_pdbs_or_fastas.split('/')
         path_dst_subdirs = []
@@ -503,10 +530,10 @@ class GUM(object):
         path_dst_dir = GUM._os_makedirs(path_dst_dir, *path_dst_subdirs)
         path_input_fastafile_list = []
         path_available_file_list = GUM.get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas)
-        for wanted_file in wanted_file_list:
+        for wanted_file in wanted_files:
             path_wantedfile = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
             if path_wantedfile not in path_available_file_list:
-                wanted_file_list.remove(wanted_file)
+                wanted_files.remove(wanted_file)
             else:
                 path_file_to_copy = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
                 into_own_subdirs = True
@@ -514,13 +541,17 @@ class GUM(object):
                 path_input_fastafile_list.append(GUM._build_path_filelist(path_dst_dir, wanted_file, into_own_subdirs))
         return path_input_fastafile_list
 
-    # Currently only used for Agadir.
-    # Reads the multi-fastafiles that are in output_data (to which MutateFasta wrote them), and writes the fastafiles
-    # as individual fastafiles in the (because that's how I assume agadirwrapper expects them, though I could be wrong).
-    # The dst dir (path_dst_filename) is ~/PycharmProjects/input_data/mutants_fastas/1...1000/1_A if local;
-    #  /switchlab/group/shazib/SnpEffect/input_data/mutants_fastas/1...1000/1_A if on zeus cluster.
     @staticmethod
-    def write_1_fastafile_per_fasta_from_multifastafile(path_dst, path_fastafile):
+    def write_1_fastafile_per_fasta_from_multifastafile(path_dst: str, path_fastafile: str):
+        """
+        Currently only used for Agadir.
+        Reads the multi-fastafiles that are in output_data (to which MutateFasta wrote them), and writes the fastafiles
+        as individual fastafiles in the (because that's how I assume agadirwrapper expects them, though I could be
+        wrong). The dst dir (path_dst_filename) is ~/PycharmProjects/input_data/mutants_fastas/1...1000/1_A if local;
+         /switchlab/group/shazib/SnpEffect/input_data/mutants_fastas/1...1000/1_A if on zeus cluster.
+        :param path_dst:
+        :param path_fastafile:
+        """
         fasta_str = ''
         fastafile = ''
         is_first_line = True
@@ -538,12 +569,23 @@ class GUM(object):
                     fasta_str += line
 
     @staticmethod
-    def _build_path_filelist(path_root, file, into_own_subdirs):
-        filename = file.split('.')[0] if into_own_subdirs else ''
-        return GUM._os_makedirs(path_root, filename, file)
+    def _build_path_filelist(path_root: str, filename: str, into_own_subdirs: bool):
+        """
+        :param path_root:
+        :param filename:
+        :param into_own_subdirs:
+        :return:
+        """
+        filename = filename.split('.')[0] if into_own_subdirs else ''
+        return GUM._os_makedirs(path_root, filename, filename)
 
     @staticmethod
-    def get_subdirname_starting_with(path, starting_with):
+    def get_subdirname_starting_with(path: str, starting_with: str):
+        """
+        :param path:
+        :param starting_with:
+        :return:
+        """
         dirnames = []
         dirname = ''
         for dir_tuple in os.walk(path):
@@ -555,20 +597,24 @@ class GUM(object):
             raise ValueError('No directory with a name starting with ' + starting_with + ' was found in ' + path)
         return dirname
 
-    # The repo directory structure is expected to be /REPO_PDB_FASTA/pdbs_<number> and /REPO_PDB_FASTA/fastas_<number>.
-    # Note: It assumes only 1 PDB and 1 FASTA subdirectory. If there is more than 1, they won't be seen.
-    #
-    # path_repo_pdbs_or_fastas  String          Absolute path of the source repository directory.
-    #
-    # Returns full list of pdbfiles or fastafiles from one of two subdirectories that should be in REPO_PDB_FASTA.
     @staticmethod
-    def get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas):
+    def get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas: str):
+        """
+        The repo directory structure is expected to be /REPO_PDB_FASTA/pdbs_<number> and /REPO_PDB_FASTA/fastas_<number>.
+        Note: It assumes only 1 PDB and 1 FASTA subdirectory. If there is more than 1, they won't be seen.
+        :param path_repo_pdbs_or_fastas: Absolute path of the source repository directory.
+        :return: Full list of pdbfiles or fastafiles from one of two subdirectories that should be in REPO_PDB_FASTA.
+        """
         file_ext = Str.PDBEXT.value if (Paths.DIR_PDBS.value in path_repo_pdbs_or_fastas) else Str.FSTAEXT.value
         filelist = glob.glob(path_repo_pdbs_or_fastas + '/*' + file_ext)
         return filelist
 
     @staticmethod
-    def get_3dots_dir(path_with_3dots):
+    def get_3dots_dir(path_with_3dots: str):
+        """
+        :param path_with_3dots:
+        :return:
+        """
         dir_3dots = ''
         for this_dir in path_with_3dots.split('/'):
             if Str.DOTS3.value in this_dir:
@@ -576,70 +622,96 @@ class GUM(object):
                 break
         return dir_3dots
 
-    # Note use of list comprehension.
+    # Note the use of list comprehension.
     @staticmethod
-    def make_filelist_in_current_dir_and_subdirs_recursively(path_current_dir, dot_file_ext):
+    def make_filelist_in_current_dir_and_subdirs_recursively(path_current_dir: str, dot_file_ext: str):
+        """
+        :param path_current_dir:
+        :param dot_file_ext:
+        :return:
+        """
         my_list = glob.glob(path_current_dir + '/**/*' + dot_file_ext, recursive=True)
         return [my_file.split('/')[-1] for my_file in my_list]
 
     @staticmethod
     def using_cluster():
+        """
+        :return: True if current working directory is the cluster, based on presence of string "switchlab".
+        """
         return 'switchlab' in os.getcwd()
 
-    ######################################################################################################################
+    ###################################################################################################################
 
-    # Permanently removes input_data and all contents!
     @staticmethod
     def remove_inputdata_dir_tree():
+        """
+        Permanently removes input_data and all contents!
+        """
         path_to_delete = Paths.INPUT.value
-        GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=332)
+        GUM.give_userWarning_deleting_dir(directoryname=path_to_delete, lineno=332)
         if os.path.exists(path_to_delete):
             GUM.__delete_subdirectory_tree_of_inputdata()
 
-    # Permanently removes output_data and all contents!
     @staticmethod
     def remove_output_dirs():
+        """
+        Permanently removes output_data and all contents!
+        """
         path_to_delete = Paths.OUTPUT.value
-        GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=340)
+        GUM.give_userWarning_deleting_dir(directoryname=path_to_delete, lineno=340)
         if os.path.exists(path_to_delete):
             GUM.__delete_subdirectory_tree_of_outputdata()
 
-    # Permanently removes config and all contents!
     @staticmethod
     def remove_config_folders():
+        """
+        Permanently removes config and all contents!
+        """
         path_to_delete = Paths.CONFIG.value
-        GUM.do_userWarning_deleting_dir(dir=path_to_delete, lineno=348)
+        GUM.give_userWarning_deleting_dir(directoryname=path_to_delete, lineno=348)
         if os.path.exists(path_to_delete):
             GUM.__delete_subdirectory_tree_of_outputdata()
 
     @staticmethod
-    def do_userWarning_deleting_dir(dir, lineno):
-        warnings.warn_explicit(message='You are about to delete ' + dir + 'dir tree. You have 10 secs to abort!',
-                               category=UserWarning, filename='GeneralUtilityMethods.py', lineno=lineno)
+    def give_userWarning_deleting_dir(directoryname: str, lineno: int):
+        """
+        :param directoryname:
+        :param lineno:
+        :return:
+        """
+        warnings.warn_explicit(message='You are about to delete ' + directoryname + 'dir tree. You have 10 secs to '
+                                                                                    'abort!', category=UserWarning,
+                               filename='GeneralUtilityMethods.py', lineno=lineno)
         time.sleep(10)
 
     # PRIVATE METHOD
-    # Permanently deletes /config and all its contents.
     @staticmethod
     def __delete_subdirectory_tree_of_config():
+        """
+        Permanently deletes /config and all its contents.
+        """
         try:
             shutil.rmtree(Paths.CONFIG.value)
         except OSError as e:
             print("Error removing: %s - %s." % (e.filename, e.strerror))
 
     # PRIVATE METHOD
-    # Permanently deletes /input_data and all its contents.
     @staticmethod
     def __delete_subdirectory_tree_of_inputdata():
+        """
+        Permanently deletes /input_data and all its contents.
+        """
         try:
             shutil.rmtree(Paths.INPUT.value)
         except OSError as e:
             print("Error removing: %s - %s." % (e.filename, e.strerror))
 
     # PRIVATE METHOD
-    # Permanently deletes /output_data and all its contents.
     @staticmethod
     def __delete_subdirectory_tree_of_outputdata():
+        """
+        Permanently deletes /output_data and all its contents.
+        """
         try:
             shutil.rmtree(Paths.OUTPUT.value)
         except OSError as e:
