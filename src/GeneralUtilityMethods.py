@@ -7,7 +7,6 @@ import time
 import warnings
 from src.Str import Str
 from natsort import natsort
-
 from src.AminoAcids import AA
 from src.Paths import Paths
 # import pydevd
@@ -319,6 +318,9 @@ class GUM(object):
         Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
         It builds: path_root/agadir/<3dots dir>/<filename>/<mutants>
         (includes <any other subdirs between 3dots_dir and [-3] although none are expected.)
+        :param path_root:
+        :param path_fastafile:
+        :return:
         """
         path_fastafile_list = path_fastafile.split('/')
         path_agadir_3dots_dirs = []
@@ -423,8 +425,8 @@ class GUM(object):
     @staticmethod
     def _move_files_into_own_subdirs(path_dir: str):
         """
-        Finds files in the immediate specified directory, creates a subdir with same name as the file and moves the file
-        into this new subdirectory.
+        Finds files in the immediate specified directory, creates a subdir with same name as the file and moves the
+        file into this new subdirectory.
         :param path_dir: Absolute path of files that will each be moved into their own subdir with same name.
         """
         path_files_in_dir = glob.glob(path_dir + '/*.*')
@@ -466,36 +468,6 @@ class GUM(object):
                 print(fnf)
             except OSError:
                 print(Str.PROBLNXCMD_MSG.value + cmd)
-
-    # Might be better to log in manually, as this can hang if mulitplexing is used.
-    # @staticmethod
-    # def log_in_cluster_ssh(*modules):
-        # HOST = "zeus.psb.ugent.be"
-        # # Ports are handled in ~/.ssh/config since we use OpenSSH
-        # COMMAND = "-p 7788 shazib"
-        # Ports are handled in ~/.ssh/config since we use OpenSSH
-        # ssh = subprocess.Popen(["ssh", "%s" % HOST, COMMAND], shell=False, stdout=subprocess.PIPE,
-        # stderr=subprocess.PIPE)
-        # result = ssh.stdout.readlines()
-        # if result == []:
-        #     error = ssh.stderr.readlines()
-        #     print("ERROR: %s" % error, file=sys.stderr)
-        # else:
-        #     print(result)
-
-    # or use fabric??
-    # import os
-    # from fabric.api import *
-    #
-    # HOST="www.example.org"
-    # COMMAND="uname -a"
-    #
-    # env.user = os.getenv('SSH_USER', 'vagrant')
-    # env.password = os.getenv('SSH_PASSWORD', 'vagrant')
-    #
-    # @hosts(HOST)
-    # def do_something():
-    #     run(COMMAND)
 
     @staticmethod
     def copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas: str, path_dst_dir: str, wanted_files: list):
@@ -732,3 +704,33 @@ class GUM(object):
     #         job.get()
     #     # clean up
     #     pool.close()
+
+    # Might be better to log in manually, as this can hang if mulitplexing is used.
+    # @staticmethod
+    # def log_in_cluster_ssh(*modules):
+        # HOST = "zeus.psb.ugent.be"
+        # # Ports are handled in ~/.ssh/config since we use OpenSSH
+        # COMMAND = "-p 7788 shazib"
+        # Ports are handled in ~/.ssh/config since we use OpenSSH
+        # ssh = subprocess.Popen(["ssh", "%s" % HOST, COMMAND], shell=False, stdout=subprocess.PIPE,
+        # stderr=subprocess.PIPE)
+        # result = ssh.stdout.readlines()
+        # if result == []:
+        #     error = ssh.stderr.readlines()
+        #     print("ERROR: %s" % error, file=sys.stderr)
+        # else:
+        #     print(result)
+
+    # or use fabric??
+    # import os
+    # from fabric.api import *
+    #
+    # HOST="www.example.org"
+    # COMMAND="uname -a"
+    #
+    # env.user = os.getenv('SSH_USER', 'vagrant')
+    # env.password = os.getenv('SSH_PASSWORD', 'vagrant')
+    #
+    # @hosts(HOST)
+    # def do_something():
+    #     run(COMMAND)
