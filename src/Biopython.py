@@ -123,18 +123,25 @@ class Biopy(object):
                                hsp.identities
                 if is_identical:
                     alignment_dict = Biopy._assign_alignment_and_hsp_values(alignment_dict, alignment, hsp)
-                    print('\nis_identical is True with these values: \nhsp.expect:' + str(hsp.expect) + '\nhsp.gaps:' +
-                          str(hsp.gaps) + '\nquery_length:' + str(query_length) + '\nhsp.align_length:' +
-                          str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities) + '\nhsp.sbjct_end:' +
-                          str(hsp.sbjct_end) + '\nhsp.sbjct_start:' + str(hsp.sbjct_start))
+                    print('\nis_identical is True with these values: '
+                          '\nhsp.expect:' + str(hsp.expect) +
+                          '\nhsp.gaps:' + str(hsp.gaps) +
+                          '\nquery_length:' + str(query_length) +
+                          '\nhsp.align_length:' + str(hsp.align_length) +
+                          '\nhsp.identities:' + str(hsp.identities) +
+                          '\nhsp.sbjct_end:' + str(hsp.sbjct_end) +
+                          '\nhsp.sbjct_start:' + str(hsp.sbjct_start))
                 else:
-                    print('\nis_identical is False with these values: \nhsp.expect:' + str(hsp.expect) + '\nhsp.gaps:'
-                          + str(hsp.gaps) + '\nquery_length:' + str(query_length) + '\nhsp.align_length:' +
-                          str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities) + '\nhsp.sbjct_end:' +
-                          str(hsp.sbjct_end) + '\nhsp.sbjct_start:' + str(hsp.sbjct_start))
+                    print('\nis_identical is False with these values: '
+                          '\nhsp.expect:' + str(hsp.expect) +
+                          '\nhsp.gaps:' + str(hsp.gaps) +
+                          '\nquery_length:' + str(query_length) +
+                          '\nhsp.align_length:' + str(hsp.align_length) +
+                          '\nhsp.identities:' + str(hsp.identities) +
+                          '\nhsp.sbjct_end:' + str(hsp.sbjct_end) +
+                          '\nhsp.sbjct_start:' + str(hsp.sbjct_start))
                     if not identical_aligns_list:
                         alignment_dict = Biopy._assign_alignment_and_hsp_values(alignment_dict, alignment, hsp)
-
             if is_identical:
                 identical_aligns_list.append(alignment_dict)
             else:
@@ -146,10 +153,15 @@ class Biopy(object):
                     Biopy.logger.info('No identical alignments for this sequence, according to criteria: '
                                       'hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == '
                                       'hsp.identities. Therefore this blastp is not 100 % identical. '
-                                      '\nFastafilename: ' + fastafilename + '\nAccession_num: ' +
-                                      alignment_dict['accession_num'] + '\nhsp_gaps: ' + str(hsp.gaps) +
-                                      '\nhsp_expect: ' + str(hsp.expect) + '\nhsp_align_length: ' +
-                                      str(hsp.align_length) + '\nquery_length: ' + str(query_length))
+                                      '\nFastafilename: ' + fastafilename +
+                                      '\nAccession_num: ' + alignment_dict['accession_num'] +
+                                      '\nhsp_expect: ' + str(hsp.expect) +
+                                      '\nhsp_gaps: ' + str(hsp.gaps) +
+                                      '\nquery_length: ' + str(query_length) +
+                                      '\nhsp_align_length: ' + str(hsp.align_length) +
+                                      '\nhsp.identities: ' + str(hsp.identities) +
+                                      '\nhsp.sbjct_end: ' + str(hsp.sbjct_end) +
+                                      '\nhsp.sbjct_start: ' + str(hsp.sbjct_start))
         return identical_aligns_list
 
     @staticmethod
