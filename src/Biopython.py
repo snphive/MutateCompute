@@ -38,7 +38,7 @@ import logging
 
 class Biopy(object):
 
-    logging.basicConfig(filename='logs/log.log', level=logging.DEBUG)
+    logging.basicConfig(filename='/Users/u0120577/PycharmProjects/MutateCompute/logs/log.log', level=logging.DEBUG)
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
@@ -91,12 +91,13 @@ class Biopy(object):
                        'query_length': query_length,
                        'database': database_used,
                        'database_seqs_num': database_seqs_num,
-                       'identical_aligns_list': Biopy._build_identical_alignments_list(query_length, alignments)}
+                       'identical_aligns_list': Biopy._build_identical_alignments_list(query_length, alignments,
+                                                                                       fastafilename)}
         Biopy._warn_if_discrepancies_in_query_seq_length(qblast_dict, query_length, query_letters, path_fastafile)
         return qblast_dict
 
     @staticmethod
-    def _build_identical_alignments_list(query_length: int, alignments: list):
+    def _build_identical_alignments_list(query_length: int, alignments: list, fastafilename: str):
         """
         Builds a list_of_dictionaries of relevant info for each high-scoring pair (hsp) alignment where there are zero
         gaps and the alignment length is exactly the same as the query length, hence it is a 100 % identity match.
@@ -108,6 +109,7 @@ class Biopy(object):
         identity match.
         :param query_length: Qblast output value, refers to length of the input fasta sequence.
         :param alignments: Objects with values, (including hsps, also a list of objects with values) from qblast.
+        :param fastafilename: The fasta filename - only used in logger message.
         :return: List of identical alignment hits. The hit may still be longer.
         """
         identical_aligns_list = []
@@ -143,10 +145,11 @@ class Biopy(object):
                           'is not 100 % identical. The gap: ' + str(hsp.gaps))
                     Biopy.logger.info('No identical alignments for this sequence, according to criteria: '
                                       'hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == '
-                                      'hsp.identities. Therefore this blastp is not 100 % identical.',
-                                      hsp_gaps=hsp.gaps, hsp_expect=hsp.expect, hsp_align_length=hsp.align_length,
-                                      query_length=query_length)
-
+                                      'hsp.identities. Therefore this blastp is not 100 % identical. '
+                                      '\nFastafilename: ' + fastafilename + '\nAccession_num: ' +
+                                      alignment_dict['accession_num'] + '\nhsp_gaps: ' + str(hsp.gaps) +
+                                      '\nhsp_expect: ' + str(hsp.expect) + '\nhsp_align_length: ' +
+                                      str(hsp.align_length) + '\nquery_length: ' + str(query_length))
         return identical_aligns_list
 
     @staticmethod
