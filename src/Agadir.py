@@ -91,8 +91,8 @@ class Agadir(object):
                     if not is_first_line:
                         path_dst_mutant_filename = GUM._os_makedirs(path_dst, mutantfastafilename)
                         path_dst_mutant_file = os.path.join(path_dst_mutant_filename, mutantfastafile)
-                        with open(path_dst_mutant_file, 'w') as temp_fastafile:
-                            temp_fastafile.write(fasta_str)
+                        with open(path_dst_mutant_file, 'w') as g:
+                            g.write(fasta_str)
                         agadir = Agadir(AgadCndtns.INCELL_MAML.value)
                         agadir.compute(path_dst_mutant_file)
                         GUM.linux_remove_file(path_dst_mutant_file)
