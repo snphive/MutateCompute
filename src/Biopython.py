@@ -33,19 +33,15 @@ from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 from Bio import SeqIO
 import warnings
+import logging
 
 
 class Biopy(object):
 
-    # Using alignments restricted to a fixed number (currently 20) and hitlist restricted to a fixed number (currently
-    # 20), it takes about 21 seconds to run this qblast remotely.
-    # However, using smaller number of alignments than the default (of 50), the output which is parsed to an xml file
-    # is reduced in size from ~77 KB to ~53 KB. Any reduction could be important when you consider that there are
-    # 78,586 fasta files to run (that's likely over 1.5 GB in total).
-    # We are only interested in 100% identity hits, so unless a sequence has over 20 isoforms which all include that
-    # sequence, the remaining hits on the blast_record are not used anyway.
-    #
-    # NOTE: occasionally the qblast took about 4 minutes.
+    logging.basicConfig(filename='logs/log.log', level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+
     @staticmethod
     def run_blastp(fasta: str):
         """
@@ -68,7 +64,7 @@ class Biopy(object):
                               hitlist_size=Biopy.BlastParam.MAX_HIT_5.value)
 
     @staticmethod
-    def parse_filter_blastp_xml_to_dict(path_qblast: str, fastafilename: str, path_fastafile: str):
+    def parse_filter_blastp_xml_to_dict(path_raw_blstp_xml: str, fastafilename: str, path_fastafile: str):
         """
         Parses qblast result and filters (assigns to a data structure) only those fields that are of interest.
         #
@@ -77,12 +73,12 @@ class Biopy(object):
         # fields that can be directly accessed.
         # NOTE: Time taken for this remote qblast for sequence 1_A.fasta was about 20 seconds.
         # NOTE: The query sequence id is also the filename and is used here for the name of the output xml.
-        :param path_qblast: Absolute path to the output xml file.
+        :param path_raw_blstp_xml: Absolute path to the output xml file.
         :param fastafilename: Name of fastafile (without .fasta extension).
         :param path_fastafile: Abs path to fastafile (used downstream to spot any seq length anomalies).
         :return: Data structure of the elements of the qblast result that are considered here to be pertinent.
         """
-        with open(path_qblast) as f:
+        with open(path_raw_blstp_xml) as f:
             blast_record = NCBIXML.read(f)
             query_length = blast_record.query_length
             query_letters = blast_record.query_letters
@@ -119,21 +115,12 @@ class Biopy(object):
         for alignment in alignments:
             alignment_dict = {'accession_num': 0, 'length': 0, 'hit_def': '', 'hsp_dict': {}}
             for hsp in alignment.hsps:
-                if len(identical_aligns_list) > 1:
-                    break
+                if Biopy._num_of_desired_identical_hits(len(identical_aligns_list)):
+                    return identical_aligns_list
                 is_identical = hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == \
                                hsp.identities
                 if is_identical:
-                    alignment_dict['accession_num'] = alignment.accession
-                    alignment_dict['length'] = alignment.length
-                    alignment_dict['hit_def'] = alignment.hit_def
-                    alignment_dict['hsp_dict']['align_length'] = hsp.align_length
-                    alignment_dict['hsp_dict']['gaps'] = hsp.gaps
-                    alignment_dict['hsp_dict']['identities'] = hsp.identities
-                    alignment_dict['hsp_dict']['query_end'] = hsp.query_end
-                    alignment_dict['hsp_dict']['query_start'] = hsp.query_start
-                    alignment_dict['hsp_dict']['sbjct_end'] = hsp.sbjct_end
-                    alignment_dict['hsp_dict']['sbjct_start'] = hsp.sbjct_start
+                    alignment_dict = Biopy._assign_alignment_and_hsp_values(alignment_dict, alignment, hsp)
                     print('\nis_identical is True with these values: \nhsp.expect:' + str(hsp.expect) + '\nhsp.gaps:' +
                           str(hsp.gaps) + '\nquery_length:' + str(query_length) + '\nhsp.align_length:' +
                           str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities) + '\nhsp.sbjct_end:' +
@@ -143,9 +130,42 @@ class Biopy(object):
                           + str(hsp.gaps) + '\nquery_length:' + str(query_length) + '\nhsp.align_length:' +
                           str(hsp.align_length) + '\nhsp.identities:' + str(hsp.identities) + '\nhsp.sbjct_end:' +
                           str(hsp.sbjct_end) + '\nhsp.sbjct_start:' + str(hsp.sbjct_start))
+                    if not identical_aligns_list:
+                        alignment_dict = Biopy._assign_alignment_and_hsp_values(alignment_dict, alignment, hsp)
+
             if is_identical:
                 identical_aligns_list.append(alignment_dict)
+            else:
+                if not identical_aligns_list:
+                    identical_aligns_list.append(alignment_dict)
+                    print('No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and '
+                          'hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp '
+                          'is not 100 % identical. The gap: ' + str(hsp.gaps))
+                    Biopy.logger.info('No identical alignments for this sequence, according to criteria: '
+                                      'hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == '
+                                      'hsp.identities. Therefore this blastp is not 100 % identical.',
+                                      hsp_gaps=hsp.gaps, hsp_expect=hsp.expect, hsp_align_length=hsp.align_length,
+                                      query_length=query_length)
+
         return identical_aligns_list
+
+    @staticmethod
+    def _assign_alignment_and_hsp_values(alignment_dict, alignment, hsp):
+        alignment_dict['accession_num'] = alignment.accession
+        alignment_dict['length'] = alignment.length
+        alignment_dict['hit_def'] = alignment.hit_def
+        alignment_dict['hsp_dict']['align_length'] = hsp.align_length
+        alignment_dict['hsp_dict']['gaps'] = hsp.gaps
+        alignment_dict['hsp_dict']['identities'] = hsp.identities
+        alignment_dict['hsp_dict']['query_end'] = hsp.query_end
+        alignment_dict['hsp_dict']['query_start'] = hsp.query_start
+        alignment_dict['hsp_dict']['sbjct_end'] = hsp.sbjct_end
+        alignment_dict['hsp_dict']['sbjct_start'] = hsp.sbjct_start
+        return alignment_dict
+
+    @staticmethod
+    def _num_of_desired_identical_hits(num_of_identical_aligns_in_list: int):
+        return num_of_identical_aligns_in_list >= 1
 
     @staticmethod
     def _warn_if_discrepancies_in_query_seq_length(qblast_dict: dict, query_length: int, query_letters: int,
