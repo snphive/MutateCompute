@@ -41,16 +41,17 @@ class IdProt(object):
         if GUM.using_cluster():
             # for path_fastafile in path_input_fastafile_list:
             #     with open(path_fastafile) as fastafile_opened:
-            #         fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
-            #         jobname = 'BLSTP_' + fastafile_name
+            #         fastafilename = path_fastafile.split('/')[-1].split('.')[0]
+            #         jobname = 'BLSTP_' + fastafilename
             #         Cluster.write_job_q_bash(job_name=jobname, path_job_q_dir=Paths.CONFIG_JOBQ)
-            #         path_output_blastp_fastaname = GUM._os_makedirs(Paths.OUTPUT_BLASTP, fastafile_name)
+            #         path_output_blastp_fastaname = GUM._os_makedirs(Paths.OUTPUT_BLASTP, fastafilename)
             #         os.chdir(path_output_blastp_fastaname)
             #         Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
             #         Cluster.wait_for_grid_engine_job_to_complete(grid_engine_jobname=jobname)
-            #         path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name,
+            #         path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafilename,
             #                                                 blastp_result=Biopy.run_blastp(fastafile_opened.read()))
-            #         blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
+            #         blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafilename,
+            #         path_fastafile)
             #         # blastp_dict_list.append(blastp_dict)
             #         if write_idmaps_for_mysqldb:
             #             IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv,
@@ -68,14 +69,19 @@ class IdProt(object):
             for path_fastafile in path_input_fastafiles:
                 with open(path_fastafile) as f:
                     fasta_str = f.read()
-                    fastafile_name = path_fastafile.split('/')[-1].split('.')[0]
+                    fastafilename = path_fastafile.split('/')[-1].split('.')[0]
                 if IdProt._has_all_A_sequence(path_fastafile):
                     print('This sequence has all As, BLAST would think it is a nucleotide sequence and fail. So it is '
                           'not being run: ' + path_fastafile)
                     continue
+                path_output_blastp_fastafilename = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
+                                                                                    intermed_dir=Paths.DIR_BLASTP.value,
+                                                                                                fastadir=fastafilename)
+                if os.path.exists(os.path.join(path_output_blastp_fastafilename, fastafilename + Str.XMLEXT.value)):
+                    continue
                 blastp_result = Biopy.run_blastp(fasta_str)
-                path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name, blastp_result)
-                blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
+                path_raw_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafilename, blastp_result)
+                blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_raw_blstp_xml, fastafilename, path_fastafile)
                 blastp_dict_list.append(blastp_dict)
                 if write_idmaps_for_mysqldb:
                     IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
@@ -106,7 +112,7 @@ class IdProt(object):
         path_output_blastp = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
                                                                       intermed_dir=Paths.DIR_BLASTP.value,
                                                                       fastadir=fastafile_name)
-        path_output_blastp_xmlfile = os.path.join(path_output_blastp, fastafile_name + ".xml")
+        path_output_blastp_xmlfile = os.path.join(path_output_blastp, fastafile_name + Str.XMLEXT.value)
         with open(path_output_blastp_xmlfile, 'w') as f:
             blstp_read = blastp_result.read()
             f.write(blstp_read)
@@ -179,7 +185,8 @@ class IdProt(object):
         path_output_blastp_fastaname = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
                                                                             intermed_dir=Paths.DIR_BLASTP.value,
                                                                             fastadir=idmap[IdProt.Strng.SEQ_ID.value])
-        path_output_blastp_fastaname_xmlfile = os.path.join(path_output_blastp_fastaname, 'idmap_swsprt.xml')
+        path_output_blastp_fastaname_xmlfile = os.path.join(path_output_blastp_fastaname, IdProt.Strng.IDMAPSWSPRT.value
+                                                            + Str.XMLEXT.value)
         with open(path_output_blastp_fastaname_xmlfile, 'w') as idmap_file:
             xml_str = ''.join(xml_list)
             idmap_file.write(''.join(xml_str))
@@ -207,7 +214,8 @@ class IdProt(object):
         path_output_blastp_fastaname = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
                                                                                 intermed_dir=Paths.DIR_BLASTP.value,
                                                                             fastadir=idmap[IdProt.Strng.SEQ_ID.value])
-        path_output_blastp_fastaname_csvfile = os.path.join(path_output_blastp_fastaname, 'idmap_swsprt.csv')
+        path_output_blastp_fastaname_csvfile = os.path.join(path_output_blastp_fastaname, IdProt.Strng.IDMAPSWSPRT.value
+                                                            + Str.CSVEXT.value)
         with open(path_output_blastp_fastaname_csvfile, 'w') as idmap_file:
             csv_str = ''.join(csv_list)
             idmap_file.write(''.join(csv_str))
@@ -223,7 +231,8 @@ class IdProt(object):
         path_output_blastp_fastaname = IdProt._build_dir_tree_with_intermed_dir(path_root=path_output,
                                                                             intermed_dir=Paths.DIR_BLASTP.value,
                                                                             fastadir=idmap[IdProt.Strng.SEQ_ID.value])
-        path_output_blastp_fastaname_jsonfile = os.path.join(path_output_blastp_fastaname, 'idmap_swsprt.json')
+        path_output_blastp_fastaname_jsonfile = os.path.join(path_output_blastp_fastaname,
+                                                             IdProt.Strng.IDMAPSWSPRT.value + Str.JSONEXT.value)
         with open(path_output_blastp_fastaname_jsonfile, 'w') as f:
             f.write(json.dumps(idmap))
 
@@ -313,5 +322,6 @@ class IdProt(object):
         HSP_DICT = 'hsp_dict'
         XML_PROLOG = '<?xml version="1.0" encoding="UTF-8"?>'
         DIR_SUFIX = '_idmaps'
+        IDMAPSWSPRT = 'idmap_swsprt'
 
 # pydevd.stoptrace()
