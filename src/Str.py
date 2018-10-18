@@ -14,6 +14,9 @@ class Str(Enum):
     FSLSH_ASTRX = FSLSH + '*'
     FSLSH_DBLASTRX_FSLSH_ASTRX = FSLSH_ASTRX + '*' + FSLSH_ASTRX
     FSTAEXT = '.fasta'
+    XMLEXT = '.xml'
+    JSONEXT = '.json'
+    CSVEXT = '.csv'
     PDBEXT = '.pdb'
     DOTS3 = '...'
     PDBS = Paths.DIR_PDBS.value
