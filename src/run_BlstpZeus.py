@@ -28,14 +28,15 @@ for path_fastafile in path_input_fastafile_list:
         os.chdir(path_output_blastp_fastaname)
         Cluster.run_job_q(path_job_q_dir=path_config_job)
         Cluster.wait_for_grid_engine_job_to_complete(grid_engine_jobname=jobname)
-        path_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name,
-                                                     blastp_result=NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
-                                                                    database=Biopy.BlastParam.SWSPRT.value,
-                                                                    sequence=fastafile_opened.read(),
-                                                                    entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
-                                                                    alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
-                                                                    hitlist_size=Biopy.BlastParam.MAX_HIT_20.value))
-        blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_blstp_xml, fastafile_name, path_fastafile)
+        path_raw_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name,
+                                                         blastp_result=NCBIWWW.qblast(
+                                                             program=Biopy.BlastParam.BLST_P.value,
+                                                             database=Biopy.BlastParam.SWSPRT.value,
+                                                             sequence=fastafile_opened.read(),
+                                                             entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
+                                                             alignments=Biopy.BlastParam.MAX_ALIGN_20.value,
+                                                             hitlist_size=Biopy.BlastParam.MAX_HIT_20.value))
+        blastp_dict = Biopy.parse_filter_blastp_xml_to_dict(path_raw_blstp_xml, fastafile_name, path_fastafile)
         # blastp_dict_list.append(blastp_dict)
         if write_idmaps_for_mysldb:
             IdProt._write_idmaps_for_mysqldb(path_output, blastp_dict, write_csv=write_csv, write_xml=write_xml,
