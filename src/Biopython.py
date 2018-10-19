@@ -29,16 +29,19 @@
 #   sbjct_start (position of start of this alignment on hit sequence)
 #
 #######################################################################################################################
+import warnings
+import logging
+import time
+import os
+from src.Paths import Paths
+from src.Str import Str
 from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 from Bio import SeqIO
-import warnings
-import logging
 
 
 class Biopy(object):
 
-    logging.basicConfig(filename='/Users/u0120577/PycharmProjects/MutateCompute/logs/log.log', level=logging.DEBUG)
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
@@ -56,12 +59,22 @@ class Biopy(object):
         :param fasta: Fasta as a string.
         :return: Result of Biopython.NCBIWWW.qblast() method call (Data type is _io.TextIOWrapper)
         """
-        return NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
-                              database=Biopy.BlastParam.SWSPRT.value,
-                              sequence=fasta,
-                              entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
-                              alignments=Biopy.BlastParam.MAX_ALIGN_5.value,
-                              hitlist_size=Biopy.BlastParam.MAX_HIT_5.value)
+        qblast = None
+        keep_trying = True
+        while keep_trying:
+            try:
+                qblast = NCBIWWW.qblast(program=Biopy.BlastParam.BLST_P.value,
+                                        database=Biopy.BlastParam.SWSPRT.value,
+                                        sequence=fasta,
+                                        entrez_query=Biopy.BlastParam.HOMSAP_ORG.value,
+                                        alignments=Biopy.BlastParam.MAX_ALIGN_5.value,
+                                        hitlist_size=Biopy.BlastParam.MAX_HIT_5.value)
+
+            except OSError:
+                time.sleep(60)
+            if qblast:
+                keep_trying = False
+        return qblast
 
     @staticmethod
     def parse_filter_blastp_xml_to_dict(path_raw_blstp_xml: str, fastafilename: str, path_fastafile: str):
