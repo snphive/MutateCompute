@@ -23,76 +23,56 @@ a large list in a for loop - (I experienced a delay on looping through a list of
 missed out about half of the inputs, generating only half of the outputs).   
 """
 
-if len(sys.argv) < 2:
-    use_cluster = False
-else:
-    use_cluster = True if sys.argv[1] == 'use_cluster=True' else False
-Paths.set_up_paths(use_cluster)
-if GUM.using_cluster():
-    path_input_fastas_dir_root = os.path.join(Paths.SE_INPUT_FASTAS.value, Paths.DIR_29611_FASTAS_1000.value)
-else:
-    path_input_fastas_dir_root = os.path.join(Paths.MC_REPO_PDB_FASTA.value, Paths.DIR_29611_FASTAS_1000.value)
-
-operations = {'do_mutate_fasta': True, 'do_agadir': False, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
+Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
+operations = {'do_mutate_fasta': False, 'do_agadir': True, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
               'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
 use_multithread = False
 path_pdbfiles = []
-startnum = 3001
-endnum = 4000
+startnum = 1
+endnum = 1000
 
-for i in range(27):
+for i in range(29):
     dir_3dots = str(startnum) + Str.DOTS3.value + str(endnum)
-    path_input_fastas_dir = os.path.join(path_input_fastas_dir_root, dir_3dots)
-    path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/**/*.fasta', recursive=True))
+    path_input_fastas_3dots_dir = os.path.join(Paths.INPUT_MUTS_MULTIFASTAS_29611_1000, dir_3dots)
+    path_fastafiles = sorted(glob.glob(path_input_fastas_3dots_dir + '/**/*.fasta', recursive=True))
     if not path_fastafiles:
         raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
-
     main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles,
                 AA.LIST_ALL_20_AA.value)
-    if i == 27:
+    if i == 0:
         break
     startnum += 1000
     endnum += 1000
 
-# In all cases, the start of operations begins with identifying which or how many pdb and/or fasta files are to be
-# analysed. These must then be copied over from either the repository directory (REPO_PDB_FASTA) or the output_data
-# directory, to the input_data directory.
-# (In all cases, the necessary destination directory tree for the input files being copied over will be created if not
-# already present. This involves a subdirectory bearing the name of the file, which for fastafiles is typically '1_A'
-# and for pdbfiles is typically 'RepairPDB_1', (unchanged from RvdK's naming scheme)).
-#
-# E.g. '1_A.fasta' copied from ~/REPO_PDB_FASTA/FASTAs_100/ to ~/PycharmProjects/MutateCompute/input_data/1_A/
-# 'RepairPDB_1' copied from ~/REPO_PDB_FASTA/PDBs_100/ to ~/PycharmProjects/MutateCompute/input_data/RepairPDB_1/
-#
-# The destination for output files is within the output_data directory tree.
-# and FoldX BuildModel are creating mutants precisely for further analysis (by Agadir and FoldX)
-#
-#
+
 # PROGRAM       INPUT FILES & DIRECTORIES                           OUTPUT FILES & DIRECTORIES
 # -------------------------------------------------------------------------------------------------------------------
 # MutateFasta   input_data/<fastafilename>/                         output_data/<fastafilename>/mutants/
 # Run on PSB cluster (and completed for pub_hg_fasta dataset in 29611_fastas_1000) and locally - both worked well
 # ~6:30pm Thu 11th Oct 2018, and locally ~13:00 Fri 11th Oct 2018.
 # latest commit#: 667a7ccf921dc3d700de3e7616cabffacd9c2de8
-#
+
+# Agadir runs on PSB cluster & locally (my Macbook). 13:35 10Oct18 commit#: 3f56bc782eecab941aeb29377541166f0c636c08
+# On cluster it took 1507 seconds (25 mins) to complete ITERATING through 1...1000 and sending the jobs to the cluster,
+# however it then took a further.. to complete all the computations.
+# 1...1000 took up 14 Gigabytes..
 # Agadir        configuration/agadir_config/Options.txt
-#               input_data/<fastafilename>/                         output_data/<fastafilename>/agadir/
-#               input_data/<fastafilename>/mutants/                 output_data/<fastafilename>/agadir/<mutantfilename>/
-# Run on PSB cluster and locally on Macbook - both work well. 13:35 10th Oct 2018
+#               input_data/mutants_multifastas/                     output_data/<fastafilename>/agadir/3dots_dir/
+#               29611_fastas_1000/3dots_dir/<fastafilename>/        <fastafilename>/
+#               mutants/fastafilename_mutants.fasta
 #
-# last commit#: 3f56bc782eecab941aeb29377541166f0c636c08
 #
+# FoldX BM (version 3) runs on PSB cluster. 15:25 11Oct18 commit#: 6c2c266c918be564bb5f19edb113c4f43adb4538
+# Does not run locally (have only tried FoldX version 4 locally)
 # FoldX BM      configuration/foldx_config/commands_buildmodel.txt
 #               configuration/foldx_config/options_buildmodel.txt
 #               configuration/foldx_config/rotabase.txt
-#               input_data/<pdbfilename>/                           output_data/<pdbfilename>/fx_bm/mutants/
+#               input_data/pdbs/<pdbfilename>/                      output_data/<pdbfilename>/fx_bm/mutants/
 #               input_data/<pdbfilename>/mutants/
-# Run on PSB cluster - working well 15:25 Fri 11th Oct 2018. latest commit#: 6c2c266c918be564bb5f19edb113c4f43adb4538
-#
 #
 # FoldX AC      configuration/foldx_config/rotabase.txt
-#               input_data/<pdbfilename>/                           output_data/<pdbfilename>/fx_ac/
-#               input_data/<pdbfilename>/mutants/                   output_data/<pdbfilename>/fx_ac/mutants/
+#               input_data/pdbs/<pdbfilename>/                      output_data/<pdbfilename>/fx_ac/
+#               input_data/pdbs/<pdbfilename>/mutants/              output_data/<pdbfilename>/fx_ac/mutants/
 #
 #
 # To start this script from cmd line, sh KickOff.sh
