@@ -48,6 +48,7 @@ ROOT:
     dir_pdbs: 'pdbs'
     dir_blastp: 'blastp'
     dir_bash: 'bash'
+    dir_logs: 'logs'
 
     # jobq job name prefixes
     prefix_mutatefasta: 'MF_'

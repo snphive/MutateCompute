@@ -5,13 +5,17 @@ import glob
 from src.Paths import Paths
 from src.Scheduler import Scheduler
 from src.Str import Str
+import logging
 from src.IdentifyProtein import IdProt
 from src.GeneralUtilityMethods import GUM
 import threading
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
+
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
+logfile = os.path.join(Paths.LOGS, 'log' + Str.LOGEXT.value)
+logging.basicConfig(filename=logfile, level=logging.DEBUG)
 
 startnum = 1
 endnum = 1000

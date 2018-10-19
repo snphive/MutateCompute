@@ -68,6 +68,7 @@ class Paths(Enum):
             DIR_PDBS = paths_and_dictionaries['ROOT']['dir_pdbs']
             DIR_BLASTP = paths_and_dictionaries['ROOT']['dir_blastp']
             DIR_BASH = paths_and_dictionaries['ROOT']['dir_bash']
+            DIR_LOGS = paths_and_dictionaries['ROOT']['dir_logs']
             #  CLUSTER JOB NAME PREFIXES
             PREFIX_MUTFSTA = paths_and_dictionaries['ROOT']['prefix_mutatefasta']
             PREFIX_BLSTP = paths_and_dictionaries['ROOT']['prefix_blastp']
@@ -83,6 +84,7 @@ class Paths(Enum):
             MC_CONFIG_ACRUNSCRIPT = os.path.join(MC_CONFIG, DIR_ACRUNSCRIPT)
             MC_CONFIG_BMRUNSCRIPT = os.path.join(MC_CONFIG, DIR_BMRUNSCRIPT)
             MC_BASH = os.path.join(LOCAL_MUTATECOMPUTE, DIR_BASH)
+            MC_LOGS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_LOGS)
             MC_SRC = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC)
             LOCAL_INPUT = os.path.join(LOCAL_PYPROJ, DIR_INPUT)
             LOCAL_INPUT_FASTAS = os.path.join(LOCAL_INPUT, DIR_FASTAS)
@@ -114,6 +116,7 @@ class Paths(Enum):
             SE_CONFIG_BLST_JOBQ = os.path.join(SE_CONFIG, DIR_BLST_JOBQ)
             SE_BASH = os.path.join(ZEUS_SNPEFFECT, DIR_BASH)
             SE_SRC = os.path.join(ZEUS_SNPEFFECT, DIR_SRC)
+            SE_LOGS = os.path.join(ZEUS_SNPEFFECT, DIR_LOGS)
             SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
             SE_INPUT_29611_FASTAS_1000 = os.path.join(SE_INPUT, DIR_29611_FASTAS_1000)
@@ -169,5 +172,6 @@ class Paths(Enum):
         Paths.AGADIR_EXE = Paths.ZEUS_AGADIR_EXE.value if use_cluster else Paths.LOCAL_AGADIR_EXE.value
         Paths.BASH = Paths.SE_BASH.value if use_cluster else Paths.MC_BASH.value
         Paths.SRC = Paths.SE_SRC.value if use_cluster else Paths.MC_SRC.value
+        Paths.LOGS = Paths.SE_LOGS.value if use_cluster else Paths.MC_LOGS.value
 
 # pydevd.stoptrace()
