@@ -12,6 +12,15 @@ from src.Paths import Paths
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
+"""
+Some variable naming conventions that I employ here are (the following are all always strings): 
+'fasta': FASTA sequence only, hence without any name given on the line above, prefixed with '>'.
+'fasta_str': FASTA name and sequence. Hence '>synuclein\nMDVFMKGLS...'
+'fastafile': name of the fasta file, including the file extension which is typically '.fasta'
+'fastafilename': name of the fasta file, not including the file extension. This might be used to make a file specific 
+ subdir (i.e. bearing the same name.)
+"""
+
 
 class GUM(object):
 
@@ -28,7 +37,7 @@ class GUM(object):
 
         Extract the pdbname, chain, position of starting residue and fasta sequence from a pdb file. Can also write
         fasta file to specified dst.
-        :param path_pdbfiles: str OR List of str    Absolute path to pdbfile(s) (including '.pdb') .
+        :param path_pdbfiles: str OR List of str, Absolute path to pdbfile(s) (including '.pdb') .
         :param path_fastafiles_to_be_written: Absolute path of fastafiles to be written. Empty string indicates no
         fasta files will be written.
         :return: dict, 'pdbname_chain_startpos' is key, fasta sequence is value.
@@ -51,7 +60,7 @@ class GUM(object):
                         protein_chains.append(protein_chain)
                         protein_chains_startpos[protein_chain] = pdbfile_line[22:26].strip(' ')
             for protein_chain in protein_chains:
-                fasta_list = []
+                fasta = []
                 residue_num = '0'
                 for pdbfile_line in pdbfile_lines_with_atom:
                     protein_chain_on_this_line = pdbfile_line[21]
@@ -60,16 +69,16 @@ class GUM(object):
                         residue_num = residue_num_on_this_line
                         amino_acid_on_this_line = pdbfile_line[17:20]
                         if amino_acid_on_this_line in AA.DICT_AA_3TO1.value.keys():
-                            fasta_list.append(AA.DICT_AA_3TO1.value[amino_acid_on_this_line])
+                            fasta.append(AA.DICT_AA_3TO1.value[amino_acid_on_this_line])
                         else:
                             print('This 3-letter word is not recognised as 1 of the 20 amino acids! '
                                   'Cannot extract FASTA from ' + path_pdbfile + ' !')
 
-                fasta_sequence = "".join(fasta_list)
+                fasta = "".join(fasta)
                 pdbname = GUM._remove_prefix_and_suffix(path_pdbfile.split('/')[-1].split('.')[0], 'RepairPDB_', '_1_0')
                 pdbname_chain_startpos = pdbname + '_' + protein_chain + '_' + protein_chains_startpos[protein_chain]
-                print(pdbname_chain_startpos + ' : ' + fasta_sequence)
-                pdbname_chain_startpos_fastaseq_dict[pdbname_chain_startpos] = fasta_sequence
+                print(pdbname_chain_startpos + ' : ' + fasta)
+                pdbname_chain_startpos_fastaseq_dict[pdbname_chain_startpos] = fasta
                 if path_fastafiles_to_be_written != '':
                     GUM.write_fastafile_to_name_chain_dir(pdbname_chain_startpos_fastaseq_dict,
                                                           path_fastafiles_to_be_written)
@@ -110,16 +119,16 @@ class GUM(object):
         return protein_chains
 
     @staticmethod
-    def _remove_prefix_and_suffix(input: str, prefix: str, suffix: str):
+    def _remove_prefix_and_suffix(input_text: str, prefix: str, suffix: str):
         """
-        :param input: Any string that you want to trim.
+        :param input_text: Any string that you want to trim.
         :param prefix: The prefix you want to remove from the input string.
         :param suffix: The suffix you want to remove from the input string.
         :return: str, input with specified prefix/suffix removed.
         """
-        trimmed = input
-        if input.startswith(prefix):
-            trimmed = input.replace(prefix, '')
+        trimmed = input_text
+        if input_text.startswith(prefix):
+            trimmed = input_text.replace(prefix, '')
         if trimmed.endswith(suffix):
             trimmed = trimmed.replace(suffix, '')
         return trimmed
@@ -134,8 +143,8 @@ class GUM(object):
         """
         with open(path_fastafile, 'r') as fastafile_opened:
             fastafile_lines = fastafile_opened.readlines()
-            fasta_seq = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
-        return fasta_seq
+            fasta = fastafile_lines[1] if len(fastafile_lines) == 2 else fastafile_lines[0]
+        return fasta
 
     ###################################################################################################################
     # Builds a directory tree with any number of child nodes. Each new node is only ever one level down (siblings).
@@ -295,10 +304,10 @@ class GUM(object):
         Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
         It builds: path_root/agadir/<3dots dir>/<any other subdirs between 3dots_dir and [-3] although none are expected.
         """
-        path_fastafile_list = path_fastafile.split('/')
+        path_fastafile_split_to_list = path_fastafile.split('/')
         path_agadir_3dots_dirs = []
         copy_from_here = False
-        for path_dir in path_fastafile_list[:-3]:
+        for path_dir in path_fastafile_split_to_list[:-3]:
             if path_dir == '':
                 continue
             if Str.DOTS3.value in path_dir:
@@ -322,10 +331,10 @@ class GUM(object):
         :param path_fastafile:
         :return:
         """
-        path_fastafile_list = path_fastafile.split('/')
+        path_fastafile_split_to_list = path_fastafile.split('/')
         path_agadir_3dots_dirs = []
         copy_from_here = False
-        for path_dir in path_fastafile_list[:-1]:
+        for path_dir in path_fastafile_split_to_list[:-1]:
             if path_dir == '':
                 continue
             if Str.DOTS3.value in path_dir:
@@ -349,10 +358,10 @@ class GUM(object):
         :param path_fastafile:
         :return:
         """
-        path_fastafile_list = path_fastafile.split('/')
+        path_fastafile_split_to_list = path_fastafile.split('/')
         path_input_3dots_dirs = []
         copy_from_here = False
-        for path_dir in path_fastafile_list[:-1]:
+        for path_dir in path_fastafile_split_to_list[:-1]:
             if path_dir == '':
                 continue
             if path_dir == Paths.DIR_MUTANTS.value:
@@ -387,15 +396,15 @@ class GUM(object):
 
     # NOTE: current cp command specifies not to overwrite existing files.
     @staticmethod
-    def linux_copy_files(path_src_filelist: str, path_dst: str, into_own_subdirs: bool):
+    def linux_copy_files(path_src_files, path_dst: str, into_own_subdirs: bool):
         """
-        :param path_src_filelist:
-        :param path_dst:
-        :param into_own_subdirs:
+        :param path_src_files: str OR List of str, Absolute path(s) to src file(s) to copy.
+        :param path_dst: Absolute path(s) to dst dir for files to be copied to.
+        :param into_own_subdirs: True to make individual dirs for each file (bearing same name as file).
         """
-        if isinstance(path_src_filelist, str):
-            path_src_filelist = [path_src_filelist]
-        for path_src_file in path_src_filelist:
+        if isinstance(path_src_files, str):
+            path_src_files = [path_src_files]
+        for path_src_file in path_src_files:
             if into_own_subdirs:
                 filename = path_src_file.split('/')[-1].split('.')[0]
                 path_dst_filenamedir = GUM._os_makedirs(path_dst, filename)
@@ -408,10 +417,10 @@ class GUM(object):
                 print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
-    def linux_copy_specified_files(path_src_files: str, path_dst_dir: str):
+    def linux_copy_specified_files(path_src_files, path_dst_dir: str):
         """
-        :param path_src_files:
-        :param path_dst_dir:
+        :param path_src_files: str or list of str, Absolute path(s) to src file(s) to copy.
+        :param path_dst_dir: Absolute path(s) to dst dir for files to be copied to.
         """
         if isinstance(path_src_files, str):
             path_src_files = [path_src_files]
@@ -489,9 +498,9 @@ class GUM(object):
         """
         if not wanted_files:
             return
-        path_repo_pdbs_or_fastas_list = path_repo_pdbs_or_fastas.split('/')
+        path_repo_pdbs_or_fastas_split_to_list = path_repo_pdbs_or_fastas.split('/')
         path_dst_subdirs = []
-        for path_repo_pdbs_or_fastas_dir in path_repo_pdbs_or_fastas_list:
+        for path_repo_pdbs_or_fastas_dir in path_repo_pdbs_or_fastas_split_to_list:
             if '' == path_repo_pdbs_or_fastas_dir:
                 continue
             if Str.DOTS3.value in path_repo_pdbs_or_fastas_dir:
@@ -500,18 +509,18 @@ class GUM(object):
                     Paths.DIR_PDBS.value == path_repo_pdbs_or_fastas_dir:
                 path_dst_subdirs.append(path_repo_pdbs_or_fastas_dir)
         path_dst_dir = GUM._os_makedirs(path_dst_dir, *path_dst_subdirs)
-        path_input_fastafile_list = []
-        path_available_file_list = GUM.get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas)
+        path_input_fastafiles = []
+        path_available_files = GUM.get_pdb_or_fastafiles_from_subdir(path_repo_pdbs_or_fastas)
         for wanted_file in wanted_files:
             path_wantedfile = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
-            if path_wantedfile not in path_available_file_list:
+            if path_wantedfile not in path_available_files:
                 wanted_files.remove(wanted_file)
             else:
                 path_file_to_copy = os.path.join(path_repo_pdbs_or_fastas, wanted_file)
                 into_own_subdirs = True
                 GUM.linux_copy_files(path_file_to_copy, path_dst_dir, into_own_subdirs)
-                path_input_fastafile_list.append(GUM._build_path_filelist(path_dst_dir, wanted_file, into_own_subdirs))
-        return path_input_fastafile_list
+                path_input_fastafiles.append(GUM._build_path_file(path_dst_dir, wanted_file, into_own_subdirs))
+        return path_input_fastafiles
 
     @staticmethod
     def write_1_fastafile_per_fasta_from_multifastafile(path_dst: str, path_fastafile: str):
@@ -540,8 +549,9 @@ class GUM(object):
                 else:
                     fasta_str += line
 
+
     @staticmethod
-    def _build_path_filelist(path_root: str, filename: str, into_own_subdirs: bool):
+    def _build_path_file(path_root: str, filename: str, into_own_subdirs: bool):
         """
         :param path_root:
         :param filename:
@@ -570,7 +580,7 @@ class GUM(object):
         return dirname
 
     @staticmethod
-    def get_pdb_or_fastafile_list_from_subdir(path_repo_pdbs_or_fastas: str):
+    def get_pdb_or_fastafiles_from_subdir(path_repo_pdbs_or_fastas: str):
         """
         The repo directory structure is expected to be /REPO_PDB_FASTA/pdbs_<number> and /REPO_PDB_FASTA/fastas_<number>.
         Note: It assumes only 1 PDB and 1 FASTA subdirectory. If there is more than 1, they won't be seen.
@@ -578,8 +588,7 @@ class GUM(object):
         :return: Full list of pdbfiles or fastafiles from one of two subdirectories that should be in REPO_PDB_FASTA.
         """
         file_ext = Str.PDBEXT.value if (Paths.DIR_PDBS.value in path_repo_pdbs_or_fastas) else Str.FSTAEXT.value
-        filelist = glob.glob(path_repo_pdbs_or_fastas + '/*' + file_ext)
-        return filelist
+        return glob.glob(path_repo_pdbs_or_fastas + '/*' + file_ext)
 
     @staticmethod
     def get_3dots_dir(path_with_3dots: str):
