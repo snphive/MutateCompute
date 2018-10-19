@@ -1,0 +1,670 @@
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0102bd5c-2dd0-6816-22c9-bae2ddee6bb0
+Accession_num: P30837
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 517
+hsp_align_length: 517
+hsp.identities: 516
+hsp.sbjct_end: 517
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0106e181-abad-aed3-a169-191332cc97dd
+Accession_num: Q9NPI1
+hsp_expect: 0.0
+hsp_gaps: 1
+query_length: 652
+hsp_align_length: 652
+hsp.identities: 651
+hsp.sbjct_end: 651
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 011137cf-d7f1-391e-4752-d784bbd27560
+Accession_num: P15336
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 374
+hsp_align_length: 364
+hsp.identities: 364
+hsp.sbjct_end: 430
+hsp.sbjct_start: 67
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 011620fe-16a7-dc58-a90d-8c766ea232a2
+Accession_num: P45984
+hsp_expect: 3.97751e-174
+hsp_gaps: 0
+query_length: 242
+hsp_align_length: 231
+hsp.identities: 230
+hsp.sbjct_end: 231
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 011623b7-20db-d1db-9b31-e809cc3bf77e
+Accession_num: P46087
+hsp_expect: 0.0
+hsp_gaps: 4
+query_length: 808
+hsp_align_length: 812
+hsp.identities: 808
+hsp.sbjct_end: 812
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01166699-5d9d-1ec4-ce3a-cd1ee5dc5b84
+Accession_num: Q6PGN9
+hsp_expect: 1.0645e-153
+hsp_gaps: 0
+query_length: 310
+hsp_align_length: 223
+hsp.identities: 221
+hsp.sbjct_end: 223
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0122cfd0-681d-5356-d402-bf8126e226bb
+Accession_num: Q9BQ24
+hsp_expect: 3.15177e-174
+hsp_gaps: 18
+query_length: 252
+hsp_align_length: 252
+hsp.identities: 234
+hsp.sbjct_end: 234
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01318e77-4c79-badf-7bd0-85845cfa953b
+Accession_num: O00481
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 352
+hsp_align_length: 344
+hsp.identities: 340
+hsp.sbjct_end: 344
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 013c9735-4ed5-a552-4eb2-e6dc0de0c31b
+Accession_num: Q5JUK2
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 387
+hsp_align_length: 316
+hsp.identities: 316
+hsp.sbjct_end: 316
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0149758b-0cd4-7393-2fa3-e5dadb7e6b5c
+Accession_num: Q92637
+hsp_expect: 2.26212
+hsp_gaps: 15
+query_length: 188
+hsp_align_length: 88
+hsp.identities: 25
+hsp.sbjct_end: 85
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 014d7be6-bab1-e1d1-1927-f4100920f92d
+Accession_num: Q9BZW8
+hsp_expect: 2.11844e-85
+hsp_gaps: 0
+query_length: 273
+hsp_align_length: 127
+hsp.identities: 127
+hsp.sbjct_end: 127
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 014dad6d-b84a-47b7-4c49-449b046a0737
+Accession_num: Q6YHK3
+hsp_expect: 4.32787e-50
+hsp_gaps: 0
+query_length: 1368
+hsp_align_length: 94
+hsp.identities: 93
+hsp.sbjct_end: 94
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 015316e4-1d64-b0f9-c659-d41b6ba2f363
+Accession_num: Q969J5
+hsp_expect: 1.86147e-86
+hsp_gaps: 32
+query_length: 130
+hsp_align_length: 157
+hsp.identities: 125
+hsp.sbjct_end: 157
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0153d903-0a7f-bcf2-5413-0ab77a550736
+Accession_num: Q5VU65
+hsp_expect: 7.10538e-52
+hsp_gaps: 0
+query_length: 1736
+hsp_align_length: 93
+hsp.identities: 93
+hsp.sbjct_end: 1888
+hsp.sbjct_start: 1796
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 015b6220-267f-42da-ddb4-645a94e8e85b
+Accession_num: Q6IMN6
+hsp_expect: 0.0
+hsp_gaps: 56
+query_length: 905
+hsp_align_length: 939
+hsp.identities: 883
+hsp.sbjct_end: 939
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0164facd-38c7-b4c1-c1fa-10176ec7142c
+Accession_num: Q9H4L7
+hsp_expect: 0.0
+hsp_gaps: 2
+query_length: 1028
+hsp_align_length: 1028
+hsp.identities: 1026
+hsp.sbjct_end: 1026
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0170982b-8b89-1ee7-f0a9-d75fca54fd4a
+Accession_num: Q8NAB2
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 612
+hsp_align_length: 608
+hsp.identities: 608
+hsp.sbjct_end: 608
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0174a906-0926-9fec-d81b-78673c922cea
+Accession_num: Q8N6U8
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 451
+hsp_align_length: 404
+hsp.identities: 404
+hsp.sbjct_end: 529
+hsp.sbjct_start: 126
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 017e15c2-df65-2bbe-d72d-78376bbdce6a
+Accession_num: Q12809
+hsp_expect: 0.0
+hsp_gaps: 1
+query_length: 548
+hsp_align_length: 436
+hsp.identities: 427
+hsp.sbjct_end: 800
+hsp.sbjct_start: 366
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0182272a-a2e7-8794-5d7c-9432f98836d5
+Accession_num: Q9UNQ0
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 611
+hsp_align_length: 550
+hsp.identities: 549
+hsp.sbjct_end: 550
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01831211-eea0-a076-c6bf-63c9e1100b14
+Accession_num: Q8NI32
+hsp_expect: 1.28119e-137
+hsp_gaps: 0
+query_length: 207
+hsp_align_length: 181
+hsp.identities: 181
+hsp.sbjct_end: 183
+hsp.sbjct_start: 3
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 018a82a3-d829-b2e1-9cf8-cc0e89c8bb82
+Accession_num: Q9NRI5
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 678
+hsp_align_length: 660
+hsp.identities: 660
+hsp.sbjct_end: 660
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 018df509-f014-1730-96dd-36edec23bd9d
+Accession_num: P98194
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 923
+hsp_align_length: 893
+hsp.identities: 893
+hsp.sbjct_end: 909
+hsp.sbjct_start: 17
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 018f24a7-1d42-b2cc-b109-0a1065d5f9e5
+Accession_num: Q6U841
+hsp_expect: 0.0
+hsp_gaps: 30
+query_length: 1088
+hsp_align_length: 1118
+hsp.identities: 1088
+hsp.sbjct_end: 1118
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 019ec3f3-4094-3b57-2b38-3882aad95a4e
+Accession_num: Q9BTE3
+hsp_expect: 0.0
+hsp_gaps: 2
+query_length: 467
+hsp_align_length: 469
+hsp.identities: 467
+hsp.sbjct_end: 642
+hsp.sbjct_start: 174
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01a34f3f-27f2-65a4-a069-bb3e4d8a2fcd
+Accession_num: Q5HYK7
+hsp_expect: 0.0
+hsp_gaps: 59
+query_length: 731
+hsp_align_length: 790
+hsp.identities: 730
+hsp.sbjct_end: 790
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01a6fec0-300c-13b3-7ada-775ffc404beb
+Accession_num: P78310
+hsp_expect: 1.59857e-97
+hsp_gaps: 4
+query_length: 200
+hsp_align_length: 148
+hsp.identities: 140
+hsp.sbjct_end: 148
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01ae1d98-321e-c1ad-f2a4-1282d27ad9c8
+Accession_num: Q6ICG6
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 409
+hsp_align_length: 386
+hsp.identities: 384
+hsp.sbjct_end: 404
+hsp.sbjct_start: 19
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01b7b600-7677-9824-c262-207020bd3c84
+Accession_num: Q17RY6
+hsp_expect: 6.7674e-50
+hsp_gaps: 8
+query_length: 120
+hsp_align_length: 105
+hsp.identities: 79
+hsp.sbjct_end: 97
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01c0837d-56e2-e65f-7599-ed13aa3c949e
+Accession_num: Q96PU8
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 319
+hsp_align_length: 312
+hsp.identities: 312
+hsp.sbjct_end: 312
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01c43546-312f-de14-8fdc-71efaf846a5c
+Accession_num: Q3SXY8
+hsp_expect: 2.56016e-08
+hsp_gaps: 0
+query_length: 321
+hsp_align_length: 20
+hsp.identities: 20
+hsp.sbjct_end: 20
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01d096e4-3d7a-56c0-7b38-6a1c5c0b2a47
+Accession_num: Q6QHF9
+hsp_expect: 1.61993e-106
+hsp_gaps: 0
+query_length: 511
+hsp_align_length: 168
+hsp.identities: 167
+hsp.sbjct_end: 168
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01d18c76-88ef-5585-64c9-4cfc9b9947ec
+Accession_num: P0DPB3
+hsp_expect: 0.0
+hsp_gaps: 13
+query_length: 474
+hsp_align_length: 487
+hsp.identities: 474
+hsp.sbjct_end: 487
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01db779a-9031-071f-1338-8ce65f5987d8
+Accession_num: Q8TD55
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 440
+hsp_align_length: 440
+hsp.identities: 438
+hsp.sbjct_end: 490
+hsp.sbjct_start: 51
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01e1cb1d-32bf-eeff-2064-c32e50a35b4e
+Accession_num: Q96K58
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 642
+hsp_align_length: 619
+hsp.identities: 619
+hsp.sbjct_end: 619
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01e524ab-1455-0682-2fb5-6f4a45ef679c
+Accession_num: Q01432
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 776
+hsp_align_length: 767
+hsp.identities: 767
+hsp.sbjct_end: 767
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01ea9d6e-0f1d-1527-c13c-124fb3182d01
+Accession_num: P16278
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 647
+hsp_align_length: 647
+hsp.identities: 646
+hsp.sbjct_end: 677
+hsp.sbjct_start: 31
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01eafff3-4631-e7ad-abec-875ac0cc6974
+Accession_num: Q5VUY0
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 280
+hsp_align_length: 280
+hsp.identities: 277
+hsp.sbjct_end: 407
+hsp.sbjct_start: 128
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01eceb70-0b41-f7dd-e8d8-6e2f28d1e2f9
+Accession_num: Q5T1H1
+hsp_expect: 1.13718
+hsp_gaps: 7
+query_length: 594
+hsp_align_length: 78
+hsp.identities: 22
+hsp.sbjct_end: 2970
+hsp.sbjct_start: 2899
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01eeb1c8-c4b8-996b-46b2-b768aebc268c
+Accession_num: Q00059
+hsp_expect: 4.18823e-153
+hsp_gaps: 32
+query_length: 214
+hsp_align_length: 246
+hsp.identities: 214
+hsp.sbjct_end: 246
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01f0882f-5001-36b2-92cd-9a775e00438c
+Accession_num: O60245
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 1072
+hsp_align_length: 1065
+hsp.identities: 1061
+hsp.sbjct_end: 1065
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01f48bf3-eb0f-ec77-8d25-3bc3d5f3aa66
+Accession_num: Q684P5
+hsp_expect: 0.0
+hsp_gaps: 15
+query_length: 715
+hsp_align_length: 730
+hsp.identities: 715
+hsp.sbjct_end: 730
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01f7d519-1233-80ac-b0d9-3eb3ef279197
+Accession_num: Q9ULP0
+hsp_expect: 0.0
+hsp_gaps: 31
+query_length: 357
+hsp_align_length: 370
+hsp.identities: 338
+hsp.sbjct_end: 352
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01f9e8aa-e1ed-f6b0-0528-a26167274acb
+Accession_num: P00451
+hsp_expect: 9.24769e-07
+hsp_gaps: 0
+query_length: 216
+hsp_align_length: 47
+hsp.identities: 21
+hsp.sbjct_end: 2346
+hsp.sbjct_start: 2300
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 01fa9384-95bc-16fa-b43e-b98ab3af2319
+Accession_num: Q96MT1
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 691
+hsp_align_length: 663
+hsp.identities: 663
+hsp.sbjct_end: 663
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02019465-82cc-c96c-1102-919fde51cd6b
+Accession_num: Q14188
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 349
+hsp_align_length: 343
+hsp.identities: 343
+hsp.sbjct_end: 446
+hsp.sbjct_start: 104
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 020281f4-107a-4e3e-e119-ae3ce9b33a27
+Accession_num: Q9H7Y0
+hsp_expect: 9.90165e-118
+hsp_gaps: 0
+query_length: 182
+hsp_align_length: 166
+hsp.identities: 166
+hsp.sbjct_end: 166
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0206c0b9-e0c7-fef4-5cd8-531b27a2db2d
+Accession_num: Q8N6Y2
+hsp_expect: 3.02789e-12
+hsp_gaps: 1
+query_length: 313
+hsp_align_length: 135
+hsp.identities: 46
+hsp.sbjct_end: 385
+hsp.sbjct_start: 252
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02096c7f-80ad-2774-6c2a-0aabd1eced10
+Accession_num: O43497
+hsp_expect: 6.80801e-73
+hsp_gaps: 3
+query_length: 2194
+hsp_align_length: 151
+hsp.identities: 146
+hsp.sbjct_end: 2377
+hsp.sbjct_start: 2227
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 020b29ec-f5f4-ea96-be02-76362682cdfa
+Accession_num: O75323
+hsp_expect: 1.24801e-154
+hsp_gaps: 39
+query_length: 247
+hsp_align_length: 286
+hsp.identities: 225
+hsp.sbjct_end: 286
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 021d6c3a-9da8-f0b6-40a6-7a0ee360d220
+Accession_num: Q92526
+hsp_expect: 0.0
+hsp_gaps: 45
+query_length: 485
+hsp_align_length: 530
+hsp.identities: 485
+hsp.sbjct_end: 530
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 022204e4-70ad-7efc-6aa8-8bb2fdb6d6d0
+Accession_num: Q04118
+hsp_expect: 3.08084e-19
+hsp_gaps: 25
+query_length: 198
+hsp_align_length: 153
+hsp.identities: 88
+hsp.sbjct_end: 239
+hsp.sbjct_start: 87
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 022518e5-e3c2-2852-a4c0-78b4df3c68b7
+Accession_num: Q96H22
+hsp_expect: 0.0
+hsp_gaps: 20
+query_length: 319
+hsp_align_length: 339
+hsp.identities: 318
+hsp.sbjct_end: 339
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02260973-43dd-8472-86d4-17a8f79487bb
+Accession_num: Q9UHI7
+hsp_expect: 0.0
+hsp_gaps: 4
+query_length: 602
+hsp_align_length: 602
+hsp.identities: 598
+hsp.sbjct_end: 598
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0227b493-c4d0-57fc-a13d-db1a593824d8
+Accession_num: Q8N9A8
+hsp_expect: 2.84267e-88
+hsp_gaps: 17
+query_length: 142
+hsp_align_length: 142
+hsp.identities: 125
+hsp.sbjct_end: 125
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 022afc1f-a12c-843f-ce97-6cb6ab09edb2
+Accession_num: Q4G0J3
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 589
+hsp_align_length: 582
+hsp.identities: 582
+hsp.sbjct_end: 582
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 022e9fba-1b40-f107-2a04-867766058d70
+Accession_num: Q86XX4
+hsp_expect: 3.19299e-25
+hsp_gaps: 70
+query_length: 1976
+hsp_align_length: 633
+hsp.identities: 147
+hsp.sbjct_end: 2537
+hsp.sbjct_start: 1944
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0232f79b-5377-9a73-e104-7ddf4489591e
+Accession_num: Q8IYB4
+hsp_expect: 0.0
+hsp_gaps: 24
+query_length: 602
+hsp_align_length: 626
+hsp.identities: 602
+hsp.sbjct_end: 626
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02358e1b-d1c3-313f-f015-6791cd21aff4
+Accession_num: Q8TBB5
+hsp_expect: 0.0
+hsp_gaps: 57
+query_length: 463
+hsp_align_length: 520
+hsp.identities: 451
+hsp.sbjct_end: 520
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 023c9ebe-596d-992a-5f09-3f498022c498
+Accession_num: O00213
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 490
+hsp_align_length: 470
+hsp.identities: 469
+hsp.sbjct_end: 710
+hsp.sbjct_start: 241
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 024092cf-0069-df35-2e29-86e32f92e88f
+Accession_num: Q16774
+hsp_expect: 1.92163e-146
+hsp_gaps: 0
+query_length: 218
+hsp_align_length: 197
+hsp.identities: 197
+hsp.sbjct_end: 197
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 0253d1ec-2f0c-5e09-17e1-90772d1da155
+Accession_num: P23760
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 403
+hsp_align_length: 399
+hsp.identities: 392
+hsp.sbjct_end: 399
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02559d89-f145-8c89-fa40-f23a2d8b0339
+Accession_num: Q12882
+hsp_expect: 0.0
+hsp_gaps: 0
+query_length: 1025
+hsp_align_length: 1025
+hsp.identities: 1024
+hsp.sbjct_end: 1025
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02571e4e-9cb2-e60c-d08c-f8369e14ee66
+Accession_num: Q8N3S3
+hsp_expect: 0.0
+hsp_gaps: 38
+query_length: 352
+hsp_align_length: 373
+hsp.identities: 335
+hsp.sbjct_end: 373
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02577b92-05e1-aa8b-6417-e5984f67cf38
+Accession_num: P48067
+hsp_expect: 0.0
+hsp_gaps: 69
+query_length: 637
+hsp_align_length: 706
+hsp.identities: 631
+hsp.sbjct_end: 706
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02578cee-c6b3-1364-f7db-a819213f25cc
+Accession_num: Q9BYH1
+hsp_expect: 0.0
+hsp_gaps: 13
+query_length: 1011
+hsp_align_length: 1024
+hsp.identities: 1011
+hsp.sbjct_end: 1024
+hsp.sbjct_start: 1
+INFO:src.Biopython:No identical alignments for this sequence, according to criteria: hsp.expect < 1e-20 and hsp.gaps == 0 and query_length == hsp.align_length == hsp.identities. Therefore this blastp is not 100 % identical. 
+Fastafilename: 02614e00-9243-2f45-7004-b4d3d1ac5076
+Accession_num: O95460
+hsp_expect: 2.66653e-37
+hsp_gaps: 3
+query_length: 499
+hsp_align_length: 210
+hsp.identities: 80
+hsp.sbjct_end: 222
+hsp.sbjct_start: 16
