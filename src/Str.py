@@ -18,6 +18,7 @@ class Str(Enum):
     JSONEXT = '.json'
     CSVEXT = '.csv'
     PDBEXT = '.pdb'
+    LOGEXT = '.log'
     DOTS3 = '...'
     PDBS = Paths.DIR_PDBS.value
     FASTAS = Paths.DIR_FASTAS.value
