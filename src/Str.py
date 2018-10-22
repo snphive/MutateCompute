@@ -33,3 +33,4 @@ class Str(Enum):
     COND_CONC = 'conc'
     PARTALLPATHEXISTS_MSG = 'Part/all dir tree already exists.'
     PROBLNXCMD_MSG = 'Problem with linux command: '
+    REPAIRPDB_  = 'RepairPDB_'
