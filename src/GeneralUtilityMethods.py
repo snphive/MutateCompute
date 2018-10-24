@@ -325,7 +325,7 @@ class GUM(object):
         Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
         This method is currently only used for building output dir for Agadir.
         Takes path_fastafile: /any_dir/any_dir/any_dir/<3dots dir>/<filename>[-3]/<mutants>[-2]/<file.fasta>[-1]
-        It builds: path_root/agadir/<3dots dir>/<filename>/<mutants>
+        It builds: path_root/agadir/<3dots dir>/<filename> into which all the agadir files would go
         (includes <any other subdirs between 3dots_dir and [-3] although none are expected.)
         :param path_root:
         :param path_fastafile:
@@ -336,7 +336,6 @@ class GUM(object):
         :return:
         """
         path_fastafile_split_to_list = path_fastafile.split('/')
-        fastafilename = path_fastafile.split('/')[-1].split['.'][0]
         path_agadir_3dots_dirs = []
         copy_from_here = False
         for path_dir in path_fastafile_split_to_list[:-1]:
@@ -349,8 +348,13 @@ class GUM(object):
                 continue
             if copy_from_here:
                 path_agadir_3dots_dirs.append(path_dir)
-            if add_filename_subdir:
-                path_agadir_3dots_dirs.append(fastafilename)
+        if add_filename_subdir:
+            fastafilename = path_fastafile.split('/')[-1].split('.')[0]
+            suffix = '_mutants'
+            if fastafilename.endswith(suffix):
+                n = len(suffix)
+                fastafilename = fastafilename[:-n]
+            path_agadir_3dots_dirs.append(fastafilename)
         return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
 
     @staticmethod
