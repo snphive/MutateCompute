@@ -268,10 +268,10 @@ class GUM(object):
         return GUM._os_makedirs(path_dst_dir, str(start_num) + Str.DOTS3.value + str(end_num))
 
     @staticmethod
-    def make_root_fastas_3dots_dirs(path_dst_root: str, path_fastafile: str):
+    def make_path_fastas_3dots_dirs(path_dst_root: str, path_fastafile: str):
         """
         Copies the 3dot subdir from the source dir (path_fastafile) and builds a dst dir with the same 3dots subdir.
-        This method is currently only used for bls -luilding output dir for MutateFasta.
+        This method is currently only used for building output dir for MutateFasta.
         Expects path_fastafile to be: ~/PycharmProjects/MutateCompute/input_data/fastas/1...1000/1_A/1_A.fasta
         or ~/PycharmProjects/MutateCompute/input_data/29611_fastas_1000/1...1000/00bdkjhi09234kjn3349_4234.fasta, for
         example.
@@ -297,7 +297,7 @@ class GUM(object):
         return GUM._os_makedirs(path_dst_root, '/'.join(path_fastas_3dots_dirs))
 
     @staticmethod
-    def make_root_agadir_3dots_dirs(path_root: str, path_fastafile: str):
+    def make_path_agadir_3dots_dirs(path_root: str, path_fastafile: str):
         """
         Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
         This method is currently only used for building output dir for Agadir.
@@ -320,7 +320,7 @@ class GUM(object):
         return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
 
     @staticmethod
-    def make_root_agadir_3dots_filename_mutants_dirs(path_root: str, path_fastafile: str):
+    def make_path_agadir_3dots_filename_mutants_dirs(path_root: str, path_fastafile: str, add_filename_subdir: bool):
         """
         Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
         This method is currently only used for building output dir for Agadir.
@@ -329,9 +329,14 @@ class GUM(object):
         (includes <any other subdirs between 3dots_dir and [-3] although none are expected.)
         :param path_root:
         :param path_fastafile:
+        :param add_filename_subdir: True if the dir path should include a dedicated dir name for each file, which is
+        essential for Agadir because the dir names of mutants will be the same between different proteins, and the
+        output files of Agadir do not state the name of the protein in the filename. (This was a new parameter not
+        needed before because the dir structure for input_data used to include filenamedir/mutants/fastafiles
         :return:
         """
         path_fastafile_split_to_list = path_fastafile.split('/')
+        fastafilename = path_fastafile.split('/')[-1].split['.'][0]
         path_agadir_3dots_dirs = []
         copy_from_here = False
         for path_dir in path_fastafile_split_to_list[:-1]:
@@ -344,14 +349,17 @@ class GUM(object):
                 continue
             if copy_from_here:
                 path_agadir_3dots_dirs.append(path_dir)
+            if add_filename_subdir:
+                path_agadir_3dots_dirs.append(fastafilename)
         return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
 
     @staticmethod
-    def make_root_3dots_dirs(path_root: str, path_fastafile: str):
+    def make_path_3dots_dirs(path_root: str, path_fastafile: str):
         """
         Copies the 3dot subdir from the source dir and builds a dst dir with the same 3dot subdir.
-        This method is currently only used for building input dir for individual fastafiles.
-        Expects path_fastafile to be: ~/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/mutants/1_A_mutants.fasta
+        This method is currently only used for building input dir for individual fastafiles - hence not currently used.
+        Expects path_fastafile to be: ~/PycharmProjects/output_data/mutants_fastas/1...1000/1_A/
+        mutants/1_A_mutants.fasta
         As such it builds path of child subdirs of output_data/mutant_fastas upto but not including
         /1_A/mutants/1_A_mutants.fasta
         :param path_root:
@@ -536,7 +544,7 @@ class GUM(object):
         fasta_str = ''
         fastafile = ''
         is_first_line = True
-        path_dst_filename = GUM.make_root_agadir_3dots_dirs(path_dst, path_fastafile)
+        path_dst_filename = GUM.make_path_agadir_3dots_dirs(path_dst, path_fastafile)
         with open(path_fastafile) as f:
             for line in f.readlines():
                 if '>' in line:
