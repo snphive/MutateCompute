@@ -39,7 +39,7 @@ class Scheduler(object):
         start_time = time.perf_counter()
         if path_fastafiles:
             if operations['do_mutate_fasta']:
-                path_output_fastas_3dots = GUM.make_root_fastas_3dots_dirs(path_output, path_fastafiles[0])
+                path_output_fastas_3dots = GUM.make_path_fastas_3dots_dirs(path_output, path_fastafiles[0])
                 mutate_fasta = MutateFasta(amino_acids)
                 for path_fastafile in path_fastafiles:
                     sleep_secs = 0 if len(path_fastafiles) < 200 else len(path_fastafiles) / 5000
@@ -81,7 +81,8 @@ class Scheduler(object):
                 'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile + Str.SPCE.value + Paths.OUTPUT))
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
 
-                    path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(path_output, path_fastafile)
+                    path_dst = GUM.make_path_agadir_3dots_filename_mutants_dirs(path_output, path_fastafile,
+                                                                                add_filename_subdir=True)
                     if use_multithread:
                         # Scheduler._launch_thread(target=agadir.run_agadir_on_multifastas,
                         #                          args=[path_fastafile, path_output])

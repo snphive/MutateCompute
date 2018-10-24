@@ -43,7 +43,7 @@ class MutateFasta(object):
 
         :param path_fastafile:
         """
-        path_output_3dots = GUM.make_root_fastas_3dots_dirs(Paths.OUTPUT, path_fastafile)
+        path_output_3dots = GUM.make_path_fastas_3dots_dirs(Paths.OUTPUT, path_fastafile)
         self.mutate_every_residue(path_fastafile=path_fastafile, write_1_fasta_only=True, write_fasta_per_mut=False,
                                   path_output_3dots=path_output_3dots)
 

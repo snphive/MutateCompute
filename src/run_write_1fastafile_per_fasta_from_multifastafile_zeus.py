@@ -5,7 +5,7 @@ from src.Paths import Paths
 from src.Str import Str
 
 path_fastafile = sys.argv[1]
-path_dst = GUM.make_root_agadir_3dots_filename_mutants_dirs(Paths.OUTPUT, path_fastafile)
+path_dst = GUM.make_path_agadir_3dots_filename_mutants_dirs(Paths.OUTPUT, path_fastafile)
 
 with open(path_fastafile) as f:
     fasta_str = ''
