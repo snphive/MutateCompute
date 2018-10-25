@@ -69,6 +69,7 @@ class Paths(Enum):
             DIR_BLASTP = paths_and_dictionaries['ROOT']['dir_blastp']
             DIR_BASH = paths_and_dictionaries['ROOT']['dir_bash']
             DIR_LOGS = paths_and_dictionaries['ROOT']['dir_logs']
+            DIR_CLSTR_LOGFILES = paths_and_dictionaries['ROOT']['dir_clstr_logfiles']
             #  CLUSTER JOB NAME PREFIXES
             PREFIX_MUTFSTA = paths_and_dictionaries['ROOT']['prefix_mutatefasta']
             PREFIX_BLSTP = paths_and_dictionaries['ROOT']['prefix_blastp']
@@ -133,6 +134,7 @@ class Paths(Enum):
             SE_REPO_PDB_FASTA = os.path.join(ZEUS_SNPEFFECT, DIR_REPO_PDB_FASTA)
             SE_REPO_PDBS = os.path.join(SE_REPO_PDB_FASTA, DIR_PDBS)
             SE_REPO_FASTAS = os.path.join(SE_REPO_PDB_FASTA, DIR_FASTAS)
+            SE_CLSTR_LOGFILES = os.path.join(ZEUS_SNPEFFECT, DIR_CLSTR_LOGFILES)
 
         except yaml.YAMLError as exc:
             print(exc)
