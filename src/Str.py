@@ -34,3 +34,4 @@ class Str(Enum):
     PARTALLPATHEXISTS_MSG = 'Part/all dir tree already exists.'
     PROBLNXCMD_MSG = 'Problem with linux command: '
     REPAIRPDB_  = 'RepairPDB_'
+    GLOBRESIDUE_OUT = 'PSX_globalresidue.out'
