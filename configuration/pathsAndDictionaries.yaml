@@ -49,6 +49,7 @@ ROOT:
     dir_blastp: 'blastp'
     dir_bash: 'bash'
     dir_logs: 'logs'
+    dir_clstr_logfiles: 'cluster_configfiles'
 
     # jobq job name prefixes
     prefix_mutatefasta: 'MF_'
