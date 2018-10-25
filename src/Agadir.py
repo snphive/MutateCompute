@@ -51,6 +51,15 @@ class Agadir(object):
                     mutantfastafile = mutantfastafilename + Str.FSTAEXT.value
                 else:
                     fasta_str += line
+        self.remove_unwanted_globalresidue_output_files(path_dst_mutant_filename)
+
+    def remove_unwanted_globalresidue_output_files(self, path_dst_mutant_filename: str):
+        """
+        :param path_dst_mutant_filename:
+        :return:
+        """
+        path_out_mutantfilename_globalresidue_out = os.path.join(path_dst_mutant_filename, Str.GLOBRESIDUE_OUT.value)
+        GUM.linux_remove_file(path_out_mutantfilename_globalresidue_out)
 
     def compute(self, path_dst_fastafile: str):
         """
@@ -93,7 +102,9 @@ class Agadir(object):
         """
         # There are 3 types of calculations and xx algorithms which this can be applied to.
         # 1) Global total; 2) Window calculation; 3) Residue calculation.
-        Global means ..... Window means..... Residue means .....
+        Global means the sum of all the scores for the whole protein.
+        Residue means the score for each residue in the whole protein.
+        Window means .....
         :param ntrm:
         :param ctrm:
         :param global_tot:
