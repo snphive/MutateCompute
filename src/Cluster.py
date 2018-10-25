@@ -105,7 +105,9 @@ class Cluster(object):
         if cluster_node != '':
             job_q.append('#$ -l hostname=' + cluster_node + Str.NEWLN.value)
         if 'agadir' in python_script_with_paths.lower():
-            job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles' + Str.NEWLN.value)
+            # job_q.append('#$ -wd /switchlab/group/shazib/SnpEffect/cluster_logfiles' + Str.NEWLN.value)
+            job_q.append('#$ -wd' + Str.SPCE.value + Paths.SE_CLSTR_LOGFILES.value + Str.NEWLN.value)
+
         # else:
         #     job_q.append('#$ -wd' + Str.SPCE.value + path_dst_dir + Str.NEWLN.value)
         else:
