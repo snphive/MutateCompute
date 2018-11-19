@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+"""
+Class for writing job.q bash and to run a job using the job.q bash script.
+Includes a nested Enum of cluster-specific strings located at the end of the class.
+"""
+
 import os
 import sys
 from src.Str import Str
@@ -47,6 +53,14 @@ import time
 # -l h_rt=<hh:mm:ss>        Maximum run time (hours, minutes and seconds)
 # -l s_rt=<hh:mm:ss>        Soft run time limit - NB: both s_rt and h_rt must be set.
 # -wd <dir>                 Set working directory for this job as <dir>
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 class Cluster(object):

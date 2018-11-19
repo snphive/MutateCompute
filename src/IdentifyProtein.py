@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+Class for mapping amino acid sequences (FASTA format) to proteins in Swissprot database. Designed to only return hits
+that share 100% identity.
+
+Includes nested Enum of strings specific to this class, located at end of class.
+"""
 import os
 import json
 import glob
@@ -13,9 +20,15 @@ from src.GeneralUtilityMethods import GUM
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
-# Class to take any protein identifier, pdb file, FASTA, and identify the protein, potentially via Blast and/or then
-# mapping whatever identifier the input has with the recognised identifiers (1_A to 32431_A from RvdK's repaired pdbs)
+
 class IdProt(object):
 
     @staticmethod
@@ -89,7 +102,7 @@ class IdProt(object):
         return blastp_dict_list
 
     @staticmethod
-    def _has_all_A_sequence(path_fastafile):
+    def _has_all_A_sequence(path_fastafile: str):
         is_all_A = True
         fasta_str = GUM.get_sequenceOnly_from_fastafile(path_fastafile)
         for aa in fasta_str:

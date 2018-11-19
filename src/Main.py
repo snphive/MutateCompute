@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+Class for initiating all programs except blast.
+
+Calling the constuctor can be done in the IDE through the short script called KickOff.py.
+Alternatively it can be run from the command line via KickOff.sh, which does the following 3 things:
+1. Sources .profile script that sets the python environment variable to this MutateCompute project folder.
+2. Sets path to the virtual environment folder which includes all the downloaded libraries used here.
+3. Executes KickOff.py via python3 command to indicate that version 3 and not 2 should be used here.
+"""
+
 import glob
 import natsort
 from src.Scheduler import Scheduler
@@ -5,14 +16,15 @@ from src.Str import Str
 from src.Paths import Paths
 from src.AminoAcids import AA
 
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
-# Everything, other than the Blast program, runs from here, via the constructor of Main().
-#
-# Calling the constuctor can be done in the IDE through the short script called KickOff.py.
-# Alternatively it can be run from the command line via KickOff.sh, which does 3 essential things:
-# 1. Sources .profile script that sets the python environment variable to this MutateCompute project folder.
-# 2. Sets path to the virtual environment folder which includes all the downloaded libraries used here.
-# 3. Executes KickOff.py via python3 command to indicate that version 3 and not 2 should be used here.
+
 class Main(object):
 
     def __init__(self, operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfiles: list,

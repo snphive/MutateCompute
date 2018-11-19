@@ -2,6 +2,14 @@ import sys
 from src.AminoAcids import AA
 from src.MutateFasta import MutateFasta
 
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
+
 path_fastafile = sys.argv[1]
 write_1_fasta_only = (sys.argv[2] == 'True')
 write_fasta_per_mut = (sys.argv[3] == 'True')

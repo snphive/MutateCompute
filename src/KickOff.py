@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+"""
+Script for running programs on files in different folders, locally or on cluster. Typically to run a folder of 1000
+input files through a particular algorithm. This would be instead of reading in more than 10000 files at a time, as the
+latter seems to cause problems with iterating through such a large list in a for loop - (I experienced a delay on
+looping through a list of more than 70000, whereby computations missed out about half of the inputs, thereby generating
+only about half of the outputs).
+"""
 import os
 import sys
 import glob
@@ -15,14 +23,17 @@ import multiprocessing as mp
 import pydevd
 pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
-"""
-This module is for doing batch runs, locally or on cluster, typically running a folder of 1,000 input files through a
-computation. 
-This instead of reading in > 10,000 files at a time, as the latter seems to cause problems with iterating through such 
-a large list in a for loop - (I experienced a delay on looping through a list of > 70,000, whereby the computations 
-missed out about half of the inputs, generating only half of the outputs).   
-"""
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
+"""
+Set up paths.
+"""
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
 operations = {'do_mutate_fasta': False, 'do_agadir': True, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
               'do_foldx_stability': False, 'do_foldx_analysecomplex': False}

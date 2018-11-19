@@ -1,12 +1,31 @@
+#!/usr/bin/env python3
+"""
+Class for launching FoldX algorithms (BuildModel, AnalyseComplex, Stability). Includes code for writing FoldX'' runscript
+file and processing output files.
+Includes a nested Enum of FoldX-specific strings located at the end of the class.
+"""
 import subprocess
 import os
 from src.Str import Str
 from src.Paths import Paths
 from src.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
+import mysql.connector
+from src.Conditions import Cond
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 class FoldX(object):
+
+    def __init__(self):
+        self.BuildModel(Cond.INCELL_MAML_FX.value).write_ddG_to_DB()
 
     # 30.07.18 Redesigned the directory structure such that runscripts will go in configuration/foldx/ & maybe another
     # level such as analyse_complex or build_model or stability etc.
@@ -123,6 +142,19 @@ class FoldX(object):
             for fx_mutant_name in fx_mutant_name_list:
                 path_output_pdbname_mutant = os.path.join(Paths.OUTPUT, pdbname, fx_mutant_name)
                 self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
+
+        def write_ddG_to_DB(self):
+            connection = mysql.connector.connect(user='snpeffect_v5',
+                                                 password='R34WKKGR',
+                                                 host='127.0.0.1')
+                                                #, database='snpeffect_v5', port='3306')
+            cursor = connection.cursor()
+            cursor.execute("SHOW DATABASES")
+            for x in cursor:
+                print(x)
+            # cursor.execute("CREATE DATABASE SnpEffect_v5.0")
+            # cursor.execute(
+            #     "CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
 
         def _write_ddG_csv_file(self, path_output_pdbname_mutant: str, pdbname: str, fx_mutant_name: str):
             """

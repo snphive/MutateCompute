@@ -1,6 +1,19 @@
+#!/usr/bin/env python3
+"""
+Enum for amino acid lists and dictionaries. Read from yaml file.
+"""
+
 import yaml
 import os
 from enum import Enum
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 # Name of enum may change from AminoAcids.AA if other types of data are stored here in future.

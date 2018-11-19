@@ -7,6 +7,14 @@ from src.Cluster import Cluster
 from src.IdentifyProtein import IdProt
 from src.GeneralUtilityMethods import GUM
 
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
+
 # path_input_fastafile_list = sys.argv[1].split(';')
 path_input_fastafile_list = glob.glob(sys.argv[1] + '/*.fasta')
 path_output = sys.argv[2]
@@ -27,7 +35,7 @@ for path_fastafile in path_input_fastafile_list:
         path_output_blastp_fastaname = GUM._os_makedirs(path_output_blastp, fastafile_name)
         os.chdir(path_output_blastp_fastaname)
         Cluster.run_job_q(path_job_q_dir=path_config_job)
-        Cluster.wait_for_grid_engine_job_to_complete(grid_engine_jobname=jobname)
+        Cluster.wait_for_grid_engine_job_to_complete(grid_engine_job_prefix=jobname)
         path_raw_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name,
                                                          blastp_result=NCBIWWW.qblast(
                                                              program=Biopy.BlastParam.BLST_P.value,

@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""
+Script for removing specific (unnecessary) files from particular output directories.
+"""
 from src.FoldX import FoldX
 from src.Paths import Paths
 from src.GeneralUtilityMethods import GUM
@@ -10,6 +14,14 @@ import subprocess
 from os import walk
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 # fx_mutant_dirs = []
 # pdbname = 'RepairPDB_2'

@@ -1,6 +1,18 @@
-from src.Paths import Paths
+#!/usr/bin/env python3
+"""
+Enum for strings used by more than 1 other class.
+"""
 
+from src.Paths import Paths
 from enum import Enum
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 class Str(Enum):

@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+"""
+Class for running Blastp via Biopython.
+Includes a nested Enum of Biopython-specific strings located at the end of the class.
+"""
+
 # Biopython packages NCBIWWW and NCBIXML are used here to perform a blast of query fasta sequences and to parse the
 # resulting output xml file, respectively.
 #######################################################################################################################
@@ -38,6 +44,14 @@ from src.Str import Str
 from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 from Bio import SeqIO
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 class Biopy(object):

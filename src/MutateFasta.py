@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+Class for generating mutated protein sequences (FASTA format) at every position in the protein to any other
+amino acid(s).
+"""
 import os
 from src.GeneralUtilityMethods import GUM
 from Bio.Seq import MutableSeq
@@ -5,6 +10,14 @@ from Bio.Alphabet import IUPAC
 from src.Paths import Paths
 from src.AminoAcids import AA
 from src.Str import Str
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 class MutateFasta(object):

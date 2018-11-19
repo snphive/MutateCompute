@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+"""
+Class for running program(s) on each file from a list of files. This is where multithreading code is intended to be
+(though not up and running).
+"""
+
 import os
 import time
 from multiprocessing import Process
@@ -16,6 +22,14 @@ from src.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 from src.Paths import Paths
 from src.Str import Str
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 class Scheduler(object):

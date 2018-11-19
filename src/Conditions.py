@@ -1,5 +1,18 @@
+#!/usr/bin/env python3
+"""
+Enum for different conditions used in FoldX algorithms.
+"""
+
 from src.Str import Str
 from enum import Enum
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 class Cond(Enum):

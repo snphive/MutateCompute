@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+Class for launching Agadir algorithms. Includes code for writing Agadir's options file and processing output files.
+"""
+
 import os
 import glob
 import subprocess
@@ -10,6 +15,14 @@ import natsort
 import time
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 
 class Agadir(object):
@@ -55,7 +68,8 @@ class Agadir(object):
 
     def remove_unwanted_globalresidue_output_files(self, path_dst_mutant_filename: str):
         """
-        :param path_dst_mutant_filename:
+        Deemed unnecessary (in JS meeting 24.10.18), the PSX_globalresidue.output file is to be deleted to save space.
+        :param path_dst_mutant_filename: Absolute path of the file to be deleted.
         :return:
         """
         path_out_mutantfilename_globalresidue_out = os.path.join(path_dst_mutant_filename, Str.GLOBRESIDUE_OUT.value)

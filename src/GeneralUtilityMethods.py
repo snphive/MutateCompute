@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+Class GeneralUtilityMethods for "general purpose" methods used by more than 1 other class. Includes for linux commands.
+
+Some variable naming conventions that I employ here are (the following are all always strings):
+'fasta': FASTA sequence only, hence without any name given on the line above, prefixed with '>'.
+'fasta_str': FASTA name and sequence. Hence '>synuclein\nMDVFMKGLS...'
+'fastafile': name of the fasta file, including the file extension which is typically '.fasta'
+'fastafilename': name of the fasta file, not including the file extension. This might be used to make a file specific
+ subdir (i.e. bearing the same name.)
+"""
 import os
 import glob
 import sys
@@ -12,15 +23,13 @@ from src.Paths import Paths
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
-"""
-Some variable naming conventions that I employ here are (the following are all always strings): 
-'fasta': FASTA sequence only, hence without any name given on the line above, prefixed with '>'.
-'fasta_str': FASTA name and sequence. Hence '>synuclein\nMDVFMKGLS...'
-'fastafile': name of the fasta file, including the file extension which is typically '.fasta'
-'fastafilename': name of the fasta file, not including the file extension. This might be used to make a file specific 
- subdir (i.e. bearing the same name.)
-"""
-
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 class GUM(object):
 

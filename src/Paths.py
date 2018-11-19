@@ -1,14 +1,30 @@
+#!/usr/bin/env python3
+"""
+Enum for all paths used. Root paths and individual directory names read from yaml file, full paths built at runtime to
+be either for local computer or remotely (cluster).
+
+All paths are constants and stored in the configuration directory in 'pathsAndDictionaries' yaml file.
+They are read into the Paths enum from which all other classes source all path strings.
+
+All paths are absolute paths unless prefix with an "REL_" which indicates they are relative paths.
+
+"""
+
 import os
 import yaml
 from enum import Enum
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
-# All paths are constants and stored in the configuration directory in 'pathsAndDictionaries' yaml file.
-# They are read into the Paths enum from which all other classes source all path strings.
-#
-# All paths are absolute paths unless prefix with an "REL_" which indicates they are relative paths.
+
 class Paths(Enum):
 
     cwd = os.getcwd()
