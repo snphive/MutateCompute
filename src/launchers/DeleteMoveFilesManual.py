@@ -2,13 +2,10 @@
 """
 Script for removing specific (unnecessary) files from particular output directories.
 """
-from src.Paths import Paths
-from src.Str import Str
+from src.tools.Paths import Paths
 import os
-import glob
 import sys
-import subprocess
-from src.OutputsParser import Parser
+from src.tools.OutputsParser import Parser
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 

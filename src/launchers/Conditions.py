@@ -3,7 +3,7 @@
 Enum for different conditions used in FoldX algorithms.
 """
 
-from src.Str import Str
+from src.enums.Str import Str
 from enum import Enum
 
 __author__ = "Shahin Zibaee"

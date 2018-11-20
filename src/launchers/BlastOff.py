@@ -5,15 +5,12 @@ Script for launching Blastp runs.
 
 import sys
 import os
-import natsort
 import glob
-from src.Paths import Paths
+from src.tools.Paths import Paths
 from src.Scheduler import Scheduler
-from src.Str import Str
+from src.enums.Str import Str
 import logging
-from src.IdentifyProtein import IdProt
-from src.GeneralUtilityMethods import GUM
-import threading
+
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 

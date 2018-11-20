@@ -13,9 +13,9 @@ import sys
 import glob
 
 from src.Main import Main
-from src.Paths import Paths
-from src.AminoAcids import AA
-from src.Str import Str
+from src.tools.Paths import Paths
+from src.enums.AminoAcids import AA
+from src.enums.Str import Str
 
 import pydevd
 pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
