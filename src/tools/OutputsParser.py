@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 import os
-import gzip
-import shutil
 import tarfile
-from src.Str import Str
+from src.enums.Str import Str
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"

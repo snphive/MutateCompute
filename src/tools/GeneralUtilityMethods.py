@@ -15,9 +15,9 @@ import shutil
 import subprocess
 import time
 import warnings
-from src.Str import Str
-from src.AminoAcids import AA
-from src.Paths import Paths
+from src.enums.Str import Str
+from src.enums.AminoAcids import AA
+from src.tools.Paths import Paths
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
