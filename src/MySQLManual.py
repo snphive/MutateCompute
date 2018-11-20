@@ -3,7 +3,7 @@
 Script for connecting to and reading/writing from/to a MySQL database.
 """
 import mysql.connector
-# # import mysqlx.connection
+# import mysqlx.connection
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"

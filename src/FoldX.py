@@ -2,7 +2,8 @@
 """
 Class for launching FoldX algorithms (BuildModel, AnalyseComplex, Stability). Includes code for writing FoldX'' runscript
 file and processing output files.
-Includes a nested Enum of FoldX-specific strings located at the end of the class.
+
+(Includes a nested Enum of FoldX-specific strings located at the end of the class.)
 """
 import subprocess
 import os

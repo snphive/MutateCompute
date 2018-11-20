@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Class for writing job.q bash and to run a job using the job.q bash script.
-Includes a nested Enum of cluster-specific strings located at the end of the class.
+
+(Includes a nested Enum of cluster-specific strings located at the end of the class.)
 """
 
 import os

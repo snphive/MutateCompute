@@ -11,13 +11,11 @@ Some variable naming conventions that I employ here are (the following are all a
 """
 import os
 import glob
-import sys
 import shutil
 import subprocess
 import time
 import warnings
 from src.Str import Str
-from natsort import natsort
 from src.AminoAcids import AA
 from src.Paths import Paths
 # import pydevd
@@ -30,6 +28,7 @@ __version__ = "1.0.0"
 __maintainer__ = "Shahin Zibaee"
 __email__ = "shahinzibaee@hotmail.com"
 __status__ = "Development"
+
 
 class GUM(object):
 

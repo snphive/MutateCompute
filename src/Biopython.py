@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Class for running Blastp via Biopython.
-Includes a nested Enum of Biopython-specific strings located at the end of the class.
+
+(Includes a nested Enum of Biopython-specific strings located at the end of the class.)
 """
 
 # Biopython packages NCBIWWW and NCBIXML are used here to perform a blast of query fasta sequences and to parse the
@@ -38,9 +39,6 @@ Includes a nested Enum of Biopython-specific strings located at the end of the c
 import warnings
 import logging
 import time
-import os
-from src.Paths import Paths
-from src.Str import Str
 from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 from Bio import SeqIO
@@ -93,7 +91,7 @@ class Biopy(object):
     @staticmethod
     def parse_filter_blastp_xml_to_dict(path_raw_blstp_xml: str, fastafilename: str, path_fastafile: str):
         """
-        Parses qblast result and filters (assigns to a data structure) only those fields that are of interest.
+        Parse qblast result and filters (assigns to a data structure) only those fields that are of interest.
         #
         # NCBIXML.read() takes the _io.TextIOTextWrapper (which is created when xml file is opened).
         # NCBIXML.read() returns a Bio.Blast.Record.Blast object that has assigned various values in the qblast record as
@@ -193,6 +191,13 @@ class Biopy(object):
 
     @staticmethod
     def _assign_alignment_and_hsp_values(alignment_dict, alignment, hsp):
+        """
+
+        :param alignment_dict:
+        :param alignment:
+        :param hsp:
+        :return:
+        """
         alignment_dict['accession_num'] = alignment.accession
         alignment_dict['length'] = alignment.length
         alignment_dict['hit_def'] = alignment.hit_def
@@ -234,16 +239,17 @@ class Biopy(object):
                                        filename="Biopy", lineno=65)
 
     from enum import Enum
-
-    # Created to hold constant values.
-    # BLST_P        is qblast for protein sequences
-    # MAX_ALIGN_..  Currently I have given a choice of using a max number of alignments to return from blast at either
-    #               5 or 20
-    # MAX_HIT_..    Currently I have given a choice of using a max number of hits to return from blast at either 5 or 20
+    """
+    Created to hold constant values.
+    BLST_P        is qblast for protein sequences
+    MAX_ALIGN_..  Currently I have given a choice of using a max number of alignments to return from blast at either
+                  5 or 20
+    MAX_HIT_..    Currently I have given a choice of using a max number of hits to return from blast at either 5 or 20
+    """
     class BlastParam(Enum):
-        BLST_P = "blastp"
-        SWSPRT = "swissprot"
-        HOMSAP_ORG = "Homo Sapiens[Organism]"
+        BLST_P = 'blastp'
+        SWSPRT = 'swissprot'
+        HOMSAP_ORG = 'Homo Sapiens[Organism]'
         MAX_ALIGN_5 = 5
         MAX_HIT_5 = 5
         MAX_ALIGN_20 = 20

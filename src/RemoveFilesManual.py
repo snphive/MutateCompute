@@ -2,16 +2,12 @@
 """
 Script for removing specific (unnecessary) files from particular output directories.
 """
-from src.FoldX import FoldX
 from src.Paths import Paths
-from src.GeneralUtilityMethods import GUM
-from src.Conditions import Cond
 from src.Str import Str
 import os
 import glob
 import sys
 import subprocess
-from os import walk
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
@@ -23,29 +19,24 @@ __maintainer__ = "Shahin Zibaee"
 __email__ = "shahinzibaee@hotmail.com"
 __status__ = "Development"
 
-# fx_mutant_dirs = []
-# pdbname = 'RepairPDB_2'
-# for (dirpath, dirnames, filenames) in walk(os.path.join(Paths.SE_OUTPUT_BM.value, pdbname)):
-#     fx_mutant_dirs.extend(dirnames)
-#     break
-#
-# for fx_mutant_dir in fx_mutant_dirs:
-#     bm = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
-#     path_output_pdbname_mutant = os.path.join(Paths.SE_OUTPUT_BM.value, pdbname, fx_mutant_dir)
-#     bm.remove_config_files(path_output_pdbname_mutant)
-#     path_pdbfile = os.path.join(path_output_pdbname_mutant, pdbname + '.pdb')
-#     if os.path.exists(path_pdbfile):
-#         GUM.linux_remove_file(path_pdbfile)
 
-
+"""
+Set up paths.
+"""
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
-use_multithread = False
-# path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/**/*.fasta', recursive=True))
+
+"""
+Select files for deletion.
+"""
 path_output_agadir_globresidfiles = Paths.OUTPUT_AGADIR + '/1...250/**/' + Str.GLOBRESIDUE_OUT.value
 path_globalresidueout_files = sorted(glob.glob(path_output_agadir_globresidfiles, recursive=True))
 if not path_globalresidueout_files:
     raise ValueError('No PSX_globalresidue.out files to delete. Check paths are correct and check files are where you '
                      'expect.')
+
+"""
+Delete files.
+"""
 for path_globalresidueout_file in path_globalresidueout_files:
     # GUM.linux_remove_file(path_globalresidueout_file)
     if not os.path.exists(path_globalresidueout_file):
@@ -59,5 +50,27 @@ for path_globalresidueout_file in path_globalresidueout_files:
             print(fnf)
         except OSError:
             print(Str.PROBLNXCMD_MSG.value + cmd)
+
+
+# Running FoldX BuildModel and deleting config files immediately after running.
+#
+# from src.FoldX import FoldX
+# from src.GeneralUtilityMethods import GUM
+# from src.Conditions import Cond
+# from os import walk
+#
+# fx_mutant_dirs = []
+# pdbname = 'RepairPDB_2'
+# for (dirpath, dirnames, filenames) in walk(os.path.join(Paths.SE_OUTPUT_BM.value, pdbname)):
+#     fx_mutant_dirs.extend(dirnames)
+#     break
+#
+# for fx_mutant_dir in fx_mutant_dirs:
+#     bm = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
+#     path_output_pdbname_mutant = os.path.join(Paths.SE_OUTPUT_BM.value, pdbname, fx_mutant_dir)
+#     bm.remove_config_files(path_output_pdbname_mutant)
+#     path_pdbfile = os.path.join(path_output_pdbname_mutant, pdbname + '.pdb')
+#     if os.path.exists(path_pdbfile):
+#         GUM.linux_remove_file(path_pdbfile)
 
 # pydevd.stoptrace()

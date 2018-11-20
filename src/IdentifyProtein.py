@@ -3,20 +3,16 @@
 Class for mapping amino acid sequences (FASTA format) to proteins in Swissprot database. Designed to only return hits
 that share 100% identity.
 
-Includes nested Enum of strings specific to this class, located at end of class.
+(Includes nested Enum of strings specific to this class, located at end of class.)
 """
 import os
 import json
-import glob
-import natsort
-import threading
 import time
 from src.Str import Str
 from src.Biopython import Biopy
 from src.Paths import Paths
 from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
-
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
@@ -131,7 +127,7 @@ class IdProt(object):
             f.write(blstp_read)
             blastp_result.close()
         if os.stat(path_output_blastp_xmlfile).st_size > IdProt.Strng.EST_MAX_SZE_BLSTP_RUN_300_KB.value:
-            # Not sure this needs to raise ValueError, rather than exception so that it can continue rather than halt execution.
+            # Not sure this needs to raise ValueError, rather than exception so that it can continue not halt execution.
             raise ValueError("blast xml output size is over 300 KB in size. Something may have gone wrong with the "
                              "blastp run.")
         return path_output_blastp_xmlfile
