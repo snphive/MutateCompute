@@ -31,6 +31,7 @@ class Str(Enum):
     CSVEXT = '.csv'
     PDBEXT = '.pdb'
     LOGEXT = '.log'
+    TARGZEXT = '.tar.gz'
     DOTS3 = '...'
     PDBS = Paths.DIR_PDBS.value
     FASTAS = Paths.DIR_FASTAS.value
