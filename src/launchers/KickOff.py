@@ -50,7 +50,6 @@ Get the pdb files you want to run FoldX on.
 """
 path_pdbfiles = []
 
-
 """
 Get the fasta files you want to run mutate_fasta or agadir on.
 Select range of folder names (which have a numeric component) from which fasta files are to be read. 
@@ -74,8 +73,6 @@ for i in range(29):
         break
     startnum += 1000
     endnum += 1000
-
-
 
 # pydevd.stoptrace()
 
