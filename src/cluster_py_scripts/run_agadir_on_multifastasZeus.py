@@ -1,9 +1,9 @@
 import sys
 import os
-from src.GeneralUtilityMethods import GUM
+from src.tools.GeneralUtilityMethods import GUM
 from src.Agadir import Agadir
-from src.Agadir import AgadCndtns
-from src.Str import Str
+from src.enums.Conditions import Cond
+from src.enums.Str import Str
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -25,7 +25,6 @@ crucial to prevent too much memory taken up by each file when running large numb
 """
 
 print('run_agadir_on_multifastasZeus.py ###################################')
-# agadir = Agadir(AgadCndtns.INCELL_MAML.value)
 path_dst = GUM.make_path_agadir_3dots_filename_mutants_dirs(path_dst, path_fastafile, add_filename_subdir=True)
 with open(path_fastafile) as f:
     is_first_line = True
@@ -39,7 +38,7 @@ with open(path_fastafile) as f:
                 path_dst_mutant_file = os.path.join(path_dst_mutant_filename, mutantfastafile)
                 with open(path_dst_mutant_file, 'w') as g:
                     g.write(fasta_str)
-                agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+                agadir = Agadir(Cond.INCELL_MAML.value)
                 agadir.compute(path_dst_mutant_file)
                 GUM.linux_remove_file(path_dst_mutant_file)
             fasta_str = line

@@ -5,7 +5,7 @@ from src.Biopython import Biopy
 from Bio.Blast import NCBIWWW
 from src.Cluster import Cluster
 from src.IdentifyProtein import IdProt
-from src.GeneralUtilityMethods import GUM
+from src.tools.GeneralUtilityMethods import GUM
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"

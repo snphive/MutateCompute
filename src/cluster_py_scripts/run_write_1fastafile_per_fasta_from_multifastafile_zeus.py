@@ -1,8 +1,8 @@
 import sys
 import os
-from src.GeneralUtilityMethods import GUM
-from src.Paths import Paths
-from src.Str import Str
+from src.tools.GeneralUtilityMethods import GUM
+from src.tools.Paths import Paths
+from src.enums.Str import Str
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"

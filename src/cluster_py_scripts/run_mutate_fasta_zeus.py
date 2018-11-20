@@ -1,5 +1,5 @@
 import sys
-from src.AminoAcids import AA
+from src.enums.AminoAcids import AA
 from src.MutateFasta import MutateFasta
 
 __author__ = "Shahin Zibaee"
