@@ -54,3 +54,7 @@ print('Time taken to complete iterating through fasta_list (after methods have b
 # @hosts(HOST)
 # def do_something():
 #     run(COMMAND)
+
+# (The below uses "List comprehension")
+# files_only = [f for f in os.listdir(path_to_some_root_dir) if
+#               os.path.isfile(os.path.join(path_to_some_root_dir, f))]
