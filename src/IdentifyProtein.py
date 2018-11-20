@@ -7,12 +7,11 @@ that share 100% identity.
 """
 import os
 import json
-import time
-from src.Str import Str
+from src.enums.Str import Str
 from src.Biopython import Biopy
-from src.Paths import Paths
+from src.tools.Paths import Paths
 from src.Cluster import Cluster
-from src.GeneralUtilityMethods import GUM
+from src.tools.GeneralUtilityMethods import GUM
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
