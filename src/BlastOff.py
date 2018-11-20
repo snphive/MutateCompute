@@ -36,15 +36,19 @@ Set up logger.
 logfile = os.path.join(Paths.LOGS, 'log' + Str.LOGEXT.value)
 logging.basicConfig(filename=logfile, level=logging.DEBUG)
 
+"""
+Get the fasta files you want to run mutate_fasta or agadir on.
+"""
 startnum = 1
 endnum = 1000
 path_input_files = os.path.join(Paths.INPUT_29611_FASTAS_1000, str(startnum) + Str.DOTS3.value + str(endnum))
-
-
 path_fastafiles = sorted(glob.glob(path_input_files + '/**/*.fasta', recursive=True))
-
 if not path_fastafiles:
     raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
+
+"""
+Kick off the program(s) via Scheduler's method start_blast().
+"""
 Scheduler.start_blast(path_input_fastafiles=path_fastafiles, path_output=Paths.OUTPUT, write_idmaps_for_mysldb=True,
                       write_csv=True, write_xml=True, write_json=False)
 
@@ -52,13 +56,5 @@ Scheduler.start_blast(path_input_fastafiles=path_fastafiles, path_output=Paths.O
 #                                                 write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
 #                                                 write_json=False)
 
-
-"""
-PROGRAM           INPUT FILES & DIRECTORIES                           OUTPUT FILES & DIRECTORIES
--------------------------------------------------------------------------------------------------------------------
-IdentifyProtein   input_data/<fastafilename>/                         output_data/blastp/
-                                                                      output_data/blastp/<fastafilename>_idmaps/
-Runs locally. Problem with running it as it is (via Biopython on the cluster).
-"""
 
 # pydevd.stoptrace()
