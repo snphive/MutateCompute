@@ -12,9 +12,9 @@ Alternatively it can be run from the command line via KickOff.sh, which does the
 import glob
 import natsort
 from src.Scheduler import Scheduler
-from src.Str import Str
-from src.Paths import Paths
-from src.AminoAcids import AA
+from src.enums.Str import Str
+from src.tools.Paths import Paths
+from src.enums.AminoAcids import AA
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
