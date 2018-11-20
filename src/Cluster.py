@@ -6,10 +6,9 @@ Class for writing job.q bash and to run a job using the job.q bash script.
 """
 
 import os
-import sys
-from src.Str import Str
+from src.enums.Str import Str
 import subprocess
-from src.Paths import Paths
+from src.tools.Paths import Paths
 import time
 
 # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
