@@ -27,18 +27,19 @@ Paths for the entire codebase are set accordingly. "use_cluster" is set to False
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
 
 if 'switchlab/group' in os.getcwd() and sys.argv[1].strip(' ') != 'use_cluster=True':
-    raise ValueError('Program seems to be called from within /switchlab/group path. This is likely to be the psb '
-                     'cluster path but the "use_cluster" parameter is not set to True. Please check you are starting '
-                     'the program with bash/KickOffZeus.sh which includes the "use_cluster=True" parameter. \n'
+    raise ValueError('Current working directory includes "/switchlab/group" in path. Hence you may be running the '
+                     'program on the psb cluster. However the "use_cluster" parameter is set to False. '
+                     'If launching from one of the bash scripts, check you are using bash/KickOffZeus.sh which '
+                     'includes ("use_cluster=True") parameter, as opposed to the bash/KickOff.sh script. \n'
                      'Alternatively, uncomment the Paths.set_up_paths(use_cluster=True) line below to manually set it' 
-                     'here. (Edit True to False if you are running it locally and not on the cluster)')
+                     'here.')
 # Paths.set_up_paths(use_cluster=True)
 
 if 'switchlab/group' not in os.getcwd() and sys.argv[1].strip(' ') == 'use_cluster=True':
-    raise ValueError('Program seems to be called from outside of /switchlab/group path. Hence it is likely you are not '
+    raise ValueError('Current working directory does not include "/switchlab/group" in path. Hence you might not be ' 
                      'running the program on the psb cluster. However the "use_cluster" parameter is set to True. '
-                     'Please check you are either starting the program with bash/KickOff.sh which includes the '
-                     '"use_cluster=False" parameter. \n'
+                     'If launching from one of the bash scripts, check you are using bash/KickOff.sh which includes '
+                     '("use_cluster=False") parameter, as opposed to the bash/KickOffZeus.sh script. \n'
                      'Alternatively, uncomment the Paths.set_up_paths(use_cluster=False) line below to manually set it' 
                      'here.')
 # Paths.set_up_paths(use_cluster=False)
