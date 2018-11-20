@@ -223,7 +223,7 @@ class GUM(object):
 
     # From 07Aug, started phasing in use os.makedirs() instead of my own create_dir_tree() method.
     @staticmethod
-    def _os_makedirs(path_root: str, *new_dirs):
+    def os_makedirs(path_root: str, *new_dirs):
         """
         :param path_root:
         :param new_dirs:
@@ -273,7 +273,7 @@ class GUM(object):
         :param end_num: Ending number of 3dot dir, e.g. 100 in the dir name 1...100
         :return: str, Absolute path of newly made 3dot directory.
         """
-        return GUM._os_makedirs(path_dst_dir, str(start_num) + Str.DOTS3.value + str(end_num))
+        return GUM.os_makedirs(path_dst_dir, str(start_num) + Str.DOTS3.value + str(end_num))
 
     @staticmethod
     def make_path_fastas_3dots_dirs(path_dst_root: str, path_fastafile: str):
@@ -302,7 +302,7 @@ class GUM(object):
                 path_fastas_3dots_dirs.append(dir_in_path_fastafile)
                 if Str.DOTS3.value in dir_in_path_fastafile:
                     break
-        return GUM._os_makedirs(path_dst_root, '/'.join(path_fastas_3dots_dirs))
+        return GUM.os_makedirs(path_dst_root, '/'.join(path_fastas_3dots_dirs))
 
     @staticmethod
     def make_path_agadir_3dots_dirs(path_root: str, path_fastafile: str):
@@ -325,7 +325,7 @@ class GUM(object):
                 continue
             if copy_from_here:
                 path_agadir_3dots_dirs.append(path_dir)
-        return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
+        return GUM.os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
 
     @staticmethod
     def make_path_agadir_3dots_filename_mutants_dirs(path_root: str, path_fastafile: str, add_filename_subdir: bool):
@@ -363,7 +363,7 @@ class GUM(object):
                 n = len(suffix)
                 fastafilename = fastafilename[:-n]
             path_agadir_3dots_dirs.append(fastafilename)
-        return GUM._os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
+        return GUM.os_makedirs(path_root, '/'.join(path_agadir_3dots_dirs))
 
     @staticmethod
     def make_path_3dots_dirs(path_root: str, path_fastafile: str):
@@ -390,7 +390,7 @@ class GUM(object):
                 path_input_3dots_dirs.append(path_dir)
             elif path_dir == Paths.DIR_OUTPUT.value:
                 copy_from_here = True
-        return GUM._os_makedirs(path_root, '/'.join(path_input_3dots_dirs))
+        return GUM.os_makedirs(path_root, '/'.join(path_input_3dots_dirs))
 
     # THESE LINUX COPY METHODS WILL BE COMBINED INTO ONE WITH FLAGS FOR CREATING OWN SUBDIRS BASED ON FILE NAMES AND
     # AND FOR DOING THE COPY RECURSIVELY. A FILELIST WILL ALSO BE INCLUDED BUT CAN BE EMPTY. IT MIGHT ALSO BE WORTH
@@ -427,7 +427,7 @@ class GUM(object):
         for path_src_file in path_src_files:
             if into_own_subdirs:
                 filename = path_src_file.split('/')[-1].split('.')[0]
-                path_dst_filenamedir = GUM._os_makedirs(path_dst, filename)
+                path_dst_filenamedir = GUM.os_makedirs(path_dst, filename)
                 cmd = 'cp -n' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst_filenamedir
             else:
                 cmd = 'cp -n' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst
@@ -462,7 +462,7 @@ class GUM(object):
         for path_file_in_dir in path_files_in_dir:
             if os.path.isfile(path_file_in_dir):
                 filename = path_file_in_dir.split('/')[-1].split('.')[0]
-                path_dir_filename = GUM._os_makedirs(path_dir, filename)
+                path_dir_filename = GUM.os_makedirs(path_dir, filename)
                 cmd = 'mv' + Str.SPCE.value + path_file_in_dir + Str.SPCE.value + path_dir_filename
                 try:
                     subprocess.call(cmd, shell=True)
@@ -528,7 +528,7 @@ class GUM(object):
             if Paths.DIR_FASTAS.value == path_repo_pdbs_or_fastas_dir or \
                     Paths.DIR_PDBS.value == path_repo_pdbs_or_fastas_dir:
                 path_dst_subdirs.append(path_repo_pdbs_or_fastas_dir)
-        path_dst_dir = GUM._os_makedirs(path_dst_dir, *path_dst_subdirs)
+        path_dst_dir = GUM.os_makedirs(path_dst_dir, *path_dst_subdirs)
         path_input_fastafiles = []
         path_available_files = GUM.get_pdb_or_fastafiles_from_subdir(path_repo_pdbs_or_fastas)
         for wanted_file in wanted_files:
@@ -579,7 +579,7 @@ class GUM(object):
         :return:
         """
         filename = filename.split('.')[0] if into_own_subdirs else ''
-        return GUM._os_makedirs(path_root, filename, filename)
+        return GUM.os_makedirs(path_root, filename, filename)
 
     @staticmethod
     def get_subdirname_starting_with(path: str, starting_with: str):

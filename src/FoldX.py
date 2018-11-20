@@ -69,22 +69,11 @@ class FoldX(object):
         runscript.append('<END>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<JOBEND>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<ENDFILE>' + Str.HASH.value + Str.SEMICO_NL.value)
-        path_runscript_file = os.path.join(GUM._os_makedirs(path_runscript), self.Strs.runscrpt_txt.value)
+        path_runscript_file = os.path.join(GUM.os_makedirs(path_runscript), self.Strs.runscrpt_txt.value)
         with open(path_runscript_file, 'w') as f:
             runscript_str = ''.join(runscript)
             f.write(runscript_str)
         return runscript_str
-
-    class Repair(object):
-
-        def __init__(self, cond: dict):
-            """
-            :param cond: temperature, pH, ionic strength of solute, as key-value pairs.
-            """
-            self.conditions = cond
-
-        def do_repair(self, input_pdb):
-            print('do repair method')
 
     class BuildModel(object):
 
@@ -118,7 +107,7 @@ class FoldX(object):
                 path_files_to_copy = [path_runscript_file, path_pdbfile]
                 GUM.linux_copy_specified_files(path_files_to_copy, path_dst_dir=path_output_pdbname_mutant)
                 if GUM.using_cluster():
-                    path_jobq = GUM._os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fx_mutant_name)
+                    path_jobq = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fx_mutant_name)
                     Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_BM.value + fx_mutant_name,
                                              path_job_q_dir=path_jobq, path_dst_dir=path_output_pdbname_mutant,
                                              path_runscript_dir=path_runscript_dir, using_runscript=True)
@@ -146,7 +135,12 @@ class FoldX(object):
                 ddG_average = self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
                 self.write_ddG_to_DB(ddG_average)
 
-        def write_ddG_to_DB(self, ddG_average: int):
+        def write_ddG_to_DB(self, ddG_average: float):
+            """
+            Write the average ddG to database - TODO
+            :param ddG_average:
+            :return:
+            """
             connection = mysql.connector.connect(user='snpeffect_v5',
                                                  password='R34WKKGR',
                                                  host='127.0.0.1')
@@ -166,7 +160,7 @@ class FoldX(object):
             :param fx_mutant_name:
             :return:
             """
-            ddG_average = ''
+            ddG_average: float = 0
             ddG_1 = ''
             ddG_2 = ''
             ddG_3 = ''
@@ -184,14 +178,14 @@ class FoldX(object):
                     if not pdbname + '_' in line:
                         continue
                     else:
-                        ddG = float(line.split(Str.TAB.value)[1])
+                        ddG = line.split(Str.TAB.value)[1]
                         if ddG_1 == '':
                             ddG_1 = ddG
                         elif ddG_2 == '':
                             ddG_2 = ddG
                         elif ddG_3 == '':
                             ddG_3 = ddG
-                ddG_average = (ddG_1 + ddG_2 + ddG_3) / 3
+                ddG_average = (float(ddG_1) + float(ddG_2) + float(ddG_3)) / 3
                 with open(os.path.join(path_output_pdbname_mutant, FoldX().Strs.DDG_CSV.value), 'w') as f:
                     f.write(pdbname + ',' + fx_mutant_name + ',' + str(ddG_average))
             return ddG_average
@@ -216,28 +210,15 @@ class FoldX(object):
                 if os.path.exists(path_file_to_remove):
                     GUM.linux_remove_file(path_file_to_remove)
 
-
-
         # Not tested yet.
         def _write_individual_list_for_mutant(self, path_dest_mutant_dir: str):
             """
             Writes the 'individual_list.txt' file that is used by fx/runscript to identify the protein to process.
-            :param path_dest_mutant_dir: Abs path to the output dir of foldx computation for each mutant 
+            :param path_dest_mutant_dir: Abs path to the output dir of foldx computation for each mutant
             """
             fx_mutant_name = path_dest_mutant_dir.split('/')[-1]
             with open(os.path.join(path_dest_mutant_dir, FoldX().Strs.indiv_list_txt.value), 'w') as f:
                 f.write(fx_mutant_name + ';\n')
-
-    class Stability(object):
-
-        def __init__(self, cond: dict):
-            """
-            :param cond: temperature, pH, ionic strength of solute, as key-value pairs.
-            """
-            self.conditions = cond
-
-        def calculate_stability(self, pdb):
-            print('TODO')
 
     class AnalyseComplex(object):
 
@@ -272,7 +253,7 @@ class FoldX(object):
                 path_files_to_copy = [path_runscript_file, path_pdbfile]
                 GUM.linux_copy_specified_files(path_files_to_copy, path_dst_dir=path_output_pdbname_mutant)
                 if GUM.using_cluster():
-                    path_jobq = GUM._os_makedirs(Paths.CONFIG_AC_JOBQ, pdbname, fx_mutant_name)
+                    path_jobq = GUM.os_makedirs(Paths.CONFIG_AC_JOBQ, pdbname, fx_mutant_name)
                     Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_BM.value + fx_mutant_name,
                                              path_job_q_dir=path_jobq, path_dst_dir=path_output_pdbname_mutant,
                                              path_runscript_dir=path_runscript_dir, using_runscript=True)
@@ -302,7 +283,7 @@ class FoldX(object):
         :param fx_mutant_name:
         :return:
         """
-        path_output_pdbname_mutant = GUM._os_makedirs(path_output, Paths.DIR_BM.value, pdbname, fx_mutant_name)
+        path_output_pdbname_mutant = GUM.os_makedirs(path_output, Paths.DIR_BM.value, pdbname, fx_mutant_name)
         GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_pdbname_mutant, files_only=True)
         return path_output_pdbname_mutant
 
@@ -321,6 +302,28 @@ class FoldX(object):
                 for mutant_aa in amino_acids:
                     fx_mutant_name_list.append(wt_aa + chain + str(position) + mutant_aa)
         return fx_mutant_name_list
+
+    class Repair(object):
+
+        def __init__(self, cond: dict):
+            """
+            :param cond: temperature, pH, ionic strength of solute, as key-value pairs.
+            """
+            self.conditions = cond
+
+        def do_repair(self, input_pdb):
+            print('TODO')
+
+    class Stability(object):
+
+        def __init__(self, cond: dict):
+            """
+            :param cond: temperature, pH, ionic strength of solute, as key-value pairs.
+            """
+            self.conditions = cond
+
+        def calculate_stability(self, pdb):
+            print('TODO')
 
     from enum import Enum
 

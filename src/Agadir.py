@@ -47,7 +47,7 @@ class Agadir(object):
             for line in f.readlines():
                 if '>' in line:
                     if not is_first_line:
-                        path_dst_mutant_filename = GUM._os_makedirs(path_dst, mutantfastafilename)
+                        path_dst_mutant_filename = GUM.os_makedirs(path_dst, mutantfastafilename)
                         path_dst_mutant_file = os.path.join(path_dst_mutant_filename, mutantfastafile)
                         with open(path_dst_mutant_file, 'w') as g:
                             g.write(fasta_str)

@@ -123,23 +123,23 @@ class MutateFasta(object):
         for wt_title, title_seq in title_titleSeq_w_mutants.items():
             for mut_title, mut_seq in title_seq.items():
                 if write_1_fasta_only and path_1_fastafile is None:
-                    path_1_fastafile = GUM._os_makedirs(path_output_3dots, wt_title, Paths.DIR_MUTANTS.value)
+                    path_1_fastafile = GUM.os_makedirs(path_output_3dots, wt_title, Paths.DIR_MUTANTS.value)
                     path_1_fastafile = os.path.join(path_1_fastafile, wt_title + '_mutants.fasta')
                     path_1_fastafile_open = open(path_1_fastafile, 'w')
                     path_1_fastafile_open.write('>' + wt_title + '\n' + title_seq[wt_title] + '\n')
                 if write_fasta_per_mut and path_fastafilepermut is None:
-                    path_fastafilepermut = GUM._os_makedirs(path_output_3dots, Paths.DIR_FASTAS.value, wt_title)
+                    path_fastafilepermut = GUM.os_makedirs(path_output_3dots, Paths.DIR_FASTAS.value, wt_title)
                     path_fastafilepermut = os.path.join(path_fastafilepermut, wt_title + Str.FSTAEXT.value)
                     path_fastafilepermut_open = open(path_fastafilepermut, 'w')
                     path_fastafilepermut_open.write('>' + wt_title + '\n' + title_seq[wt_title] + '\n')
                     path_fastafilepermut_open.close()
                 if write_csv and path_seqscsv is None:
-                    path_seqscsv = GUM._os_makedirs(path_output_3dots, Paths.DIR_SEQS_TXT_CSV.value, wt_title)
+                    path_seqscsv = GUM.os_makedirs(path_output_3dots, Paths.DIR_SEQS_TXT_CSV.value, wt_title)
                     path_seqscsv = os.path.join(path_seqscsv, wt_title + '_mutants.csv')
                     path_seqscsv_open = open(path_seqscsv, 'w')
                     path_seqscsv_open.write(wt_title + ':' + title_seq[wt_title] + ',')
                 if write_txt and path_seqstxt is None:
-                    path_seqstxt = GUM._os_makedirs(path_output_3dots, Paths.DIR_SEQS_TXT_CSV.value, wt_title)
+                    path_seqstxt = GUM.os_makedirs(path_output_3dots, Paths.DIR_SEQS_TXT_CSV.value, wt_title)
                     path_seqstxt = os.path.join(path_seqstxt, wt_title + '_mutants.txt')
                     path_seqstxt_open = open(path_seqstxt, 'w')
                     path_seqstxt_open.write(wt_title + ':' + title_seq[wt_title] + '\n')
