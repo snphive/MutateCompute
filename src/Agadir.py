@@ -5,11 +5,10 @@ Class for launching Agadir algorithms. Includes code for writing Agadir's option
 
 import os
 import subprocess
-from src.Str import Str
-from src.Cluster import Cluster
-from src.GeneralUtilityMethods import GUM
-from src.Paths import Paths
-from src.Conditions import Cond
+from src.enums.Str import Str
+from src.tools.GeneralUtilityMethods import GUM
+from src.tools.Paths import Paths
+from src.launchers.Conditions import Cond
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
