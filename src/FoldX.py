@@ -7,12 +7,12 @@ file and processing output files.
 """
 import subprocess
 import os
-from src.Str import Str
-from src.Paths import Paths
-from src.GeneralUtilityMethods import GUM
+from src.enums.Str import Str
+from src.tools.Paths import Paths
+from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 import mysql.connector
-from src.Conditions import Cond
+from src.launchers.Conditions import Cond
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -30,7 +30,7 @@ class FoldX(object):
 
     # 30.07.18 Redesigned the directory structure such that runscripts will go in configuration/foldx/ & maybe another
     # level such as analyse_complex or build_model or stability etc.
-    def write_runscript_file(self, path_runscript: str, pdbs: str, conditions: dict, action: str,
+    def write_runscript_file(self, path_runscript: str, pdbs: str, conditions: dict, action: str, num_of_runs=3,
                              show_sequence_detail=False, print_networks=False, calculate_stability=False):
         """
         The runscript.txt is an input file for FoldX indicating which pdbs to analyse & which programs to run on them.
@@ -38,6 +38,7 @@ class FoldX(object):
         :param pdbs: pdb(s) (including .pdb extension) inputs for FoldX.
         :param conditions: temperature (Kelvin), pH and ionic strength (Molar) of solute.
         :param action: FoldX computation to be performed (e.g. BuildModel, AnalyseComplex, etc).
+        :param num_of_runs: Number of times FoldX runs the pdb through algorithm. Lower to 2 or 1 for speed/disk space.
         :param show_sequence_detail: True will provide extra information in output. 
         :param print_networks: True to output network data on .. ?
         :param calculate_stability: True include a stability calculation.
@@ -63,7 +64,7 @@ class FoldX(object):
         runscript.append('<ph>' + str(conditions[Str.COND_PH.value]) + Str.SEMICO_NL.value)
         runscript.append('<moveNeighbours>' + Str.TRUE_lc.value + Str.SEMICO_NL.value)
         runscript.append('<VdWDesign>2' + Str.SEMICO_NL.value)
-        runscript.append('<numberOfRuns>3' + Str.SEMICO_NL.value)
+        runscript.append('<numberOfRuns>' + str(num_of_runs) + Str.SEMICO_NL.value)
         runscript.append('<OutPDB>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<END>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<JOBEND>' + Str.HASH.value + Str.SEMICO_NL.value)
@@ -142,9 +143,10 @@ class FoldX(object):
 
             for fx_mutant_name in fx_mutant_name_list:
                 path_output_pdbname_mutant = os.path.join(Paths.OUTPUT, pdbname, fx_mutant_name)
-                self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
+                ddG_average = self._write_ddG_csv_file(path_output_pdbname_mutant, pdbname, fx_mutant_name)
+                self.write_ddG_to_DB(ddG_average)
 
-        def write_ddG_to_DB(self):
+        def write_ddG_to_DB(self, ddG_average: int):
             connection = mysql.connector.connect(user='snpeffect_v5',
                                                  password='R34WKKGR',
                                                  host='127.0.0.1')
@@ -253,12 +255,12 @@ class FoldX(object):
 
             path_runscript_dir = os.path.join(Paths.CONFIG_ACRUNSCRIPT, pdbname)
             wt_pdbname = FoldX.Strs.WT_.value + pdbname
-            pdbs_to_analyse = pdbname + FoldX.Strs._1_0_1_2_SUFFIX_PDBS[0] + ',' + \
-                              pdbname + FoldX.Strs._1_0_1_2_SUFFIX_PDBS[1] + ',' + \
-                              pdbname + FoldX.Strs._1_0_1_2_SUFFIX_PDBS[2] + ',' + \
-                              wt_pdbname + FoldX.Strs._1_0_1_2_SUFFIX_PDBS[0] + ',' + \
-                              wt_pdbname + FoldX.Strs._1_0_1_2_SUFFIX_PDBS[1] + ',' + \
-                              wt_pdbname + FoldX.Strs._1_0_1_2_SUFFIX_PDBS[2]
+            pdbs_to_analyse = pdbname + FoldX.Strs._1_012_SUFFIX_PDBS[0] + ',' + \
+                              pdbname + FoldX.Strs._1_012_SUFFIX_PDBS[1] + ',' + \
+                              pdbname + FoldX.Strs._1_012_SUFFIX_PDBS[2] + ',' + \
+                              wt_pdbname + FoldX.Strs._1_012_SUFFIX_PDBS[0] + ',' + \
+                              wt_pdbname + FoldX.Strs._1_012_SUFFIX_PDBS[1] + ',' + \
+                              wt_pdbname + FoldX.Strs._1_012_SUFFIX_PDBS[2]
             action = FoldX().Strs.AC.value + Str.HASH.value
             FoldX().write_runscript_file(path_runscript_dir, pdbs_to_analyse, self.conditions, action)
             path_runscript_file = os.path.join(path_runscript_dir, FoldX().Strs.runscrpt_txt.value)
@@ -340,7 +342,7 @@ class FoldX(object):
         CMNDS_STAB_TXT = 'commands_stability.txt'
         OPTNS_BM_TXT = 'options_buildmodel.txt'
         OPTNS_STAB_TXT = 'options_stability.txt'
-        _1_0_1_2_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
+        _1_012_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
         WT_ = 'WT_'
 
 
