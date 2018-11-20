@@ -48,28 +48,12 @@ Set the value(s) of whichever operation(s) you want to run to True in the operat
 operations is passed to Main via its constructor.
 """
 operations = {'do_mutate_fasta': False, 'do_agadir': False, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
-              'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
+              'do_foldx_stability': False, 'do_foldx_analysecomplex': True}
 
 """
 Multithreading is not up and running yet (Nov18). Set to False for now.
 """
 use_multithread = False
-
-"""
-Paths and other parameters for programs run outside of Main() and the algorithms. This is just to do a quick test-run
-on some functionality.
-"""
-path_dir_files_to_pack = Paths.SE_OUTPUT_AGADIR + '/1...250/02064053-3f32-32e6-9660-aaaffc30db87'
-
-"""
-Get the fasta files you want to run mutate_fasta or agadir on.
-"""
-path_fastafiles = []
-# path_input_fastas_dir = Paths.INPUT_MUTS_MULTIFASTAS_29611_1000 + '/1...250/'
-# path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/**/*.fasta', recursive=True))
-# path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
-# if not path_fastafiles:
-#     raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
 
 """
 Get the pdb files you want to run FoldX on.
@@ -80,6 +64,16 @@ path_pdbfiles = []
 # path_pdbfiles = sorted(glob.glob(path_input_pdbs_dir + '/**/*.pdb', recursive=True))
 # if not path_pdbfiles:
 #     raise ValueError('No pdb files to process. Check paths are correct and check files are where you expect.')
+
+"""
+Get the fasta files you want to run mutate_fasta or agadir on.
+"""
+path_fastafiles = []
+# path_input_fastas_dir = Paths.INPUT_MUTS_MULTIFASTAS_29611_1000 + '/1...250/'
+# path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/**/*.fasta', recursive=True))
+# path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
+# if not path_fastafiles:
+#     raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
 
 """
 Kick off the program(s) via the constructor or Main class.

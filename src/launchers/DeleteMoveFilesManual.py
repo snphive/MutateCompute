@@ -29,8 +29,8 @@ Select files for deletion.
 # path_output_agadir_globresidfiles = Paths.OUTPUT_AGADIR + '/1...250/**/' + Str.GLOBRESIDUE_OUT.value
 # path_globalresidueout_files = sorted(glob.glob(path_output_agadir_globresidfiles, recursive=True))
 # if not path_globalresidueout_files:
-#     raise ValueError('No PSX_globalresidue.out files to delete. Check paths are correct and check files are where you '
-#                      'expect.')
+#     raise ValueError('No PSX_globalresidue.out files to delete. Check paths are correct and check files are where
+#       you expect.')
 
 """
 Delete files.
@@ -48,17 +48,6 @@ Delete files.
 #             print(fnf)
 #         except OSError:
 #             print(Str.PROBLNXCMD_MSG.value + cmd)
-
-"""
-Select directory for packing into tar.
-"""
-
-path_dir_txt_files_to_pack = os.path.join(Paths.OUTPUT_AGADIR, '02064053-3f32-32e6-9660-aaaffc30db87')
-
-"""
-Pack files in directory into tar.
-"""
-Parser().make_tarfile(path_dir_txt_files_to_pack)
 
 
 # Running FoldX BuildModel and deleting config files immediately after running.
