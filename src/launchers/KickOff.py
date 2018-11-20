@@ -13,7 +13,7 @@ import sys
 import glob
 
 from src.Main import Main
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
 

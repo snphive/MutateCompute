@@ -9,7 +9,7 @@ import os
 import json
 from src.enums.Str import Str
 from src.Biopython import Biopy
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 from src.Cluster import Cluster
 from src.tools.GeneralUtilityMethods import GUM
 # import pydevd

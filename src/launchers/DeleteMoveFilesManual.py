@@ -2,7 +2,7 @@
 """
 Script for removing specific (unnecessary) files from particular output directories.
 """
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 import os
 import sys
 from src.tools.OutputsParser import Parser

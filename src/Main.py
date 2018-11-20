@@ -13,7 +13,7 @@ import glob
 import natsort
 from src.Scheduler import Scheduler
 from src.enums.Str import Str
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 
 __author__ = "Shahin Zibaee"

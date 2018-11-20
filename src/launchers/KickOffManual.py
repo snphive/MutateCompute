@@ -8,7 +8,7 @@ KickOffManual.py can be run locally or on cluster.
 import sys
 import os
 from src.Main import Main
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)

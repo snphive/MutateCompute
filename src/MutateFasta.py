@@ -7,7 +7,7 @@ import os
 from src.tools.GeneralUtilityMethods import GUM
 from Bio.Seq import MutableSeq
 from Bio.Alphabet import IUPAC
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 from src.enums.Str import Str
 
 __author__ = "Shahin Zibaee"

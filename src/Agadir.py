@@ -7,8 +7,8 @@ import os
 import subprocess
 from src.enums.Str import Str
 from src.tools.GeneralUtilityMethods import GUM
-from src.tools.Paths import Paths
-from src.launchers.Conditions import Cond
+from src.enums.Paths import Paths
+from src.enums.Conditions import Cond
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 

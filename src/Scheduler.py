@@ -6,22 +6,19 @@ Class for running program(s) on each file from a list of files. This is where mu
 
 import os
 import time
-from multiprocessing import Process
-from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 import multiprocessing as mp
 # import concurrent.futures.ThreadPoolExecutor
 from threading import Thread
 from src.MutateFasta import MutateFasta
 from src.Agadir import Agadir
-from src.Agadir import AgadCndtns
 from src.FoldX import FoldX
-from src.Conditions import Cond
+from src.enums.Conditions import Cond
 from src.IdentifyProtein import IdProt
-from src.GeneralUtilityMethods import GUM
+from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
-from src.Paths import Paths
-from src.Str import Str
+from src.enums.Paths import Paths
+from src.enums.Str import Str
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -83,7 +80,7 @@ class Scheduler(object):
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value)
 
             if operations['do_agadir']:
-                agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+                agadir = Agadir(Cond.INCELL_MAML.value)
                 for path_fastafile in path_fastafiles:
                     sleep_secs = 0 if len(path_fastafiles) < 200 else len(path_fastafiles) / 1000
                     time.sleep(sleep_secs)

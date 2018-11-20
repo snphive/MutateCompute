@@ -6,7 +6,7 @@ Script for launching Blastp runs.
 import sys
 import os
 import glob
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 from src.Scheduler import Scheduler
 from src.enums.Str import Str
 import logging

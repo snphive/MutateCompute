@@ -17,7 +17,7 @@ import time
 import warnings
 from src.enums.Str import Str
 from src.enums.AminoAcids import AA
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 

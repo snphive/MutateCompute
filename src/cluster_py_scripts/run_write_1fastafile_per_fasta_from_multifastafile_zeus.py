@@ -1,7 +1,7 @@
 import sys
 import os
 from src.tools.GeneralUtilityMethods import GUM
-from src.tools.Paths import Paths
+from src.enums.Paths import Paths
 from src.enums.Str import Str
 
 __author__ = "Shahin Zibaee"
