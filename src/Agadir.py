@@ -4,15 +4,12 @@ Class for launching Agadir algorithms. Includes code for writing Agadir's option
 """
 
 import os
-import glob
 import subprocess
 from src.Str import Str
 from src.Cluster import Cluster
 from src.GeneralUtilityMethods import GUM
 from src.Paths import Paths
-from enum import Enum
-import natsort
-import time
+from src.Conditions import Cond
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
@@ -55,7 +52,7 @@ class Agadir(object):
                         path_dst_mutant_file = os.path.join(path_dst_mutant_filename, mutantfastafile)
                         with open(path_dst_mutant_file, 'w') as g:
                             g.write(fasta_str)
-                        agadir = Agadir(AgadCndtns.INCELL_MAML.value)
+                        agadir = Agadir(Cond.INCELL_MAML.value)
                         agadir.compute(path_dst_mutant_file)
                         GUM.linux_remove_file(path_dst_mutant_file)
                     fasta_str = line
@@ -196,14 +193,6 @@ class Agadir(object):
             GUM.linux_copy_all_files_in_dir(path_output_fastas, path_input, recursively=True)
             if into_own_subdirs:
                 GUM._move_files_into_own_subdirs(path_dir=path_input_fastas)
-
-
-class AgadCndtns(Enum):
-    # cytoplasm and nucleus had a pH of ≈7.3, mitochondria ≈8.0, ER ≈7.5 and Golgi ≈6.6
-    INCELL_MAML = {'temp': 310.15, 'ph': 7.4, 'ion_strgth': 0.05, 'tfe': 0, 'stab': 0, 'conc': 1}
-    # OUTCELL_MAML = {'temp': 310.15, 'pH': 7?}
-    INVITRO_COND1 = {'temp': 298.15, 'ph': 7.5, 'ion_strgth': 0.15, 'tfe': 0, 'stab': 0, 'conc': 1}
-    # ETC
 
 
 # pydevd.stoptrace()
