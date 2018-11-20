@@ -1,9 +1,8 @@
 import os
 from unittest import TestCase
 from src.Cluster import Cluster
-from src.GeneralUtilityMethods import GUM
+from src.tools.GeneralUtilityMethods import GUM
 from tests.TestPathsAndListsSeqs import TPLS
-from tests.HelperMethods import HM
 
 
 class TestCluster(TestCase):

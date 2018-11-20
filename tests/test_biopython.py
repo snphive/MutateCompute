@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 from unittest import TestCase
 from src.Biopython import Biopy
@@ -6,6 +8,13 @@ from tests.HelperMethods import HM
 from tests.TestPathsAndListsSeqs import TPLS
 from Bio.Blast import NCBIXML
 
+__author__ = "Shahin Zibaee"
+__copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__maintainer__ = "Shahin Zibaee"
+__email__ = "shahinzibaee@hotmail.com"
+__status__ = "Development"
 
 class TestBiopython(TestCase):
 

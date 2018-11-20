@@ -1,16 +1,17 @@
 ROOT:
     # absoluate paths to executables on cluster and local directory tress
-    path_zeus_r_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript'
+    path_zeus_r_exe: '/software/shared/apps/general/R/3.1.2/bin/Rscript/'
     path_zeus_fx_exe: '/switchlab/group/tools/FoldX_2015/FoldX'
-    path_zeus_agad_exe: '/switchlab/group/tools/agadir_10042012/agadirwrapper'
+    path_zeus_agad_exe: '/switchlab/group/tools/agadir_10042012/'
     path_zeus_qsub_exe: '/opt/sge/bin/lx-amd64/'
-    path_local_r_exe: '/usr/local/bin/R'
-    path_local_fx_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX'
-    path_local_agad_exe: '/Users/u0120577/SNPEFFECT/executables/agadirwrapper'
+    path_local_r_exe: '/usr/local/bin/R/'
+    path_local_fx_exe: '/Users/u0120577/SNPEFFECT/executables/FoldX/foldx'
+    path_local_agad_exe: '/Users/u0120577/SNPEFFECT/executables/agadir_10042012/'
 
     # absolute paths to root directories on cluster and local directory trees
     path_zeus_snpeffect: '/switchlab/group/shazib/SnpEffect'
-    path_local_mutatecompute: '/Users/u0120577/PycharmProjects/MutateCompute'
+    path_local_pyproj_mutatecompute: '/Users/u0120577/PycharmProjects/MutateCompute'
+    path_local_pyproj: '/Users/u0120577/PycharmProjects'
 
     # absolute path to local pdb and fasta data repositories
     path_local_pdb_fasta_repository: '/Users/u0120577/REPO_PDB_FASTA'
@@ -18,7 +19,11 @@ ROOT:
     # directory names common to local and cluster dir trees. Used to construct absolute paths at runtime.
     dir_config: 'configuration'
     dir_agadconfig: 'agadir_config'
-    dir_clustjobq: 'cluster_jobq'
+    dir_agadir_jobq: 'agadir_jobq'
+    dir_mf_jobq: 'mutatefasta_jobq'
+    dir_bm_jobq: 'bm_jobq'
+    dir_ac_jobq: 'ac_jobq'
+    dir_blst_jobq: 'blst_jobq'
     dir_globoptions: 'global_options'
     dir_fxconfig: 'foldx_config'
     dir_acrunscript: 'ac_runscript'
@@ -27,16 +32,29 @@ ROOT:
     dir_src: 'src'
     dir_input: 'input_data'
     dir_mutants: 'mutants'
+    dir_mutants_fastas: 'mutants_fastas'
+    dir_mutants_multifastas: 'mutants_multifastas'
     dir_output: 'output_data'
-    dir_fx: 'foldx'
-    dir_ac: 'analyse_complex'
-    dir_bm: 'build_model'
-    dir_rep: 'repair'
+    dir_agadir: 'agadir'
+    dir_foldx: 'foldx'
+    dir_analysecomplex: 'analyse_complex'
+    dir_build_model: 'build_model'
+    dir_repair: 'repair'
     dir_fastas: 'fastas'
-    dir_sequences: 'sequences'
+    dir_29611_fastas_1000: '29611_fastas_1000'
+    dir_32431_repairedpdbs_1000: '32431_repairedpdbs_1000'
+    dir_seqs_txt_csv: 'sequences_txt_csv'
     dir_pdb_fasta_repo: 'REPO_PDB_FASTA'
     dir_pdbs: 'pdbs'
     dir_blastp: 'blastp'
+    dir_bash: 'bash'
+
+    # jobq job name prefixes
+    prefix_mutatefasta: 'MF_'
+    prefix_blastp: 'BP_'
+    prefix_agadir: 'AG_'
+    prefix_foldx_buildmodel: 'BM_'
+    prefix_foldx_analysecomplex: 'AC_'
 
     # dictionaries & lists (amino acids)
     dict_aa_1to3:

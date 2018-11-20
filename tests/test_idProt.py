@@ -1,16 +1,12 @@
 import os
-import io
 from unittest import TestCase
-from unittest import mock
 from unittest.mock import patch
 from src.Biopython import Biopy
 from Bio.Blast import NCBIWWW
-from Bio.Blast import NCBIXML
-from Bio import SeqIO
 from tests.HelperMethods import HM
 from src.IdentifyProtein import IdProt
 from tests.TestPathsAndListsSeqs import TPLS
-from src.GeneralUtilityMethods import GUM
+from src.tools.GeneralUtilityMethods import GUM
 
 
 class TestIdProt(TestCase):
@@ -166,7 +162,7 @@ class TestIdProt(TestCase):
                                                                self.XML_FILE_1_A)
             # act
             path_output_blastp_xmlfile = IdProt._write_raw_blast_xml(path_output=TPLS.MC_TESTS_OUTPUT.value,
-                                                                     fastafile_name=self.DIR_1_A,
+                                                                     fastafilename=self.DIR_1_A,
                                                                      blastp_result=ref_xml_1_A_open)
         # assert
         self.assertTrue(os.path.exists(expected_path_output_blastp_xmlfile))

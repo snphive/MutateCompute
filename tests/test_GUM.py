@@ -1,12 +1,11 @@
 from unittest import TestCase
-from src.GeneralUtilityMethods import GUM
-from tests.HelperMethods import HM
+from src.tools.GeneralUtilityMethods import GUM
 import os
 import glob
-from src.Paths import Paths
+from src.enums.Paths import Paths
 from unittest.mock import patch
 from tests.TestPathsAndListsSeqs import TPLS
-import subprocess
+from src.enums.Str import Str
 
 
 class TestGUM(TestCase):
@@ -15,12 +14,12 @@ class TestGUM(TestCase):
     @classmethod
     def setUpClass(cls):
         if not os.path.exists(TPLS.MC_TESTS_CONFIG.value):
-            GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst_dir=TPLS.MC_TESTS.value,
-                                            recursively=True)
+            GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.CONFIG_FOR_READ_ONLY.value,
+                                            path_dst_dir=TPLS.MC_TESTS.value, recursively=True)
 
         if not os.path.exists(TPLS.MC_TESTS_INPUT.value):
-            GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.INPUT_FOR_READ_ONLY.value, path_dst_dir=TPLS.MC_TESTS.value,
-                                            recursively=True)
+            GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.INPUT_FOR_READ_ONLY.value,
+                                            path_dst_dir=TPLS.MC_TESTS.value, recursively=True)
 
     # CHECK WHAT HAPPENS IF THERE ARE FEWER FILES THAN SPECIFIED TO MOVE BY TOTAL_NUM_TO_COPY
     # @patch.object(GUM, '_make_subfoldername')
@@ -72,9 +71,8 @@ class TestGUM(TestCase):
 
     def test_extract_pdbname_chain_fasta_from_pdbs(self):
         # arrange
-        pdbfiles = ['RepairPDB_1.pdb', 'RepairPDB_2.pdb']
-        path_input = TPLS.MC_TESTS_INPUT.value
-        write_fastafile = False
+        path_pdbfiles = [os.path.join(TPLS.MC_TESTS_INPUT.value, 'RepairPDB_1', 'RepairPDB_1.pdb'),
+                         os.path.join(TPLS.MC_TESTS_INPUT.value, 'RepairPDB_2', 'RepairPDB_2.pdb')]
         path_to_write_fastafile = ''
         # Need at some point to make a decision about whether to include 'RepairPDB_' in the names.
         # expected_pdbname_chain_fastaseq_dict = {
@@ -82,13 +80,11 @@ class TestGUM(TestCase):
         # 'RepairPDB_1_B': TPLS.FASTA_SEQ_1_B.value,
         # 'RepairPDB_2_A': TPLS.FASTA_SEQ_2_A.value}
         expected_pdbname_chain_fastaseq_dict = {
-        '1_A': TPLS.FASTA_SEQ_1_A.value,
-        '1_B': TPLS.FASTA_SEQ_1_B.value,
-        '2_A': TPLS.FASTA_SEQ_2_A.value}
+        '1_A_1': TPLS.FASTA_SEQ_1_A.value,
+        '1_B_540': TPLS.FASTA_SEQ_1_B.value,
+        '2_A_1': TPLS.FASTA_SEQ_2_A.value}
         # act
-        pdbname_chain_fastaseq_dict = GUM.extract_pdbname_chain_fasta_from_pdbs(path_input, pdbfiles,
-                                                                                path_to_write_fastafile='',
-                                                                                write_fastafile=False)
+        pdbname_chain_fastaseq_dict = GUM.extract_pdbname_chain_startpos_fasta_from_pdbs(path_pdbfiles=path_pdbfiles)
         # assert
         # self.maxDiff = None
         self.assertDictEqual(expected_pdbname_chain_fastaseq_dict, pdbname_chain_fastaseq_dict)
@@ -137,20 +133,25 @@ class TestGUM(TestCase):
     def test_copy_files_to_3dot_dir_1(self):
         # act
         Paths.set_up_paths(use_cluster=False)
-        GUM.copy_files_to_3dot_dir(path_src_dir='/Users/u0120577/ROB_HOMOLOGY_HUMAN/Fasta',
-                                   path_dst_dir=Paths.REPO_FASTAS, file_extension='.fasta', starting_num=1,
-                                   num_to_copy_per_subdir=1000)
+        # GUM.copy_files_to_3dot_dir(path_src_dir='/Users/u0120577/ROB_HOMOLOGY_HUMAN/Fasta',
+        GUM.copy_files_to_3dot_dir(path_src_dir='/Users/u0120577/ROB_HOMOLOGY_HUMAN/pub_hg_fasta',
+                                   path_dst_dir=Paths.REPO_FASTAS + '/29611_fastas_1000',
+                                   file_extension=Str.FSTAEXT.value, starting_num=1, num_to_copy_per_subdir=1000)
         # assert
-        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000')),
-                        'No folder at  ~/REPO_PDB_FASTA/fastas/fastas_1000 found')
-        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000', '1...1000')),
-                        'No folder at  ~/REPO_PDB_FASTA/fastas/fastas_1000/1...1000 found')
-        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000', '2001...3000')),
-                        'No folder at  ~/REPO_PDB_FASTA/fastas/fastas_1000/2001...3000 found')
-        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000', '1...1000', '1_A.fasta')),
-                        'No file at  ~/REPO_PDB_FASTA/fastas/fastas_1000/1...1000/1_A.fasta found')
-        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, 'fastas_1000', '2001...3000', '1131_A.fasta')),
-                        'No file at  ~/REPO_PDB_FASTA/fastas/fastas_1000/2001...3000/1131_A.fasta found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, '29611_fastas_1000')),
+                        'No folder at  ~/REPO_PDB_FASTA/fastas/29611_fastas_1000 found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, '29611_fastas_1000', '1...1000')),
+                        'No folder at  ~/REPO_PDB_FASTA/fastas/29611_fastas_1000/1...1000 found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, '29611_fastas_1000', '2001...3000')),
+                        'No folder at  ~/REPO_PDB_FASTA/fastas/29611_fastas_1000/2001...3000 found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, '29611_fastas_1000', '1...1000',
+                                                    '0001c4ad-0f86-3c74-9010-11fe302e765c.fasta')),
+                        'No file at  ~/REPO_PDB_FASTA/fastas/29611_fastas_1000/1...1000/'
+                        '0001c4ad-0f86-3c74-9010-11fe302e765c.fasta found')
+        self.assertTrue(os.path.exists(os.path.join(Paths.REPO_FASTAS, '29611_fastas_1000', '2001...3000',
+                                                    '048b6fff-4495-3872-bccf-3d6d77cad903.fasta')),
+                        'No file at  ~/REPO_PDB_FASTA/fastas/29611_fastas_1000/2001...3000/'
+                        '048b6fff-4495-3872-bccf-3d6d77cad903.fasta found')
 
     def test_copy_files_to_3dot_dir_2(self):
         # act

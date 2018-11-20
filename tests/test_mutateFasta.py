@@ -1,11 +1,8 @@
 import os
-import glob
 from unittest import TestCase
 from src.MutateFasta import MutateFasta
 from tests.TestPathsAndListsSeqs import TPLS
-from unittest.mock import patch
-from unittest.mock import MagicMock
-from src.GeneralUtilityMethods import GUM
+from src.tools.GeneralUtilityMethods import GUM
 
 
 class TestMutateFasta(TestCase):

@@ -1,16 +1,15 @@
 from unittest import TestCase
-from unittest.mock import patch
 from src.Main import Main
 from tests.TestPathsAndListsSeqs import TPLS
-from src.GeneralUtilityMethods import GUM
-from src.Scheduler import Scheduler
+from src.tools.GeneralUtilityMethods import GUM
 
 
 class TestMain(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst_dir=TPLS.MC_TESTS.value, recursively=True)
+        GUM.linux_copy_all_files_in_dir(path_src_dir=TPLS.CONFIG_FOR_READ_ONLY.value, path_dst_dir=TPLS.MC_TESTS.value,
+                                        recursively=True)
 
     def test__read_global_options(self):
         # arrange

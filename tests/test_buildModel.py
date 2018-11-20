@@ -2,11 +2,10 @@ import os
 from unittest import TestCase
 from unittest.mock import patch
 from src.FoldX import FoldX
-from src.Conditions import Cond
-from src.GeneralUtilityMethods import GUM
+from src.enums.Conditions import Cond
+from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
-from src.Paths import Paths
-from tests.HelperMethods import HM
+from src.enums.Paths import Paths
 from tests.TestPathsAndListsSeqs import TPLS
 
 
@@ -22,26 +21,25 @@ class TestBuildModel(TestCase):
     def tearDown(self):
         self.buildModel = None
 
-    # @patch.object(FoldX.BuildModel, '_write_individual_list_for_mutant')
     @patch.object(FoldX.BuildModel, '_make_fx_mutant_name_list')
-    @patch.object(GUM, 'extract_pdbname_chain_fasta_from_pdbs')
-    def test_mutate_protein_structure_Not_Cluster(self, mock_extract_pdbname_chain_fasta_from_pdbs,
+    @patch.object(GUM, 'extract_pdbname_chain_startpos_fasta_from_pdbs')
+    def test_mutate_protein_structure_Not_Cluster(self, mock_extract_pdbname_chain_startpos_fasta_from_pdbs,
                                                   mock__make_fx_mutant_name_list):
         # arrange
         Paths.set_up_paths(use_cluster=False)
-        mock_extract_pdbname_chain_fasta_from_pdbs.return_value = {'RepairPDB_1A': 'RVYLT', 'RepairPDB_1B': 'RVYLT'}
+        mock_extract_pdbname_chain_startpos_fasta_from_pdbs.return_value = {'RepairPDB_1A': 'RVYLT',
+                                                                            'RepairPDB_1B': 'RVYLT'}
         # Note FoldX expects mutant names to have format wtaa_chain_position_mutant aa.
         mock__make_fx_mutant_name_list.return_value = ['RA1A', 'RA1C', 'VA2A', 'VA2C', 'YA3A', 'YA3C', 'LA4A', 'LA4C',
-                                                       'TA5A', 'TA5C', 'RB1A', 'RB1C', 'VB2A', 'VB2C', 'YB3A', 'YB3C',
-                                                       'LB4A', 'LB4C', 'TB5A', 'TB5C']
+                                                       'TA5A', 'TA5C', 'RB540A', 'RB540C', 'VB541A', 'VB541C',
+                                                       'YB542A', 'YB542C', 'LB543A', 'LB543C', 'TB544A', 'TB544C']
         amino_acids = ['A', 'C']
-        # path_pdb = '/Users/u0120577/PycharmProjects/input_data/pdbs/1...10/RepairPDB_1.pdb'
-        path_pdb = '/Users/u0120577/PycharmProjects/input_data/pdbs/1...10/RepairPDB_1.pdb'
+        path_pdb = '/Users/u0120577/PycharmProjects/MutateCompute/tests/input_data/pdbs/RepairPDB_1_first5aa.pdb'
         # act
         self.buildModel.mutate_protein_structure(path_pdbfile=path_pdb, amino_acids=amino_acids)
         # assert
         expected_call_count_1 = 1
-        self.assertEqual(expected_call_count_1, mock_extract_pdbname_chain_fasta_from_pdbs.call_count)
+        self.assertEqual(expected_call_count_1, mock_extract_pdbname_chain_startpos_fasta_from_pdbs.call_count)
         self.assertEqual(expected_call_count_1, mock__make_fx_mutant_name_list.call_count)
 
     @patch('subprocess.call')
@@ -51,17 +49,18 @@ class TestBuildModel(TestCase):
     @patch.object(GUM, '_os_makedirs')
     @patch.object(FoldX, 'write_runscript_file')
     @patch.object(FoldX.BuildModel, '_make_fx_mutant_name_list')
-    @patch.object(GUM, 'extract_pdbname_chain_fasta_from_pdbs')
-    def test_mutate_protein_structure_Cluster(self, mock_extract_pdbname_chain_fasta_from_pdbs, mock__make_fx_mutant_name_list,
-                                      mock_write_runscript_file, mock__os_makedirs, mock_os_chdir,
-                                      mock__write_individual_list_for_mutant, mock_write_job_q_bash, mock_subprocess_call):
+    @patch.object(GUM, 'extract_pdbname_chain_startpos_fasta_from_pdbs')
+    def test_mutate_protein_structure_Cluster(self, mock_extract_pdbname_chain_startpos_fasta_from_pdbs,
+                                              mock__make_fx_mutant_name_list, mock_write_runscript_file,
+                                              mock__os_makedirs, mock_os_chdir, mock__write_individual_list_for_mutant,
+                                              mock_write_job_q_bash, mock_subprocess_call):
         # arrange
         Paths.set_up_paths(use_cluster=True)
-        mock_extract_pdbname_chain_fasta_from_pdbs.return_value = {'RepPDB_1A_test': 'RVYLT', 'RepPDB_1B_test': 'RVYLT'}
+        mock_extract_pdbname_chain_startpos_fasta_from_pdbs.return_value = {'RepPDB_1A_test': 'RVYLT', 'RepPDB_1B_test': 'RVYLT'}
         # Note FoldX expects mutant names to have format wtaa_chain_position_mutant aa.
         mock__make_fx_mutant_name_list.return_value = ['RA1A', 'RA1C', 'VA2A', 'VA2C', 'YA3A', 'YA3C', 'LA4A', 'LA4C',
-                                                       'TA5A', 'TA5C', 'RB1A', 'RB1C', 'VB2A', 'VB2C', 'YB3A', 'YB3C',
-                                                       'LB4A', 'LB4C', 'TB5A', 'TB5C']
+                                                       'TA5A', 'TA5C', 'RB540A', 'RB540C', 'VB541A', 'VB541C',
+                                                       'YB542A', 'YB542C', 'LB543A', 'LB543C', 'TB544A', 'TB544C']
         mock_os_chdir.return_value = None
         write_wt_fastafiles = False
         amino_acids = ['A', 'C']
@@ -72,7 +71,7 @@ class TestBuildModel(TestCase):
         expected_call_count_1 = 1
         expected_call_count_20 = len(mock__make_fx_mutant_name_list.return_value)
         expected_call_count_22 = 22
-        self.assertEqual(expected_call_count_1, mock_extract_pdbname_chain_fasta_from_pdbs.call_count)
+        self.assertEqual(expected_call_count_1, mock_extract_pdbname_chain_startpos_fasta_from_pdbs.call_count)
         self.assertEqual(expected_call_count_1, mock__make_fx_mutant_name_list.call_count)
         self.assertEqual(expected_call_count_1, mock_write_runscript_file.call_count)
         self.assertEqual(expected_call_count_22, mock__os_makedirs.call_count)
@@ -83,9 +82,9 @@ class TestBuildModel(TestCase):
     # Note FoldX expects mutant names to have format wtaa_chain_position_mutantaa.
     # Variable names for values with this format are denoted with '_fx_'
     def test_make_fx_mutant_name_list(self):
-        pdbname_chain_fasta_dict = {'Test1Residue_A': 'R', 'Test1Residue_B': 'R'}
+        pdbname_chain_startpos_fasta_dict = {'Test1Residue_A': 'R', 'Test1Residue_B': 'R'}
         amino_acids = ['A', 'C', 'D']
-        fx_mutant_name_list = self.buildModel._make_fx_mutant_name_list(amino_acids, pdbname_chain_fasta_dict)
+        fx_mutant_name_list = self.buildModel._make_fx_mutant_name_list(amino_acids, pdbname_chain_startpos_fasta_dict)
         expected_fx_mutant_name_list = ['RA1A', 'RA1C', 'RA1D', 'RB1A', 'RB1C', 'RB1D']
         self.assertEqual(fx_mutant_name_list, expected_fx_mutant_name_list)
 
@@ -132,7 +131,9 @@ class TestBuildModel(TestCase):
         single_space = ' '
         not_expected_runscript = single_space + expected_runscript
         # act
-        actual_runscript = self.foldx.write_runscript_file(path_runscript, pdb, action)
+        actual_runscript = self.foldx.write_runscript_file(
+            path_runscript=TPLS.MC_TESTS_CONFIG_FXCONFIG_BMRUNSCRIPT.value, pdb=pdb,
+            conditions=Cond.INCELL_MAML_FX.value, action=action)
         # assert
         self.assertEqual(actual_runscript, expected_runscript)
         self.assertNotEqual(actual_runscript, not_expected_runscript)
@@ -148,9 +149,9 @@ class TestBuildModel(TestCase):
     def test_make_fx_mutant_name_list(self):
         # arrange
         amino_acids = TPLS.LIST_ALL_20_AA.value
-        pdbname_chain_fasta = 'PDB1_X: TESTSEQ'
+        pdbname_chain_startpos_fasta = 'PDB1_X_1: TESTSEQ'
         # act
-        self.buildModel._make_fx_mutant_name_list(amino_acids, pdbname_chain_fasta)
+        self.buildModel._make_fx_mutant_name_list(amino_acids, pdbname_chain_startpos_fasta)
         # assert
 
     def test_make_output_dir_and_copy_fxconfig_files_in(self):

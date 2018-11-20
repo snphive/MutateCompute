@@ -1,6 +1,6 @@
 import os
 import shutil
-from src.GeneralUtilityMethods import GUM
+from src.tools.GeneralUtilityMethods import GUM
 from tests.TestPathsAndListsSeqs import TPLS
 
 
