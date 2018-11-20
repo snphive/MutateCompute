@@ -3,7 +3,7 @@
 Enum for strings used by more than 1 other class.
 """
 
-from src.Paths import Paths
+from src.tools.Paths import Paths
 from enum import Enum
 
 __author__ = "Shahin Zibaee"
