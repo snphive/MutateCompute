@@ -105,6 +105,7 @@ class Paths(Enum):
             MC_SRC = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC)
             LOCAL_INPUT = os.path.join(LOCAL_PYPROJ, DIR_INPUT)
             LOCAL_INPUT_FASTAS = os.path.join(LOCAL_INPUT, DIR_FASTAS)
+            LOCAL_INPUT_PDBS = os.path.join(LOCAL_INPUT, DIR_PDBS)
             LOCAL_INPUT_29611_FASTAS_1000 = os.path.join(LOCAL_INPUT, DIR_29611_FASTAS_1000)
             LOCAL_INPUT_MUTS_MULTIFASTAS_29611_1000 = os.path.join(LOCAL_INPUT, DIR_MUTANTS_MULTIFASTAS,
                                                                    DIR_29611_FASTAS_1000)
@@ -137,6 +138,7 @@ class Paths(Enum):
             SE_LOGS = os.path.join(ZEUS_SNPEFFECT, DIR_LOGS)
             SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
+            SE_INPUT_PDBS = os.path.join(SE_INPUT, DIR_PDBS)
             SE_INPUT_29611_FASTAS_1000 = os.path.join(SE_INPUT, DIR_29611_FASTAS_1000)
             SE_INPUT_MUTS_MULTIFASTAS_29611_1000 = os.path.join(SE_INPUT, DIR_MUTANTS_MULTIFASTAS,
                                                                 DIR_29611_FASTAS_1000)
@@ -175,6 +177,7 @@ class Paths(Enum):
             Paths.MC_CONFIG_BMRUNSCRIPT.value
         Paths.INPUT = Paths.SE_INPUT.value if use_cluster else Paths.LOCAL_INPUT.value
         Paths.INPUT_FASTAS = Paths.SE_INPUT_FASTAS.value if use_cluster else Paths.LOCAL_INPUT_FASTAS.value
+        Paths.INPUT_PDBS = Paths.SE_INPUT_PDBS.value if use_cluster else Paths.LOCAL_INPUT_PDBS.value
         Paths.INPUT_MUTS_MULTIFASTAS_29611_1000 = Paths.SE_INPUT_MUTS_MULTIFASTAS_29611_1000.value if use_cluster else \
             Paths.LOCAL_INPUT_MUTS_MULTIFASTAS_29611_1000.value
         Paths.INPUT_29611_FASTAS_1000 = Paths.SE_INPUT_29611_FASTAS_1000.value if use_cluster else \
