@@ -67,14 +67,13 @@ class Cluster(object):
 
 
     @staticmethod
-    def write_job_q_bash(jobname: str, path_job_q_dir: str, path_dst_dir='', startnum='', endnum='',
-                         using_runscript=False, path_runscript_dir='', python_script_with_paths='', queue='',
-                         n_slots='', total_memory_GB='', memory_limit_GB='', cluster_node=''):
+    def write_job_q_bash(jobname: str, path_job_q_dir: str, startnum='', endnum='', using_runscript=False, path_runscript_dir='',
+                         python_script_with_paths='', queue='', n_slots='', total_memory_GB='', memory_limit_GB='',
+                         cluster_node=''):
         """
         Note that only 1st 2 arguments are required, the rest have default named arguments that can be overwritten.
         :param jobname: N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
         :param path_job_q_dir: Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
-        :param path_dst_dir:
         :param startnum: Starting number for an array job. If either startnum or endnum are empty, no array job.
         :param endnum: End number for an array job. If either startnum or endnum are empty, no array job.
         :param using_runscript: True/False using runscript (hence running FoldX).
