@@ -71,16 +71,15 @@ class Scheduler(object):
                         write_fasta_per_mut = False
                         Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value,
                                                  python_script_with_paths=os.path.join(Paths.SE_SRC.value,
-                                                 'run_mutate_fasta_zeus.py') + Str.SPCE.value + path_fastafile +
-                                                 Str.SPCE.value + str(write_1_fasta_only) +
-                                                 Str.SPCE.value + str(write_fasta_per_mut) +
-                                                 Str.SPCE.value + path_output_fastas_3dots,
-                                                 queue='', n_slots='', total_memory_GB='', memory_limit_GB='3',
-                                                 cluster_node='')
+                                                                                       'run_mutate_fasta_zeus.py') + Str.SPCE.value + path_fastafile +
+                                                                          Str.SPCE.value + str(write_1_fasta_only) +
+                                                                          Str.SPCE.value + str(write_fasta_per_mut) +
+                                                                          Str.SPCE.value + path_output_fastas_3dots, queue='',
+                                                 n_slots='', total_memory_GB='', memory_limit_GB='3', cluster_node='')
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value)
 
             if operations['do_agadir']:
-                agadir = Agadir(Cond.INCELL_MAML.value)
+                agadir = Agadir(Cond.INCELL_MAML_FX.value)
                 for path_fastafile in path_fastafiles:
                     sleep_secs = 0 if len(path_fastafiles) < 200 else len(path_fastafiles) / 1000
                     time.sleep(sleep_secs)
@@ -88,8 +87,9 @@ class Scheduler(object):
                         print('Calling scheduler.do_agadir using_cluster condition')
                         jobname = Paths.PREFIX_AGADIR.value + path_fastafile.split('/')[-1]
                         Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value,
-                                                 python_script_with_paths=os.path.join(Paths.SRC,
-                'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile + Str.SPCE.value + Paths.OUTPUT))
+                                                 python_script_with_paths=os.path.join(Paths.SE_SRC.value,
+                        'run_agadir_on_multifastasZeus.py' + Str.SPCE.value + path_fastafile + Str.SPCE.value +
+                                                                                       Paths.SE_OUTPUT.value))
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
 
                     path_dst = GUM.make_path_agadir_3dots_filename_mutants_dirs(path_output, path_fastafile,
@@ -106,12 +106,6 @@ class Scheduler(object):
         print('Time taken to complete iterating through fasta files (after methods have been called): ' + str(elapsed))
         if path_pdbfiles:
             for path_pdbfile in path_pdbfiles:
-                if operations['do_foldx_repair']:
-                    repair = FoldX().Repair(Cond.INCELL_MAML_FX.value)
-                    if use_multithread:
-                        Scheduler._launch_thread(target=repair.do_repair, args=path_pdbfile)
-                    else:
-                        repair.do_repair(path_pdbfile)
                 if operations['do_foldx_buildmodel']:
                     buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
@@ -119,18 +113,18 @@ class Scheduler(object):
                                                  args=[path_pdbfile, amino_acids])
                     else:
                         buildmodel.mutate_protein_structure(path_pdbfile, amino_acids)
-                if operations['do_foldx_stability']:
-                    stability = FoldX().Stability(Cond.INCELL_MAML_FX.value)
-                    if use_multithread:
-                        Scheduler._launch_thread(target=stability.calculate_stability, args=path_pdbfile)
-                    else:
-                        stability.calculate_stability(path_pdbfile)
                 if operations['do_foldx_analysecomplex']:
                     analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=analysecomplex.calculate_complex_energies, args=path_pdbfile)
                     else:
-                        analysecomplex.calculate_complex_energies(path_pdbfile)
+                        analysecomplex.calculate_complex_energies(path_pdbfile, amino_acids)
+                if operations['do_foldx_repair']:
+                    repair = FoldX().Repair(Cond.INCELL_MAML_FX.value)
+                    if use_multithread:
+                        Scheduler._launch_thread(target=repair.do_repair, args=path_pdbfile)
+                    else:
+                        repair.do_repair(path_pdbfile)
 
     @staticmethod
     def start_blast(path_input_fastafiles: list, path_output: str, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
