@@ -236,7 +236,7 @@ class FoldX(object):
             :param path_dst_dir: Abs path to the output dir of foldx computation for each mutant
             """
             fx_mutant_name = path_dst_dir.split('/')[-1]
-            with open(os.path.join(path_dst_dir, fx.Strs.indiv_list_txt.value), 'w') as f:
+            with open(os.path.join(path_dst_dir, FoldX().Strs.indiv_list_txt.value), 'w') as f:
                 f.write(fx_mutant_name + ';\n')
 
     class AnalyseComplex(object):
@@ -259,33 +259,35 @@ class FoldX(object):
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
             wt_pdbname = FoldX.Strs.WT_.value + pdbname
-            pdbname_chain_startpos_fasta_dict = GUM.extract_pdbname_chain_startpos_fasta_from_pdbs(path_pdbfile)
             fx = FoldX()
-            # fx_mutant_name_list = fx.make_fx_mutant_name_list(amino_acids, pdbname_chain_startpos_fasta_dict)
-            fx_mutant_name_list = sorted(glob.glob(Paths.OUTPUT_BM + Str.FSLSH_ASTRX))
+            path_fx_mutant_name_list = sorted(glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*')))
             action = fx.Strs.AC.value + Str.HASH.value
             # action += '0'  # According to FoldX manual (version3), write 0 for all possible interation in a complex.
             # Write AB for example if only interested in iteraction energies of chain A with chain B.
 
-            for fx_mutant_name in fx_mutant_name_list:
+            for path_fx_mutant_name in path_fx_mutant_name_list:
+                fx_mutant_name = os.path.basename(path_fx_mutant_name)
                 path_output_ac_pdbname_mutant = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_AC.value, pdbname, fx_mutant_name)
                 path_runscript_file = os.path.join(path_output_ac_pdbname_mutant, fx.Strs.runscrpt_txt.value)
                 pdbs_to_analyse = [pdbname + FoldX.Strs._1_012_SUFFIX_PDBS.value[0], ',', wt_pdbname +
                                    FoldX.Strs._1_012_SUFFIX_PDBS.value[0]]
-                for i in range(start=1, stop=self._get_num_of_repaired_pdbs(path_output_ac_pdbname_mutant, pdbname)):
+                path_output_bm_pdbname_mutant = os.path.join(Paths.OUTPUT, Paths.DIR_BM.value, pdbname, fx_mutant_name)
+                num_of_repaired_pdbs = self._get_num_of_repaired_pdbs(path_output_bm_pdbname_mutant, pdbname)
+                for i in range(1, num_of_repaired_pdbs):
                     pdbs_to_analyse.append(',')
-                    pdbs_to_analyse.append(pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs._1_012_SUFFIX_PDBS.value[i])
+                    # pdbs_to_analyse.append(pdbname)
+                    pdbs_to_analyse.append(pdbname + FoldX.Strs._1_012_SUFFIX_PDBS.value[i])
                     pdbs_to_analyse.append(',')
-                    pdbs_to_analyse.append(wt_pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs._1_012_SUFFIX_PDBS.value[i])
+                    # pdbs_to_analyse.append(wt_pdbname)
+                    pdbs_to_analyse.append(wt_pdbname + FoldX.Strs._1_012_SUFFIX_PDBS.value[i])
                 pdbs_to_analyse = ''.join(pdbs_to_analyse)
                 fx.write_runscript_file(path_output_ac_pdbname_mutant, pdbs_to_analyse, self.conditions, action)
                 GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_ac_pdbname_mutant, files_only=True)
                 os.chdir(path_output_ac_pdbname_mutant)
-                path_files_to_copy = pdbs_to_analyse.split(',')
-                for pdb in pdbs_to_analyse:
-                    path_files_to_copy.append(os.path.join(Paths.OUTPUT, Paths.DIR_BM.value, pdbname, fx_mutant_name, pdb))
+                files_to_copy = pdbs_to_analyse.split(',')
+                path_files_to_copy = []
+                for file_to_copy in files_to_copy:
+                    path_files_to_copy.append(os.path.join(path_output_bm_pdbname_mutant, file_to_copy))
                 GUM.linux_copy_specified_files(path_files_to_copy, path_dst_dir=path_output_ac_pdbname_mutant)
 
                 if GUM.using_cluster():
@@ -309,8 +311,7 @@ class FoldX(object):
                         raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
 
         def _get_num_of_repaired_pdbs(self, path_output_pdbname_mutant, pdbname):
-            repaired_pdbs = glob.glob(path_output_pdbname_mutant + Str.FSLSH_ASTRX.value + pdbname + Str.ASTRX.value +
-                                      Str.PDBEXT.value)
+            repaired_pdbs = glob.glob(os.path.join(path_output_pdbname_mutant, pdbname + '_1_*' + Str.PDBEXT.value))
             return len(repaired_pdbs)
 
     class Repair(object):
