@@ -13,6 +13,7 @@ import os
 import glob
 from src.enums.Str import Str
 from src.enums.Paths import Paths
+from src.enums.UNPW import Server
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 import mysql.connector
@@ -75,7 +76,7 @@ class FoldX(object):
             f.write(runscript_str)
         return runscript_str
 
-    def _make_fx_mutant_name_list(self, amino_acids: list, pdbname_chain_startpos_fasta: dict):
+    def make_fx_mutant_name_list(self, amino_acids: list, pdbname_chain_startpos_fasta: dict):
         """
         :param amino_acids: Amino acids that (every residue in) the protein will be mutated to.
         :param pdbname_chain_startpos_fasta: pdbname_underscore_chain and fasta sequence as key-value pair.
@@ -109,11 +110,12 @@ class FoldX(object):
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
             pdbname_chain_startpos_fasta_dict = GUM.extract_pdbname_chain_startpos_fasta_from_pdbs(path_pdbfile)
-            fx_mutant_name_list = FoldX._make_fx_mutant_name_list(amino_acids, pdbname_chain_startpos_fasta_dict)
-            action = FoldX().Strs.BM.value + Str.HASH.value + ',' + FoldX().Strs.indiv_list_txt.value
+            fx = FoldX()
+            fx_mutant_name_list = fx.make_fx_mutant_name_list(amino_acids, pdbname_chain_startpos_fasta_dict)
+            action = fx.Strs.BM.value + Str.HASH.value + ',' + fx.Strs.indiv_list_txt.value
             path_runscript_dir = os.path.join(Paths.CONFIG_BMRUNSCRIPT, pdbname)
-            FoldX().write_runscript_file(path_runscript_dir, pdbfile, self.conditions, action)
-            path_runscript_file = os.path.join(path_runscript_dir, FoldX().Strs.runscrpt_txt.value)
+            fx.write_runscript_file(path_runscript_dir, pdbfile, self.conditions, action)
+            path_runscript_file = os.path.join(path_runscript_dir, fx.Strs.runscrpt_txt.value)
 
             for fx_mutant_name in fx_mutant_name_list:
                 path_output_bm_pdbname_mutant = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_BM.value, pdbname, fx_mutant_name)
@@ -132,19 +134,18 @@ class FoldX(object):
                     if os.path.exists(path_runscript_file):
                         Cluster.run_job_q(path_job_q_dir=path_jobq)
                     else:
-                        raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
+                        raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
                 else:
-                    cmd = 'chmod 777' + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
+                    cmd = Str.CHMOD777.value + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
                     try:
                         subprocess.call(cmd, shell=True)
                     except OSError:
                         print(Str.PROBLNXCMD_MSG.value + cmd)
-                    cmd = Paths.FOLDX_EXE + Str.SPCE.value + FoldX().Strs.DSH_RUNFILE.value + Str.SPCE.value + \
-                          path_runscript_file
+                    cmd = Paths.FOLDX_EXE + Str.SPCE.value + fx.Strs.DSH_RUNFILE.value + Str.SPCE.value + path_runscript_file
                     if os.path.exists(path_runscript_file):
                         subprocess.call(cmd, shell=True)
                     else:
-                        raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
+                        raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
 
             for fx_mutant_name in fx_mutant_name_list:
                 path_output_bm_pdbname_mutant = os.path.join(Paths.OUTPUT, pdbname, fx_mutant_name)
@@ -157,9 +158,9 @@ class FoldX(object):
             :param ddG_average:
             :return:
             """
-            connection = mysql.connector.connect(user='snpeffect_v5',
-                                                 password='R34WKKGR',
-                                                 host='127.0.0.1')
+            connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_UN.value,
+                                                 password=Server.SNPEFFECT_V5_MYSQL_PW.value,
+                                                 host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
                                                 #, database='snpeffect_v5', port='3306')
             cursor = connection.cursor()
             cursor.execute("SHOW DATABASES")
@@ -180,12 +181,13 @@ class FoldX(object):
             ddG_1 = ''
             ddG_2 = ''
             ddG_3 = ''
-            path_output_dif_file = os.path.join(path_output_pdbname_mutant, FoldX().Strs.DIF_FXOUTFILE.value)
+            fx = FoldX()
+            path_output_dif_file = os.path.join(path_output_pdbname_mutant, fx.Strs.DIF_FXOUTFILE.value)
             if not os.path.exists(path_output_dif_file):
                 print(path_output_dif_file + ' has not be written yet')
             else:
                 self.remove_config_files(path_output_pdbname_mutant)
-                GUM.linux_remove_file(os.path.join(path_output_pdbname_mutant, pdbname + '.pdb'))
+                GUM.linux_remove_file(os.path.join(path_output_pdbname_mutant, pdbname + Str.PDBEXT.value))
                 with open(path_output_dif_file) as f:
                     dif_fxoutfile_lines = f.readlines()
                 for line in dif_fxoutfile_lines:
@@ -202,7 +204,7 @@ class FoldX(object):
                         elif ddG_3 == '':
                             ddG_3 = ddG
                 ddG_average = (float(ddG_1) + float(ddG_2) + float(ddG_3)) / 3
-                with open(os.path.join(path_output_pdbname_mutant, FoldX().Strs.DDG_CSV.value), 'w') as f:
+                with open(os.path.join(path_output_pdbname_mutant, fx.Strs.DDG_CSV.value), 'w') as f:
                     f.write(pdbname + ',' + fx_mutant_name + ',' + str(ddG_average))
             return ddG_average
 
@@ -213,13 +215,14 @@ class FoldX(object):
             :param path_output_pdbname_mutant: Absoluate path to output dir for each mutant housing the individual
             copies of the config files to be deleted.
             """
-            path_runscript_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.runscrpt_txt.value)
-            path_rotabase_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.ROTABASE_TXT.value)
-            path_cmds_bm_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.CMNDS_BM_TXT.value)
-            path_cmds_stab_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.CMNDS_STAB_TXT.value)
-            path_options_bm_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTNS_BM_TXT.value)
-            path_options_stab_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.OPTNS_STAB_TXT.value)
-            path_indiv_list_txt = os.path.join(path_output_pdbname_mutant, FoldX().Strs.indiv_list_txt.value)
+            fx = FoldX()
+            path_runscript_txt = os.path.join(path_output_pdbname_mutant, fx.Strs.runscrpt_txt.value)
+            path_rotabase_txt = os.path.join(path_output_pdbname_mutant, fx.Strs.ROTABASE_TXT.value)
+            path_cmds_bm_txt = os.path.join(path_output_pdbname_mutant, fx.Strs.CMNDS_BM_TXT.value)
+            path_cmds_stab_txt = os.path.join(path_output_pdbname_mutant, fx.Strs.CMNDS_STAB_TXT.value)
+            path_options_bm_txt = os.path.join(path_output_pdbname_mutant, fx.Strs.OPTNS_BM_TXT.value)
+            path_options_stab_txt = os.path.join(path_output_pdbname_mutant, fx.Strs.OPTNS_STAB_TXT.value)
+            path_indiv_list_txt = os.path.join(path_output_pdbname_mutant, fx.Strs.indiv_list_txt.value)
             path_files_to_remove = [path_runscript_txt, path_rotabase_txt, path_cmds_bm_txt, path_cmds_stab_txt,
                                     path_options_bm_txt, path_options_stab_txt, path_indiv_list_txt]
             for path_file_to_remove in path_files_to_remove:
@@ -233,7 +236,7 @@ class FoldX(object):
             :param path_dst_dir: Abs path to the output dir of foldx computation for each mutant
             """
             fx_mutant_name = path_dst_dir.split('/')[-1]
-            with open(os.path.join(path_dst_dir, FoldX().Strs.indiv_list_txt.value), 'w') as f:
+            with open(os.path.join(path_dst_dir, fx.Strs.indiv_list_txt.value), 'w') as f:
                 f.write(fx_mutant_name + ';\n')
 
     class AnalyseComplex(object):
@@ -248,32 +251,36 @@ class FoldX(object):
             """
             Calculates interaction energies for a complex of protein chains for a specified pdb and list of amino acids.
             The amino acids indicate the mutants that should have already been generated by FoldX BuildModel.
-            The repaired pdbs
+            The repaired pdbs are read from each output_data/buildmodel/<pdbname>/<fxmutantname> folder.
             :param path_pdbfile:
-            :param amino_acids:
+            :param amino_acids: amino acids that the
             :return:
             """
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
             wt_pdbname = FoldX.Strs.WT_.value + pdbname
             pdbname_chain_startpos_fasta_dict = GUM.extract_pdbname_chain_startpos_fasta_from_pdbs(path_pdbfile)
-            fx_mutant_name_list = FoldX()._make_fx_mutant_name_list(amino_acids, pdbname_chain_startpos_fasta_dict)
-            action = FoldX().Strs.AC.value + Str.HASH.value
+            fx = FoldX()
+            # fx_mutant_name_list = fx.make_fx_mutant_name_list(amino_acids, pdbname_chain_startpos_fasta_dict)
+            fx_mutant_name_list = sorted(glob.glob(Paths.OUTPUT_BM + Str.FSLSH_ASTRX))
+            action = fx.Strs.AC.value + Str.HASH.value
+            # action += '0'  # According to FoldX manual (version3), write 0 for all possible interation in a complex.
+            # Write AB for example if only interested in iteraction energies of chain A with chain B.
 
             for fx_mutant_name in fx_mutant_name_list:
                 path_output_ac_pdbname_mutant = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_AC.value, pdbname, fx_mutant_name)
-                path_runscript_file = os.path.join(path_output_ac_pdbname_mutant, FoldX().Strs.runscrpt_txt.value)
-                pdbs_to_analyse = [pdbname + FoldX.Strs.value_1_012_SUFFIX_PDBS[0], ',', wt_pdbname +
-                                         FoldX.Strs.value_1_012_SUFFIX_PDBS[0]]
+                path_runscript_file = os.path.join(path_output_ac_pdbname_mutant, fx.Strs.runscrpt_txt.value)
+                pdbs_to_analyse = [pdbname + FoldX.Strs._1_012_SUFFIX_PDBS.value[0], ',', wt_pdbname +
+                                   FoldX.Strs._1_012_SUFFIX_PDBS.value[0]]
                 for i in range(start=1, stop=self._get_num_of_repaired_pdbs(path_output_ac_pdbname_mutant, pdbname)):
                     pdbs_to_analyse.append(',')
                     pdbs_to_analyse.append(pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs.value_1_012_SUFFIX_PDBS[i])
+                    pdbs_to_analyse.append(FoldX.Strs._1_012_SUFFIX_PDBS.value[i])
                     pdbs_to_analyse.append(',')
                     pdbs_to_analyse.append(wt_pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs.value_1_012_SUFFIX_PDBS[i])
+                    pdbs_to_analyse.append(FoldX.Strs._1_012_SUFFIX_PDBS.value[i])
                 pdbs_to_analyse = ''.join(pdbs_to_analyse)
-                FoldX().write_runscript_file(path_output_ac_pdbname_mutant, pdbs_to_analyse, self.conditions, action)
+                fx.write_runscript_file(path_output_ac_pdbname_mutant, pdbs_to_analyse, self.conditions, action)
                 GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_ac_pdbname_mutant, files_only=True)
                 os.chdir(path_output_ac_pdbname_mutant)
                 path_files_to_copy = pdbs_to_analyse.split(',')
@@ -288,22 +295,22 @@ class FoldX(object):
                     if os.path.exists(path_runscript_file):
                         Cluster.run_job_q(path_job_q_dir=path_output_ac_pdbname_mutant)
                     else:
-                        raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
+                        raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
                 else:
-                    cmd = 'chmod 777' + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
+                    cmd = Str.CHMOD777.value + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
                     try:
                         subprocess.call(cmd, shell=True)
                     except OSError:
                         print(Str.PROBLNXCMD_MSG.value + cmd)
-                    cmd = Paths.FOLDX_EXE + Str.SPCE.value + FoldX().Strs.DSH_RUNFILE.value + Str.SPCE.value + path_runscript_file
+                    cmd = Paths.FOLDX_EXE + Str.SPCE.value + fx.Strs.DSH_RUNFILE.value + Str.SPCE.value + path_runscript_file
                     if os.path.exists(path_runscript_file):
                         subprocess.call(cmd, shell=True)
                     else:
-                        raise ValueError(FoldX().Strs.NO_RUNSCRPT_FILE_MSG.value)
+                        raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
 
         def _get_num_of_repaired_pdbs(self, path_output_pdbname_mutant, pdbname):
             repaired_pdbs = glob.glob(path_output_pdbname_mutant + Str.FSLSH_ASTRX.value + pdbname + Str.ASTRX.value +
-                                            Str.PDBEXT.value)
+                                      Str.PDBEXT.value)
             return len(repaired_pdbs)
 
     class Repair(object):
