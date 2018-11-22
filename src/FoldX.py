@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Class for launching FoldX algorithms (BuildModel, AnalyseComplex, Stability). Includes code for writing FoldX'' runscript
-file and processing output files.
+Class for launching FoldX algorithms (BuildModel, AnalyseComplex, Repair). Includes code for writing FoldX's runscript file
+and processing output files.
 
 (Includes a nested Enum of FoldX-specific strings located at the end of the class.)
 
-Note: FoldX output files are written to the working directory which must also contain certain config files and pdbs,
-Thus these output & input files are located together - in output_data/build_model & output_data/analyse_complex dirs.
+Note: FoldX output files are written to the working directory which must also contain certain config files and pdbs. Thus these
+output & input files are located together - in output_data/build_model & output_data/analyse_complex dirs.
 """
 import subprocess
 import os
@@ -16,7 +16,8 @@ from src.enums.Paths import Paths
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 import mysql.connector
-from src.enums.Conditions import Cond
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -29,11 +30,6 @@ __status__ = "Development"
 
 class FoldX(object):
 
-    def __init__(self):
-        self.BuildModel(Cond.INCELL_MAML_FX.value).write_ddG_to_DB()
-
-    # 30.07.18 Redesigned the directory structure such that runscripts will go in configuration/foldx/ & maybe another
-    # level such as analyse_complex or build_model or stability etc.
     def write_runscript_file(self, path_runscript: str, pdbs: str, conditions: dict, action: str, num_of_runs=3,
                              show_sequence_detail=False, print_networks=False, calculate_stability=False):
         """
@@ -267,15 +263,15 @@ class FoldX(object):
             for fx_mutant_name in fx_mutant_name_list:
                 path_output_ac_pdbname_mutant = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_AC.value, pdbname, fx_mutant_name)
                 path_runscript_file = os.path.join(path_output_ac_pdbname_mutant, FoldX().Strs.runscrpt_txt.value)
-                pdbs_to_analyse = [pdbname + FoldX.Strs._1_012_SUFFIX_PDBS[0], ',', wt_pdbname +
-                                         FoldX.Strs._1_012_SUFFIX_PDBS[0]]
+                pdbs_to_analyse = [pdbname + FoldX.Strs.value_1_012_SUFFIX_PDBS[0], ',', wt_pdbname +
+                                         FoldX.Strs.value_1_012_SUFFIX_PDBS[0]]
                 for i in range(start=1, stop=self._get_num_of_repaired_pdbs(path_output_ac_pdbname_mutant, pdbname)):
                     pdbs_to_analyse.append(',')
                     pdbs_to_analyse.append(pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs._1_012_SUFFIX_PDBS[i])
+                    pdbs_to_analyse.append(FoldX.Strs.value_1_012_SUFFIX_PDBS[i])
                     pdbs_to_analyse.append(',')
                     pdbs_to_analyse.append(wt_pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs._1_012_SUFFIX_PDBS[i])
+                    pdbs_to_analyse.append(FoldX.Strs.value_1_012_SUFFIX_PDBS[i])
                 pdbs_to_analyse = ''.join(pdbs_to_analyse)
                 FoldX().write_runscript_file(path_output_ac_pdbname_mutant, pdbs_to_analyse, self.conditions, action)
                 GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_ac_pdbname_mutant, files_only=True)
@@ -345,4 +341,4 @@ class FoldX(object):
         WT_ = 'WT_'
 
 
-
+pydevd.stoptrace()
