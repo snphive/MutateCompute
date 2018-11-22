@@ -7,4 +7,4 @@ export PYTHONPATH=$PYTHONPATH:/switchlab/group/shazib/SnpEffect/venv/lib/python3
 export PYTHONPATH=$PYTHONPATH:/switchlab/group/shazib/SnpEffect
 
 #!/usr/bin/env python3
-python3 /switchlab/group/shazib/SnpEffect/src/RemoveFilesManual.py 'use_cluster=True'
+python3 /switchlab/group/shazib/SnpEffect/src/launchers/DeleteMoveFilesManual.py 'use_cluster=True'
