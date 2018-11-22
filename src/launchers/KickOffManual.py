@@ -10,8 +10,8 @@ import os
 from src.Main import Main
 from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -28,7 +28,7 @@ Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 
 
 if 'switchlab/group' in os.getcwd() and sys.argv[1].strip(' ') != 'use_cluster=True':
     raise ValueError('Current working directory includes "/switchlab/group" in path. Hence you may be running the '
-                     'program on the psb cluster. However the "use_cluster" parameter is set to False. '
+                     'program on the psb cluster, while the "use_cluster" parameter is False. '
                      'If launching from one of the bash scripts, check you are using bash/KickOffZeus.sh which '
                      'includes ("use_cluster=True") parameter, as opposed to the bash/KickOff.sh script. \n'
                      'Alternatively, uncomment the Paths.set_up_paths(use_cluster=True) line below to manually set it' 
@@ -37,7 +37,7 @@ if 'switchlab/group' in os.getcwd() and sys.argv[1].strip(' ') != 'use_cluster=T
 
 if 'switchlab/group' not in os.getcwd() and sys.argv[1].strip(' ') == 'use_cluster=True':
     raise ValueError('Current working directory does not include "/switchlab/group" in path. Hence you might not be ' 
-                     'running the program on the psb cluster. However the "use_cluster" parameter is set to True. '
+                     'running the program on the psb cluster, while the "use_cluster" parameter is True. '
                      'If launching from one of the bash scripts, check you are using bash/KickOff.sh which includes '
                      '("use_cluster=False") parameter, as opposed to the bash/KickOffZeus.sh script. \n'
                      'Alternatively, uncomment the Paths.set_up_paths(use_cluster=False) line below to manually set it' 
@@ -63,7 +63,7 @@ Get the pdb files you want to run FoldX on.
 # path_input_pdbs_dir = '/switchlab/group/shazib/SnpEffect/output_data/analyse_complex'
 # path_input_pdbs_dir = Paths.OUTPUT_AC
 # path_pdbfiles = sorted(glob.glob(path_input_pdbs_dir + '/**/*.pdb', recursive=True))
-path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, 'RepairPDB_2')]
+path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, 'RepairPDB_2.pdb')]
 if not path_pdbfiles:
     raise ValueError('No pdb files to process. Check paths are correct and check files are where you expect.')
 
@@ -84,5 +84,5 @@ main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile
             AA.LIST_ALL_20_AA.value)
 
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
 
