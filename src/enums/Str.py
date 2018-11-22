@@ -48,3 +48,4 @@ class Str(Enum):
     PROBLNXCMD_MSG = 'Problem with linux command: '
     REPAIRPDB_  = 'RepairPDB_'
     GLOBRESIDUE_OUT = 'PSX_globalresidue.out'
+    CHMOD777 = 'chmod 777'
