@@ -63,7 +63,7 @@ Get the pdb files you want to run FoldX on.
 # path_input_pdbs_dir = '/switchlab/group/shazib/SnpEffect/output_data/analyse_complex'
 # path_input_pdbs_dir = Paths.OUTPUT_AC
 # path_pdbfiles = sorted(glob.glob(path_input_pdbs_dir + '/**/*.pdb', recursive=True))
-path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, 'RepairPDB_2.pdb')]
+path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, 'RepairPDB_14.pdb')]
 if not path_pdbfiles:
     raise ValueError('No pdb files to process. Check paths are correct and check files are where you expect.')
 
