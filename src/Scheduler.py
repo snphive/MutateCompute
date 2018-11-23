@@ -118,7 +118,7 @@ class Scheduler(object):
                     if use_multithread:
                         Scheduler._launch_thread(target=analysecomplex.calculate_complex_energies, args=path_pdbfile)
                     else:
-                        analysecomplex.calculate_complex_energies(path_pdbfile, amino_acids)
+                        analysecomplex.calculate_complex_energies(path_pdbfile)
                 if operations['do_foldx_repair']:
                     repair = FoldX().Repair(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
