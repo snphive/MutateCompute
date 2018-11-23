@@ -32,6 +32,7 @@ class Str(Enum):
     PDBEXT = '.pdb'
     LOGEXT = '.log'
     TARGZEXT = '.tar.gz'
+    FXOUTEXT = '.fxout'
     DOTS3 = '...'
     PDBS = Paths.DIR_PDBS.value
     FASTAS = Paths.DIR_FASTAS.value
