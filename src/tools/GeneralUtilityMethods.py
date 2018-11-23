@@ -109,15 +109,15 @@ class GUM(object):
                 fastafile.write(fasta_sequence)
 
     @staticmethod
-    def extract_all_chains_from_pdb(pdbfile: str, path_pdbfile: str):
+    def extract_all_chains_from_pdb(path_pdbfile: str):
         """
         For the pdb passed here, all chains are read from the pdb file.
         :param pdbfile: String name of pdb file (incl. '.pdb' extension).
         :param path_pdbfile: Absolute path to directory where the target pdbfile is.
         :return: list of str, protein chains
         """
-        with open(os.path.join(path_pdbfile, pdbfile)) as pdbfile_opened:
-            pdbfile_lines = pdbfile_opened.readlines()
+        with open(path_pdbfile) as f:
+            pdbfile_lines = f.readlines()
         protein_chains = []
         for pdbfile_line in pdbfile_lines:
             if 'ATOM' == pdbfile_line[0:4]:
@@ -125,6 +125,16 @@ class GUM(object):
                 if protein_chain not in protein_chains:
                     protein_chains.append(protein_chain)
         return protein_chains
+
+    @staticmethod
+    def get_num_of_chains(path_pdbfile: str):
+        """
+
+        :param path_pdbfile:
+        :return: Number of protein chains (aka molecules) within the specified pdb file.
+        """
+        return len(GUM.extract_all_chains_from_pdb(path_pdbfile))
+
 
     @staticmethod
     def _remove_prefix_and_suffix(input_text: str, prefix: str, suffix: str):
@@ -481,19 +491,18 @@ class GUM(object):
             print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
-    def linux_remove_file(path_dst_mutant_file: str):
+    def linux_remove_file(path_file_to_remove: str):
         """
-        :param path_dst_mutant_file:
+        :param path_file_to_remove:
         """
-
-        if not os.path.exists(path_dst_mutant_file):
-            print('Path: ' + path_dst_mutant_file + ' does not exist.')
+        if not os.path.exists(path_file_to_remove):
+            print('Path: ' + path_file_to_remove + ' does not exist.')
         else:
-            cmd = 'rm' + Str.SPCE.value + path_dst_mutant_file
+            cmd = 'rm' + Str.SPCE.value + path_file_to_remove
             try:
                 subprocess.call(cmd, shell=True)
             except FileNotFoundError as fnf:
-                print('File not found: ' + path_dst_mutant_file)
+                print('File not found: ' + path_file_to_remove)
                 print(fnf)
             except OSError:
                 print(Str.PROBLNXCMD_MSG.value + cmd)
