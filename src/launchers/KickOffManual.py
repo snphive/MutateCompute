@@ -10,8 +10,8 @@ import os
 from src.Main import Main
 from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -84,5 +84,5 @@ main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile
             AA.LIST_ALL_20_AA.value)
 
 
-# pydevd.stoptrace()
+pydevd.stoptrace()
 
