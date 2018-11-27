@@ -71,7 +71,8 @@ class Scheduler(object):
                         write_fasta_per_mut = False
                         Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value,
                                                  python_script_with_paths=os.path.join(Paths.SE_SRC.value,
-                                                                                       'run_mutate_fasta_zeus.py') + Str.SPCE.value + path_fastafile +
+                                                                                       'run_mutate_fasta_zeus.py') +
+                                                                          Str.SPCE.value + path_fastafile +
                                                                           Str.SPCE.value + str(write_1_fasta_only) +
                                                                           Str.SPCE.value + str(write_fasta_per_mut) +
                                                                           Str.SPCE.value + path_output_fastas_3dots, queue='',
@@ -101,7 +102,6 @@ class Scheduler(object):
                                                   args=[path_fastafile, path_dst])
                     elif not GUM.using_cluster() and not use_multithread:
                         agadir.run_agadir_on_multifastas(path_fastafile, path_dst)
-
         elapsed = time.perf_counter() - start_time
         print('Time taken to complete iterating through fasta files (after methods have been called): ' + str(elapsed))
         if path_pdbfiles:
@@ -125,6 +125,24 @@ class Scheduler(object):
                         Scheduler._launch_thread(target=repair.do_repair, args=path_pdbfile)
                     else:
                         repair.do_repair(path_pdbfile)
+        if path_pdbfiles:
+            for path_pdbfile in path_pdbfiles:
+                if operations['do_foldx_buildmodel']:
+                    buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
+                    if not buildmodel.confirm_all_dif_bm_fxoutfiles_computed(path_pdbfile, amino_acids):
+                        print('Warning: BuildModel has not completed all computations for this pdb: ' + os.path.basename(
+                            path_pdbfile))
+                    else:
+                        print('BuildModel has completed all computations for this pdb: ' + os.path.basename(path_pdbfile))
+
+                # if operations['do_foldx_analysecomplex']:
+                #     analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
+                #     if not analysecomplex.confirm_interaction_energies_computed(path_pdbfile, amino_acids):
+                #         print('Warning: AnalyseComplex has not completed all computations for this pdb: ' + os.path.basename(
+                #             path_pdbfile))
+                #     else:
+                #         print('AnalyseComplex has completed all computations for this pdb: ' + os.path.basename(path_pdbfile))
+
 
     @staticmethod
     def start_blast(path_input_fastafiles: list, path_output: str, write_idmaps_for_mysldb=True, write_csv=True, write_xml=True,
