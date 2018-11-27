@@ -6,7 +6,15 @@ latter seems to cause problems with iterating through such a large list in a for
 looping through a list of more than 70000, whereby computations missed out about half of the inputs, thereby generating
 only about half of the outputs).
 
-To start this script from terminal, use following command: sh KickOff.sh
+To run this script from:
+- local terminal: Enter command sh KickOff.sh
+- local Pycharm IDE: Select "KickOffManPy" in Run/Edit Configurations/Python: Click green 'play' button icon.
+- remote (cluster) terminal: Enter command sh KickOffZeus.sh in /switchlab/group/shazib/SnpEffect/bash directory.
+- remote (cluster) Pycharm IDE debugger: Select "KickOffRemoteDebug" in Run/Edit Configurations/Python Remote Debug. Click green
+'bug' button icon. Make sure the script has "import pydevd" and "pydevd.settrace('localhost', port=51234, stdoutToServer=True,
+stderrToServer=True)" at top of file and "pydevd.stoptrace()" at end. Log in to cluster with "ssh -p 7788
+shazib@zeus.psb.ugent.be -R 51234:localhost:51234". Enter command sh KickOffZeus.sh in /switchlab/group/shazib/SnpEffect/bash
+directory.
 """
 import os
 import sys
@@ -17,8 +25,8 @@ from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
 
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
