@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-Script for running any part of the codebase on relatively small numbers of files typically housed in a single folder.
-Those to be run on multiple folders can be done through the KickOff.py module.
+Script for launching the packing and compressing files into tar files in a specified directory.
 
-PackCompressManual.py can be run locally or on cluster.
+PackCompressManual.py can be run locally or on cluster (the latter via a bash script).
 """
 import sys
 import os
