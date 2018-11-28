@@ -11,8 +11,8 @@ from src.Main import Main
 from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -28,6 +28,7 @@ Paths for the entire codebase are set accordingly. "use_cluster" is set to False
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
 
 if 'switchlab/group' in os.getcwd() and sys.argv[1].strip(' ') != 'use_cluster=True':
+
     raise ValueError('Current working directory includes "/switchlab/group" in path. Hence you may be running the '
                      'program on the psb cluster, while the "use_cluster" parameter is False. '
                      'If launching from one of the bash scripts, check you are using bash/KickOffZeus.sh which '
@@ -67,6 +68,11 @@ Get the pdb files you want to run FoldX on.
 path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, 'RepairPDB_14' + Str.PDBEXT.value)]
 if not path_pdbfiles:
     raise ValueError('No pdb files to process. Check paths are correct and check files are where you expect.')
+"""
+Provide mutants names (using FoldX format: wtaa|chain|position|mutantaa), on occasions when you only want to run specific mutants 
+only. (This is most useful when you only need to run one or a few mutants.) 
+"""
+specific_fxmutants = ['TA14P']
 
 """
 Get the fasta files you want to run mutate_fasta or agadir on.
@@ -81,9 +87,9 @@ path_fastafiles = []
 """
 Kick off the program(s) via the constructor or Main class.
 """
-main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles,
+main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles, specific_fxmutants,
             AA.LIST_ALL_20_AA.value)
 
 
-# pydevd.stoptrace()
+pydevd.stoptrace()
 
