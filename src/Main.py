@@ -28,7 +28,7 @@ __status__ = "Development"
 class Main(object):
 
     def __init__(self, operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfiles: list,
-                 path_fastafiles: list, amino_acids: list):
+                 path_fastafiles: list, specific_fxmutants: list, amino_acids: list):
         """
         All algorithmic analyses start from here. IdentifyProtein.py which runs Blast analyses is the only program that
         currently runs independently.
@@ -47,7 +47,7 @@ class Main(object):
                 operations['do_foldx_repair'] or operations['do_foldx_buildmodel'] or \
                 operations['do_foldx_stability'] or operations['do_foldx_analysecomplex']:
             Scheduler.start(operations, use_multithread, path_input, path_output, path_pdbfiles, path_fastafiles,
-                            amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False)
+                            specific_fxmutants, amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False)
 
     @staticmethod
     def _all_ops_are_false(operations: dict):

@@ -33,7 +33,8 @@ class Scheduler(object):
 
     @staticmethod
     def start(operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfiles: list,
-              path_fastafiles: list, amino_acids: list, write_1_fasta_only: bool, write_fasta_per_mut: bool):
+              path_fastafiles: list, specific_fxmutants: list, amino_acids: list, write_1_fasta_only: bool,
+              write_fasta_per_mut: bool):
         """
         Not sure yet if I should instantiate the objects once at beginning rather than a new instance for each and
         every fasta or pdb. (NOTE: argument list is identical as those of the calling method _start_scheduler())
@@ -43,6 +44,7 @@ class Scheduler(object):
         :param path_output: Absolute path to output_data root dir.
         :param path_pdbfiles: Pdbfiles to run (incl. .pdb extension)
         :param path_fastafiles: Fastafiles to run (incl. .fasta extension)
+        :param specific_fxmutants: Given when specific mutants only should be calculated.
         :param amino_acids: All amino acids that any mutations operations will use to mutate residues to.
         :param write_1_fasta_only: True to write any fasta output data to 1 fasta file, each separated by \n.
         :param write_fasta_per_mut: True to write any fasta output data as 1 fasta file per mutant.
@@ -110,15 +112,15 @@ class Scheduler(object):
                     buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=buildmodel.mutate_protein_structure,
-                                                 args=[path_pdbfile, amino_acids])
+                                                 args=[path_pdbfile, amino_acids, specific_fxmutants])
                     else:
-                        buildmodel.mutate_protein_structure(path_pdbfile, amino_acids)
+                        buildmodel.mutate_protein_structure(path_pdbfile, amino_acids, specific_fxmutants)
                 if operations['do_foldx_analysecomplex']:
                     analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=analysecomplex.calculate_complex_energies, args=path_pdbfile)
                     else:
-                        analysecomplex.calculate_complex_energies(path_pdbfile)
+                        analysecomplex.calculate_complex_energies(path_pdbfile, specific_fxmutants)
                 if operations['do_foldx_repair']:
                     repair = FoldX().Repair(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
@@ -129,7 +131,7 @@ class Scheduler(object):
             for path_pdbfile in path_pdbfiles:
                 if operations['do_foldx_buildmodel']:
                     buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
-                    if not buildmodel.confirm_all_dif_bm_fxoutfiles_computed(path_pdbfile, amino_acids):
+                    if buildmodel.find_num_of_missing_dif_bm_fxoutfiles(path_pdbfile, amino_acids) != 0:
                         print('Warning: BuildModel has not completed all computations for this pdb: ' + os.path.basename(
                             path_pdbfile))
                     else:
@@ -137,7 +139,7 @@ class Scheduler(object):
 
                 # if operations['do_foldx_analysecomplex']:
                 #     analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
-                #     if not analysecomplex.confirm_interaction_energies_computed(path_pdbfile, amino_acids):
+                #     if analysecomplex.find_num_of_missing_interaction_energies(path_pdbfile, amino_acids) != 0:
                 #         print('Warning: AnalyseComplex has not completed all computations for this pdb: ' + os.path.basename(
                 #             path_pdbfile))
                 #     else:
