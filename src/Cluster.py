@@ -145,6 +145,7 @@ class Cluster(object):
     @staticmethod
     def run_job_q(path_job_q_dir: str, run_in_background=False):
         """
+        TODO replace qsub and job.q with enum reference
         :param path_job_q_dir: Absolute path of the job.q file of interest.
         :param run_in_background: True if the job should run detached from the terminal.
         """
@@ -177,12 +178,12 @@ class Cluster(object):
     from enum import Enum
 
     class CLSTR(Enum):
-        ALLQ = 'all.q'
+        ALLQ = 'all' + Str.Q_EXT.value
         NODE_HDR1 = 'hodor1.vib'
         NODE_HDR2 = 'hodor2.vib'
         NODE_ODN1 = 'odin1.vib'
         NODE_ODN2 = 'odin2.vib'
-        JOBQ = Str.JOBQ.value
+        JOBQ = 'job' + Str.Q_EXT.value
         QSTAT = 'qstat'
         QSUB = 'qsub'
         RNFL = '-runfile'
