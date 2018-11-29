@@ -1,18 +1,25 @@
 #!/usr/bin/env python3
 """
-Script for running any part of the codebase on relatively small numbers of files typically housed in a single folder.
-Those to be run on multiple folders can be done through the KickOff.py module.
+Script for running Agadir and/or FoldX on fasta/pdb files.
+
+Includes functionality for reducing disk space usage by deleting input files after computation completed and deleting output
+files that are not needed.
+
+Will include functionality for read data from output files and write to summary files and/or MySQL database.
 
 KickOffManual.py can be run locally or on cluster.
 """
 import sys
 import os
+import glob
 from src.Main import Main
 from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+from src.enums.Conditions import Cond
+from src.FoldX import FoldX
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -50,8 +57,8 @@ if 'switchlab/group' not in os.getcwd() and sys.argv[1].strip(' ') == 'use_clust
 Set the value(s) of whichever operation(s) you want to run to True in the operations dict. 
 operations is passed to Main via its constructor.
 """
-operations = {'do_mutate_fasta': False, 'do_agadir': False, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
-              'do_foldx_stability': False, 'do_foldx_analysecomplex': True}
+operations = {'do_mutate_fasta': False, 'do_agadir': False, 'do_foldx_repair': False, 'do_foldx_buildmodel': True,
+              'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
 
 """
 Multithreading is not up and running yet (Nov18). Set to False for now.
@@ -69,11 +76,12 @@ path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, 'RepairPDB_14' + Str.PDBEXT.valu
 if not path_pdbfiles:
     raise ValueError('No pdb files to process. Check paths are correct and check files are where you expect.')
 """
-Provide mutants names (using FoldX format: wtaa|chain|position|mutantaa), on occasions when you only want to run specific mutants 
-only. (This is most useful when you only need to run one or a few mutants.) 
-"""
-specific_fxmutants = ['TA14P']
+Select specific mutants if you are only interested in these.
 
+BE SURE TO SET THIS TO EMPTY LIST IF YOU DON'T WANT ANY OF THE SUBSEQUENT ACTIONS BELOW TO BE SPECIFIC TO THIS/THESE MUTANTS ONLY.
+"""
+specific_fxmutants = ['AA101A']
+# specific_fxmutants = []
 """
 Get the fasta files you want to run mutate_fasta or agadir on.
 """
@@ -90,6 +98,55 @@ Kick off the program(s) via the constructor or Main class.
 main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles, specific_fxmutants,
             AA.LIST_ALL_20_AA.value)
 
+"""
+After computation completed, DELETE config files no longer needed.  
+"""
+# if operations['do_foldx_buildmodel']:
+#     fx = FoldX()
+#     path_output_bm_pdb_fxmutant_dirs = []
+#     for path_pdbfile in path_pdbfiles:
+#         pdbname = os.path.basename(path_pdbfile).split('.')[0]
+#         for specific_fxmutant in specific_fxmutants:
+#             path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
+#         if not specific_fxmutants:
+#             path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
+#         for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
+#             if fx.BuildModel(Cond.INCELL_MAML_FX.value).has_already_generated_dif_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+#                 fx.remove_config_files(path_output_bm_pdb_fxmutant_dir)
 
-pydevd.stoptrace()
+if operations['do_foldx_analysecomplex']:
+    fx = FoldX()
+    path_output_bm_pdb_fxmutant_dirs = []
+    path_output_ac_pdb_fxmutant_dirs = []
+    for path_pdbfile in path_pdbfiles:
+        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        for specific_fxmutant in specific_fxmutants:
+            path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
+            path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
+        if not specific_fxmutants:
+            path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
+        for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
+            if fx.AnalyseComplex(Cond.INCELL_MAML_FX.value).has_already_generated_summary_ac_fxoutfile(
+                    path_output_ac_pdb_fxmutant_dir):
+                fx.remove_config_files(path_output_ac_pdb_fxmutant_dir)
+                fx.remove_pdbfiles(os.path.join(Paths.OUTPUT_BM, pdbname, os.path.basename(path_output_ac_pdb_fxmutant_dir)))
+                fx.remove_pdbfiles(os.path.join(path_output_ac_pdb_fxmutant_dir))
+
+"""
+After computation completed, write result values to summary and/or MySQL database.  
+"""
+
+
+
+# """
+# After deletion of unnecessary files, COMPRESS remaining files, (that will be copied over to storage directories)
+# """
+# if self._has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
+#     fx.remove_all_pdbfiles(path_output_bm_pdb_fxmutant_dir)
+#
+
+
+
+
+# pydevd.stoptrace()
 
