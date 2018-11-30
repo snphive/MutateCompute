@@ -19,7 +19,6 @@ import glob
 from src.enums.Str import Str
 from src.enums.Paths import Paths
 from src.enums.UNPW import Server
-from src.enums.Conditions import Cond
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 import mysql.connector
@@ -37,18 +36,20 @@ __status__ = "Development"
 
 class FoldX(object):
 
-    def write_runscript_file(self, path_runscript: str, pdbs: str, conditions: dict, action: str, num_of_runs=3,
-                             show_sequence_detail=False, print_networks=False, calculate_stability=False):
+    def write_runscript_file(self, path_runscript: str, pdbs: str, conditions: dict, action: str,
+                             num_of_runs=Str.DEFAULT_NUM_FX_RUNS_1.value, show_sequence_detail=False, print_networks=False,
+                             calculate_stability=False):
         """
         The runscript.txt is an input file for FoldX indicating which pdbs to analyse & which programs to run on them.
         :param path_runscript: Absolute path for runscript.txt file being written.
         :param pdbs: pdb(s) (including .pdb extension) inputs for FoldX.
         :param conditions: temperature (Kelvin), pH and ionic strength (Molar) of solute.
         :param action: FoldX computation to be performed (e.g. BuildModel, AnalyseComplex, etc).
-        :param num_of_runs: Number of times FoldX runs the pdb through algorithm. Lower to 2 or 1 for speed/disk space.
+        :param num_of_runs: Number of times FoldX runs the pdb through algorithm. Default in FoldXv3 manual is 1. (Note: It is
+        not possible to access FoldX.Strs enum in method argument so resorted to storing DEFAULT_NUM_FX_RUNS in Str enum.)
         :param show_sequence_detail: True will provide extra information in output. 
         :param print_networks: True to output network data on .. ?
-        :param calculate_stability: True include a stability calculation.
+        :param calculate_stability: True to include a stability calculation.
         :return: The string representation of the runscript file that is written.
         """
         runscript = []
@@ -70,7 +71,7 @@ class FoldX(object):
         runscript.append('<IonStrength>' + str(conditions[Str.COND_ION_STRGTH.value]) + Str.SEMICO_NL.value)
         runscript.append('<ph>' + str(conditions[Str.COND_PH.value]) + Str.SEMICO_NL.value)
         runscript.append('<moveNeighbours>' + Str.TRUE_lc.value + Str.SEMICO_NL.value)
-        runscript.append('<VdWDesign>2' + Str.SEMICO_NL.value)
+        runscript.append('<VdWDesign>' + str(self.Strs.DEFAULT_VDW_DSGN.value) + Str.SEMICO_NL.value)
         runscript.append('<numberOfRuns>' + str(num_of_runs) + Str.SEMICO_NL.value)
         runscript.append('<OutPDB>' + Str.HASH.value + Str.SEMICO_NL.value)
         runscript.append('<END>' + Str.HASH.value + Str.SEMICO_NL.value)
@@ -100,20 +101,63 @@ class FoldX(object):
 
     def remove_pdbfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
-
-        :param path_output_ac_or_bm_pdb_fxmutant_dir:
-        :return:
+        Remove all pdb files from specified directory directory.
+        :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path for pdb files to be deleted.
         """
         path_pdbfiles = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, '*' + Str.PDBEXT.value))
         for path_pdbfile in path_pdbfiles:
             GUM.linux_remove_file(path_pdbfile)
 
+    def remove_cluster_logfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+        """
+        Remove all e.1234567 and o.1234567 cluster log files from specified output directory.
+        :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path for log files to be deleted.
+        """
+        fxmutantname = os.path.basename(path_output_ac_or_bm_pdb_fxmutant_dir)
+        path_output_ac_or_bm_pdb_fxmutant_ologfiles = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, '*_' + fxmutantname +
+                                                                   Str.CLSTR_OUT_LOGEXT.value + '*')
+        GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_ologfiles)
+
+        path_output_ac_or_bm_pdb_fxmutant_elogfiles = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, '*_' + fxmutantname +
+                                                                   Str.CLSTR_ERR_LOGEXT.value + '*')
+        path_output_ac_or_bm_pdb_fxmutant_elogfiles = glob.glob(path_output_ac_or_bm_pdb_fxmutant_elogfiles)
+
+        for path_output_ac_or_bm_pdb_fxmutant_elogfile in path_output_ac_or_bm_pdb_fxmutant_elogfiles:
+            if os.stat(path_output_ac_or_bm_pdb_fxmutant_elogfile).st_size != 0:
+                with open(path_output_ac_or_bm_pdb_fxmutant_elogfile) as f:
+                    path_output_ac_or_bm_pdb_fxmutant_elogfile = path_output_ac_or_bm_pdb_fxmutant_elogfiles.split('/')
+                    pdbname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-3]
+                    fxmutantname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-2]
+                    print('This error logfile is not 0 bytes in size (' + pdbname + ':' + fxmutantname + ')')
+                    print('The error logfile reads: ' + f.read())
+            else:
+                GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
+
+    def remove_unnecessary_foldxfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+        """
+        Remove all unnecessary FoldX output files.
+        For BuildModel, this includes Raw_BuildModel_pdbname.fxout, Dif_BuildModel_pdbname.fxout, BuildModel_pdbname.fxout and
+        PdbList_BuildModel_pdbname.fxout.
+        For AnalyseComplex, this includes AnalyseComplex_pdbname.fxout, Indiv_energies_AnalyseComplex_pdbname.fxout,
+        Interaction_AnalyseComplex_pdbname.fxout and Interface_Residues_AnalyseComplex_pdbname.fxout.
+        :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path for unnecessary FoldX files to be deleted.
+        """
+        path_output_ac_or_bm_pdb_fxmutant_dir = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')
+        ac_or_bm = path_output_ac_or_bm_pdb_fxmutant_dir[-3]
+        pdbname = path_output_ac_or_bm_pdb_fxmutant_dir[-2]
+        path_output_ac_or_bm_pdb_fxmutant_dir = '/'.join(path_output_ac_or_bm_pdb_fxmutant_dir)
+        fx = FoldX()
+        files_to_delete = fx.Strs.FX_BM_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else fx.Strs.FX_AC_TO_DELETE.value
+        for file_to_delete in files_to_delete:
+            GUM.linux_remove_file(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, file_to_delete + '*' + pdbname + '*' +
+                                               fx.Strs.FXOUTEXT.value))
+
     def remove_config_files(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
-        Remove the copies of config files that had to be copied to the FoldX output dir, but once used serve no
-        purpose and only take up disk space.
-        :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path to output dir for each mutant housing the individual
-        copies of the config files to be deleted.
+        Remove all config files from specified output directory. This includes runscript.txt, rotabase.txt,
+        commands_stability.txt, commands_buildmodel.txt, options_stability.txt, options_buildmodel.txt, individual_list.txt,
+        and job.q files.
+        :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path for config files to be deleted.
         """
         fx = FoldX()
         path_runscript_txt = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, fx.Strs.RNSCRPT_TXT.value)
@@ -129,7 +173,6 @@ class FoldX(object):
         for path_file_to_remove in path_files_to_remove:
             if os.path.exists(path_file_to_remove):
                 GUM.linux_remove_file(path_file_to_remove)
-
 
     def _get_num_of_repaired_pdbfiles(self, path_output_pdb_fxmutant_dir: str):
         """
@@ -171,7 +214,7 @@ class FoldX(object):
             fx = FoldX()
             fxmutantnames = specific_fxmutants if specific_fxmutants else fx.make_fxmutantnames(amino_acids,
                                                                                                 pdbname_chain_startpos_fasta_dict)
-            action = fx.Strs.BM.value + Str.HASH.value + ',' + fx.Strs.INDIV_LST_TXT.value
+            action = fx.Strs.BM_ACTN.value + Str.HASH.value + ',' + fx.Strs.INDIV_LST_TXT.value
             path_runscript_dir = os.path.join(Paths.CONFIG_BMRUNSCRIPT, pdbname)
             fx.write_runscript_file(path_runscript_dir, pdbfile, self.conditions, action)
             path_runscript_file = os.path.join(path_runscript_dir, fx.Strs.RNSCRPT_TXT.value)
@@ -230,7 +273,7 @@ class FoldX(object):
             fxmutant_dir = path_output_bm_pdb_fxmutant_dir[-1]
             pdbname = path_output_bm_pdb_fxmutant_dir[-2]
             fx = FoldX()
-            path_dif_buildmodel_fxoutfile = os.path.join(Paths.OUTPUT_BM, pdbname, fxmutant_dir, fx.Strs.DIF_BLDMDL_.value +
+            path_dif_buildmodel_fxoutfile = os.path.join(Paths.OUTPUT_BM, pdbname, fxmutant_dir, fx.Strs.AVG_BMDL_.value +
                                                          pdbname + fx.Strs.FXOUTEXT.value)
             return os.path.exists(path_dif_buildmodel_fxoutfile)
 
@@ -267,7 +310,7 @@ class FoldX(object):
                     if not self.has_already_generated_dif_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
                         num_of_missing_mutant_files += 1
                         fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
-                        print('However, ' + fx.Strs.DIF_BLDMDL_.value + pdbname + Str.FXOUTEXT.value + ' file is missing from '
+                        print('However, ' + fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' file is missing from '
                               + fxmutantname)
             return num_of_missing_mutant_files
 
@@ -365,7 +408,7 @@ class FoldX(object):
                     path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
             else:
                 path_output_bm_pdb_fxmutant_dirs = sorted(glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*')))
-            action = fx.Strs.AC.value + Str.HASH.value
+            action = fx.Strs.AC_ACTN.value + Str.HASH.value
             # action += '0'  # According to FoldX manual (version3), write 0 for all possible interation in a complex.
             # Write AB for example if only interested in iteraction energies of chain A with chain B.
             has_one_chain_only = GUM.get_num_of_chains(path_pdbfile) == 1
@@ -376,7 +419,7 @@ class FoldX(object):
                 fxmutant_dir = os.path.basename(path_output_bm_pdb_fxmutant_dir)
                 path_output_ac_pdb_fxmutant_dir = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_AC.value, pdbname, fxmutant_dir)
                 if self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
-                    print(fx.Strs.SMRY_ANLYSCMPLX_.value + pdbname + Str.FXOUTEXT.value + ' already exists.')
+                    print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists.')
                     continue
                 pdbs_to_analyse = [pdbname + FoldX.Strs._1_012_SUFFIX_PDBS.value[0], ',', wt_pdbname +
                                    FoldX.Strs._1_012_SUFFIX_PDBS.value[0]]
@@ -421,40 +464,16 @@ class FoldX(object):
 
         def has_already_generated_summary_ac_fxoutfile(self, path_output_ac_pdb_fxmutant_dir: str):
             """
-            :param path_output_ac_pdb_fxmutant_dir:
-            :return: True if there are atleast as many AnalyseComplex_RepairPDB_x_1_...fxout files as expected by the number of
-            repaired pdb files that would be used for the computation.
+            :param path_output_ac_pdb_fxmutant_dir: Absolute path to the output folder for a specific mutant.
+            :return: True if Summary_AnalyseComplex_RepairPDB_x_1_...fxout file is found in the mutant directory indicating
+            that this mutant has already been run through the Foldx AnalyseComplex algorithm successfully.
             """
             path_output_ac_pdb_fxmutant_dir = path_output_ac_pdb_fxmutant_dir.split('/')
-            fxmutant_dir = path_output_ac_pdb_fxmutant_dir[-1]
             pdbname = path_output_ac_pdb_fxmutant_dir[-2]
-            path_output_bm_pdb_fxmutant_dir = os.path.join(Paths.OUTPUT_BM, pdbname, fxmutant_dir)
+            path_output_ac_pdb_fxmutant_dir = '/'.join(path_output_ac_pdb_fxmutant_dir)
             fx = FoldX()
-            num_of_repaired_pdbfiles = fx._get_num_of_repaired_pdbfiles(path_output_bm_pdb_fxmutant_dir)
-            num_of_analysecomplex_fxoutfiles = len(glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, fxmutant_dir,
-                                                                          fx.Strs.SMRY_ANLYSCMPLX_.value + pdbname +
-                                                                          fx.Strs.UNDRSCR1_.value + '*' +
-                                                                          fx.Strs.FXOUTEXT.value)))
-            analysecomplex_fxoutfiles = fx.Strs.SMRY_ANLYSCMPLX_.value + pdbname + fx.Strs.UNDRSCR1_.value + ' fxout files. '
-            has_generated_all_ac_fxoutfiles = False
-            if num_of_analysecomplex_fxoutfiles == 0 and num_of_repaired_pdbfiles == 0:
-                print(pdbname + ':' + fxmutant_dir + ' - Warning: There are 0 ' + analysecomplex_fxoutfiles + '. However ' +
-                      'there are also 0 repaired pdb files in the corresponding BuildModel folder. These pdb files are ' +
-                      'needed. They would be copied over the corresponding AnalyseComplex folders prior to calculation of ' +
-                      'interaction energies.')
-            elif num_of_analysecomplex_fxoutfiles < num_of_repaired_pdbfiles:
-                if num_of_analysecomplex_fxoutfiles != 0:
-                    print(pdbname + ':' + fxmutant_dir + ' - There are ' + str(num_of_repaired_pdbfiles) + ' repaired pdb ' +
-                          'files in the corresponding BuildModel folder but only ' + str(num_of_analysecomplex_fxoutfiles) +
-                          ' ' + analysecomplex_fxoutfiles + '.')
-            elif num_of_analysecomplex_fxoutfiles > num_of_repaired_pdbfiles:
-                print(pdbname + ':' + fxmutant_dir + ' - There are ' + str(num_of_repaired_pdbfiles) + ' repaired pdb files ' +
-                      'in the corresponding BuildModel folder but ' + str(num_of_analysecomplex_fxoutfiles) + ' ' +
-                      analysecomplex_fxoutfiles + '. Something has likely gone wrong. The number of ' +
-                      analysecomplex_fxoutfiles + ' should be the same as the number of repaired pdb files, not more.')
-            else:
-                has_generated_all_ac_fxoutfiles = True
-            return has_generated_all_ac_fxoutfiles
+            return os.path.exists(os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value + pdbname
+                                               + fx.Strs.UNDRSCR1_.value + '*' + fx.Strs.FXOUTEXT.value))
 
         def find_num_of_missing_interaction_energies(self, path_pdbfile: str, amino_acids: list):
             """
@@ -492,7 +511,7 @@ class FoldX(object):
                     if not self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
                         num_of_missing_mutant_files += 1
                         fxmutantname = os.path.basename(path_output_ac_pdb_fxmutant_dir)
-                        print('However, ' + fx.Strs.SMRY_ANLYSCMPLX_.value + pdbname + Str.FXOUTEXT.value + ' file is missing from ' +
+                        print('However, ' + fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' file is missing from ' +
                               fxmutantname)
             return num_of_missing_mutant_files
 
@@ -511,19 +530,21 @@ class FoldX(object):
 
     class Strs(Enum):
 
-        AC = '<AnalyseComplex>'
-        BM = '<BuildModel>'
+        FXOUTEXT = Str.FXOUTEXT.value
+        AC_ACTN = '<AnalyseComplex>'
+        BM_ACTN = '<BuildModel>'
         INDIV_LST_TXT = 'individual_list' + Str.TXTEXT.value
         FXRUNSCRPT = 'FOLDX_runscript'
         FXCMDFILE = 'FOLDX_commandfile'
         FXOPTFILE = 'FOLDX_optionfile'
-        RNSCRPT_TXT = Str.runscrpt_txt.value
+        RNSCRPT_TXT = Str.RNSCRPT.value + Str.TXTEXT.value
+        DEFAULT_VDW_DSGN = 2
         JOB_Q = Cluster.CLSTR.JOBQ.value
         NO_RUNSCRPT_FILE_MSG = 'No runscript file was found'
         DSH_RUNFILE = '-runfile'
-        DIF_FXOUTFILE = 'Dif_BuildModel_RepairPDBtest_1' + Str.FXOUTEXT.value
+        DIF_FXOUTFILE = 'Dif_BuildModel_RepairPDBtest_1' + FXOUTEXT
+        # this is temporary, just for trying something out
         DDG_CSV = 'ddG' + Str.CSVEXT.value
-        FXOUTEXT = Str.FXOUTEXT.value
         ROTABASE_TXT = 'rotabase' + Str.TXTEXT.value
         CMNDS_BM_TXT = 'commands_buildmodel' + Str.TXTEXT.value
         CMNDS_STAB_TXT = 'commands_stability' + Str.TXTEXT.value
@@ -532,8 +553,17 @@ class FoldX(object):
         _1_012_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
         UNDRSCR1_ = '_1_'
         WT_ = 'WT_'
-        SMRY_ANLYSCMPLX_ = 'Summary_AnalyseComplex_'
-        DIF_BLDMDL_ = 'Dif_BuildModel_'
-
+        BMDL_ = 'BuildModel_'
+        AVG_BMDL_ = 'Average_' + BMDL_
+        RAW_BMDL_ = 'Raw_' + BMDL_
+        DIF_BMDL_ = 'Dif_' + BMDL_
+        PDBLST_BMDL = 'PdbList_' + BMDL_
+        ACPLX_ = 'AnalyseComplex_'
+        SMRY_AC_ = 'Summary_' + ACPLX_
+        INDIV_ENRG_ACPLX_ = 'Indiv_energies_' + ACPLX_
+        INTACTN_ACPLX_ = 'Interaction_' + ACPLX_
+        INTRFC_RESDS_ACPLX_ = 'Interface_Residues_' + ACPLX_
+        FX_BM_TO_DELETE = [BMDL_, RAW_BMDL_, DIF_BMDL_, PDBLST_BMDL]
+        FX_AC_TO_DELETE = [ACPLX_, INDIV_ENRG_ACPLX_, INTACTN_ACPLX_, INTRFC_RESDS_ACPLX_]
 
 # pydevd.stoptrace()
