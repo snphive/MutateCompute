@@ -3,7 +3,7 @@
 Enum for all paths used. Root paths and individual directory names read from yaml file, full paths built at runtime to
 be either for local computer or remotely (cluster).
 
-All paths are constants and stored in the configuration directory in 'pathsAndDictionaries' yaml file.
+All paths are constants and stored in the config directory in 'pathsAndDictionaries' yaml file.
 They are read into the Paths enum from which all other classes source all path strings.
 
 All paths are absolute paths unless prefix with an "REL_" which indicates they are relative paths.
@@ -28,9 +28,9 @@ __status__ = "Development"
 class Paths(Enum):
 
     cwd = os.getcwd()
-    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/configuration/pathsAndDictionaries.yaml' if not \
+    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml' if not \
         ('switchlab' in cwd or 'shazib' in cwd) else \
-        '/switchlab/group/shazib/SnpEffect/configuration/pathsAndDictionaries.yaml'
+        '/switchlab/group/shazib/SnpEffect/config/pathsAndDictionaries.yaml'
 
     with open(YAML_FILE, 'r') as stream:
 

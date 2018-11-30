@@ -73,7 +73,7 @@ class Agadir(object):
 
     def compute(self, path_dst_fastafile: str):
         """
-        Runs Agadirwrapper according to the options specified in /configuration/agadir_config/Options.txt file.
+        Runs Agadirwrapper according to the options specified in /config/agadir_config/Options.txt file.
         Expecting path_fastafile to potentially contain more than 1 sequence.
         :param path_dst_fastafile: Abs path to fasta file.
         """
@@ -97,7 +97,7 @@ class Agadir(object):
         #       Paths.CONFIG_AGAD + '/Options.txt'
         cmd = path_agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + path_config_agad + '/Options.txt'
         # cmd = '/switchlab/group/tools/agadir_10042012/' + agadir_exe + Str.SPCE.value + path_dst_fastafile +
-        # Str.SPCE.value + '/switchlab/group/shazib/SnpEffect/configuration/agadir_config/Options.txt'
+        # Str.SPCE.value + '/switchlab/group/shazib/SnpEffect/config/agadir_config/Options.txt'
         subprocess.call(cmd, shell=True)
 
     def write_agadir_options_file(self, ntrm='#', ctrm='#', global_tot=Str.TRUE_lc.value, tango_wndw=Str.TRUE_lc.value,

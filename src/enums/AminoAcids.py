@@ -20,9 +20,9 @@ __status__ = "Development"
 class AA(Enum):
 
     cwd = os.getcwd()
-    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/configuration/pathsAndDictionaries.yaml' if not \
+    YAML_FILE = '/Users/u0120577/PycharmProjects/MutateCompute/config/pathsAndDictionaries.yaml' if not \
         ('switchlab' in cwd or 'shazib' in cwd) else \
-        '/switchlab/group/shazib/SnpEffect/configuration/pathsAndDictionaries.yaml'
+        '/switchlab/group/shazib/SnpEffect/config/pathsAndDictionaries.yaml'
 
     with open(YAML_FILE, 'r') as stream:
 

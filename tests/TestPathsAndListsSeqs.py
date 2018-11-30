@@ -2,10 +2,10 @@ import os
 from enum import Enum
 
 
-# All paths are constants and stored in the configuration directory in 'pathsAndDictionaries' yaml file.
+# All paths are constants and stored in the config directory in 'pathsAndDictionaries' yaml file.
 # They are read into the Paths enum from which all other classes source all path strings.
 # However for tests, the absolute paths are directed towards the "tests" directory, so tests should never need to
-# access the yaml configuration file.
+# access the yaml config file.
 #
 # All paths are absolute paths. They are constructed here from a absoluate root and directory names that constitute
 # relative paths. (The use of os.path.join(root, dirs) replaces the need to explicitly build in fwd slashes).
@@ -16,7 +16,7 @@ class TPLS(Enum):
     MC_TESTS = "/Users/u0120577/PycharmProjects/MutateCompute/tests"
 
     # CONFIGURATION FILES FROM MAIN DIRECTORY (i.e. real data)
-    CONFIG_FOR_READ_ONLY = "/Users/u0120577/PycharmProjects/MutateCompute/configuration"
+    CONFIG_FOR_READ_ONLY = "/Users/u0120577/PycharmProjects/MutateCompute/config"
     # INPUT FILES FROM MAIN DIRECTORY (i.e. real data)
     INPUT_FOR_READ_ONLY = "/Users/u0120577/PycharmProjects/MutateCompute/input_data"
 
@@ -24,7 +24,7 @@ class TPLS(Enum):
     REPO_PDB_FASTA = '/Users/u0120577/REPO_PDB_FASTA'
 
     # These relative paths might not be used - entire config dir gets copied as a whole into /tests/ at start of tests.
-    DIR_CONFIG = "configuration"
+    DIR_CONFIG = "config"
     DIR_AGADIRCONFIG = "agadir_config"
     DIR_JOBQ = "cluster_jobq"
     DIR_FXCONFIG = "foldx_config"

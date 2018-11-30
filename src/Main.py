@@ -42,7 +42,7 @@ class Main(object):
         """
         if operations == {} or Main._all_ops_are_false(operations):
             raise ValueError("All options in 'operations' were either set to FALSE or some typographical error. "
-                             "Check /configuration/global_options/global_options.txt was written correctly")
+                             "Check /config/global_options/global_options.txt was written correctly")
         elif operations['do_mutate_fasta'] or operations['do_agadir'] or \
                 operations['do_foldx_repair'] or operations['do_foldx_buildmodel'] or \
                 operations['do_foldx_stability'] or operations['do_foldx_analysecomplex']:
@@ -65,7 +65,7 @@ class Main(object):
     @staticmethod
     def _read_global_options(path_globaloptions_file: str):
         """
-        Reads the global_options.txt in /configuration/global_options breaking the text up according to newlines.
+        Reads the global_options.txt in /config/global_options breaking the text up according to newlines.
         :param path_globaloptions_file: Abs path to global_options file (incl. extension).
         :return: Text of the file as a list of strings for each line ending with \n.
         """
@@ -79,7 +79,7 @@ class Main(object):
     @staticmethod
     def _build_filelist_for_analysis(globaloptions_lines: list, path_repo_pdbs_or_fastas: str):
         """
-        Takes the /configuration/global_options/global_options.txt text as a list of \n separated lines.
+        Takes the /config/global_options/global_options.txt text as a list of \n separated lines.
         Reads the option given at either "PDBs" and "FASTAs".
         The option is expected to be in one of four forms: "", "all", "<filename(s)>", or "<number>".
         '' indictes no files - returns None.
