@@ -455,7 +455,7 @@ class GUM(object):
         if isinstance(path_src_files, str):
             path_src_files = [path_src_files]
         for path_src_file in path_src_files:
-            cmd = 'cp' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst_dir
+            cmd = 'cp -f' + Str.SPCE.value + path_src_file + Str.SPCE.value + path_dst_dir
             try:
                 subprocess.call(cmd, shell=True)
             except OSError:
@@ -493,19 +493,17 @@ class GUM(object):
     @staticmethod
     def linux_remove_file(path_file_to_remove: str):
         """
-        :param path_file_to_remove:
+        Removes the specified file.
+        :param path_file_to_remove: Absolute path to file to be deleted. This can also be an expression including '*'
         """
-        if not os.path.exists(path_file_to_remove):
-            print('Path: ' + path_file_to_remove + ' does not exist.')
-        else:
-            cmd = 'rm' + Str.SPCE.value + path_file_to_remove
-            try:
-                subprocess.call(cmd, shell=True)
-            except FileNotFoundError as fnf:
-                print('File not found: ' + path_file_to_remove)
-                print(fnf)
-            except OSError:
-                print(Str.PROBLNXCMD_MSG.value + cmd)
+        cmd = 'rm -f' + Str.SPCE.value + path_file_to_remove
+        try:
+            subprocess.call(cmd, shell=True)
+        except FileNotFoundError as fnf:
+            print('File not found: ' + path_file_to_remove)
+            print(fnf)
+        except OSError:
+            print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
     def copy_files_from_repo_to_input_dirs(path_repo_pdbs_or_fastas: str, path_dst_dir: str, wanted_files: list):
