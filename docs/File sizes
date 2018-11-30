@@ -10,63 +10,70 @@ Note: size of pdb files will vary depending on size of the protein (shown for Re
  ----------
                                                                                                     NEEDED AFTER COMPUTATION?(Y/N)
  CONFIG FILES
-                rotabase.txt*                                                   2.5 MB                                  N
-                runscript.txt*                                                  309 bytes                               N
-                individual_list.txt*                                            8 bytes                                 N
-                commands_buildmodel.txt*                                        66 bytes                                N
-                commands_stability.txt*                                         46 bytes                                N
-                options_buildmodel.txt*                                         136 bytes                               N
-                options_stability.txt*                                          40 bytes                                N
+                rotabase.txt*                                                   2.5 MB                                          N
+                runscript.txt*                                                  300 bytes                                       N
+                individual_list.txt*                                            10 bytes                                        N
+                commands_buildmodel.txt*                                        70 bytes                                        N
+                commands_stability.txt*                                         50 bytes                                        N
+                options_buildmodel.txt*                                         140 bytes                                       N
+                options_stability.txt*                                          40 bytes                                        N
 
  PDBS
-                RepairPDB_x.pdb*                                                                                        N
-                RepairPDB_x_1_0.pdb                                             92 KB X number of repeats               Y
-                WT_RepairPDB_x_1_0.pdb                                          92 KB X number of repeats               Y
+                RepairPDB_x.pdb*                                                                                                N
+                RepairPDB_x_1_0.pdb                                             90 KB X number of repeats                       Y
+                WT_RepairPDB_x_1_0.pdb                                          90 KB X number of repeats                       Y
 
  FXOUT FILES
-                Average_BuildModel_RepairPDB_14.fxout                           697 bytes                               Y
-                BuildModel_RepairPDB_14.fxout                                   742 bytes                               N ?
-                Dif_BuildModel_RepairPDB_14.fxout                               858 bytes                               N ?
-                PdbList_BuildModel_RepairPDB_14.fxout                           135 bytes                               N ?
-                Raw_BuildModel_RepairPDB_14.fxout                               1.6 KB                                  N ?
+                Average_BuildModel_RepairPDB_14.fxout                           700 bytes                                       Y
+                BuildModel_RepairPDB_14.fxout                                   740 bytes                                       N
+                Dif_BuildModel_RepairPDB_14.fxout                               860 bytes                                       N
+                PdbList_BuildModel_RepairPDB_14.fxout                           140 bytes                                       N
+                Raw_BuildModel_RepairPDB_14.fxout                               1.6 KB                                          N
 
  CLUSTER LOGS
-                BM_<mutant>.e1234567                                            0 (if no errors)                        N
-                BM_<mutant>.o1234567                                            2 KB (variable?)                        N ?
+                BM_<mutant>.e1234567                                            0 (if no errors)                                N
+                BM_<mutant>.o1234567                                            2 KB (variable?)                                N
 
- Total folder sizes:
-                3 runs per mutant                                               1.3 MB (which is weird as its less than rotabase)
+ Total folder sizes (for 3 runs):
+                3 runs per mutant                                               1.3 MB (A bit weird as it's < rotabase alone)
                 configs removed                                                 380 KB (also weird as pdbs alone are bigger)
-                7 pdbs removed                                                  58 KB (weird, contents are ~ 5-6 KB)
+                7 pdbs removed                                                  77 KB (contents are ~ 5-6 KB ??)
+                log files removed                                               67 KB (contents are ~ 3 KB ??)
+                all fxout files except 'Average_..' removed                     29 KB
 
  ANALYSECOMPLEX
  --------------
 
  CONFIG FILES
-                job.q*                                                          210                                     N
-                rest is same as BuildModel                                      25 MB + 606 bytes                       N
+                job.q*                                                          210                                             N
+                rest is same as BuildModel                                      25 MB + 600 bytes                               N
  PDBS
-                RepairPDB_x_1_0.pdb*                                            92 KB X number of repeats               N
-                WT_RepairPDB_x_1_0.pdb*                                         92 KB X number of repeats               N
+                RepairPDB_x_1_0.pdb*                                            90 KB X number of repeats                       N
+                WT_RepairPDB_x_1_0.pdb*                                         90 KB X number of repeats                       N
 
  FXOUT FILES
-                AnalyseComplex_RepairPDB_14_1_0.fxout                           690 bytes X number of repeats           N ?
-                AnalyseComplex_WT_RepairPDB_14_1_0.fxout                        702 bytes X number of repeats           N ?
-                Indiv_energies_AnalyseComplex_RepairPDB_14_1_0.fxout            928 bytes X number of repeats           N ?
-                Indiv_energies_AnalyseComplex_WT_RepairPDB_14_1_0.fxout         937 bytes X number of repeats           N ?
-                Interaction_AnalyseComplex_RepairPDB_14_1_0.fxout               1015 bytes X number of repeats          N ?
-                Interaction_AnalyseComplex_WT_RepairPDB_14_1_0.fxout            1021 bytes X number of repeats          N ?
-                Interface_Residues_AnalyseComplex_RepairPDB_14_1_0.fxout        352 bytes X number of repeats           N ?
-                Interface_Residues_AnalyseComplex_WT_RepairPDB_14_1_0.fxout     358 bytes X number of repeats           N ?
-                Summary_AnalyseComplex_RepairPDB_14_1_0.fxout                   430 bytes X number of repeats           N ?
-                Summary_AnalyseComplex_WT_RepairPDB_14_1_0.fxout                436 bytes X number of repeats           N ?
+                AnalyseComplex_RepairPDB_14_1_0.fxout                           700 bytes X number of repeats                   N
+                AnalyseComplex_WT_RepairPDB_14_1_0.fxout                        700 bytes X number of repeats                   N
+                Indiv_energies_AnalyseComplex_RepairPDB_14_1_0.fxout            930 bytes X number of repeats                   N
+                Indiv_energies_AnalyseComplex_WT_RepairPDB_14_1_0.fxout         930 bytes X number of repeats                   N
+                Interaction_AnalyseComplex_RepairPDB_14_1_0.fxout               1020 bytes X number of repeats                  N
+                Interaction_AnalyseComplex_WT_RepairPDB_14_1_0.fxout            1020 bytes X number of repeats                  N
+                Interface_Residues_AnalyseComplex_RepairPDB_14_1_0.fxout        360 bytes X number of repeats                   N
+                Interface_Residues_AnalyseComplex_WT_RepairPDB_14_1_0.fxout     360 bytes X number of repeats                   N
+                Summary_AnalyseComplex_RepairPDB_14_1_0.fxout                   440 bytes X number of repeats                   Y
+                Summary_AnalyseComplex_WT_RepairPDB_14_1_0.fxout                440 bytes X number of repeats                   Y
 
  CLUSTER LOGS
-                BM_<mutant>.e1234567                                            < 1000 bytes ? (0 if no errors)         N
-                BM_<mutant>.o1234567                                            14 KB                                   N ?
+                BM_<mutant>.e1234567                                            < 1000 bytes ? (0 if no errors)                 N
+                BM_<mutant>.o1234567                                            14 KB                                           N
 
- Total folder sizes:
-                3 runs per mutant                                               KB
-                configs removed                                                 636 KB
-                7 pdbs removed                                                  KB
+ Total folder sizes (for 3 runs):
+                3 runs per mutant                                               1.5 MB
+                configs removed                                                 ? KB
+                7 pdbs removed                                                  650 KB (3 x 4 different fxout files x 2 for WT)
+                log files removed                                               626 KB
+                all fxout files except 'Summary_..' removed                     113 KB (3 mutant, 3 WT)
 
+
+
+NOTE: The ls -lh command seems to give very different values to du -h command.
