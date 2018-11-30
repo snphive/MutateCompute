@@ -73,7 +73,7 @@ class Cluster(object):
         """
         Note that only 1st 2 arguments are required, the rest have default named arguments that can be overwritten.
         :param jobname: N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
-        :param path_job_q_dir: Name of destination dir for this job.q file. Root fixed to /configuration/cluster_jobq.
+        :param path_job_q_dir: Name of destination dir for this job.q file. Root fixed to /config/cluster_jobq.
         :param startnum: Starting number for an array job. If either startnum or endnum are empty, no array job.
         :param endnum: End number for an array job. If either startnum or endnum are empty, no array job.
         :param using_runscript: True/False using runscript (hence running FoldX).
@@ -128,7 +128,7 @@ class Cluster(object):
         job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
         if using_runscript:
             job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + Cluster.CLSTR.RNFL.value + Str.SPCE.value +
-                         os.path.join(path_runscript_dir, Str.runscrpt_txt.value) + Str.NEWLN.value)
+                         os.path.join(path_runscript_dir, Cluster.CLSTR.RNSCPT_TXT.value) + Str.NEWLN.value)
 
         if python_script_with_paths != '':
             job_q.append('python3' + Str.SPCE.value + python_script_with_paths + Str.NEWLN.value)
@@ -187,4 +187,5 @@ class Cluster(object):
         QSTAT = 'qstat'
         QSUB = 'qsub'
         RNFL = '-runfile'
+        RNSCPT_TXT = Str.RNSCRPT.value + Str.TXTEXT.value
 
