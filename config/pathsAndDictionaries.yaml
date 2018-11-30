@@ -17,7 +17,7 @@ ROOT:
     path_local_pdb_fasta_repository: '/Users/u0120577/REPO_PDB_FASTA'
 
     # directory names common to local and cluster dir trees. Used to construct absolute paths at runtime.
-    dir_config: 'configuration'
+    dir_config: 'config'
     dir_agadconfig: 'agadir_config'
     dir_agadir_jobq: 'agadir_jobq'
     dir_mf_jobq: 'mutatefasta_jobq'
