@@ -21,13 +21,22 @@ __status__ = "Development"
 Paths for the entire codebase are set accordingly. "use_cluster" is set to False by default.  
 """
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
+"""
+Select directory for packing into tar: Agadir-related
+"""
+# path_dir_txt_files_to_pack = os.path.join(Paths.OUTPUT_AGADIR, '02064053-3f32-32e6-9660-aaaffc30db87')
 
 """
-Select directory for packing into tar.
+Select pdb 
 """
-path_dir_txt_files_to_pack = os.path.join(Paths.OUTPUT_AGADIR, '02064053-3f32-32e6-9660-aaaffc30db87')
+pdbname = ['Repair_14']
+
+"""
+Select directory for packing into tar: FoldX-related
+"""
+path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
 
 """
 Pack files in directory into tar.
 """
-Parser().make_tarfile(path_dir_txt_files_to_pack)
+Parser().make_tarfile(path_files_to_pack_dir)
