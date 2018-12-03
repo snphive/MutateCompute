@@ -222,7 +222,7 @@ class FoldX(object):
 
             for fxmutantname in fxmutantnames:
                 path_output_bm_pdb_fxmutant_dir = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_BM.value, pdbname, fxmutantname)
-                if self.has_already_generated_dif_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                if self.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
                     print('BuildModel output data (Dif_BuildModel_RepairPDB_X.fxout) for this pdb (mutant) already exists in '
                           'output folder.')
                     continue
@@ -263,7 +263,7 @@ class FoldX(object):
             #     ddG_average = self._write_ddG_csv_file(path_output_bm_pdb_fxmutant_dir, pdbname, fxmutantname)
             #     self.write_ddG_to_DB(ddG_average)
 
-        def has_already_generated_dif_bm_fxoutfile(self, path_output_bm_pdb_fxmutant_dir: str):
+        def has_already_generated_avg_bm_fxoutfile(self, path_output_bm_pdb_fxmutant_dir: str):
             """
             :param path_output_bm_pdb_fxmutant_dir:
             :return: True if there are atleast as many AnalyseComplex_RepairPDB_x_1_...fxout files as expected by the number of
@@ -273,13 +273,13 @@ class FoldX(object):
             fxmutant_dir = path_output_bm_pdb_fxmutant_dir[-1]
             pdbname = path_output_bm_pdb_fxmutant_dir[-2]
             fx = FoldX()
-            path_dif_buildmodel_fxoutfile = os.path.join(Paths.OUTPUT_BM, pdbname, fxmutant_dir, fx.Strs.AVG_BMDL_.value +
+            path_avg_buildmodel_fxoutfile = os.path.join(Paths.OUTPUT_BM, pdbname, fxmutant_dir, fx.Strs.AVG_BMDL_.value +
                                                          pdbname + fx.Strs.FXOUTEXT.value)
-            return os.path.exists(path_dif_buildmodel_fxoutfile)
+            return os.path.exists(path_avg_buildmodel_fxoutfile)
 
-        def find_num_of_missing_dif_bm_fxoutfiles(self, path_pdbfile: str, amino_acids: list):
+        def find_num_of_missing_avg_bm_fxoutfiles(self, path_pdbfile: str, amino_acids: list):
             """
-            Checks that BuildModel ddGs (in dif_bm_repairedpdb_fxout) have been calculated for all expected mutants of the
+            Checks that BuildModel ddGs (in avg_bm_repairedpdb_fxout) have been calculated for all expected mutants of the
             specified pdb, according to the amino acid list.
             :param path_pdbfile: Absolute path to pdb file.
             :param amino_acids: List of amino acids that the pdb is mutated to at every position, thereby indicating which
@@ -307,20 +307,19 @@ class FoldX(object):
             else:
                 print('Correct number of output_data/buildmodel/' + pdbname + '/<fxmutantnames> folders')
                 for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
-                    if not self.has_already_generated_dif_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                    if not self.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
                         num_of_missing_mutant_files += 1
                         fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
                         print('However, ' + fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' file is missing from '
                               + fxmutantname)
             return num_of_missing_mutant_files
 
-        def write_ddG_to_DB(self, ddG_average: float):
+        def write_ddG_to_DB(self, path_output_bm_pdb_fxmutant_ddG_csvfile: str):
             """
-            Write the average ddG to database - TODO
-            :param ddG_average:
-            :return:
+            Read ddG from csv file and write to database.
+            :param path_output_bm_pdb_fxmutant_ddG_csvfile:
             """
-            connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_UN.value,
+            connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_USER.value,
                                                  password=Server.SNPEFFECT_V5_MYSQL_PW.value,
                                                  host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
                                                 #, database='snpeffect_v5', port='3306')
@@ -337,39 +336,13 @@ class FoldX(object):
             :param path_output_bm_pdb_fxmutant_dir:
             :param pdbname:
             :param fxmutantname:
-            :return:
             """
             ddG_average = 0.0
-            ddG_1 = ''
-            ddG_2 = ''
-            ddG_3 = ''
             fx = FoldX()
-            path_output_dif_file = os.path.join(path_output_bm_pdb_fxmutant_dir, fx.Strs.DIF_FXOUTFILE.value)
-            if not os.path.exists(path_output_dif_file):
-                print(path_output_dif_file + ' has not been written yet')
-            else:
-                fx.remove_config_files(path_output_bm_pdb_fxmutant_dir)
-                GUM.linux_remove_file(os.path.join(path_output_bm_pdb_fxmutant_dir, pdbname + Str.PDBEXT.value))
-                with open(path_output_dif_file) as f:
-                    dif_fxoutfile_lines = f.readlines()
-                for line in dif_fxoutfile_lines:
-                    if ddG_average != '':
-                        break
-                    if not pdbname + '_' in line:
-                        continue
-                    else:
-                        ddG = line.split(Str.TAB.value)[1]
-                        if ddG_1 == '':
-                            ddG_1 = ddG
-                        elif ddG_2 == '':
-                            ddG_2 = ddG
-                        elif ddG_3 == '':
-                            ddG_3 = ddG
-                ddG_average = (float(ddG_1) + float(ddG_2) + float(ddG_3)) / 3
-                print('Here is the calculated ddG =: ' + str(ddG_average))
-                with open(os.path.join(path_output_bm_pdb_fxmutant_dir, fx.Strs.DDG_CSV.value), 'w') as f:
-                    f.write(pdbname + ',' + fxmutantname + ',' + str(ddG_average))
-            return ddG_average
+
+
+
+            return path_output_bm_pdb_fxmutant_ddG_csvfile
 
         # Not unit tested yet.
         def _write_individual_list_for_mutant(self, path_dst_dir: str):
@@ -515,6 +488,77 @@ class FoldX(object):
                               fxmutantname)
             return num_of_missing_mutant_files
 
+        def _write_sumry_ac_fxout_to_csv_file_up_1_dir_level(self, path_output_ac_pdb_fxmutant_dir: str):
+            """
+            Reads the Summary_AnalyseComplex_..fxout file and writes a csv file of the data lines only (excluding top 8
+            lines (FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which
+            mutation it is so no need for the extra fxmutant directory, hence it is written up one level in the pdb directory.
+            The fxmtuant directory is deleted.
+            :param path_output_ac_pdb_fxmutant_dir: absolute path to mutant directory holding the
+            Summary_AnalyseComplex_..fxout file.
+            :return: new csv output file (including absolute path)
+            """
+            path_output_ac_pdb_fxmutant_dir = path_output_ac_pdb_fxmutant_dir.split('/')
+            pdbname = path_output_ac_pdb_fxmutant_dir[-2]
+            fxmutantname = path_output_ac_pdb_fxmutant_dir[-1]
+            path_output_ac_pdb_fxmutant_dir = ''.join(path_output_ac_pdb_fxmutant_dir[:-2])
+            path_output_ac_pdb_dir = ''.join(path_output_ac_pdb_fxmutant_dir[:-2])
+            fx = FoldX()
+            path_output_ac_pdb_fxmutant_sumry_fxoutfile = os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value
+                                                                       + pdbname + fx.Strs.UNDRSCR1_0_FXOUT.value)
+            path_output_ac_pdb_sumry_csvfile = os.path.join(path_output_ac_pdb_dir, pdbname + '_' + fxmutantname + '_' +
+                                                            fx.Strs.SMRY_AC_CSV.value)
+            if not os.path.exists(path_output_ac_pdb_fxmutant_sumry_fxoutfile):
+                print(path_output_ac_pdb_fxmutant_sumry_fxoutfile + ' has not been written yet')
+            else:
+                with open(path_output_ac_pdb_fxmutant_sumry_fxoutfile) as sumry_f:
+                    sumry_file_lines = sumry_f.readlines()
+                with open(path_output_ac_pdb_sumry_csvfile, 'w') as csv_f:
+                    csv_f.write(pdbname + ',' + fxmutantname + '\n')
+                    has_reached_line_to_read_from = False
+                    for line in sumry_file_lines:
+                        if 'Pdb' in line or has_reached_line_to_read_from:
+                            has_reached_line_to_read_from = True
+                            cells = line.split(' ')
+                            csv_f.write(''.join(cells[1]))
+                            csv_f.write(','.join(cells[1:-2]))
+                            csv_f.write(''.join(cells[-1]))
+                            csv_f.write('\n')
+            GUM.linux_remove_dir(path_output_ac_pdb_fxmutant_dir)
+            return path_output_ac_pdb_sumry_csvfile
+
+        def _set_up_connection_to_DB(self):
+            """
+            Sets up the connection to the MySQL database.
+            """
+            # connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_UN.value,
+            #                                      password=Server.SNPEFFECT_V5_MYSQL_PW.value,
+            #                                      host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
+                                                #, database='snpeffect_v5', port='3306')
+            cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
+            cursor = cnx.cursor()
+            cursor.execute("SHOW DATABASES")
+            cursor.execute("CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
+            cursor.
+
+
+        def write_interaction_energy_to_DB(self, path_output_ac_pdb_sumry_csvfile: str):
+            """
+            Read interaction energy from csv file and write to database.
+            :param path_output_ac_pdb_sumry_csvfile:
+            """
+            connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_USER.value,
+                                                 password=Server.SNPEFFECT_V5_MYSQL_PW.value,
+                                                 host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
+                                                #, database='snpeffect_v5', port='3306')
+            cursor = connection.cursor()
+            cursor.execute("SHOW DATABASES")
+            for x in cursor:
+                print(x)
+            # cursor.execute("CREATE DATABASE SnpEffect_v5.0")
+            # cursor.execute(
+            #     "CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
+
     class Repair(object):
 
         def __init__(self, cond: dict):
@@ -552,6 +596,8 @@ class FoldX(object):
         OPTNS_STAB_TXT = 'options_stability' + Str.TXTEXT.value
         _1_012_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
         UNDRSCR1_ = '_1_'
+        UNDRSCR1_0 = UNDRSCR1_ + '0'
+        UNDRSCR1_0_FXOUT = UNDRSCR1_ + FXOUTEXT
         WT_ = 'WT_'
         BMDL_ = 'BuildModel_'
         AVG_BMDL_ = 'Average_' + BMDL_

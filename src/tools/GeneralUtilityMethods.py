@@ -494,7 +494,7 @@ class GUM(object):
     def linux_remove_file(path_file_to_remove: str):
         """
         Removes the specified file.
-        :param path_file_to_remove: Absolute path to file to be deleted. This can also be an expression including '*'
+        :param path_file_to_remove: Absolute path for file to be deleted. This can also be an expression including '*'
         """
         cmd = 'rm -f' + Str.SPCE.value + path_file_to_remove
         try:
@@ -502,6 +502,24 @@ class GUM(object):
         except FileNotFoundError as fnf:
             print('File not found: ' + path_file_to_remove)
             print(fnf)
+        except OSError:
+            print(Str.PROBLNXCMD_MSG.value + cmd)
+
+    @staticmethod
+    def linux_remove_dir(path_dir_to_remove: str):
+        """
+        Removes the specified directory (and all contents).
+        :param path_dir_to_remove: Absolute path for directory to be deleted.
+        """
+        cmd = 'rm -r -f' + Str.SPCE.value + path_dir_to_remove
+        try:
+            subprocess.call(cmd, shell=True)
+        except FileNotFoundError as fnf:
+            print('Folder not found: ' + path_dir_to_remove)
+            print(fnf)
+        except NotADirectoryError as nad:
+            print('This is not a directory: ' + path_dir_to_remove)
+            print(nad)
         except OSError:
             print(Str.PROBLNXCMD_MSG.value + cmd)
 
