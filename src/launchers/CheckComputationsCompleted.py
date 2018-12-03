@@ -47,7 +47,7 @@ Check for dif_BuildModel_RepairPDB_x.fxout file.
 """
 if check_buildmodel_completed:
     num_of_missing_dif_fxoutfiles = FoldX().BuildModel(Cond.INCELL_MAML_FX.value).\
-        find_num_of_missing_dif_bm_fxoutfiles(path_pdbfile, amino_acids)
+        find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids)
     if num_of_missing_dif_fxoutfiles != 0:
         print('Warning: BuildModel has not completed computations for this pdb: ' + os.path.basename(path_pdbfile))
         print('Number of mutants missing dif files = ' + str(num_of_missing_dif_fxoutfiles))
