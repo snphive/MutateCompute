@@ -131,7 +131,7 @@ class Scheduler(object):
             for path_pdbfile in path_pdbfiles:
                 if operations['do_foldx_buildmodel']:
                     buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
-                    if buildmodel.find_num_of_missing_dif_bm_fxoutfiles(path_pdbfile, amino_acids) != 0:
+                    if buildmodel.find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids) != 0:
                         print('Warning: BuildModel has not completed all computations for this pdb: ' + os.path.basename(
                             path_pdbfile))
                     else:
