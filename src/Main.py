@@ -2,11 +2,11 @@
 """
 Class for initiating all programs except blast.
 
-Calling the constuctor can be done in the IDE through the short script called KickOff.py.
+Calling the constuctor can be done in the IDE through the short script called KickOffAuto.py.
 Alternatively it can be run from the command line via KickOff.sh, which does the following 3 things:
 1. Sources .profile script that sets the python environment variable to this MutateCompute project folder.
 2. Sets path to the virtual environment folder which includes all the downloaded libraries used here.
-3. Executes KickOff.py via python3 command to indicate that version 3 and not 2 should be used here.
+3. Executes KickOffAuto.py via python3 command to indicate that version 3 and not 2 should be used here.
 """
 
 import glob
