@@ -2,7 +2,7 @@
 """
 Script for launching the packing and compressing files into tar files in a specified directory.
 
-PackCompressManual.py can be run locally or on cluster (the latter via a bash script).
+PackCompress.py can be run locally or on cluster (the latter via a bash script).
 """
 import sys
 import os
