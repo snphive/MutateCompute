@@ -14,8 +14,8 @@ from src.enums.Conditions import Cond
 from src.tools.GeneralUtilityMethods import GUM
 from src.FoldX import FoldX
 from src.tools.OutputsParser import Parser
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -69,36 +69,37 @@ BE SURE TO SET THIS TO EMPTY LIST IF YOU DON'T WANT ANY OF THE SUBSEQUENT ACTION
 specific_fxmutants = []
 
 """
-Delete FoldX-related files: config files from AnalyseComplex output folders.
+Decide which code blocks to run.
 """
-fx = FoldX()
-path_output_ac_pdbname_fxmutantnames_dirs = []
-for pdbname in pdbnames:
-    if specific_fxmutants:
-        for specific_fxmutant in specific_fxmutants:
-            path_output_ac_pdbname_fxmutantnames_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
-    else:
-        path_output_ac_pdbname_fxmutantnames_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
-    for path_output_ac_pdbname_fxmutantnames_dir in path_output_ac_pdbname_fxmutantnames_dirs:
-        fx.remove_config_files(path_output_ac_pdbname_fxmutantnames_dir)
-        fx.remove_pdbfiles(path_output_ac_pdbname_fxmutantnames_dir)
-        fx.remove_cluster_logfiles(path_output_ac_pdbname_fxmutantnames_dir)
-        fx.remove_unnecessary_foldxfiles(path_output_ac_pdbname_fxmutantnames_dir)
-"""
-Delete FoldX-related files: pdb files from BuildModel folders. 
-"""
-fx = FoldX()
-path_output_bm_pdbname_fxmutantnames_dirs = []
-for pdbname in pdbnames:
-    if specific_fxmutants:
-        for specific_fxmutant in specific_fxmutants:
-            path_output_bm_pdbname_fxmutantnames_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
-    else:
-        path_output_bm_pdbname_fxmutantnames_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
-    for path_output_bm_pdbname_fxmutantnames_dir in path_output_bm_pdbname_fxmutantnames_dirs:
-        # fx.remove_config_files(path_output_bm_pdbname_fxmutantnames_dir)
-        # fx.remove_pdbfiles(path_output_bm_pdbname_fxmutantnames_dir)
-        fx.remove_cluster_logfiles(path_output_bm_pdbname_fxmutantnames_dir)
-        fx.remove_unnecessary_foldxfiles(path_output_bm_pdbname_fxmutantnames_dir)
+delete_from_bm_outputs = False
+delete_from_ac_outputs = True
 
-# pydevd.stoptrace()
+"""
+Define module-level function (before using it below).
+"""
+def remove_config_pdb_log_and_fxoutfiles(path_output_ac_or_bm):
+    """
+    Delete FoldX-related files - either from BuildModel or AnalyseComplex output folders.
+    """
+    path_output_ac_or_bm_pdb_fxmutantnames_dirs = []
+    for pdbname in pdbnames:
+        if specific_fxmutants:
+            for specific_fxmutant in specific_fxmutants:
+                path_output_ac_or_bm_pdb_fxmutantnames_dirs.append(os.path.join(path_output_ac_or_bm, pdbname, specific_fxmutant))
+        else:
+            path_output_ac_or_bm_pdb_fxmutantnames_dirs = glob.glob(os.path.join(path_output_ac_or_bm, pdbname, '*'))
+        for path_output_ac_or_bm_pdb_fxmutantnames_dir in path_output_ac_or_bm_pdb_fxmutantnames_dirs:
+            # fx.remove_config_files(path_output_ac_pdb_fxmutantnames_dir)
+            # fx.remove_pdbfiles(path_output_ac_pdb_fxmutantnames_dir)
+            # fx.remove_cluster_logfiles(path_output_ac_pdb_fxmutantnames_dir)
+            # fx.remove_unnecessary_foldxfiles(path_output_ac_pdb_fxmutantnames_dir)
+            fx.remove_all_sumry_except_1_0(path_output_ac_or_bm_pdb_fxmutantnames_dir)
+
+
+fx = FoldX()
+if delete_from_bm_outputs:
+    remove_config_pdb_log_and_fxoutfiles(Paths.OUTPUT_BM)
+if delete_from_ac_outputs:
+    remove_config_pdb_log_and_fxoutfiles(Paths.OUTPUT_AC)
+
+pydevd.stoptrace()
