@@ -22,8 +22,8 @@ from src.enums.UNPW import Server
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 import mysql.connector
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -174,6 +174,20 @@ class FoldX(object):
             if os.path.exists(path_file_to_remove):
                 GUM.linux_remove_file(path_file_to_remove)
 
+    def remove_all_sumry_except_1_0(self, path_output_ac_pdb_fxmutant_dir: str):
+        """
+        In cases where FoldX has been run more than once, producing multiple outputs of all fxout files including the
+        Summary_AnalyseComplex_ fxout files. All are deleted except for one (_1_0.fxout), one for the mutant and one for the WT.
+        :param path_output_ac_pdb_fxmutant_dir:
+        """
+        fx = FoldX()
+        path_sumry_files = glob.glob(os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value + '*'))
+        for path_sumry_file in path_sumry_files:
+            if fx.Strs.UNDRSCR1_0_FXOUT.value in path_sumry_file:
+                continue
+            else:
+                GUM.linux_remove_file(path_sumry_file)
+
     def _get_num_of_repaired_pdbfiles(self, path_output_pdb_fxmutant_dir: str):
         """
         Finds pdb files in the specified mutant folder, with pdbname followed by "_1_". Hence does not include those for
@@ -314,6 +328,46 @@ class FoldX(object):
                               + fxmutantname)
             return num_of_missing_mutant_files
 
+        def write_bm_avg_fxout_to_csvfile_up_1dirlevel(self, path_output_bm_pdb_fxmutant_dir):
+            """
+             Reads the Average_BuildModel_..fxout file and writes a csv file of the data lines only (excluding top 8
+             lines (FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which
+             mutation it is so no need for the extra fxmutant directory, hence it is written up one level in the pdb directory.
+             The fxmtuant directory is deleted.
+             :param path_output_bm_pdb_fxmutant_dir: Absolute path for mutant directory holding the Average_BuildModel_..fxout
+             file.
+             :return: new csv output file (including absolute path).
+             """
+            path_output_bm_pdb_fxmutant_dir = path_output_bm_pdb_fxmutant_dir.split('/')
+            pdbname = path_output_bm_pdb_fxmutant_dir[-2]
+            fxmutantname = path_output_bm_pdb_fxmutant_dir[-1]
+            path_output_bm_pdb_dir = '/'.join(path_output_bm_pdb_fxmutant_dir[:-1])
+            path_output_bm_pdb_fxmutant_dir = '/'.join(path_output_bm_pdb_fxmutant_dir)
+            fx = FoldX()
+            path_output_bm_pdb_fxmutant_avg_fxoutfile = os.path.join(path_output_bm_pdb_fxmutant_dir, fx.Strs.AVG_BMDL_.value +
+                                                                     pdbname + fx.Strs.FXOUTEXT.value)
+            path_output_bm_pdb_avg_csvfile = os.path.join(path_output_bm_pdb_dir, pdbname + '_' + fxmutantname + '_' +
+                                                          fx.Strs.AVG_BMDL_CSV.value)
+            if not os.path.exists(path_output_bm_pdb_fxmutant_avg_fxoutfile):
+                if not os.path.exists(path_output_bm_pdb_avg_csvfile):
+                    print(path_output_bm_pdb_fxmutant_avg_fxoutfile + ' not found. But ' + path_output_bm_pdb_avg_csvfile
+                          + ' also not found. It seems the Average_BuildModel_ value for this mutant has not been calculated '
+                            'yet. Otherwise data has been transferred to a new location or lost.')
+                    return ''
+                else:
+                    print(path_output_bm_pdb_avg_csvfile + ' has already been written.')
+                    return path_output_bm_pdb_avg_csvfile
+            else:
+                with open(path_output_bm_pdb_fxmutant_avg_fxoutfile) as avg_f:
+                    avg_file_lines = avg_f.readlines()
+                with open(path_output_bm_pdb_avg_csvfile, 'w') as csv_f:
+                    csv_f.write('pdb,fxmutant,ddG\n')
+                    csv_f.write(pdbname + ',' + fxmutantname + ',')
+                    avg_ddG_values = avg_file_lines[fx.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value]
+                    avg_ddG_values = avg_ddG_values.split()
+                    csv_f.write(avg_ddG_values[fx.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value])
+            return path_output_bm_pdb_avg_csvfile
+
         def write_ddG_to_DB(self, path_output_bm_pdb_fxmutant_ddG_csvfile: str):
             """
             Read ddG from csv file and write to database.
@@ -331,18 +385,15 @@ class FoldX(object):
             # cursor.execute(
             #     "CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
 
-        def _write_ddG_csv_file(self, path_output_bm_pdb_fxmutant_dir: str, pdbname: str, fxmutantname: str):
-            """
-            :param path_output_bm_pdb_fxmutant_dir:
-            :param pdbname:
-            :param fxmutantname:
-            """
-            ddG_average = 0.0
-            fx = FoldX()
-
-
-
-            return path_output_bm_pdb_fxmutant_ddG_csvfile
+        # def _write_ddG_csv_file(self, path_output_bm_pdb_fxmutant_dir: str, pdbname: str, fxmutantname: str):
+        #     """
+        #     :param path_output_bm_pdb_fxmutant_dir:
+        #     :param pdbname:
+        #     :param fxmutantname:
+        #     """
+        #     ddG_average = 0.0
+        #     fx = FoldX()
+        #     return path_output_bm_pdb_fxmutant_ddG_csvfile
 
         # Not unit tested yet.
         def _write_individual_list_for_mutant(self, path_dst_dir: str):
@@ -488,7 +539,7 @@ class FoldX(object):
                               fxmutantname)
             return num_of_missing_mutant_files
 
-        def _write_sumry_ac_fxout_to_csv_file_up_1_dir_level(self, path_output_ac_pdb_fxmutant_dir: str):
+        def write_ac_sumry_fxout_to_csvfile_up_1dirlevel(self, path_output_ac_pdb_fxmutant_dir: str):
             """
             Reads the Summary_AnalyseComplex_..fxout file and writes a csv file of the data lines only (excluding top 8
             lines (FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which
@@ -501,11 +552,14 @@ class FoldX(object):
             path_output_ac_pdb_fxmutant_dir = path_output_ac_pdb_fxmutant_dir.split('/')
             pdbname = path_output_ac_pdb_fxmutant_dir[-2]
             fxmutantname = path_output_ac_pdb_fxmutant_dir[-1]
-            path_output_ac_pdb_fxmutant_dir = ''.join(path_output_ac_pdb_fxmutant_dir[:-2])
-            path_output_ac_pdb_dir = ''.join(path_output_ac_pdb_fxmutant_dir[:-2])
+            path_output_ac_pdb_dir = '/'.join(path_output_ac_pdb_fxmutant_dir[:-2])
+            path_output_ac_pdb_fxmutant_dir = '/'.join(path_output_ac_pdb_fxmutant_dir)
             fx = FoldX()
             path_output_ac_pdb_fxmutant_sumry_fxoutfile = os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value
                                                                        + pdbname + fx.Strs.UNDRSCR1_0_FXOUT.value)
+            path_output_ac_pdb_fxmutant_sumry_fxoutfile_wt = os.path.join(path_output_ac_pdb_fxmutant_dir,
+                                                                          fx.Strs.SMRY_AC_.value + fx.Strs.WT_.value + pdbname
+                                                                          + fx.Strs.UNDRSCR1_0_FXOUT.value)
             path_output_ac_pdb_sumry_csvfile = os.path.join(path_output_ac_pdb_dir, pdbname + '_' + fxmutantname + '_' +
                                                             fx.Strs.SMRY_AC_CSV.value)
             if not os.path.exists(path_output_ac_pdb_fxmutant_sumry_fxoutfile):
@@ -513,34 +567,35 @@ class FoldX(object):
             else:
                 with open(path_output_ac_pdb_fxmutant_sumry_fxoutfile) as sumry_f:
                     sumry_file_lines = sumry_f.readlines()
+                with open(path_output_ac_pdb_fxmutant_sumry_fxoutfile_wt) as sumry_wt_f:
+                    sumry_wt_file_lines = sumry_wt_f.readlines()
                 with open(path_output_ac_pdb_sumry_csvfile, 'w') as csv_f:
-                    csv_f.write(pdbname + ',' + fxmutantname + '\n')
-                    has_reached_line_to_read_from = False
-                    for line in sumry_file_lines:
-                        if 'Pdb' in line or has_reached_line_to_read_from:
-                            has_reached_line_to_read_from = True
-                            cells = line.split(' ')
-                            csv_f.write(''.join(cells[1]))
-                            csv_f.write(','.join(cells[1:-2]))
-                            csv_f.write(''.join(cells[-1]))
-                            csv_f.write('\n')
-            GUM.linux_remove_dir(path_output_ac_pdb_fxmutant_dir)
+                    csv_f.write('pdb,fxmutant,interaction energy\n')
+                    csv_f.write(pdbname + ',' + fxmutantname + ',')
+                    sumry_values = sumry_file_lines[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX.value]
+                    sumry_wt_values = sumry_wt_file_lines[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX.value]
+                    sumry_values = sumry_values.split()
+                    sumry_wt_values = sumry_wt_values.split()
+                    csv_f.write(sumry_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value])
+                    # OR IF IT SHOULD BE THE DIFFERENCE OF THE TWO FILES:
+                    # int_energy = sumry_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value]
+                    # int_energy_wt = sumry_wt_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value]
+                    # csv_f.write(int_energy_wt - int_energy)
             return path_output_ac_pdb_sumry_csvfile
 
-        def _set_up_connection_to_DB(self):
-            """
-            Sets up the connection to the MySQL database.
-            """
-            # connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_UN.value,
-            #                                      password=Server.SNPEFFECT_V5_MYSQL_PW.value,
-            #                                      host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
-                                                #, database='snpeffect_v5', port='3306')
-            cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
-            cursor = cnx.cursor()
-            cursor.execute("SHOW DATABASES")
-            cursor.execute("CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
-            cursor.
-
+        # def _set_up_connection_to_DB(self):
+        #     """
+        #     Sets up the connection to the MySQL database.
+        #     """
+        #     # connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_UN.value,
+        #     #                                      password=Server.SNPEFFECT_V5_MYSQL_PW.value,
+        #     #                                      host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
+        #                                         #, database='snpeffect_v5', port='3306')
+        #     cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
+        #     cursor = cnx.cursor()
+        #     cursor.execute("SHOW DATABASES")
+        #     cursor.execute("CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
+        #     cursor.
 
         def write_interaction_energy_to_DB(self, path_output_ac_pdb_sumry_csvfile: str):
             """
@@ -597,7 +652,7 @@ class FoldX(object):
         _1_012_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
         UNDRSCR1_ = '_1_'
         UNDRSCR1_0 = UNDRSCR1_ + '0'
-        UNDRSCR1_0_FXOUT = UNDRSCR1_ + FXOUTEXT
+        UNDRSCR1_0_FXOUT = UNDRSCR1_0 + FXOUTEXT
         WT_ = 'WT_'
         BMDL_ = 'BuildModel_'
         AVG_BMDL_ = 'Average_' + BMDL_
@@ -611,5 +666,14 @@ class FoldX(object):
         INTRFC_RESDS_ACPLX_ = 'Interface_Residues_' + ACPLX_
         FX_BM_TO_DELETE = [BMDL_, RAW_BMDL_, DIF_BMDL_, PDBLST_BMDL]
         FX_AC_TO_DELETE = [ACPLX_, INDIV_ENRG_ACPLX_, INTACTN_ACPLX_, INTRFC_RESDS_ACPLX_]
+        SMRY_AC_CSV = 'summary_ac' + Str.CSVEXT.value
+        AVG_BMDL_CSV = 'avg_bm' + Str.CSVEXT.value
+        Pdb_FXOUTFILE_HEADER = 'Pdb'
+        TOTL_ddG = 'Total energy (ddG)'
+        AVG_BM_FILE_DDG_LINE_INDEX = 9
+        AVG_BM_FILE_DDG_CELL_INDEX = 2
+        SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX = 5
+        SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX = 9
 
-# pydevd.stoptrace()
+
+pydevd.stoptrace()
