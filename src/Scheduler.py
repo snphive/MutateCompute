@@ -127,15 +127,15 @@ class Scheduler(object):
                         Scheduler._launch_thread(target=repair.do_repair, args=path_pdbfile)
                     else:
                         repair.do_repair(path_pdbfile)
-        if path_pdbfiles:
-            for path_pdbfile in path_pdbfiles:
-                if operations['do_foldx_buildmodel']:
-                    buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
-                    if buildmodel.find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids) != 0:
-                        print('Warning: BuildModel has not completed all computations for this pdb: ' + os.path.basename(
-                            path_pdbfile))
-                    else:
-                        print('BuildModel has completed all computations for this pdb: ' + os.path.basename(path_pdbfile))
+        # if path_pdbfiles:
+        #     for path_pdbfile in path_pdbfiles:
+        #         if operations['do_foldx_buildmodel']:
+        #             buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
+        #             if buildmodel.find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids) != 0:
+        #                 print('Warning: BuildModel has not completed all computations for this pdb: ' + os.path.basename(
+        #                     path_pdbfile))
+        #             else:
+        #                 print('BuildModel has completed all computations for this pdb: ' + os.path.basename(path_pdbfile))
 
                 # if operations['do_foldx_analysecomplex']:
                 #     analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
