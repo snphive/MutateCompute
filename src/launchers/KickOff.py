@@ -1,32 +1,27 @@
 #!/usr/bin/env python3
 """
-Script for running programs on files in different folders, locally or on cluster. Typically to run a folder of 1000
-input files through a particular algorithm. This would be instead of reading in more than 10000 files at a time, as the
-latter seems to cause problems with iterating through such a large list in a for loop - (I experienced a delay on
-looping through a list of more than 70000, whereby computations missed out about half of the inputs, thereby generating
-only about half of the outputs).
+Script for running Agadir and/or FoldX on fasta/pdb files.
 
-To run this script from:
-- local terminal: Enter command sh KickOff.sh
-- local Pycharm IDE: Select "KickOffManPy" in Run/Edit Configurations/Python: Click green 'play' button icon.
-- remote (cluster) terminal: Enter command sh KickOffZeus.sh in /switchlab/group/shazib/SnpEffect/bash directory.
-- remote (cluster) Pycharm IDE debugger: Select "KickOffRemoteDebug" in Run/Edit Configurations/Python Remote Debug. Click green
-'bug' button icon. Make sure the script has "import pydevd" and "pydevd.settrace('localhost', port=51234, stdoutToServer=True,
-stderrToServer=True)" at top of file and "pydevd.stoptrace()" at end. Log in to cluster with "ssh -p 7788
-shazib@zeus.psb.ugent.be -R 51234:localhost:51234". Enter command sh KickOffZeus.sh in /switchlab/group/shazib/SnpEffect/bash
-directory.
+Includes functionality for reducing disk space usage by deleting input files after computation completed and deleting output
+files that are not needed.
+
+Will include functionality for read data from output files and write to summary files and/or MySQL database.
+
+KickOff.py can be run locally or on cluster.
 """
-import os
 import sys
+import os
 import glob
-
+from src.tools.GeneralUtilityMethods import GUM
 from src.Main import Main
 from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
-
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+from src.enums.Conditions import Cond
+from src.tools.OutputsParser import Parser
+from src.FoldX import FoldX
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -37,15 +32,34 @@ __email__ = "shahinzibaee@hotmail.com"
 __status__ = "Development"
 
 """
-Set up paths.
+Paths for the entire codebase are set accordingly. "use_cluster" is set to False by default.  
 """
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
+
+if 'switchlab/group' in os.getcwd() and sys.argv[1].strip(' ') != 'use_cluster=True':
+
+    raise ValueError('Current working directory includes "/switchlab/group" in path. Hence you may be running the '
+                     'program on the psb cluster, while the "use_cluster" parameter is False. '
+                     'If launching from one of the bash scripts, check you are using bash/KickOffZeus.sh which '
+                     'includes ("use_cluster=True") parameter, as opposed to the bash/KickOff.sh script. \n'
+                     'Alternatively, uncomment the Paths.set_up_paths(use_cluster=True) line below to manually set it' 
+                     'here.')
+# Paths.set_up_paths(use_cluster=True)
+
+if 'switchlab/group' not in os.getcwd() and sys.argv[1].strip(' ') == 'use_cluster=True':
+    raise ValueError('Current working directory does not include "/switchlab/group" in path. Hence you might not be ' 
+                     'running the program on the psb cluster, while the "use_cluster" parameter is True. '
+                     'If launching from one of the bash scripts, check you are using bash/KickOff.sh which includes '
+                     '("use_cluster=False") parameter, as opposed to the bash/KickOffZeus.sh script. \n'
+                     'Alternatively, uncomment the Paths.set_up_paths(use_cluster=False) line below to manually set it' 
+                     'here.')
+# Paths.set_up_paths(use_cluster=False)
 
 """
 Set the value(s) of whichever operation(s) you want to run to True in the operations dict. 
 operations is passed to Main via its constructor.
 """
-operations = {'do_mutate_fasta': False, 'do_agadir': True, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
+operations = {'do_mutate_fasta': False, 'do_agadir': False, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
               'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
 
 """
@@ -56,69 +70,136 @@ use_multithread = False
 """
 Get the pdb files you want to run FoldX on.
 """
-path_pdbfiles = []
+# path_pdbfiles = []
+# path_input_pdbs_dir = '/switchlab/group/shazib/SnpEffect/output_data/analyse_complex'
+# path_input_pdbs_dir = Paths.OUTPUT_AC
+# path_pdbfiles = sorted(glob.glob(path_input_pdbs_dir + '/**/*.pdb', recursive=True))
+path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, 'RepairPDB_14' + Str.PDBEXT.value)]
+if not path_pdbfiles:
+    raise ValueError('No pdb files to process. Check paths are correct and check files are where you expect.')
+"""
+Select specific mutants if you are only interested in these.
 
+BE SURE TO SET THIS TO EMPTY LIST IF YOU DON'T WANT ANY OF THE SUBSEQUENT ACTIONS BELOW TO BE SPECIFIC TO THIS/THESE MUTANTS ONLY.
+"""
+specific_fxmutants = ['AA101A']
+# specific_fxmutants = []
 """
 Get the fasta files you want to run mutate_fasta or agadir on.
-Select range of folder names (which have a numeric component) from which fasta files are to be read. 
-For each folder and list of fasta files, run your selected program(s) via Main's constructor.
 """
-startnum = 1
-endnum = 1000
-
-for i in range(29):
-    dir_3dots = str(startnum) + Str.DOTS3.value + str(endnum)
-    path_input_fastas_3dots_dir = os.path.join(Paths.INPUT_MUTS_MULTIFASTAS_29611_1000, dir_3dots)
-    path_fastafiles = sorted(glob.glob(path_input_fastas_3dots_dir + '/**/*.fasta', recursive=True))
-    if not path_fastafiles:
-        raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
-    """
-    Kick off the program(s) via the constructor or Main class.
-    """
-    main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles,
-                AA.LIST_ALL_20_AA.value)
-    if i == 0:
-        break
-    startnum += 1000
-    endnum += 1000
-
-# pydevd.stoptrace()
+path_fastafiles = []
+# path_input_fastas_dir = Paths.INPUT_MUTS_MULTIFASTAS_29611_1000 + '/1...250/'
+# path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/**/*.fasta', recursive=True))
+# path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
+# if not path_fastafiles:
+#     raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
 
 """
-THE FOLLOWING ARE ONLY NECESSARY IF YOU WANT TO RUN THE WHOLE THING FROM VALUES IN THE GLOBAL OPTIONS TEXT FILE.
-
-import natsort
-import time
-from src.Agadir import Agadir
-from src.Conditions import Cond
-from src.Cluster import Cluster
-from src.GeneralUtilityMethods import GUM
-import multiprocessing as mp
-
-path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + Str.DOTS3.value + str(endnum))
-globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
-wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
-wanted_fastafile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_fastas)
-operations = Main._determine_which_operations_to_perform(globaloptions_lines)
-mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
-path_dst = Paths.INPUT
-path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
-path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
-
-def run_agadir_on_1000_fastas():
-    path_output_mutants = os.path.join(Paths.OUTPUT, Paths.DIR_MUTANTS_FASTAS.value,
-str(startnum) + Str.DOTS3.value + str(endnum))
-    path_to_fastas = path_output_mutants + '/**/*' + Str.FSTAEXT.value
-    path_fastafile_list = natsort.natsorted(glob.glob(path_to_fastas, recursive=True))
-    agadir = Agadir(Cond.INCELL_MAML.value)
-    for path_fastafile in path_fastafile_list:
-        time.sleep(1)
-        if use_cluster:
-            jobname = 'wr_' + path_fastafile.split('/')[-1]
-            path_to_script = os.path.join(Paths.SRC, 'run_write_1fastafile_per_fasta_from_multifastafile_zeus.py')
-            Cluster.write_job_q_bash(jobname, path_job_q_dir=Paths.CONFIG_JOBQ,
-python_script_with_paths=path_to_script + Str.SPCE.value + path_fastafile)
-            Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
-        else:
-            GUM.write_1_fastafile_per_fasta_from_multifastafile(path_dst=Paths.INPUT, path_fastafile=path_fastafile)
+Kick off the program(s) via the constructor or Main class.
 """
+# main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles, specific_fxmutants,
+#             AA.LIST_ALL_20_AA.value)
+
+"""
+After computation completed, DELETE config files no longer needed.  
+"""
+if operations['do_foldx_buildmodel']:
+    fx = FoldX()
+    path_output_bm_pdb_fxmutant_dirs = []
+    for path_pdbfile in path_pdbfiles:
+        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        for specific_fxmutant in specific_fxmutants:
+            path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
+        if not specific_fxmutants:
+            path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
+        for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
+            bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
+            if bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                fx.remove_config_files(path_output_bm_pdb_fxmutant_dir)
+
+if operations['do_foldx_analysecomplex']:
+    fx = FoldX()
+    path_output_bm_pdb_fxmutant_dirs = []
+    path_output_ac_pdb_fxmutant_dirs = []
+    for path_pdbfile in path_pdbfiles:
+        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        for specific_fxmutant in specific_fxmutants:
+            path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
+            path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
+        if not specific_fxmutants:
+            path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
+        for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
+            ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
+            if ac.has_already_generated_summary_ac_fxoutfile(
+                    path_output_ac_pdb_fxmutant_dir):
+                fx.remove_config_files(path_output_ac_pdb_fxmutant_dir)
+                # fx.remove_pdbfiles(os.path.join(Paths.OUTPUT_BM, pdbname, os.path.basename(path_output_ac_pdb_fxmutant_dir)))
+                # fx.remove_pdbfiles(os.path.join(path_output_ac_pdb_fxmutant_dir))
+
+"""
+Choose post-computation actions:
+"""
+write_bm_to_csv = False
+write_bm_to_db = False
+write_ac_to_csv = False
+write_ac_to_db = False
+pack_compress_bm_outputs = True
+pack_compress_ac_outputs = False
+
+"""
+After computations completed, WRITE RESULTS to CSV files.  
+"""
+if write_bm_to_csv:
+    fx = FoldX()
+    path_output_bm_pdb_fxmutant_dirs = []
+    for path_pdbfile in path_pdbfiles:
+        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        for specific_fxmutant in specific_fxmutants:
+            path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
+        if not specific_fxmutants:
+            path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
+        for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
+            bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
+            bm.write_bm_avg_fxout_to_csvfile_up_1dirlevel(path_output_bm_pdb_fxmutant_dir)
+            GUM.linux_remove_dir(path_output_bm_pdb_fxmutant_dir)
+
+# NEED TO ESTABLISH WHETHER YOU SHOULD READ FROM BOTH THE WT AND MUTANT SUMMARY FILE AND TAKE THE DIFFERENCE.
+# NEED TO KNOW WHAT VALUES ARE SIGNIFICANT, E.G. ANYTHING < 0.01 KCAL/MOL SIGINIFICANT ??
+if write_ac_to_csv:
+    fx = FoldX()
+    path_output_ac_pdb_fxmutant_dirs = []
+    for path_pdbfile in path_pdbfiles:
+        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        for specific_fxmutant in specific_fxmutants:
+            path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
+        if not specific_fxmutants:
+            path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
+        for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
+            ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
+            ac.write_ac_sumry_fxout_to_csvfile_up_1dirlevel(path_output_ac_pdb_fxmutant_dir)
+            GUM.linux_remove_dir(path_output_ac_pdb_fxmutant_dir)
+
+"""
+After computations completed, WRITE RESULTS to DATABASE.  
+"""
+
+
+"""
+After computations completed, and results written, COMPRESS RESULTS to one tar per pdb (per algorithm) for transfer and storage.  
+"""
+
+if pack_compress_bm_outputs:
+    for path_pdbfile in path_pdbfiles:
+        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
+        Parser().make_tarfile(path_files_to_pack_dir)
+
+
+if pack_compress_ac_outputs:
+    for path_pdbfile in path_pdbfiles:
+        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
+        Parser().make_tarfile(path_files_to_pack_dir)
+
+
+pydevd.stoptrace()
