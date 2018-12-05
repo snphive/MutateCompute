@@ -22,9 +22,6 @@ class Str(Enum):
     TAB = "\t"
     SEMICO_NL = ';' + NEWLN
     SPCE = ' '
-    FSLSH = "/"
-    FSLSH_ASTRX = FSLSH + '*'
-    FSLSH_DBLASTRX_FSLSH_ASTRX = FSLSH_ASTRX + '*' + FSLSH_ASTRX
     TXTEXT = '.txt'
     FSTAEXT = '.fasta'
     XMLEXT = '.xml'
