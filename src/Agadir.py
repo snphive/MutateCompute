@@ -86,6 +86,9 @@ class Agadir(object):
         print('Agadir.compute() is being called on: ' + path_dst_fastafile)
         path_agadir_dst_dir = '/'.join(path_dst_fastafile.split('/')[:-1])
         os.chdir(path_agadir_dst_dir)
+        # TODO write a check in the output dir if output data files have already been produced for each mutant. Expected
+        #  data files are based on what agadir_config Options.txt file. It does not indicate justhexa.txt or wins_per_seq so
+        #  just check for these anyway. If all are present, no need to re-compute it.
         if GUM.using_cluster():
             # Cluster.wait_for_grid_engine_job_to_complete(Paths.PREFIX_AGADIR.value)
             path_agadir_exe = Paths.ZEUS_AGADIR_EXE.value + 'agadirwrapper'
