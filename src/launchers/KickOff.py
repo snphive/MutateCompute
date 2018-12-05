@@ -18,6 +18,7 @@ from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
 from src.enums.Conditions import Cond
+from src.enums.DBServer import Server
 from src.tools.OutputsParser import Parser
 from src.FoldX import FoldX
 import pydevd
@@ -176,7 +177,8 @@ if write_ac_to_csv:
 """
 11. Write results to database.  
 """
-
+Server.connect_mysql_practice_db()
+Server.disconnect_mysql_practice_db()
 
 """
 12. Pack & compress results in to one tar per pdb (per algorithm), for improved transfer and storage.  
