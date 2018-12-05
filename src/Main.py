@@ -99,7 +99,7 @@ class Main(object):
         if Paths.DIR_FASTAS.value in path_repo_pdbs_or_fastas:
             file_extension = Str.FSTAEXT.value
             pdbs_or_fastas_option = Main.Strs.OPT_FASTAs.value
-        path_repo_files = path_repo_pdbs_or_fastas + Str.FSLSH_ASTRX.value + file_extension
+        path_repo_files = path_repo_pdbs_or_fastas + '/*' + file_extension
         for line in globaloptions_lines:
             if '#' in line:
                 continue
