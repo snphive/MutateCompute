@@ -147,7 +147,7 @@ class FoldX(object):
         pdbname = path_output_ac_or_bm_pdb_fxmutant_dir[-2]
         path_output_ac_or_bm_pdb_fxmutant_dir = '/'.join(path_output_ac_or_bm_pdb_fxmutant_dir)
         fx = FoldX()
-        files_to_delete = fx.Strs.FX_BM_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else fx.Strs.FX_AC_TO_DELETE.value
+        files_to_delete = fx.Strs.BM_FILES_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else fx.Strs.AC_FILES_TO_DELETE.value
         for file_to_delete in files_to_delete:
             GUM.linux_remove_file(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, file_to_delete + '*' + pdbname + '*' +
                                                fx.Strs.FXOUTEXT.value))
@@ -173,20 +173,6 @@ class FoldX(object):
         for path_file_to_remove in path_files_to_remove:
             if os.path.exists(path_file_to_remove):
                 GUM.linux_remove_file(path_file_to_remove)
-
-    def remove_all_sumry_except_1_0(self, path_output_ac_pdb_fxmutant_dir: str):
-        """
-        In cases where FoldX has been run more than once, producing multiple outputs of all fxout files including the
-        Summary_AnalyseComplex_ fxout files. All are deleted except for one (_1_0.fxout), one for the mutant and one for the WT.
-        :param path_output_ac_pdb_fxmutant_dir:
-        """
-        fx = FoldX()
-        path_sumry_files = glob.glob(os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value + '*'))
-        for path_sumry_file in path_sumry_files:
-            if fx.Strs.UNDRSCR1_0_FXOUT.value in path_sumry_file:
-                continue
-            else:
-                GUM.linux_remove_file(path_sumry_file)
 
     def _get_num_of_repaired_pdbfiles(self, path_output_pdb_fxmutant_dir: str):
         """
@@ -562,6 +548,20 @@ class FoldX(object):
                               fxmutantname)
             return num_of_missing_mutant_files
 
+        def remove_all_sumry_except_1_0(self, path_output_ac_pdb_fxmutant_dir: str):
+            """
+            In cases where FoldX has been run more than once, producing multiple outputs of all fxout files including the
+            Summary_AnalyseComplex_ fxout files. All are deleted except for one (_1_0.fxout), one for the mutant and one for the WT.
+            :param path_output_ac_pdb_fxmutant_dir:
+            """
+            fx = FoldX()
+            path_sumry_files = glob.glob(os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value + '*'))
+            for path_sumry_file in path_sumry_files:
+                if fx.Strs.UNDRSCR1_0_FXOUT.value in path_sumry_file:
+                    continue
+                else:
+                    GUM.linux_remove_file(path_sumry_file)
+
         def write_ac_sumry_fxout_to_csvfile_up_1dirlevel(self, path_output_ac_pdb_fxmutant_dir: str):
             """
             Reads the Summary_AnalyseComplex_..fxout file and writes a csv file of the data lines only (excluding top 8
@@ -688,8 +688,8 @@ class FoldX(object):
         INDIV_ENRG_ACPLX_ = 'Indiv_energies_' + ACPLX_
         INTACTN_ACPLX_ = 'Interaction_' + ACPLX_
         INTRFC_RESDS_ACPLX_ = 'Interface_Residues_' + ACPLX_
-        FX_BM_TO_DELETE = [BMDL_, RAW_BMDL_, DIF_BMDL_, PDBLST_BMDL]
-        FX_AC_TO_DELETE = [ACPLX_, INDIV_ENRG_ACPLX_, INTACTN_ACPLX_, INTRFC_RESDS_ACPLX_]
+        BM_FILES_TO_DELETE = [BMDL_, RAW_BMDL_, DIF_BMDL_, PDBLST_BMDL]
+        AC_FILES_TO_DELETE = [ACPLX_, INDIV_ENRG_ACPLX_, INTACTN_ACPLX_, INTRFC_RESDS_ACPLX_]
         SMRY_AC_CSV = 'summary_ac' + Str.CSVEXT.value
         AVG_BMDL_CSV = 'avg_bm' + Str.CSVEXT.value
         Pdb_FXOUTFILE_HEADER = 'Pdb'
