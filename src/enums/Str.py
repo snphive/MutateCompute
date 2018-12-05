@@ -50,8 +50,7 @@ class Str(Enum):
     COND_CONC = 'conc'
     PARTALLPATHEXISTS_MSG = 'Part/all dir tree already exists.'
     PROBLNXCMD_MSG = 'Problem with linux command: '
-    REPAIRPDB_  = 'RepairPDB_'
-    GLOBRESIDUE_OUT = 'PSX_globalresidue.out'
+    REPAIRPDB_ = 'RepairPDB_'
     CHMOD777 = 'chmod 777'
     DEFAULT_NUM_FX_RUNS_1 = 1
     OPER_RUN_MUT_FSTA = 'run_mutate_fasta'
