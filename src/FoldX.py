@@ -18,7 +18,7 @@ import os
 import glob
 from src.enums.Str import Str
 from src.enums.Paths import Paths
-from src.enums.UNPW import Server
+from src.enums.DBServer import Server
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 import mysql.connector
