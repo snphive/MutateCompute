@@ -6,6 +6,7 @@ PackCompress.py can be run locally or on cluster (the latter via a bash script).
 """
 import sys
 import os
+import glob
 from src.enums.Paths import Paths
 from src.tools.OutputsParser import Parser
 
@@ -18,25 +19,30 @@ __email__ = "shahinzibaee@hotmail.com"
 __status__ = "Development"
 
 """
-Paths for the entire codebase are set accordingly. "use_cluster" is set to False by default.  
+1. Set up paths. ("use_cluster" is set to False by default.)  
 """
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
-"""
-Select directory for packing into tar: Agadir-related
-"""
-# path_dir_txt_files_to_pack = os.path.join(Paths.OUTPUT_AGADIR, '02064053-3f32-32e6-9660-aaaffc30db87')
 
 """
-Select pdb 
+2. Select directory of files for packing & compressing: Agadir-related
+"""
+# path_dir_txt_files_to_pack = os.path.join(Paths.OUTPUT_AGADIR, '02064053-3f32-32e6-9660-aaaffc30db87')
+path_output_agad_3dots_dir = os.path.join(Paths.OUTPUT_AGADIR, '1...250')
+path_files_to_pack_dirs = glob.glob(path_output_agad_3dots_dir + '/*')
+
+"""
+3. Select pdbname(s), outputs of which are to be packed & compressed. 
 """
 pdbname = ['Repair_14']
 
 """
-Select directory for packing into tar: FoldX-related
+4. Select directory of files for packing & compressing: FoldX-related
 """
-path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
+path_files_to_pack_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname))
+path_files_to_pack_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname))
 
 """
-Pack files in directory into tar.
+5. Pack files in directory into tar.
 """
-Parser().make_tarfile(path_files_to_pack_dir)
+for path_files_to_pack_dir in path_files_to_pack_dirs:
+    Parser().make_tarfile(path_files_to_pack_dir)
