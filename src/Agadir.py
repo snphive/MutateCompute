@@ -5,6 +5,7 @@ Class for launching Agadir algorithms. Includes code for writing Agadir's option
 
 import os
 import subprocess
+import glob
 from src.enums.Str import Str
 from src.tools.GeneralUtilityMethods import GUM
 from src.enums.Paths import Paths
@@ -44,6 +45,7 @@ class Agadir(object):
             fasta_str = ''
             mutantfastafilename = ''
             mutantfastafile = ''
+            path_dst_mutant_filename = ''
             for line in f.readlines():
                 if '>' in line:
                     if not is_first_line:
@@ -60,16 +62,20 @@ class Agadir(object):
                     mutantfastafile = mutantfastafilename + Str.FSTAEXT.value
                 else:
                     fasta_str += line
-        self.remove_unwanted_globalresidue_output_files(path_dst_mutant_filename)
 
-    def remove_unwanted_globalresidue_output_files(self, path_dst_mutant_filename: str):
+    def remove_unwanted_agad_output_files(self, path_output_agad_dir: str):
         """
-        Deemed unnecessary (in JS meeting 24.10.18), the PSX_globalresidue.output file is to be deleted to save space.
-        :param path_dst_mutant_filename: Absolute path of the file to be deleted.
-        :return:
+        Remove PSX_globalresidue.output, deemed unnecessary (in JS meeting 24.10.18).
+        :param path_output_agad_dir: Absolute path of the file to be deleted. (Typically path would be to a 3dots folder name,
+        e.g. 1...250 or 1...1000, etc).
         """
-        path_out_mutantfilename_globalresidue_out = os.path.join(path_dst_mutant_filename, Str.GLOBRESIDUE_OUT.value)
-        GUM.linux_remove_file(path_out_mutantfilename_globalresidue_out)
+        path_output_agadir_globresidfiles = path_output_agad_dir + '/**/' + Agadir.Strs.GLOB_RESD_OUT.value
+        path_output_agadir_globresidfiles = sorted(glob.glob(path_output_agadir_globresidfiles, recursive=True))
+        if not path_output_agadir_globresidfiles:
+            raise ValueError(Agadir.Strs.GLOB_RESD_OUT.value + ' not found in any folders. Check paths are correct and check '
+                                                               'files are where you expect.')
+        for path_output_agadir_globresidfile in path_output_agadir_globresidfiles:
+            GUM.linux_remove_file(path_output_agadir_globresidfile)
 
     def compute(self, path_dst_fastafile: str):
         """
@@ -191,7 +197,12 @@ class Agadir(object):
             path_input = '/'.join(path_input_list)
             GUM.linux_copy_all_files_in_dir(path_output_fastas, path_input, recursively=True)
             if into_own_subdirs:
-                GUM._move_files_into_own_subdirs(path_dir=path_input_fastas)
+                GUM.move_files_into_own_subdirs(path_dir=path_input_fastas)
 
+    from enum import Enum
+
+    class Strs(Enum):
+        GLOB_RESD_OUT = 'PSX_globalresidue.out'
+        JST_HEXA_TXT = 'justhexa.txt'
 
 # pydevd.stoptrace()
