@@ -440,6 +440,16 @@ class FoldX(object):
                 if has_one_chain_only:
                     print('Only one protein chain. No interactions to be quantified for this pdbfile.')
                     return
+                path_output_bm_pdb_fxmutant_repaired = os.path.join(path_output_bm_pdb_fxmutant_dir, pdbname + \
+                                                       fx.Strs.UNDRSCR1_0_PDB.value)
+                path_output_bm_pdb_fxmutant_wt_repaired = os.path.join(path_output_bm_pdb_fxmutant_dir, wt_pdbname +
+                                                                       fx.Strs.UNDRSCR1_0_PDB.value)
+                if not os.path.exists(path_output_bm_pdb_fxmutant_repaired) or not os.path.exists(
+                        path_output_bm_pdb_fxmutant_wt_repaired):
+                    print('Repaired pdb files for this mutant cannot be found at the expected BuildModel output location: ' +
+                          path_output_bm_pdb_fxmutant_dir + '. AnalyseComplex cannot be run for this pdb/mutation. Check '
+                                                            'BuildModel has been run for this pdb/mutation.')
+                    return
                 fxmutant_dir = os.path.basename(path_output_bm_pdb_fxmutant_dir)
                 path_output_ac_pdb_fxmutant_dir = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_AC.value, pdbname, fxmutant_dir)
                 if self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
@@ -652,6 +662,7 @@ class FoldX(object):
         _1_012_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
         UNDRSCR1_ = '_1_'
         UNDRSCR1_0 = UNDRSCR1_ + '0'
+        UNDRSCR1_0_PDB = UNDRSCR1_0 + Str.PDBEXT.value
         UNDRSCR1_0_FXOUT = UNDRSCR1_0 + FXOUTEXT
         WT_ = 'WT_'
         BMDL_ = 'BuildModel_'
