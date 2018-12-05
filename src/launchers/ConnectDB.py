@@ -3,6 +3,8 @@
 Script for connecting to and reading/writing from/to a MySQL database.
 """
 import mysql.connector
+from src.enums.DBServer import Server
+from src.database.DBConnection import DBCnx
 # import mysqlx.connection
 
 __author__ = "Shahin Zibaee"
@@ -24,12 +26,17 @@ __status__ = "Development"
 # for x in cursor:
 #     print(x)
 
-cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='testForScope', port='3306',
-                              auth_plugin='mysql_native_password')
-cur = cnx.cursor()
-cur.execute("SHOW DATABASES")
-for x in cur:
-    print(x)
+# cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='testForScope', port='3306',
+#                               auth_plugin='mysql_native_password')
+# cur = cnx.cursor()
+# cur.execute("SHOW DATABASES")
+# for x in cur:
+#     print(x)
+#
+# cnx.close()
 
-cnx.close()
-# cur.execute("CREATE TABLE testDBConnect ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
+db = DBCnx()
+db.connect_mysql_practice_db()
+# db.add_new_columns('ddG', 'FLOAT')
+db.insert_values()
+db.disconnect_mysql_practice_db()
