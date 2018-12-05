@@ -59,8 +59,8 @@ if 'switchlab/group' not in os.getcwd() and sys.argv[1].strip(' ') == 'use_clust
 Set the value(s) of whichever operation(s) you want to run to True in the operations dict. 
 operations is passed to Main via its constructor.
 """
-operations = {'do_mutate_fasta': False, 'do_agadir': False, 'do_foldx_repair': False, 'do_foldx_buildmodel': False,
-              'do_foldx_stability': False, 'do_foldx_analysecomplex': False}
+operations = {Str.OPER_RUN_MUT_FSTA.value: False, Str.OPER_RUN_AGDR.value: False, Str.OPER_RUN_FX_RPR.value: False, Str.OPER_RUN_FX_BM.value: False,
+              Str.OPER_RUN_FX_STAB.value: False, Str.OPER_RUN_FX_AC.value: False}
 
 """
 Multithreading is not up and running yet (Nov18). Set to False for now.
@@ -74,7 +74,8 @@ Get the pdb files you want to run FoldX on.
 # path_input_pdbs_dir = '/switchlab/group/shazib/SnpEffect/output_data/analyse_complex'
 # path_input_pdbs_dir = Paths.OUTPUT_AC
 # path_pdbfiles = sorted(glob.glob(path_input_pdbs_dir + '/**/*.pdb', recursive=True))
-path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, 'RepairPDB_14' + Str.PDBEXT.value)]
+pdbname = 'RepairPDB_1'
+path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, pdbname + Str.PDBEXT.value)]
 if not path_pdbfiles:
     raise ValueError('No pdb files to process. Check paths are correct and check files are where you expect.')
 """
@@ -82,8 +83,8 @@ Select specific mutants if you are only interested in these.
 
 BE SURE TO SET THIS TO EMPTY LIST IF YOU DON'T WANT ANY OF THE SUBSEQUENT ACTIONS BELOW TO BE SPECIFIC TO THIS/THESE MUTANTS ONLY.
 """
-specific_fxmutants = ['AA101A']
-# specific_fxmutants = []
+# specific_fxmutants = ['AA101A']
+specific_fxmutants = []
 """
 Get the fasta files you want to run mutate_fasta or agadir on.
 """
@@ -97,13 +98,13 @@ path_fastafiles = []
 """
 Kick off the program(s) via the constructor or Main class.
 """
-# main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles, specific_fxmutants,
-#             AA.LIST_ALL_20_AA.value)
+main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles, specific_fxmutants,
+            AA.LIST_ALL_20_AA.value)
 
 """
 After computation completed, DELETE config files no longer needed.  
 """
-if operations['do_foldx_buildmodel']:
+if operations[Str.OPER_RUN_FX_BM.value]:
     fx = FoldX()
     path_output_bm_pdb_fxmutant_dirs = []
     for path_pdbfile in path_pdbfiles:
@@ -117,7 +118,7 @@ if operations['do_foldx_buildmodel']:
             if bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
                 fx.remove_config_files(path_output_bm_pdb_fxmutant_dir)
 
-if operations['do_foldx_analysecomplex']:
+if operations[Str.OPER_RUN_FX_AC.value]:
     fx = FoldX()
     path_output_bm_pdb_fxmutant_dirs = []
     path_output_ac_pdb_fxmutant_dirs = []
@@ -143,8 +144,8 @@ write_bm_to_csv = False
 write_bm_to_db = False
 write_ac_to_csv = False
 write_ac_to_db = False
-pack_compress_bm_outputs = True
-pack_compress_ac_outputs = False
+pack_compress_bm_outputs = False
+pack_compress_ac_outputs = True
 
 """
 After computations completed, WRITE RESULTS to CSV files.  
@@ -198,7 +199,7 @@ if pack_compress_bm_outputs:
 if pack_compress_ac_outputs:
     for path_pdbfile in path_pdbfiles:
         pdbname = os.path.basename(path_pdbfile).split('.')[0]
-        path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
+        path_files_to_pack_dir = os.path.join(Paths.OUTPUT_AC, pdbname)
         Parser().make_tarfile(path_files_to_pack_dir)
 
 
