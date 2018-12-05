@@ -417,7 +417,7 @@ class GUM(object):
         :param files_only: True to copy all files only, not with folders (not sure this is functional).
         """
         recurse_option = '-r' if recursively else ''
-        path_src_dir = path_src_dir + Str.FSLSH_ASTRX.value if files_only else path_src_dir
+        path_src_dir = path_src_dir + '/*' if files_only else path_src_dir
         cmd = 'cp' + Str.SPCE.value + recurse_option + Str.SPCE.value + path_src_dir + Str.SPCE.value + path_dst_dir
         try:
             subprocess.call(cmd, shell=True)
@@ -462,7 +462,7 @@ class GUM(object):
                 print(Str.PROBLNXCMD_MSG.value + cmd)
 
     @staticmethod
-    def _move_files_into_own_subdirs(path_dir: str):
+    def move_files_into_own_subdirs(path_dir: str):
         """
         Finds files in the immediate specified directory, creates a subdir with same name as the file and moves the
         file into this new subdirectory.
