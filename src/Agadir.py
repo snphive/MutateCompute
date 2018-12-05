@@ -83,7 +83,7 @@ class Agadir(object):
         Expecting path_fastafile to potentially contain more than 1 sequence.
         :param path_dst_fastafile: Abs path to fasta file.
         """
-        print('Agadir.compute is called on: ' + path_dst_fastafile)
+        print('Agadir.compute() is being called on: ' + path_dst_fastafile)
         path_agadir_dst_dir = '/'.join(path_dst_fastafile.split('/')[:-1])
         os.chdir(path_agadir_dst_dir)
         if GUM.using_cluster():
@@ -110,7 +110,7 @@ class Agadir(object):
                                   waltz_wndw=Str.TRUE_lc.value, limbo_wndw=Str.FALSE_lc.value,
                                   agadir_wndw=Str.FALSE_lc.value, csblnca_wndw=Str.FALSE_lc.value,
                                   complex_wndw=Str.FALSE_lc.value, repeat_wndw=Str.FALSE_lc.value,
-                                  pat_tango_wndw=Str.FALSE_lc.value, tango_resid=Str.FALSE_lc.value,
+                                  patent_tango_wndw=Str.FALSE_lc.value, tango_resid=Str.FALSE_lc.value,
                                   waltz_resid=Str.FALSE_lc.value, limbo_resid=Str.FALSE_lc.value,
                                   complex_resid=Str.FALSE_lc.value, agadir_resid=Str.FALSE_lc.value,
                                   csblnca_resid=Str.FALSE_lc.value, repeat_resid=Str.FALSE_lc.value,
@@ -131,7 +131,7 @@ class Agadir(object):
         :param csblnca_wndw:
         :param complex_wndw:
         :param repeat_wndw:
-        :param pat_tango_wndw:
+        :param patent_tango_wndw:
         :param tango_resid:
         :param waltz_resid:
         :param limbo_resid:
@@ -161,7 +161,7 @@ class Agadir(object):
         options.append('<casablanca_window>' + csblnca_wndw + Str.SEMICO_NL.value)
         options.append('<complex_window>' + complex_wndw + Str.SEMICO_NL.value)
         options.append('<repeat_window>' + repeat_wndw + Str.SEMICO_NL.value)
-        options.append('<patentTango_window>' + pat_tango_wndw + Str.SEMICO_NL.value)
+        options.append('<patentTango_window>' + patent_tango_wndw + Str.SEMICO_NL.value)
         options.append('<tango_residue>' + tango_resid + Str.SEMICO_NL.value)
         options.append('<waltz_residue>' + waltz_resid + Str.SEMICO_NL.value)
         options.append('<limbo_residue>' + limbo_resid + Str.SEMICO_NL.value)
