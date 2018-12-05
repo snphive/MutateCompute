@@ -43,9 +43,9 @@ class Main(object):
         if operations == {} or Main._all_ops_are_false(operations):
             raise ValueError("All options in 'operations' were either set to FALSE or some typographical error. "
                              "Check /config/global_options/global_options.txt was written correctly")
-        elif operations[Str.RUN_MUT_FSTA.value] or operations[Str.RUN_AGDR.value] or \
-                operations[Str.RUN_FX_RPR.value] or operations[Str.RUN_FX_BM.value] or \
-                operations[Str.RUN_FX_STAB.value] or operations[Str.RUN_FX_AC.value]:
+        elif operations[Str.OPER_RUN_MUT_FSTA.value] or operations[Str.OPER_RUN_AGDR.value] or \
+                operations[Str.OPER_RUN_FX_RPR.value] or operations[Str.OPER_RUN_FX_BM.value] or \
+                operations[Str.OPER_RUN_FX_STAB.value] or operations[Str.OPER_RUN_FX_AC.value]:
             Scheduler.start(operations, use_multithread, path_input, path_output, path_pdbfiles, path_fastafiles,
                             specific_fxmutants, amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False)
 
@@ -55,9 +55,9 @@ class Main(object):
         :param operations:
         :return: True indicates all oprations are set to False in global_options.txt.
         """
-        if not operations[Str.RUN_MUT_FSTA.value] and not operations[Str.RUN_AGDR.value] \
-                and not operations[Str.RUN_FX_RPR.value] and not operations[Str.RUN_FX_BM.value] \
-                and not operations[Str.RUN_FX_STAB.value] and not operations[Str.RUN_FX_AC.value]:
+        if not operations[Str.OPER_RUN_MUT_FSTA.value] and not operations[Str.OPER_RUN_AGDR.value] \
+                and not operations[Str.OPER_RUN_FX_RPR.value] and not operations[Str.OPER_RUN_FX_BM.value] \
+                and not operations[Str.OPER_RUN_FX_STAB.value] and not operations[Str.OPER_RUN_FX_AC.value]:
             return True
         else:
             return False
@@ -147,17 +147,17 @@ class Main(object):
             if "#" in line:
                 continue
             if Main.Strs.OPT_MUT_FSTA.value in line:
-                operations[Str.RUN_MUT_FSTA.value] = Main.__is_true(line)
+                operations[Str.OPER_RUN_MUT_FSTA.value] = Main.__is_true(line)
             if Main.Strs.OPT_AGDR.value in line:
-                operations[Str.RUN_AGDR.value] = Main.__is_true(line)
+                operations[Str.OPER_RUN_AGDR.value] = Main.__is_true(line)
             if Main.Strs.OPT_FX_RPR.value in line:
-                operations[Str.RUN_FX_RPR.value] = Main.__is_true(line)
+                operations[Str.OPER_RUN_FX_RPR.value] = Main.__is_true(line)
             if Main.Strs.OPT_FX_BM.value in line:
-                operations[Str.RUN_FX_BM.value] = Main.__is_true(line)
-            if Str.RUN_FX_STAB.value in line:
-                operations[Str.RUN_FX_STAB.value] = Main.__is_true(line)
-            if Str.RUN_FX_AC.value in line:
-                operations[Str.RUN_FX_AC.value] = Main.__is_true(line)
+                operations[Str.OPER_RUN_FX_BM.value] = Main.__is_true(line)
+            if Str.OPER_RUN_FX_STAB.value in line:
+                operations[Str.OPER_RUN_FX_STAB.value] = Main.__is_true(line)
+            if Str.OPER_RUN_FX_AC.value in line:
+                operations[Str.OPER_RUN_FX_AC.value] = Main.__is_true(line)
         return operations
 
     @staticmethod
@@ -201,12 +201,12 @@ class Main(object):
     from enum import Enum
 
     class Strs(Enum):
-        RUN_MUT_FSTA = Str.RUN_MUT_FSTA.value
-        RUN_AGDR = Str.RUN_AGDR.value
-        RUN_FX_RPR = Str.RUN_FX_RPR.value
-        RUN_FX_BM = Str.RUN_FX_BM.value
-        RUN_FX_AC = Str.RUN_FX_AC.value
-        RUN_FX_STAB = Str.RUN_FX_STAB.value
+        OPER_RUN_MUT_FSTA = Str.OPER_RUN_MUT_FSTA.value
+        OPER_RUN_AGDR = Str.OPER_RUN_AGDR.value
+        OPER_RUN_FX_RPR = Str.OPER_RUN_FX_RPR.value
+        OPER_RUN_FX_BM = Str.OPER_RUN_FX_BM.value
+        OPER_RUN_FX_AC = Str.OPER_RUN_FX_AC.value
+        OPER_RUN_FX_STAB = Str.OPER_RUN_FX_STAB.value
         OPT_MUT_FSTA = 'MUTATE_FASTA:'
         OPT_AGDR = 'AGADIR:'
         OPT_FX_RPR = 'FOLDX_REPAIR:'

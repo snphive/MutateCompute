@@ -51,7 +51,7 @@ class Scheduler(object):
         """
         start_time = time.perf_counter()
         if path_fastafiles:
-            if operations[Scheduler.Strs.RUN_MUT_FSTA.value]:
+            if operations[Scheduler.Strs.OPER_RUN_MUT_FSTA.value]:
                 path_output_fastas_3dots = GUM.make_path_fastas_3dots_dirs(path_output, path_fastafiles[0])
                 mutate_fasta = MutateFasta(amino_acids)
                 for path_fastafile in path_fastafiles:
@@ -81,7 +81,7 @@ class Scheduler(object):
                                                  n_slots='', total_memory_GB='', memory_limit_GB='3', cluster_node='')
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value)
 
-            if operations[Scheduler.Strs.RUN_AGDR.value]:
+            if operations[Scheduler.Strs.OPER_RUN_AGDR.value]:
                 agadir = Agadir(Cond.INCELL_MAML_FX.value)
                 for path_fastafile in path_fastafiles:
                     sleep_secs = 0 if len(path_fastafiles) < 200 else len(path_fastafiles) / 1000
@@ -108,20 +108,20 @@ class Scheduler(object):
         print('Time taken to complete iterating through fasta files (after methods have been called): ' + str(elapsed))
         if path_pdbfiles:
             for path_pdbfile in path_pdbfiles:
-                if operations[Scheduler.Strs.RUN_FX_BM.value]:
+                if operations[Scheduler.Strs.OPER_RUN_FX_BM.value]:
                     buildmodel = FoldX().BuildModel(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=buildmodel.mutate_protein_structure,
                                                  args=[path_pdbfile, amino_acids, specific_fxmutants])
                     else:
                         buildmodel.mutate_protein_structure(path_pdbfile, amino_acids, specific_fxmutants)
-                if operations[Scheduler.Strs.RUN_FX_AC.value]:
+                if operations[Scheduler.Strs.OPER_RUN_FX_AC.value]:
                     analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=analysecomplex.calculate_complex_energies, args=path_pdbfile)
                     else:
                         analysecomplex.calculate_complex_energies(path_pdbfile, specific_fxmutants)
-                if operations[Scheduler.Strs.RUN_FX_RPR.value]:
+                if operations[Scheduler.Strs.OPER_RUN_FX_RPR.value]:
                     repair = FoldX().Repair(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=repair.do_repair, args=path_pdbfile)
@@ -223,9 +223,9 @@ class Scheduler(object):
     from enum import Enum
 
     class Strs(Enum):
-        RUN_MUT_FSTA = Str.RUN_MUT_FSTA.value
-        RUN_AGDR = Str.RUN_AGDR.value
-        RUN_FX_RPR = Str.RUN_FX_RPR.value
-        RUN_FX_BM = Str.RUN_FX_BM.value
-        RUN_FX_AC = Str.RUN_FX_AC.value
-        RUN_FX_STAB = Str.RUN_FX_STAB.value
+        OPER_RUN_MUT_FSTA = Str.OPER_RUN_MUT_FSTA.value
+        OPER_RUN_AGDR = Str.OPER_RUN_AGDR.value
+        OPER_RUN_FX_RPR = Str.OPER_RUN_FX_RPR.value
+        OPER_RUN_FX_BM = Str.OPER_RUN_FX_BM.value
+        OPER_RUN_FX_AC = Str.OPER_RUN_FX_AC.value
+        OPER_RUN_FX_STAB = Str.OPER_RUN_FX_STAB.value
