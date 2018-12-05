@@ -4,28 +4,42 @@ from src.enums.UNPW import Server
 
 class DBCnx(object):
 
-    cnx_mysql_practice = ''
-    cnx_mysql_snpeffect5 = ''
-
     def connect_mysql_practice_db(self):
-        global cnx
-
+        global mysql_practice
         try:
             # cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
-            cnx = mysql.connector.connect(user=Server.PRACTICE_DB_MYSQL_USER.value,
-                                          password=Server.PRACTICE_DB_MYSQL_PW.value,
-                                          host=Server.PRACTICE_DB__MYSQL_NETADD.value,
-                                          database=Server.PRACTICE_DB_MYSQL_DBNAME.value,
-                                          port=Server.PRACTICE_DB__MYSQL_PORT.value)
-            cur = cnx.cursor()
+            mysql_practice = mysql.connector.connect(user=Server.PRACTICE_DB_MYSQL_USER.value,
+                                                     password=Server.PRACTICE_DB_MYSQL_PW.value,
+                                                     host=Server.PRACTICE_DB_MYSQL_NETADD.value,
+                                                     database=Server.PRACTICE_DB_MYSQL_DBNAME.value,
+                                                     port=Server.PRACTICE_DB_MYSQL_PORT.value)
+            cur = mysql_practice.cursor()
             cur.execute("CREATE TABLE testDBCon2 ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
-            # cnx.close()
+        except mysql.connector.Error as err:
+            print("Something went wrong: {}".format(err))
+
+    def connect_mysql_snpeffect_v5_db(self):
+        global mysql_snpeffect5
+        try:
+            # cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
+            mysql_snpeffect5 = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_USER.value,
+                                                       password=Server.SNPEFFECT_V5_MYSQL_PW.value,
+                                                       host=Server.SNPEFFECT_V5_MYSQL_NETADD.value,
+                                                       database=Server.SNPEFFECT_V5_MYSQL_DBNAME.value,
+                                                       port=Server.SNPEFFECT_V5_MYSQL_PORT.value)
+            cur = mysql_snpeffect5.cursor()
+            cur.execute("CREATE TABLE testDBCon2 ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
+
         except mysql.connector.Error as err:
             print("Something went wrong: {}".format(err))
 
     def disconnect_mysql_practice_db(self):
-        global cnx
-        cnx.close()
+        global mysql_practice
+        mysql_practice.close()
+
+    def disconnect_mysql_snpeffect_v5_db(self):
+        global mysql_snpeffect5
+        mysql_snpeffect5.close()
 
 
 # """
