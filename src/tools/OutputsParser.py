@@ -15,17 +15,22 @@ __status__ = "Development"
 
 class Parser(object):
 
-    def make_tarfile(self, path_dir_txt_files_to_pack):
+    def make_tarfile(self, path_files_to_pack_dir: str):
         """
         Recursively pack contents of specified directory to improve file transfer rates and reduce disk space usage.
         (The tar.gz was observed to reduce disk space usage about 5-fold.)
-        :param path_dir_txt_files_to_pack: Absolute path of directory for source files to pack.
+        :param path_files_to_pack_dir: Absolute path of directory for source files to pack.
         """
-        if not os.path.isdir(path_dir_txt_files_to_pack):
+        if not os.path.isdir(path_files_to_pack_dir):
             raise FileNotFoundError('Directory to pack does not exist with this path.')
 
-        with tarfile.open(path_dir_txt_files_to_pack + Str.TARGZEXT.value, 'w:gz') as tar:
-            tar.add(path_dir_txt_files_to_pack, arcname=os.path.basename(path_dir_txt_files_to_pack))
+        path_files_to_pack_tar_gz = path_files_to_pack_dir + Str.TARGZEXT.value
+
+        if os.path.exists(path_files_to_pack_tar_gz):
+            print(path_files_to_pack_tar_gz + ' already exists. This will be overwritten by new one.')
+        with tarfile.open(path_files_to_pack_tar_gz, 'w:gz') as tar:
+            tar.add(path_files_to_pack_dir, arcname=os.path.basename(path_files_to_pack_dir))
+
 
     # def parse_agadir_outputs_to_1_file(self, path_output_agadir_3dotsdir):
     #     """
