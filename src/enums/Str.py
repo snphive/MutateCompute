@@ -54,3 +54,9 @@ class Str(Enum):
     GLOBRESIDUE_OUT = 'PSX_globalresidue.out'
     CHMOD777 = 'chmod 777'
     DEFAULT_NUM_FX_RUNS_1 = 1
+    RUN_MUT_FSTA = 'run_mutate_fasta'
+    RUN_AGDR = 'run_agadir'
+    RUN_FX_RPR = 'run_fx_repair'
+    RUN_FX_BM = 'run_fx_buildmodel'
+    RUN_FX_STAB = 'run_fx_stability'
+    RUN_FX_AC = 'run_fx_analysecomplex'

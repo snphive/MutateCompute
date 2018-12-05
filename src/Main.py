@@ -43,9 +43,9 @@ class Main(object):
         if operations == {} or Main._all_ops_are_false(operations):
             raise ValueError("All options in 'operations' were either set to FALSE or some typographical error. "
                              "Check /config/global_options/global_options.txt was written correctly")
-        elif operations['do_mutate_fasta'] or operations['do_agadir'] or \
-                operations['do_foldx_repair'] or operations['do_foldx_buildmodel'] or \
-                operations['do_foldx_stability'] or operations['do_foldx_analysecomplex']:
+        elif operations[Str.RUN_MUT_FSTA.value] or operations[Str.RUN_AGDR.value] or \
+                operations[Str.RUN_FX_RPR.value] or operations[Str.RUN_FX_BM.value] or \
+                operations[Str.RUN_FX_STAB.value] or operations[Str.RUN_FX_AC.value]:
             Scheduler.start(operations, use_multithread, path_input, path_output, path_pdbfiles, path_fastafiles,
                             specific_fxmutants, amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False)
 
@@ -55,9 +55,9 @@ class Main(object):
         :param operations:
         :return: True indicates all oprations are set to False in global_options.txt.
         """
-        if not operations['do_mutate_fasta'] and not operations['do_agadir'] \
-                and not operations['do_foldx_repair'] and not operations['do_foldx_buildmodel'] \
-                and not operations['do_foldx_stability'] and not operations['do_foldx_analysecomplex']:
+        if not operations[Str.RUN_MUT_FSTA.value] and not operations[Str.RUN_AGDR.value] \
+                and not operations[Str.RUN_FX_RPR.value] and not operations[Str.RUN_FX_BM.value] \
+                and not operations[Str.RUN_FX_STAB.value] and not operations[Str.RUN_FX_AC.value]:
             return True
         else:
             return False
@@ -95,11 +95,11 @@ class Main(object):
         """
         file_list = []
         file_extension = Str.PDBEXT.value
-        pdbs_or_fastas_option = 'PDBs'
+        pdbs_or_fastas_option = Main.Strs.OPT_PDBs.value
         if Paths.DIR_FASTAS.value in path_repo_pdbs_or_fastas:
             file_extension = Str.FSTAEXT.value
-            pdbs_or_fastas_option = 'FASTAs'
-        path_repo_files = path_repo_pdbs_or_fastas + '/*' + file_extension
+            pdbs_or_fastas_option = Main.Strs.OPT_FASTAs.value
+        path_repo_files = path_repo_pdbs_or_fastas + Str.FSLSH_ASTRX.value + file_extension
         for line in globaloptions_lines:
             if '#' in line:
                 continue
@@ -121,7 +121,7 @@ class Main(object):
                             break
                         file_list.append(path_file_natsorted.split('/')[-1])
                 elif pdb_or_fasta_option.isalpha():
-                    if pdb_or_fasta_option.lower() == 'all':
+                    if pdb_or_fasta_option.lower() == Main.Strs.OPT_ALL.value:
                         path_file_list = glob.glob(path_repo_files)
                         for path_file in path_file_list:
                             file_list.append(path_file.split('/')[-1])
@@ -146,18 +146,18 @@ class Main(object):
         for line in globaloptions_lines:
             if "#" in line:
                 continue
-            if "MUTATE_FASTA:" in line:
-                operations['do_mutate_fasta'] = Main.__is_true(line)
-            if "AGADIR:" in line:
-                operations['do_agadir'] = Main.__is_true(line)
-            if "FOLDX_REPAIR:" in line:
-                operations['do_foldx_repair'] = Main.__is_true(line)
-            if "FOLDX_BUILDMODEL:" in line:
-                operations['do_foldx_buildmodel'] = Main.__is_true(line)
-            if "FOLDX_STABILITY:" in line:
-                operations['do_foldx_stability'] = Main.__is_true(line)
-            if "FOLDX_ANALYSECOMPLEX:" in line:
-                operations['do_foldx_analysecomplex'] = Main.__is_true(line)
+            if Main.Strs.OPT_MUT_FSTA.value in line:
+                operations[Str.RUN_MUT_FSTA.value] = Main.__is_true(line)
+            if Main.Strs.OPT_AGDR.value in line:
+                operations[Str.RUN_AGDR.value] = Main.__is_true(line)
+            if Main.Strs.OPT_FX_RPR.value in line:
+                operations[Str.RUN_FX_RPR.value] = Main.__is_true(line)
+            if Main.Strs.OPT_FX_BM.value in line:
+                operations[Str.RUN_FX_BM.value] = Main.__is_true(line)
+            if Str.RUN_FX_STAB.value in line:
+                operations[Str.RUN_FX_STAB.value] = Main.__is_true(line)
+            if Str.RUN_FX_AC.value in line:
+                operations[Str.RUN_FX_AC.value] = Main.__is_true(line)
         return operations
 
     @staticmethod
@@ -172,9 +172,9 @@ class Main(object):
         for line in globaloptions_lines:
             if '#' in line:
                 continue
-            if 'RESIDUES' in line:
+            if Main.Strs.OPT_RESDS.value in line:
                 aa_option = Main.__get_text_after_colon_before_semi(line)
-                if aa_option.lower() == 'all':
+                if aa_option.lower() == Main.Strs.OPT_ALL.value:
                     mutant_aa_list = AA.LIST_ALL_20_AA.value
                 else:
                     for aa in aa_option:
@@ -198,7 +198,22 @@ class Main(object):
         """
         return line.split(':')[-1].strip(';\n').strip()
 
+    from enum import Enum
 
-# cnx is the mysql connector (see top of script)
-# cnx.close()
-
+    class Strs(Enum):
+        RUN_MUT_FSTA = Str.RUN_MUT_FSTA.value
+        RUN_AGDR = Str.RUN_AGDR.value
+        RUN_FX_RPR = Str.RUN_FX_RPR.value
+        RUN_FX_BM = Str.RUN_FX_BM.value
+        RUN_FX_AC = Str.RUN_FX_AC.value
+        RUN_FX_STAB = Str.RUN_FX_STAB.value
+        OPT_MUT_FSTA = 'MUTATE_FASTA:'
+        OPT_AGDR = 'AGADIR:'
+        OPT_FX_RPR = 'FOLDX_REPAIR:'
+        OPT_FX_BM = 'FOLDX_BUILDMODEL:'
+        OPT_FX_STAB = 'FOLDX_STABILITY:'
+        OPT_FX_AC = 'FOLDX_ANALYSECOMPLEX:'
+        OPT_RESDS = 'RESIDUES'
+        OPT_ALL = 'all'
+        OPT_PDBs = 'PDBs'
+        OPT_FASTAs = 'FASTAs'
