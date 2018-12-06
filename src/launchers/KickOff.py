@@ -18,9 +18,9 @@ from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
 from src.enums.Conditions import Cond
-from src.enums.DBServer import Server
 from src.tools.OutputsParser import Parser
 from src.FoldX import FoldX
+from src.database.DAL import DAL
 import pydevd
 pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
@@ -144,6 +144,7 @@ pack_compress_ac_outputs = True
 """
 10. Write results to csv files.  
 """
+path_output_bm_pdb_avg_csvfiles = []
 if write_bm_to_csv:
     fx = FoldX()
     path_output_bm_pdb_fxmutant_dirs = []
@@ -155,11 +156,12 @@ if write_bm_to_csv:
             path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
         for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
             bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
-            bm.write_bm_avg_fxout_to_csvfile_up_1dirlevel(path_output_bm_pdb_fxmutant_dir)
+            path_output_bm_pdb_avg_csvfiles.append(bm.write_bm_avg_fxout_to_csvfile_up_1dirlevel(path_output_bm_pdb_fxmutant_dir))
             GUM.linux_remove_dir(path_output_bm_pdb_fxmutant_dir)
 
 # NEED TO ESTABLISH WHETHER YOU SHOULD READ FROM BOTH THE WT AND MUTANT SUMMARY FILE AND TAKE THE DIFFERENCE.
 # NEED TO KNOW WHAT VALUES ARE SIGNIFICANT, E.G. ANYTHING < 0.01 KCAL/MOL SIGINIFICANT ??
+path_output_ac_pdb_sumry_csvfiles = []
 if write_ac_to_csv:
     fx = FoldX()
     path_output_ac_pdb_fxmutant_dirs = []
@@ -171,25 +173,29 @@ if write_ac_to_csv:
             path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
         for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
             ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
-            ac.write_ac_sumry_fxout_to_csvfile_up_1dirlevel(path_output_ac_pdb_fxmutant_dir)
+            path_output_ac_pdb_sumry_csvfiles.append(ac.write_ac_sumry_fxout_to_csvfile_up_1dirlevel(
+                path_output_ac_pdb_fxmutant_dir))
             GUM.linux_remove_dir(path_output_ac_pdb_fxmutant_dir)
 
 """
 11. Write results to database.  
 """
-Server.connect_mysql_practice_db()
-Server.disconnect_mysql_practice_db()
+if write_ac_to_db:
+    for path_output_ac_pdb_sumry_csvfile in path_output_bm_pdb_avg_csvfiles:
+        DAL().write_csv_to_db(path_output_ac_pdb_sumry_csvfile)
+
+if write_bm_to_db:
+    for path_output_bm_pdb_avg_csvfile in path_output_bm_pdb_avg_csvfiles:
+        DAL().write_csv_to_db(path_output_bm_pdb_avg_csvfile)
 
 """
 12. Pack & compress results in to one tar per pdb (per algorithm), for improved transfer and storage.  
 """
-
 if pack_compress_bm_outputs:
     for path_pdbfile in path_pdbfiles:
         pdbname = os.path.basename(path_pdbfile).split('.')[0]
         path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
         Parser().make_tarfile(path_files_to_pack_dir)
-
 
 if pack_compress_ac_outputs:
     for path_pdbfile in path_pdbfiles:
