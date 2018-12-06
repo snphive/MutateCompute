@@ -37,6 +37,7 @@ __status__ = "Development"
 
 db = DBCnx()
 db.connect_mysql_practice_db()
-# db.add_new_columns('ddG', 'FLOAT')
-db.insert_values()
+db.add_new_columns('ddG', 'FLOAT')
+db.insert_values_by_column(["pdb", "mutation", "ddG"], ["Repair_PDB2", "AA101C", 1.23456789])
 db.disconnect_mysql_practice_db()
+
