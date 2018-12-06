@@ -21,6 +21,7 @@ from src.enums.Paths import Paths
 from src.enums.DBServer import Server
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
+from src.database.DAL import DAL
 import mysql.connector
 import pydevd
 pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
@@ -258,11 +259,6 @@ class FoldX(object):
                     # no use for them either. Hence, they can already be deleted, saving disk space (crucial for cluster).
                     fx.remove_pdbfiles(path_output_bm_pdb_fxmutant_dir)
 
-            # for fxmutantname in fxmutantnames:
-            #     path_output_bm_pdb_fxmutant_dir = os.path.join(Paths.OUTPUT_BM, pdbname, fxmutantname)
-            #     ddG_average = self._write_ddG_csv_file(path_output_bm_pdb_fxmutant_dir, pdbname, fxmutantname)
-            #     self.write_ddG_to_DB(ddG_average)
-
         def has_already_generated_avg_bm_fxoutfile(self, path_output_bm_pdb_fxmutant_dir: str):
             """
             :param path_output_bm_pdb_fxmutant_dir:
@@ -354,34 +350,6 @@ class FoldX(object):
                     csv_f.write(avg_ddG_values[fx.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value])
             return path_output_bm_pdb_avg_csvfile
 
-        def write_ddG_to_DB(self, path_output_bm_pdb_fxmutant_ddG_csvfile: str):
-            """
-            Read ddG from csv file and write to database.
-            :param path_output_bm_pdb_fxmutant_ddG_csvfile:
-            """
-            connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_USER.value,
-                                                 password=Server.SNPEFFECT_V5_MYSQL_PW.value,
-                                                 host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
-                                                #, database='snpeffect_v5', port='3306')
-            cursor = connection.cursor()
-            cursor.execute("SHOW DATABASES")
-            for x in cursor:
-                print(x)
-            # cursor.execute("CREATE DATABASE SnpEffect_v5.0")
-            # cursor.execute(
-            #     "CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
-
-        # def _write_ddG_csv_file(self, path_output_bm_pdb_fxmutant_dir: str, pdbname: str, fxmutantname: str):
-        #     """
-        #     :param path_output_bm_pdb_fxmutant_dir:
-        #     :param pdbname:
-        #     :param fxmutantname:
-        #     """
-        #     ddG_average = 0.0
-        #     fx = FoldX()
-        #     return path_output_bm_pdb_fxmutant_ddG_csvfile
-
-        # Not unit tested yet.
         def _write_individual_list_for_mutant(self, path_dst_dir: str):
             """
             Writes the 'individual_list.txt' file that is used by fx/runscript to identify the protein to process.
@@ -605,37 +573,6 @@ class FoldX(object):
                     # int_energy_wt = sumry_wt_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value]
                     # csv_f.write(int_energy_wt - int_energy)
             return path_output_ac_pdb_sumry_csvfile
-
-        # def _set_up_connection_to_DB(self):
-        #     """
-        #     Sets up the connection to the MySQL database.
-        #     """
-        #     # connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_UN.value,
-        #     #                                      password=Server.SNPEFFECT_V5_MYSQL_PW.value,
-        #     #                                      host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
-        #                                         #, database='snpeffect_v5', port='3306')
-        #     cnx = mysql.connector.connect(user='root', password='K0yGrJ8(', host='127.0.0.1', database='mydb', port='3306')
-        #     cursor = cnx.cursor()
-        #     cursor.execute("SHOW DATABASES")
-        #     cursor.execute("CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
-        #     cursor.
-
-        def write_interaction_energy_to_DB(self, path_output_ac_pdb_sumry_csvfile: str):
-            """
-            Read interaction energy from csv file and write to database.
-            :param path_output_ac_pdb_sumry_csvfile:
-            """
-            connection = mysql.connector.connect(user=Server.SNPEFFECT_V5_MYSQL_USER.value,
-                                                 password=Server.SNPEFFECT_V5_MYSQL_PW.value,
-                                                 host=Server.SNPEFFECT_V5_MYSQL_NETADD.value)
-                                                #, database='snpeffect_v5', port='3306')
-            cursor = connection.cursor()
-            cursor.execute("SHOW DATABASES")
-            for x in cursor:
-                print(x)
-            # cursor.execute("CREATE DATABASE SnpEffect_v5.0")
-            # cursor.execute(
-            #     "CREATE TABLE testingDBConnection ( id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT, title TEXT NOT NULL )")
 
     class Repair(object):
 
