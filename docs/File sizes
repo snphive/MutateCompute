@@ -73,7 +73,7 @@ Note: size of pdb files will vary depending on size of the protein (shown for Re
                 7 pdbs removed                                                  650 KB (3 x 4 different fxout files x 2 for WT)
                 log files removed                                               626 KB
                 all fxout files except 'Summary_..' removed                     113 KB (3 mutant, 3 WT)
-
+                Only 2 summary files (mutant & WT)                              75 KB
 
 
 NOTE: The ls -lh command seems to give very different values to du -h command.

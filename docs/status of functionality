@@ -39,6 +39,3 @@ FoldX AC            configuration/foldx_config/rotabase.txt
 IdentifyProtein     input_data/<fastafilename>/                         output_data/blastp/
                                                                       output_data/blastp/<fastafilename>_idmaps/
 Runs locally. Does not currently run on cluster.
-
-
-
