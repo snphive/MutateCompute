@@ -4,6 +4,11 @@ Class for mapping amino acid sequences (FASTA format) to proteins in Swissprot d
 that share 100% identity.
 
 (Includes nested Enum of strings specific to this class, located at end of class.)
+
+Note: Some sequences are all As. The reason for this was explained to me by Coos Baakman (10Oct2018): "in order to model
+protein complexes in human form. The software blasts every subunit in the template complex against the human proteome.
+However, sometimes it doesn't find a hit. In such case, a poly-alanine is modeled instead."
+
 """
 import os
 import json
@@ -30,6 +35,8 @@ class IdProt(object):
     def map_seq_to_swsprt_acc_id_and_write_files(path_input_fastafiles, path_output: str, write_idmaps_for_mysqldb: bool,
                                                  write_csv=True, write_xml=True, write_json=False):
         """
+        Maps the specified protein sequences in FASTA format to sequences in the SwissProt database, to find 100% identity
+        hits. The results including the SwissProt Accession Id are written to a csv file.
         Expects a directory location of fastafiles (not a fastafile itself).
         (This method relies on the presence of fastafiles in the specified dir, in order for them to be run on Blastp.
         This transfer is currently done manually)
