@@ -12,8 +12,8 @@ from src.enums.Conditions import Cond
 from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -67,4 +67,4 @@ if check_analysecomplex_completed:
         print('AnalyseComplex has completed interaction energy computations for this pdb: ' + os.path.basename(path_pdbfile))
 
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
