@@ -3,6 +3,14 @@
 Class for writing job.q bash and to run a job using the job.q bash script.
 
 (Includes a nested Enum of cluster-specific strings located at the end of the class.)
+
+Currently (2018) the cluster is made up of:
+odin1: 64 cores, split over 4 cpus
+odin2: 64 cores, split over 4 cpus
+hodor1: 44 cores, split over 2 cpus
+hodor2: 44 cores, split over 2 cpus
+BUT hodor1 & 2 are intel cpus which support Hyperthreading, which means that you have 2 slots per core
+odin1 & 2 are amd cpus and they don't have this feature. (based on Frederik Delaere email 09Oct2018)
 """
 
 import os
