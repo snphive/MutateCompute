@@ -37,8 +37,6 @@ __status__ = "Development"
 
 class FoldX(object):
 
-    completed_bm_mutants = {{}}
-
     def write_runscript_file(self, path_runscript: str, pdbs: str, conditions: dict, action: str,
                              num_of_runs=Str.DEFAULT_NUM_FX_RUNS_1.value, show_sequence_detail=False, print_networks=False,
                              calculate_stability=False):
@@ -201,7 +199,8 @@ class FoldX(object):
             """
             self.conditions = cond
 
-        def mutate_protein_structure(self, path_pdbfile: str, amino_acids: list, specific_fxmutants=None):
+        def mutate_protein_structure(self, path_pdbfile: str, amino_acids: list, specific_fxmutants=None,
+                                     rm_xtra_files_after_each_pdb=False, write_to_csv_after_each_pdb=False):
             """
             Mutate all amino acids in this pdb to all listed amino acids using FoldX BuildModel.
             Note: individual_list needs to go in the same dir as runscript.txt.
@@ -210,6 +209,9 @@ class FoldX(object):
             :param amino_acids: Amino acids that proteins will be mutated to.
             :param specific_fxmutants: Specific mutants to perform BuildModel computation on. Remains empty if all mutations
             should be calculated (specified by amino_acids list).
+            :param rm_xtra_files_after_each_pdb: True to remove excess files (such as config files) from output folders for
+            each mutant in this pdb.
+            :param write_to_csv_after_each_pdb: True to write ddG to csv file for each mutant in this pdb.
             """
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
@@ -260,6 +262,16 @@ class FoldX(object):
                     # BuildModel has no use for these mutant pdb files and because this pdb only has 1 chain, AnalyseComplex has
                     # no use for them either. Hence, they can already be deleted, saving disk space (crucial for cluster).
                     fx.remove_pdbfiles(path_output_bm_pdb_fxmutant_dir)
+            if rm_xtra_files_after_each_pdb:
+                missing_num = self.find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids)
+                if missing_num != 0:
+                    print('BuildModel computations not completed for this pdb: ' + pdbname + '. Number of missing computations: '
+                          + missing_num + '. Therefore will not proceed to removing extra files (such as config files etc)')
+            if write_to_csv_after_each_pdb:
+                missing_num = self.find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids)
+                if missing_num != 0:
+                    print('BuildModel computations not completed for this pdb: ' + pdbname + '. Number of missing computations: '
+                          + missing_num + '. Therefore will not proceed to removing extra files (such as config files etc)')
 
         def has_already_generated_avg_bm_fxoutfile(self, path_output_bm_pdb_fxmutant_dir: str):
             """
@@ -312,7 +324,7 @@ class FoldX(object):
                               + fxmutantname)
             return num_of_missing_mutant_files
 
-        def write_bm_avg_fxout_to_csvfile_up_1dirlevel(self, path_output_bm_pdb_fxmutant_dir):
+        def write_bm_avg_fxout_to_csvfile_up_2dirlevels(self, path_output_bm_pdb_fxmutant_dir):
             """
             Reads the Average_BuildModel_..fxout file and writes a csv file of the data lines only (excluding top 8 lines (
             FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which mutation it
@@ -324,33 +336,35 @@ class FoldX(object):
             path_output_bm_pdb_fxmutant_dir = path_output_bm_pdb_fxmutant_dir.split('/')
             pdbname = path_output_bm_pdb_fxmutant_dir[-2]
             fxmutantname = path_output_bm_pdb_fxmutant_dir[-1]
-            path_output_bm_pdb_dir = '/'.join(path_output_bm_pdb_fxmutant_dir[:-1])
             path_output_bm_pdb_fxmutant_dir = '/'.join(path_output_bm_pdb_fxmutant_dir)
             fx = FoldX()
             path_output_bm_pdb_fxmutant_avg_fxoutfile = os.path.join(path_output_bm_pdb_fxmutant_dir, fx.Strs.AVG_BMDL_.value +
                                                                      pdbname + fx.Strs.FXOUTEXT.value)
-            path_output_bm_pdb_avg_csvfile = os.path.join(path_output_bm_pdb_dir, pdbname + '_' + fxmutantname + '_' +
-                                                          fx.Strs.AVG_BMDL_CSV.value)
+            path_output_bm_avg_csvfile = os.path.join(Paths.OUTPUT_BM, pdbname + '_' + fxmutantname + '_' +
+                                                      fx.Strs.AVG_BMDL_CSV.value)
+            if not os.path.exists(path_output_bm_avg_csvfile):
+                with open(path_output_bm_avg_csvfile, 'w') as csv_f:
+                    csv_f.write('pdb,fxmutant,ddG\n')
             if not os.path.exists(path_output_bm_pdb_fxmutant_avg_fxoutfile):
-                if not os.path.exists(path_output_bm_pdb_avg_csvfile):
+                if not os.path.exists(path_output_bm_avg_csvfile):
                     print('Warning: ' + path_output_bm_pdb_fxmutant_avg_fxoutfile + ' not found. But ' +
-                          path_output_bm_pdb_avg_csvfile + ' also not found. It seems the Average_BuildModel_ value for this '
+                          path_output_bm_avg_csvfile + ' also not found. It seems the Average_BuildModel_ value for this '
                                                            'mutant has not been calculated yet. Otherwise the data files have '
                                                            'been transferred to a new location or lost.')
                     return ''
                 else:
-                    print(path_output_bm_pdb_avg_csvfile + ' has already been written.')
-                    return path_output_bm_pdb_avg_csvfile
+                    print(path_output_bm_avg_csvfile + ' has already been written.')
+                    return path_output_bm_avg_csvfile
             else:
                 with open(path_output_bm_pdb_fxmutant_avg_fxoutfile) as avg_f:
                     avg_file_lines = avg_f.readlines()
-                with open(path_output_bm_pdb_avg_csvfile, 'w') as csv_f:
-                    csv_f.write('pdb,fxmutant,ddG\n')
+                with open(path_output_bm_avg_csvfile, 'w') as csv_f:
+                    # csv_f.write('pdb,fxmutant,ddG\n')
                     csv_f.write(pdbname + ',' + fxmutantname + ',')
                     avg_ddG_values = avg_file_lines[fx.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value]
                     avg_ddG_values = avg_ddG_values.split()
                     csv_f.write(avg_ddG_values[fx.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value])
-            return path_output_bm_pdb_avg_csvfile
+            return path_output_bm_avg_csvfile
 
         def _write_individual_list_for_mutant(self, path_dst_dir: str):
             """
@@ -369,7 +383,8 @@ class FoldX(object):
             """
             self.conditions = cond
 
-        def calculate_complex_energies(self, path_pdbfile: str, specific_fxmutants=None):
+        def calculate_complex_energies(self, path_pdbfile: str, specific_fxmutants=None, rm_xtra_files_after_each_pdb=False,
+                                       write_to_csv_after_each_pdb=False):
             """
             Calculates interaction energies for a complex of protein chains for a specified pdb and list of amino acids.
             The repaired pdbs are read from each output_data/buildmodel/<pdbname>/<fxmutantname> folder.
@@ -532,12 +547,12 @@ class FoldX(object):
                 else:
                     GUM.linux_remove_file(path_sumry_file)
 
-        def write_ac_sumry_fxout_to_csvfile_up_1dirlevel(self, path_output_ac_pdb_fxmutant_dir: str):
+        def write_ac_sumry_fxout_to_csvfile_up_2dirlevels(self, path_output_ac_pdb_fxmutant_dir: str):
             """
             Reads the Summary_AnalyseComplex_..fxout file and writes a csv file of the data lines only (excluding top 8
             lines (FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which
-            mutation it is so no need for the extra fxmutant directory, hence it is written up one level in the pdb directory.
-            The fxmtuant directory is deleted.
+            pdb and which mutation it is so no need for the pdb and the many fxmutant subdirectories, hence it is written two
+            levels up, to /output_data/analyse_complex/ directory. The fxmtuant directory is then deleted.
             :param path_output_ac_pdb_fxmutant_dir: absolute path to mutant directory holding the
             Summary_AnalyseComplex_..fxout file.
             :return: New csv output file (with its absolute path)
@@ -545,7 +560,6 @@ class FoldX(object):
             path_output_ac_pdb_fxmutant_dir = path_output_ac_pdb_fxmutant_dir.split('/')
             pdbname = path_output_ac_pdb_fxmutant_dir[-2]
             fxmutantname = path_output_ac_pdb_fxmutant_dir[-1]
-            path_output_ac_pdb_dir = '/'.join(path_output_ac_pdb_fxmutant_dir[:-2])
             path_output_ac_pdb_fxmutant_dir = '/'.join(path_output_ac_pdb_fxmutant_dir)
             fx = FoldX()
             path_output_ac_pdb_fxmutant_sumry_fxoutfile = os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value
@@ -553,8 +567,11 @@ class FoldX(object):
             path_output_ac_pdb_fxmutant_sumry_fxoutfile_wt = os.path.join(path_output_ac_pdb_fxmutant_dir,
                                                                           fx.Strs.SMRY_AC_.value + fx.Strs.WT_.value + pdbname
                                                                           + fx.Strs.UNDRSCR1_0_FXOUT.value)
-            path_output_ac_pdb_sumry_csvfile = os.path.join(path_output_ac_pdb_dir, pdbname + '_' + fxmutantname + '_' +
-                                                            fx.Strs.SMRY_AC_CSV.value)
+            path_output_ac_sumry_csvfile = os.path.join(Paths.OUTPUT_AC, pdbname + '_' + fxmutantname + '_' +
+                                                        fx.Strs.SMRY_AC_CSV.value)
+            if not os.path.exists(path_output_ac_sumry_csvfile):
+                with open(path_output_ac_sumry_csvfile, 'w') as csv_f:
+                    csv_f.write('pdb,fxmutant,interaction ddG\n')
             if not os.path.exists(path_output_ac_pdb_fxmutant_sumry_fxoutfile):
                 print(path_output_ac_pdb_fxmutant_sumry_fxoutfile + ' has not been written yet')
             else:
@@ -562,8 +579,8 @@ class FoldX(object):
                     sumry_file_lines = sumry_f.readlines()
                 with open(path_output_ac_pdb_fxmutant_sumry_fxoutfile_wt) as sumry_wt_f:
                     sumry_wt_file_lines = sumry_wt_f.readlines()
-                with open(path_output_ac_pdb_sumry_csvfile, 'w') as csv_f:
-                    csv_f.write('pdb,fxmutant,interaction energy\n')
+                with open(path_output_ac_sumry_csvfile, 'w') as csv_f:
+                    # csv_f.write('pdb,fxmutant,interaction energy\n')
                     csv_f.write(pdbname + ',' + fxmutantname + ',')
                     sumry_values = sumry_file_lines[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX.value]
                     sumry_wt_values = sumry_wt_file_lines[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX.value]
@@ -572,7 +589,7 @@ class FoldX(object):
                     int_energy = float(sumry_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value])
                     int_energy_wt = float(sumry_wt_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value])
                     csv_f.write(str(int_energy_wt - int_energy))
-            return path_output_ac_pdb_sumry_csvfile
+            return path_output_ac_sumry_csvfile
 
     class Repair(object):
 
