@@ -12,6 +12,7 @@ KickOff.py can be run locally or on cluster.
 import sys
 import os
 import glob
+import warnings
 from src.tools.GeneralUtilityMethods import GUM
 from src.Main import Main
 from src.enums.Paths import Paths
@@ -21,8 +22,8 @@ from src.enums.Conditions import Cond
 from src.tools.OutputsParser import Parser
 from src.FoldX import FoldX
 from src.database.DAL import DAL
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -55,17 +56,17 @@ use_multithread = False
 """
 4. Get the pdb files you want to run FoldX on.
 """
-# path_pdbfiles = []
 # path_input_pdbs_dir = '/switchlab/group/shazib/SnpEffect/output_data/analyse_complex'
 # path_input_pdbs_dir = Paths.OUTPUT_AC
 # path_pdbfiles = sorted(glob.glob(path_input_pdbs_dir + '/**/*.pdb', recursive=True))
+# path_pdbfiles = []
 pdbnames = ['RepairPDB_1', 'RepairPDB_3', 'RepairPDB_4', 'RepairPDB_5', 'RepairPDB_6', 'RepairPDB_7', 'RepairPDB_8',
             'RepairPDB_9', 'RepairPDB_10']
 for pdbname in pdbnames:
     path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, pdbname + Str.PDBEXT.value)]
-    if not path_pdbfiles:
-        raise ValueError('No pdb files to process. Check paths are correct and check files are where you expect.')
-
+if not path_pdbfiles:
+    warnings.warn_explicit(message="No pdb files to process. Check paths are correct and check files are where you expect.",
+                           category=RuntimeWarning, filename="KickOff", lineno=68)
 """
 5. Select specific mutants if you are only interested in these.
 BE SURE to set this empty list if you don't want any of the subsequent below to be for these mutants only.
@@ -80,9 +81,9 @@ path_fastafiles = []
 # path_input_fastas_dir = Paths.INPUT_MUTS_MULTIFASTAS_29611_1000 + '/1...250/'
 # path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/**/*.fasta', recursive=True))
 # path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
-# if not path_fastafiles:
-#     raise ValueError('No fasta files to process. Check paths are correct and check files are where you expect.')
-
+if not path_fastafiles:
+    warnings.warn_explicit(message="No fasta files to process. Check paths are correct and check files are where you expect.",
+                           category=RuntimeWarning, filename="KickOff", lineno=84)
 """
 7. Kick off the program(s) via the constructor or Main class.
 """
@@ -204,4 +205,4 @@ if pack_compress_ac_outputs:
         Parser().make_tarfile(path_files_to_pack_dir)
 
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
