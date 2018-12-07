@@ -37,6 +37,8 @@ __status__ = "Development"
 
 class FoldX(object):
 
+    completed_bm_mutants = {{}}
+
     def write_runscript_file(self, path_runscript: str, pdbs: str, conditions: dict, action: str,
                              num_of_runs=Str.DEFAULT_NUM_FX_RUNS_1.value, show_sequence_detail=False, print_networks=False,
                              calculate_stability=False):
@@ -312,14 +314,13 @@ class FoldX(object):
 
         def write_bm_avg_fxout_to_csvfile_up_1dirlevel(self, path_output_bm_pdb_fxmutant_dir):
             """
-             Reads the Average_BuildModel_..fxout file and writes a csv file of the data lines only (excluding top 8
-             lines (FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which
-             mutation it is so no need for the extra fxmutant directory, hence it is written up one level in the pdb directory.
-             The fxmtuant directory is deleted.
-             :param path_output_bm_pdb_fxmutant_dir: Absolute path for mutant directory holding the Average_BuildModel_..fxout
-             file.
-             :return: new csv output file (including absolute path).
-             """
+            Reads the Average_BuildModel_..fxout file and writes a csv file of the data lines only (excluding top 8 lines (
+            FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which mutation it
+            is so no need for the extra fxmutant directory, hence it is written up one level in the pdb directory.
+            The fxmtuant directory is deleted.
+            :param path_output_bm_pdb_fxmutant_dir: Absolute path for mutant directory holding Average_BuildModel_..fxout file.
+            :return: New csv output file (with its absolute path).
+            """
             path_output_bm_pdb_fxmutant_dir = path_output_bm_pdb_fxmutant_dir.split('/')
             pdbname = path_output_bm_pdb_fxmutant_dir[-2]
             fxmutantname = path_output_bm_pdb_fxmutant_dir[-1]
@@ -332,9 +333,10 @@ class FoldX(object):
                                                           fx.Strs.AVG_BMDL_CSV.value)
             if not os.path.exists(path_output_bm_pdb_fxmutant_avg_fxoutfile):
                 if not os.path.exists(path_output_bm_pdb_avg_csvfile):
-                    print(path_output_bm_pdb_fxmutant_avg_fxoutfile + ' not found. But ' + path_output_bm_pdb_avg_csvfile
-                          + ' also not found. It seems the Average_BuildModel_ value for this mutant has not been calculated '
-                            'yet. Otherwise data has been transferred to a new location or lost.')
+                    print('Warning: ' + path_output_bm_pdb_fxmutant_avg_fxoutfile + ' not found. But ' +
+                          path_output_bm_pdb_avg_csvfile + ' also not found. It seems the Average_BuildModel_ value for this '
+                                                           'mutant has not been calculated yet. Otherwise the data files have '
+                                                           'been transferred to a new location or lost.')
                     return ''
                 else:
                     print(path_output_bm_pdb_avg_csvfile + ' has already been written.')
@@ -538,7 +540,7 @@ class FoldX(object):
             The fxmtuant directory is deleted.
             :param path_output_ac_pdb_fxmutant_dir: absolute path to mutant directory holding the
             Summary_AnalyseComplex_..fxout file.
-            :return: new csv output file (including absolute path)
+            :return: New csv output file (with its absolute path)
             """
             path_output_ac_pdb_fxmutant_dir = path_output_ac_pdb_fxmutant_dir.split('/')
             pdbname = path_output_ac_pdb_fxmutant_dir[-2]
@@ -567,11 +569,9 @@ class FoldX(object):
                     sumry_wt_values = sumry_wt_file_lines[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX.value]
                     sumry_values = sumry_values.split()
                     sumry_wt_values = sumry_wt_values.split()
-                    csv_f.write(sumry_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value])
-                    # OR IF IT SHOULD BE THE DIFFERENCE OF THE TWO FILES:
-                    # int_energy = sumry_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value]
-                    # int_energy_wt = sumry_wt_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value]
-                    # csv_f.write(int_energy_wt - int_energy)
+                    int_energy = float(sumry_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value])
+                    int_energy_wt = float(sumry_wt_values[fx.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value])
+                    csv_f.write(str(int_energy_wt - int_energy))
             return path_output_ac_pdb_sumry_csvfile
 
     class Repair(object):
