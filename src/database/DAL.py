@@ -3,6 +3,10 @@
 An approximation of Data Access Layer pattern.
 Class for connecting to relational databases and performing SQL DML commands: e.g. INSERT, UPDATE, DELETE.
 
+
+NOTE: the use of f-strings for string interpolation was only introduced in Python 3.6. The current (7Dec2018) latest version of
+Python on the cluster is 3.5. Therefore, while this is my prefered syntax for insert_value_by_column(), I have provided an
+alternative to prevent the syntax error it causes which others prevents the codebase from starting.
 """
 import mysql.connector
 from src.database.DBConnectDDL import DBCnxDDL
@@ -26,12 +30,12 @@ class DAL(object):
         self.insert_values_by_column(db, column_names, column_values)
         DBCnxDDL().disconnect_mysql_db(db)
 
-    def insert_values_by_column(self, mysql_practice_cnx, columns: list, values: list):
+    def insert_values_by_column(self, mysql_practice_cnx, column_names: list, column_values: list):
         cursor = mysql_practice_cnx.cursor()
-        columns = ','.join(columns)
-        # values = ','.join([str(value) for value in values])
-        values = ','.join(['\"' + str(value) + '\"' for value in values])
-        sql_cmd = f"""INSERT INTO fx_data({columns}) VALUES({values})"""
+        column_names = ','.join(column_names)
+        column_values = ','.join(['\"' + str(value) + '\"' for value in column_values])
+        sql_cmd = 'INSERT INTO fx_data{columns} VALUES{values}'.format(column_names=column_names, column_values=column_values)
+        # sql_cmd = f"""INSERT INTO fx_data({columns}) VALUES({values})"""
         try:
             cursor.execute(sql_cmd)
             mysql_practice_cnx.commit()
