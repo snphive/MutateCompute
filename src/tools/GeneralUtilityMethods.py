@@ -112,9 +112,8 @@ class GUM(object):
     def extract_all_chains_from_pdb(path_pdbfile: str):
         """
         For the pdb passed here, all chains are read from the pdb file.
-        :param pdbfile: String name of pdb file (incl. '.pdb' extension).
         :param path_pdbfile: Absolute path to directory where the target pdbfile is.
-        :return: list of str, protein chains
+        :return: List of protein chains
         """
         with open(path_pdbfile) as f:
             pdbfile_lines = f.readlines()
