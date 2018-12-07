@@ -22,8 +22,8 @@ from src.enums.Conditions import Cond
 from src.tools.OutputsParser import Parser
 from src.FoldX import FoldX
 from src.database.DAL import DAL
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -61,9 +61,11 @@ use_multithread = False
 # path_pdbfiles = sorted(glob.glob(path_input_pdbs_dir + '/**/*.pdb', recursive=True))
 # path_pdbfiles = []
 pdbnames = ['RepairPDB_1', 'RepairPDB_3', 'RepairPDB_4', 'RepairPDB_5', 'RepairPDB_6', 'RepairPDB_7', 'RepairPDB_8',
-            'RepairPDB_9', 'RepairPDB_10']
+            'RepairPDB_9', 'RepairPDB_10', 'RepairPDB_11']
+
+path_pdbfiles = []
 for pdbname in pdbnames:
-    path_pdbfiles = [os.path.join(Paths.INPUT_PDBS, pdbname + Str.PDBEXT.value)]
+    path_pdbfiles.append(os.path.join(Paths.INPUT_PDBS, pdbname + Str.PDBEXT.value))
 if not path_pdbfiles:
     warnings.warn_explicit(message="No pdb files to process. Check paths are correct and check files are where you expect.",
                            category=RuntimeWarning, filename="KickOff", lineno=68)
@@ -135,12 +137,12 @@ if operations[Str.OPER_RUN_FX_AC.value]:
 """
 9. Choose which post-computation writing & file compressing to perform:
 """
-write_bm_to_csv = False
+write_bm_to_csv = True
 write_bm_to_db = False
 write_ac_to_csv = False
 write_ac_to_db = False
-pack_compress_bm_outputs = False
-pack_compress_ac_outputs = True
+pack_compress_bm_outputs = True
+pack_compress_ac_outputs = False
 
 """
 10. Write results to csv files.  
@@ -157,7 +159,8 @@ if write_bm_to_csv:
             path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
         for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
             bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
-            path_output_bm_pdb_avg_csvfiles.append(bm.write_bm_avg_fxout_to_csvfile_up_1dirlevel(path_output_bm_pdb_fxmutant_dir))
+            path_output_bm_pdb_avg_csvfile = bm.write_bm_avg_fxout_to_csvfile_up_2dirlevels(path_output_bm_pdb_fxmutant_dir)
+            path_output_bm_pdb_avg_csvfiles.append(path_output_bm_pdb_avg_csvfile)
             GUM.linux_remove_dir(path_output_bm_pdb_fxmutant_dir)
 
 # NEED TO ESTABLISH WHETHER YOU SHOULD READ FROM BOTH THE WT AND MUTANT SUMMARY FILE AND TAKE THE DIFFERENCE.
@@ -174,8 +177,8 @@ if write_ac_to_csv:
             path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
         for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
             ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
-            path_output_ac_pdb_sumry_csvfiles.append(ac.write_ac_sumry_fxout_to_csvfile_up_1dirlevel(
-                path_output_ac_pdb_fxmutant_dir))
+            path_output_ac_pdb_sumry_csvfile = ac.write_ac_sumry_fxout_to_csvfile_up_2dirlevels(path_output_ac_pdb_fxmutant_dir)
+            path_output_ac_pdb_sumry_csvfiles.append(path_output_ac_pdb_sumry_csvfile)
             GUM.linux_remove_dir(path_output_ac_pdb_fxmutant_dir)
 
 """
@@ -205,4 +208,4 @@ if pack_compress_ac_outputs:
         Parser().make_tarfile(path_files_to_pack_dir)
 
 
-# pydevd.stoptrace()
+pydevd.stoptrace()
