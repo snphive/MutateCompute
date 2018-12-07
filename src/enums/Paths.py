@@ -13,8 +13,6 @@ All paths are absolute paths unless prefix with an "REL_" which indicates they a
 import os
 import yaml
 from enum import Enum
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -198,4 +196,3 @@ class Paths(Enum):
         Paths.SRC = Paths.SE_SRC.value if use_cluster else Paths.MC_SRC.value
         Paths.LOGS = Paths.SE_LOGS.value if use_cluster else Paths.MC_LOGS.value
 
-# pydevd.stoptrace()
