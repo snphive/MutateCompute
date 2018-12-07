@@ -36,20 +36,18 @@ class Scheduler(object):
               path_fastafiles: list, specific_fxmutants: list, amino_acids: list, write_1_fasta_only: bool,
               write_fasta_per_mut: bool):
         """
-        Not sure yet if I should instantiate the objects once at beginning rather than a new instance for each and
-        every fasta or pdb. (NOTE: argument list is identical as those of the calling method _start_scheduler())
-        :param operations: Operations each paired with a flag, True to run the operation.
+        Iterate through a list of fasta files or pdb files and perform Agadir, or Foldx computations as specified by 'operations'.
+        :param operations: Each operation paired with True/False flag to indicate whether or not to perform the operation.
         :param use_multithread: True to employ parallel processing.
         :param path_input: Absolute path to input_data root dir.
         :param path_output: Absolute path to output_data root dir.
-        :param path_pdbfiles: Pdbfiles to run (incl. .pdb extension)
-        :param path_fastafiles: Fastafiles to run (incl. .fasta extension)
+        :param path_pdbfiles: Absolute path to pdb input files.
+        :param path_fastafiles: Absolute path to fasta input files.
         :param specific_fxmutants: Given when specific mutants only should be calculated.
-        :param amino_acids: All amino acids that any mutations operations will use to mutate residues to.
+        :param amino_acids: Amino acids that mutation operations should use to mutate to.
         :param write_1_fasta_only: True to write any fasta output data to 1 fasta file, each separated by \n.
-        :param write_fasta_per_mut: True to write any fasta output data as 1 fasta file per mutant.
+        :param write_fasta_per_mut: True to write any fasta output data as 1 fasta file per mutant. (Uses a lot of disk space).
         """
-        start_time = time.perf_counter()
         if path_fastafiles:
             if operations[Scheduler.Strs.OPER_RUN_MUT_FSTA.value]:
                 path_output_fastas_3dots = GUM.make_path_fastas_3dots_dirs(path_output, path_fastafiles[0])
@@ -104,8 +102,6 @@ class Scheduler(object):
                                                   args=[path_fastafile, path_dst])
                     elif not GUM.using_cluster() and not use_multithread:
                         agadir.run_agadir_on_multifastas(path_fastafile, path_dst)
-        elapsed = time.perf_counter() - start_time
-        print('Time taken to complete iterating through fasta files (after methods have been called): ' + str(elapsed))
         if path_pdbfiles:
             for path_pdbfile in path_pdbfiles:
                 if operations[Scheduler.Strs.OPER_RUN_FX_BM.value]:
@@ -127,6 +123,9 @@ class Scheduler(object):
                         Scheduler._launch_thread(target=repair.do_repair, args=path_pdbfile)
                     else:
                         repair.do_repair(path_pdbfile)
+
+
+
         # if path_pdbfiles:
         #     for path_pdbfile in path_pdbfiles:
         #         if operations['do_foldx_buildmodel']:
