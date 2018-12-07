@@ -34,17 +34,16 @@ __status__ = "Development"
 Paths.set_up_paths(use_cluster=(len(sys.argv) > 1 and sys.argv[1].strip(' ') == 'use_cluster=True'))
 
 """
-2. Select for Agadir-related files for deletion:
+2. Select Agadir-related files for deletion:
 """
-agadir = Agadir(Cond.INCELL_MAML_AG.value)
 path_output_agadir_3dots_dir = os.path.join(Paths.OUTPUT_AGADIR, '1...250')
-agadir.remove_unwanted_agad_output_files(path_output_agadir_3dots_dir)
 
 """
 3. Select pdb file(s).
 """
-pdbnames = ['RepairPDB_1', 'RepairPDB_3', 'RepairPDB_4', 'RepairPDB_5', 'RepairPDB_6', 'RepairPDB_7', 'RepairPDB_8',
-            'RepairPDB_9', 'RepairPDB_10']
+# pdbnames = ['RepairPDB_1', 'RepairPDB_3', 'RepairPDB_4', 'RepairPDB_5', 'RepairPDB_6', 'RepairPDB_7', 'RepairPDB_8',
+#             'RepairPDB_9', 'RepairPDB_10']
+pdbnames = ['RepairPDB_1']
 
 """
 4. Select specific mutants if you are only interested in these.
@@ -74,14 +73,15 @@ def remove_config_pdb_log_and_fxoutfiles(path_output_ac_or_bm):
             fx.remove_pdbfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
             fx.remove_cluster_logfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
             fx.remove_unnecessary_foldxfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
-            fx.AnalyseComplex().remove_all_sumry_except_1_0(path_output_ac_or_bm_pdb_fxmutant_dir)
+            fx.AnalyseComplex(Cond.INCELL_MAML_FX.value).remove_all_sumry_except_1_0(path_output_ac_or_bm_pdb_fxmutant_dir)
 
 
 """
 6. Decide which code blocks to run.
 """
-delete_from_bm_outputs = False
-delete_from_ac_outputs = True
+delete_from_agadir_outputs = False
+delete_from_bm_outputs = True
+delete_from_ac_outputs = False
 
 """
 7. Call the function above according to the flags set in 
@@ -91,5 +91,13 @@ if delete_from_bm_outputs:
     remove_config_pdb_log_and_fxoutfiles(Paths.OUTPUT_BM)
 if delete_from_ac_outputs:
     remove_config_pdb_log_and_fxoutfiles(Paths.OUTPUT_AC)
+
+"""
+8. Remove unwanted Agadir-related output files if flag set to true. 
+"""
+agadir = Agadir(Cond.INCELL_MAML_AG.value)
+if delete_from_agadir_outputs:
+    agadir.remove_unwanted_agad_output_files(path_output_agadir_3dots_dir)
+
 
 pydevd.stoptrace()
