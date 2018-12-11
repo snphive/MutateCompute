@@ -73,7 +73,7 @@ class IdProt(object):
             #                                              write_xml=write_xml,
             #                                              write_json=write_json)
 
-            python_script_w_paths = os.path.join(Paths.SRC, 'run_BlstpZeus.py') + ' ' + path_input_fastafiles + ' ' \
+            python_script_w_paths = os.path.join(Paths.SRC, 'run_blastp_zeus.py') + ' ' + path_input_fastafiles + ' ' \
                                     + path_output + ' ' + Paths.CONFIG_BLST_JOBQ + ' ' + Paths.OUTPUT_BLASTP + ' ' + \
                                     str(write_idmaps_for_mysqldb) + ' ' + str(write_csv) + ' ' + str(write_xml) + \
                                     ' ' + str(write_json)
