@@ -30,6 +30,11 @@ ROOT:
     dir_bmrunscript: 'bm_runscript'
     dir_reprunscript: 'repair_runscript'
     dir_src: 'src'
+    dir_clstr_pyscrpts: 'cluster_py_scripts'
+    dir_db: 'database'
+    dir_enums: 'enums'
+    dir_launchers: 'launchers'
+    dir_tools: 'tools'
     dir_input: 'input_data'
     dir_mutants: 'mutants'
     dir_mutants_fastas: 'mutants_fastas'
@@ -57,6 +62,7 @@ ROOT:
     prefix_agadir: 'AG_'
     prefix_foldx_buildmodel: 'BM_'
     prefix_foldx_analysecomplex: 'AC_'
+    prefix_remove_files: 'RM_'
 
     # dictionaries & lists (amino acids)
     dict_aa_1to3:

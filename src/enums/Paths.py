@@ -65,6 +65,11 @@ class Paths(Enum):
             DIR_ACRUNSCRIPT = paths_and_dictionaries['ROOT']['dir_acrunscript']
             DIR_REPRUNSCRIPT = paths_and_dictionaries['ROOT']['dir_reprunscript']
             DIR_SRC = paths_and_dictionaries['ROOT']['dir_src']
+            DIR_CLSTR_PYSCRPTS = paths_and_dictionaries['ROOT']['dir_clstr_pyscrpts']
+            DIR_DB = paths_and_dictionaries['ROOT']['dir_db']
+            DIR_ENUMS = paths_and_dictionaries['ROOT']['dir_enums']
+            DIR_LAUNCHERS = paths_and_dictionaries['ROOT']['dir_launchers']
+            DIR_TOOLS = paths_and_dictionaries['ROOT']['dir_tools']
             DIR_INPUT = paths_and_dictionaries['ROOT']['dir_input']
             DIR_MUTANTS = paths_and_dictionaries['ROOT']['dir_mutants']
             DIR_MUTANTS_FASTAS = paths_and_dictionaries['ROOT']['dir_mutants_fastas']
@@ -90,6 +95,7 @@ class Paths(Enum):
             PREFIX_AGADIR = paths_and_dictionaries['ROOT']['prefix_agadir']
             PREFIX_FX_BM = paths_and_dictionaries['ROOT']['prefix_foldx_buildmodel']
             PREFIX_FX_AC = paths_and_dictionaries['ROOT']['prefix_foldx_analysecomplex']
+            PREFIX_FX_RM = paths_and_dictionaries['ROOT']['prefix_remove_files']
 
             # ABSOLUTE PATHS BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_CONFIG = os.path.join(LOCAL_MUTATECOMPUTE, DIR_CONFIG)
@@ -101,6 +107,11 @@ class Paths(Enum):
             MC_BASH = os.path.join(LOCAL_MUTATECOMPUTE, DIR_BASH)
             MC_LOGS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_LOGS)
             MC_SRC = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC)
+            MC_SRC_CLSTR_PYSCRPTS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_CLSTR_PYSCRPTS)
+            MC_SRC_DB = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_DB)
+            MC_SRC_ENUMS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_ENUMS)
+            MC_SRC_LAUNCHERS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_LAUNCHERS)
+            MC_SRC_TOOLS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_TOOLS)
             LOCAL_INPUT = os.path.join(LOCAL_PYPROJ, DIR_INPUT)
             LOCAL_INPUT_FASTAS = os.path.join(LOCAL_INPUT, DIR_FASTAS)
             LOCAL_INPUT_PDBS = os.path.join(LOCAL_INPUT, DIR_PDBS)
@@ -133,6 +144,11 @@ class Paths(Enum):
             SE_CONFIG_BLST_JOBQ = os.path.join(SE_CONFIG, DIR_BLST_JOBQ)
             SE_BASH = os.path.join(ZEUS_SNPEFFECT, DIR_BASH)
             SE_SRC = os.path.join(ZEUS_SNPEFFECT, DIR_SRC)
+            SE_SRC_CLSTR_PYSCRPTS = os.path.join(ZEUS_SNPEFFECT, DIR_SRC, DIR_CLSTR_PYSCRPTS)
+            SE_SRC_DB = os.path.join(ZEUS_SNPEFFECT, DIR_SRC, DIR_DB)
+            SE_SRC_ENUMS = os.path.join(ZEUS_SNPEFFECT, DIR_SRC, DIR_ENUMS)
+            SE_SRC_LAUNCHERS = os.path.join(ZEUS_SNPEFFECT, DIR_SRC, DIR_LAUNCHERS)
+            SE_SRC_TOOLS = os.path.join(ZEUS_SNPEFFECT, DIR_SRC, DIR_TOOLS)
             SE_LOGS = os.path.join(ZEUS_SNPEFFECT, DIR_LOGS)
             SE_INPUT = os.path.join(ZEUS_SNPEFFECT, DIR_INPUT)
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
@@ -194,5 +210,10 @@ class Paths(Enum):
         Paths.AGADIR_EXE = Paths.ZEUS_AGADIR_EXE.value if use_cluster else Paths.LOCAL_AGADIR_EXE.value
         Paths.BASH = Paths.SE_BASH.value if use_cluster else Paths.MC_BASH.value
         Paths.SRC = Paths.SE_SRC.value if use_cluster else Paths.MC_SRC.value
+        Paths.SRC_CLSTR_PYSCRPTS = Paths.SE_SRC_CLSTR_PYSCRPTS.value if use_cluster else Paths.MC_SRC_CLSTR_PYSCRPTS.value
+        Paths.SRC_DB = Paths.SE_SRC_DB.value if use_cluster else Paths.MC_SRC_CLSTR_DB.value
+        Paths.SRC_ENUMS = Paths.SE_SRC_ENUMS.value if use_cluster else Paths.MC_SRC_ENUMS.value
+        Paths.SRC_LAUNCHERS = Paths.SE_SRC_LAUNCHERS.value if use_cluster else Paths.MC_SRC_LAUNCHERS.value
+        Paths.SRC_TOOLS = Paths.SE_SRC_TOOLS.value if use_cluster else Paths.MC_SRC_TOOLS.value
         Paths.LOGS = Paths.SE_LOGS.value if use_cluster else Paths.MC_LOGS.value
 
