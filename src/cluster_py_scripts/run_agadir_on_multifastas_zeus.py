@@ -24,7 +24,7 @@ crucial to prevent too much memory taken up by each file when running large numb
 :sys.argv[2] path_dst: Abs path to output root dir.
 """
 
-print('run_agadir_on_multifastasZeus.py ###################################')
+print('run_agadir_on_multifastas_zeus.py ###################################')
 path_dst = GUM.make_path_agadir_3dots_filename_mutants_dirs(path_dst, path_fastafile, add_filename_subdir=True)
 with open(path_fastafile) as f:
     is_first_line = True
