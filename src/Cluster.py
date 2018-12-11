@@ -144,7 +144,7 @@ class Cluster(object):
             # script then space then the qsub path string, which seemed odd as the path/to/qsub is specified in the
             # prefix to qsub command in subprocess.call())
 
-        with open(os.path.join(path_job_q_dir, Cluster.CLSTR.JOBQ.value), 'w') as job_q_file:
+        with open(os.path.join(path_job_q_dir, Cluster.CLSTR.JOBQFILE.value), 'w') as job_q_file:
             job_q_str = ''.join(job_q)
             job_q_file.write(job_q_str)
 
@@ -153,17 +153,16 @@ class Cluster(object):
     @staticmethod
     def run_job_q(path_job_q_dir: str, run_in_background=False):
         """
-        TODO replace qsub and job.q with enum reference
-        :param path_job_q_dir: Absolute path of the job.q file of interest.
-        :param run_in_background: True if the job should run detached from the terminal.
+        :param path_job_q_dir: Absolute path of the directory holding the job.q file.
+        :param run_in_background: True to run detached from the terminal.
         """
         nohup = ''
         ampersand = ''
         if run_in_background:
             nohup = 'nohup' + Str.SPCE.value
             ampersand = Str.SPCE.value + '&'
-        cmd = nohup + Paths.ZEUS_QSUB_EXE.value + 'qsub' + Str.SPCE.value + os.path.join(path_job_q_dir, 'job.q') + \
-              ampersand
+        cmd = nohup + Paths.ZEUS_QSUB_EXE.value + Cluster.CLSTR.QSUB.value + Str.SPCE.value + os.path.join(path_job_q_dir,
+                                                                                    Cluster.CLSTR.JOBQFILE.value) + ampersand
         subprocess.call(cmd, shell=True)
 
     @staticmethod
@@ -191,7 +190,7 @@ class Cluster(object):
         NODE_HDR2 = 'hodor2.vib'
         NODE_ODN1 = 'odin1.vib'
         NODE_ODN2 = 'odin2.vib'
-        JOBQ = 'job' + Str.Q_EXT.value
+        JOBQFILE = 'job' + Str.Q_EXT.value
         QSTAT = 'qstat'
         QSUB = 'qsub'
         RNFL = '-runfile'
