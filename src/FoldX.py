@@ -23,8 +23,8 @@ from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
 from src.database.DAL import DAL
 import mysql.connector
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -100,7 +100,7 @@ class FoldX(object):
                     fxmutantnames.append(wt_aa + chain + str(position) + mutant_aa)
         return fxmutantnames
 
-    def remove_pdbfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+    def rm_pdbfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
         Remove all pdb files from specified directory directory.
         :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path for pdb files to be deleted.
@@ -109,7 +109,7 @@ class FoldX(object):
         for path_pdbfile in path_pdbfiles:
             GUM.linux_remove_file(path_pdbfile)
 
-    def remove_cluster_logfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+    def rm_logfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
         Remove all e.1234567 and o.1234567 cluster log files from specified output directory.
         :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path for log files to be deleted.
@@ -134,7 +134,7 @@ class FoldX(object):
             else:
                 GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
 
-    def remove_unnecessary_foldxfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+    def rm_unnecessary_fxoutfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
         Remove all unnecessary FoldX output files.
         For BuildModel, this includes Raw_BuildModel_pdbname.fxout, Dif_BuildModel_pdbname.fxout, BuildModel_pdbname.fxout and
@@ -153,7 +153,7 @@ class FoldX(object):
             GUM.linux_remove_file(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, file_to_delete + '*' + pdbname + '*' +
                                                fx.Strs.FXOUTEXT.value))
 
-    def remove_config_files(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+    def rm_config_files(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
         Remove all config files from specified output directory. This includes runscript.txt, rotabase.txt,
         commands_stability.txt, commands_buildmodel.txt, options_stability.txt, options_buildmodel.txt, individual_list.txt,
@@ -261,7 +261,7 @@ class FoldX(object):
                 if has_one_chain_only:
                     # BuildModel has no use for these mutant pdb files and because this pdb only has 1 chain, AnalyseComplex has
                     # no use for them either. Hence, they can already be deleted, saving disk space (crucial for cluster).
-                    fx.remove_pdbfiles(path_output_bm_pdb_fxmutant_dir)
+                    fx.rm_pdbfiles(path_output_bm_pdb_fxmutant_dir)
             if rm_xtra_files_after_each_pdb:
                 missing_num = self.find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids)
                 if missing_num != 0:
@@ -324,12 +324,13 @@ class FoldX(object):
                               + fxmutantname)
             return num_of_missing_mutant_files
 
-        def write_bm_avg_fxout_to_csvfile_up_2dirlevels(self, path_output_bm_pdb_fxmutant_dir):
+        def write_bm_avg_fxout_to_1csvfile_up_2dirlevels(self, path_output_bm_pdb_fxmutant_dir):
             """
             Reads the Average_BuildModel_..fxout file and writes a csv file of the data lines only (excluding top 8 lines (
-            FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which mutation it
-            is so no need for the extra fxmutant directory, hence it is written up one level in the pdb directory.
-            The fxmtuant directory is deleted.
+            FoldX version and Consortium info, pdb name, output type..). The csv filename incorporates the pdbname and
+            mutation, so there is no longer the need for the extra pdb folder and the many fxmutant subfolders, hence it is
+            written two levels up, to /output_data/analyse_complex/. The fxmtuant directory is then deleted, saving about 20KB
+            per mutant.
             :param path_output_bm_pdb_fxmutant_dir: Absolute path for mutant directory holding Average_BuildModel_..fxout file.
             :return: New csv output file (with its absolute path).
             """
@@ -533,7 +534,7 @@ class FoldX(object):
                               fxmutantname)
             return num_of_missing_mutant_files
 
-        def remove_all_sumry_except_1_0(self, path_output_ac_pdb_fxmutant_dir: str):
+        def rm_all_sumry_except_1_0(self, path_output_ac_pdb_fxmutant_dir: str):
             """
             In cases where FoldX has been run more than once, producing multiple outputs of all fxout files including the
             Summary_AnalyseComplex_ fxout files. All are deleted except for one (_1_0.fxout), one for the mutant and one for the WT.
@@ -547,12 +548,13 @@ class FoldX(object):
                 else:
                     GUM.linux_remove_file(path_sumry_file)
 
-        def write_ac_sumry_fxout_to_csvfile_up_2dirlevels(self, path_output_ac_pdb_fxmutant_dir: str):
+        def write_ac_sumry_fxout_to_1csvfile_up_2dirlevels(self, path_output_ac_pdb_fxmutant_dir: str):
             """
             Reads the Summary_AnalyseComplex_..fxout file and writes a csv file of the data lines only (excluding top 8
-            lines (FoldX version and Consortium info, pdb name, output type..). The csv file contains information of which
-            pdb and which mutation it is so no need for the pdb and the many fxmutant subdirectories, hence it is written two
-            levels up, to /output_data/analyse_complex/ directory. The fxmtuant directory is then deleted.
+            lines (FoldX version and Consortium info, pdb name, output type..). The csv filename incorporates the pdbname and
+            mutation, so there is no longer the need for the extra pdb folder and the many fxmutant subfolders, hence it is
+            written two levels up, to /output_data/analyse_complex/. The fxmtuant directory is then deleted, saving about 20KB
+            per mutant.
             :param path_output_ac_pdb_fxmutant_dir: absolute path to mutant directory holding the
             Summary_AnalyseComplex_..fxout file.
             :return: New csv output file (with its absolute path)
@@ -615,7 +617,7 @@ class FoldX(object):
         FXOPTFILE = 'FOLDX_optionfile'
         RNSCRPT_TXT = Str.RNSCRPT.value + Str.TXTEXT.value
         DEFAULT_VDW_DSGN = 2
-        JOB_Q = Cluster.CLSTR.JOBQ.value
+        JOB_Q = Cluster.CLSTR.JOBQFILE.value
         NO_RUNSCRPT_FILE_MSG = 'No runscript file was found'
         DSH_RUNFILE = '-runfile'
         DIF_FXOUTFILE = 'Dif_BuildModel_RepairPDBtest_1' + FXOUTEXT
@@ -654,4 +656,4 @@ class FoldX(object):
         SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX = 9
 
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
