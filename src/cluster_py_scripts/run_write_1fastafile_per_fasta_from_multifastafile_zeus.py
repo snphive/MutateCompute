@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+Script for writing 1 fastafile per mutant, read from a multifastafile, from within cluster, specified in job.q. Each file is
+deleted immediately after use (to save disk space).
+"""
 import sys
 import os
 from src.tools.GeneralUtilityMethods import GUM

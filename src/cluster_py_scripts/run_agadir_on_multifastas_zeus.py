@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""
+Script for running Agadir from within cluster, specified in job.q.
+"""
 import sys
 import os
 from src.tools.GeneralUtilityMethods import GUM

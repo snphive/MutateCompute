@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""
+Script for removing unnecessary FoldX input & output files from within cluster, specified in job.q.
+"""
 import os
 import sys
 from src.enums.Paths import Paths

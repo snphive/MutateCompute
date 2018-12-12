@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""
+Script for running MutateFasta from within cluster, specified in job.q.
+"""
 import sys
 from src.enums.AminoAcids import AA
 from src.MutateFasta import MutateFasta

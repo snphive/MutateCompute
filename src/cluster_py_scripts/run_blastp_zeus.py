@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""
+Script for running blastp via Biopython from within cluster, specified in job.q. (Currently does not succeed).
+"""
 import sys
 import os
 import glob
