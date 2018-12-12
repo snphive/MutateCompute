@@ -18,6 +18,7 @@ from src.enums.Str import Str
 import subprocess
 from src.enums.Paths import Paths
 import time
+import signal
 
 # The job.q is a script that includes all necessary information for the grid engine, in terms of which computations
 # to perform as well as how to run these computations
@@ -77,9 +78,13 @@ class Cluster(object):
     @staticmethod
     def write_job_q_bash(jobname: str, path_job_q_dir: str, startnum='', endnum='', using_runscript=False, path_runscript_dir='',
                          python_script_with_paths='', queue='', n_slots='', total_memory_GB='', memory_limit_GB='',
-                         cluster_node=''):
+                         cluster_node='', max_runtime_limit_hard='00:00:30', max_runtime_limit_soft='00:00:01',
+                         send_email_job_end='True', email_address='shahin.zibaee@kuleuven.vib.be'):
         """
         Note that only 1st 2 arguments are required, the rest have default named arguments that can be overwritten.
+        If you  want to run parallel jobs using shared-memory to the specified number of slots, you must change replace
+        'serial' with 'smp'.
+
         :param jobname: N specifies job name, e.g. concatenation of mutant name + computation-specific prefix.
         :param path_job_q_dir: Name of destination dir for this job.q file. Root fixed to /config/cluster_jobq.
         :param startnum: Starting number for an array job. If either startnum or endnum are empty, no array job.
@@ -88,10 +93,16 @@ class Cluster(object):
         :param path_runscript_dir: Which script to run followed by paths to relevant executables, such as to Qsub.
         :param python_script_with_paths:
         :param queue: q specifies which oge queue you want to use, e.g. 'all.q' for all queues.
-        :param n_slots: serial is number of slots you want your job to use. There are 8 slots per cluster node.
+        :param n_slots: Serial is number of slots you want your job to use. There are 8 slots per cluster node.
         :param total_memory_GB: mem_free is the total amount of memory (here as GB) you expect your job will need.
         :param memory_limit_GB: h_vmem is the max memory (here as GB) you want to allow your job to use.
-        :param cluster_node: hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
+        :param cluster_node: Hostname specifies a specific node on the cluster you want to use e.g. hodor1.vib.
+        :param max_runtime_limit_hard: Maximum runtime that any single job is allowed to run. After this time the OGE aborts the
+        job using the SIGKILL signal.
+        :param max_runtime_limit_soft: Maximum runtime that any single job will run before the OGE warns the job by sending the
+        job the SIGUSR1 signal. (This behaviour is effective only if the job catches and handles that warning signal.)
+        :param send_email_job_end: True to send email to specified email address when job end or aborts.
+        :param email_address: To which emails will be sent if send_email_job_end is True.
         :return:
         """
         try:
@@ -123,6 +134,9 @@ class Cluster(object):
             else:
                 job_q.append('#$ -l h_vmem=' + str(memory_limit_GB) + 'G' + Str.NEWLN.value)
 
+        job_q.append('#$ -l h_rt=' + max_runtime_limit_hard + Str.NEWLN.value)
+        job_q.append('#$ -l s_rt=' + max_runtime_limit_soft + Str.NEWLN.value)
+
         if cluster_node != '':
             job_q.append('#$ -l hostname=' + cluster_node + Str.NEWLN.value)
         if 'agadir' in python_script_with_paths.lower():
@@ -134,6 +148,10 @@ class Cluster(object):
         else:
             job_q.append('#$ -cwd' + Str.NEWLN.value)
         job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
+
+        if send_email_job_end:
+            job_q.append('#$ -m ea')
+            job_q.append('#S -M ' + email_address)
         if using_runscript:
             job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + Cluster.CLSTR.RNFL.value + Str.SPCE.value +
                          os.path.join(path_runscript_dir, Cluster.CLSTR.RNSCPT_TXT.value) + Str.NEWLN.value)
@@ -151,18 +169,29 @@ class Cluster(object):
         return job_q_str
 
     @staticmethod
+    def signal_handler(signum, frame, jobname: str):
+        print('got SIGUSR1 for job: ' + jobname + '. This is just a warning that the job has exceeded the soft runtime limit '
+                                                  'of 1 second. It will not terminate, unless it exceeds the hard runtime limit '
+                                                  'of 30 seconds'.format(signum))
+
+    @staticmethod
     def run_job_q(path_job_q_dir: str, run_in_background=False):
         """
         :param path_job_q_dir: Absolute path of the directory holding the job.q file.
         :param run_in_background: True to run detached from the terminal.
         """
+        signal.signal(signal.SIGUSR1, Cluster.signal_handler)
         nohup = ''
         ampersand = ''
         if run_in_background:
             nohup = 'nohup' + Str.SPCE.value
             ampersand = Str.SPCE.value + '&'
+        # try:
         cmd = nohup + Paths.ZEUS_QSUB_EXE.value + Cluster.CLSTR.QSUB.value + Str.SPCE.value + os.path.join(path_job_q_dir,
                                                                                     Cluster.CLSTR.JOBQFILE.value) + ampersand
+        # except:
+        #     signal.signal(signal.SIGUSR1, Cluster.signal_term_handler)
+
         subprocess.call(cmd, shell=True)
 
     @staticmethod
