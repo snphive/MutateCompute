@@ -21,6 +21,7 @@ from src.enums.Str import Str
 from src.enums.Conditions import Cond
 from src.tools.OutputsParser import Parser
 from src.FoldX import FoldX
+from src.Cluster import Cluster
 from src.database.DAL import DAL
 import pydevd
 pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
@@ -60,9 +61,9 @@ use_multithread = False
 # path_input_pdbs_dir = Paths.OUTPUT_AC
 # path_pdbfiles = sorted(glob.glob(path_input_pdbs_dir + '/**/*.pdb', recursive=True))
 # path_pdbfiles = []
-pdbnames = ['RepairPDB_1', 'RepairPDB_3', 'RepairPDB_4', 'RepairPDB_5', 'RepairPDB_6', 'RepairPDB_7', 'RepairPDB_8',
-            'RepairPDB_9', 'RepairPDB_10', 'RepairPDB_11']
-
+# pdbnames = ['RepairPDB_1', 'RepairPDB_3', 'RepairPDB_4', 'RepairPDB_5', 'RepairPDB_6', 'RepairPDB_7', 'RepairPDB_8',
+#             'RepairPDB_9', 'RepairPDB_10', 'RepairPDB_11']
+pdbnames = ['RepairPDB_1']
 path_pdbfiles = []
 for pdbname in pdbnames:
     path_pdbfiles.append(os.path.join(Paths.INPUT_PDBS, pdbname + Str.PDBEXT.value))
@@ -107,9 +108,17 @@ if operations[Str.OPER_RUN_FX_BM.value]:
         for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
             bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
             if bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
-                fx.remove_config_files(path_output_bm_pdb_fxmutant_dir)
-                fx.remove_cluster_logfiles(path_output_bm_pdb_fxmutant_dir)
-                fx.remove_unnecessary_foldxfiles(path_output_bm_pdb_fxmutant_dir)
+                fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
+                if GUM.using_cluster():
+                    path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
+                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
+                                             python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
+                                            'run_remove_files_zeus.py' + Str.SPCE.value + path_output_bm_pdb_fxmutant_dir))
+                    Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
+                else:
+                    fx.rm_config_files(path_output_bm_pdb_fxmutant_dir)
+                    fx.rm_logfiles(path_output_bm_pdb_fxmutant_dir)
+                    fx.rm_unnecessary_fxoutfiles(path_output_bm_pdb_fxmutant_dir)
 
 if operations[Str.OPER_RUN_FX_AC.value]:
     fx = FoldX()
@@ -125,14 +134,21 @@ if operations[Str.OPER_RUN_FX_AC.value]:
             path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
         for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
             ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
-            if ac.has_already_generated_summary_ac_fxoutfile(
-                    path_output_ac_pdb_fxmutant_dir):
-                fx.remove_config_files(path_output_ac_pdb_fxmutant_dir)
-                fx.remove_pdbfiles(os.path.join(Paths.OUTPUT_BM, pdbname, os.path.basename(path_output_ac_pdb_fxmutant_dir)))
-                fx.remove_pdbfiles(os.path.join(path_output_ac_pdb_fxmutant_dir))
-                fx.remove_cluster_logfiles(path_output_ac_pdb_fxmutant_dir)
-                fx.remove_unnecessary_foldxfiles(path_output_ac_pdb_fxmutant_dir)
-                ac.remove_all_sumry_except_1_0(path_output_ac_pdb_fxmutant_dir)
+            if ac.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
+                fxmutantname = os.path.basename(path_output_ac_pdb_fxmutant_dir)
+                if GUM.using_cluster():
+                    path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
+                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
+                                             python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
+                                            'run_remove_files_zeus.py' + Str.SPCE.value + path_output_ac_pdb_fxmutant_dir))
+                    Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
+                else:
+                    fx.rm_config_files(path_output_ac_pdb_fxmutant_dir)
+                    fx.rm_pdbfiles(os.path.join(Paths.OUTPUT_BM, pdbname, fxmutantname))
+                    fx.rm_pdbfiles(os.path.join(path_output_ac_pdb_fxmutant_dir))
+                    fx.rm_logfiles(path_output_ac_pdb_fxmutant_dir)
+                    fx.rm_unnecessary_fxoutfiles(path_output_ac_pdb_fxmutant_dir)
+                    ac.rm_all_sumry_except_1_0(path_output_ac_pdb_fxmutant_dir)
 
 """
 9. Choose which post-computation writing & file compressing to perform:
@@ -159,7 +175,7 @@ if write_bm_to_csv:
             path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
         for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
             bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
-            path_output_bm_pdb_avg_csvfile = bm.write_bm_avg_fxout_to_csvfile_up_2dirlevels(path_output_bm_pdb_fxmutant_dir)
+            path_output_bm_pdb_avg_csvfile = bm.write_bm_avg_fxout_to_1csvfile_up_2dirlevels(path_output_bm_pdb_fxmutant_dir)
             path_output_bm_pdb_avg_csvfiles.append(path_output_bm_pdb_avg_csvfile)
             GUM.linux_remove_dir(path_output_bm_pdb_fxmutant_dir)
 
@@ -177,7 +193,7 @@ if write_ac_to_csv:
             path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
         for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
             ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
-            path_output_ac_pdb_sumry_csvfile = ac.write_ac_sumry_fxout_to_csvfile_up_2dirlevels(path_output_ac_pdb_fxmutant_dir)
+            path_output_ac_pdb_sumry_csvfile = ac.write_ac_sumry_fxout_to_1csvfile_up_2dirlevels(path_output_ac_pdb_fxmutant_dir)
             path_output_ac_pdb_sumry_csvfiles.append(path_output_ac_pdb_sumry_csvfile)
             GUM.linux_remove_dir(path_output_ac_pdb_fxmutant_dir)
 
