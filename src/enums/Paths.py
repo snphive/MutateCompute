@@ -96,6 +96,7 @@ class Paths(Enum):
             PREFIX_FX_BM = paths_and_dictionaries['ROOT']['prefix_foldx_buildmodel']
             PREFIX_FX_AC = paths_and_dictionaries['ROOT']['prefix_foldx_analysecomplex']
             PREFIX_FX_RM = paths_and_dictionaries['ROOT']['prefix_remove_files']
+            PREFIX_WRITE = paths_and_dictionaries['ROOT']['prefix_write_files']
 
             # ABSOLUTE PATHS BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_CONFIG = os.path.join(LOCAL_MUTATECOMPUTE, DIR_CONFIG)
