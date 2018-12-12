@@ -79,7 +79,7 @@ class Cluster(object):
     def write_job_q_bash(jobname: str, path_job_q_dir: str, startnum='', endnum='', using_runscript=False, path_runscript_dir='',
                          python_script_with_paths='', queue='', n_slots='', total_memory_GB='', memory_limit_GB='',
                          cluster_node='', max_runtime_limit_hard='00:00:30', max_runtime_limit_soft='00:00:01',
-                         send_email_job_end='True', email_address='shahin.zibaee@kuleuven.vib.be'):
+                         email_address='shahin.zibaee@kuleuven.vib.be'):
         """
         Note that only 1st 2 arguments are required, the rest have default named arguments that can be overwritten.
         If you  want to run parallel jobs using shared-memory to the specified number of slots, you must change replace
@@ -101,7 +101,6 @@ class Cluster(object):
         job using the SIGKILL signal.
         :param max_runtime_limit_soft: Maximum runtime that any single job will run before the OGE warns the job by sending the
         job the SIGUSR1 signal. (This behaviour is effective only if the job catches and handles that warning signal.)
-        :param send_email_job_end: True to send email to specified email address when job end or aborts.
         :param email_address: To which emails will be sent if send_email_job_end is True.
         :return:
         """
@@ -149,7 +148,7 @@ class Cluster(object):
             job_q.append('#$ -cwd' + Str.NEWLN.value)
         job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
 
-        if send_email_job_end:
+        if email_address != '':
             job_q.append('#$ -m ea')
             job_q.append('#S -M ' + email_address)
         if using_runscript:
