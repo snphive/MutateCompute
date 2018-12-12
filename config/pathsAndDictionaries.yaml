@@ -63,6 +63,7 @@ ROOT:
     prefix_foldx_buildmodel: 'BM_'
     prefix_foldx_analysecomplex: 'AC_'
     prefix_remove_files: 'RM_'
+    prefix_write_files: 'WR_'
 
     # dictionaries & lists (amino acids)
     dict_aa_1to3:
