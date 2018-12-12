@@ -15,6 +15,7 @@ import shutil
 import subprocess
 import time
 import warnings
+import tarfile
 from src.enums.Str import Str
 from src.enums.AminoAcids import AA
 from src.enums.Paths import Paths
@@ -33,6 +34,24 @@ __status__ = "Development"
 class GUM(object):
 
     # def __init__(self):
+
+    @staticmethod
+    def make_tarfile(self, path_files_to_pack_dir: str):
+        """
+        Recursively pack contents of specified directory to improve file transfer rates and reduce disk space usage.
+        (The tar.gz was observed to reduce disk space usage about 5-fold.)
+        :param path_files_to_pack_dir: Absolute path of directory for source files to pack.
+        """
+        if not os.path.isdir(path_files_to_pack_dir):
+            raise FileNotFoundError('Directory to pack does not exist with this path.')
+
+        path_files_to_pack_tar_gz = path_files_to_pack_dir + Str.TARGZEXT.value
+
+        if os.path.exists(path_files_to_pack_tar_gz):
+            print(path_files_to_pack_tar_gz + ' already exists. This will be overwritten by new one.')
+        with tarfile.open(path_files_to_pack_tar_gz, 'w:gz') as tar:
+            tar.add(path_files_to_pack_dir, arcname=os.path.basename(path_files_to_pack_dir))
+
 
     @staticmethod
     def extract_pdbname_chain_startpos_fasta_from_pdbs(path_pdbfiles, path_fastafiles_to_be_written=''):
@@ -593,6 +612,65 @@ class GUM(object):
                 else:
                     fasta_str += line
 
+
+    @staticmethod
+    def write_1_csvfile_from_csv_per_mutants(path_csvfile: str, path_output_ac_or_bm_dir: str, pdbname: str):
+        ddG = ''
+        buildmodel_csvfile_header = 'pdb,fxmutant,ddG'
+        analysecomplex_csvfile_header = 'pdb,fxmutant,interaction ddG'
+        csvfile_header = ''
+
+        if Paths.DIR_BM.value in path_output_ac_or_bm_dir:
+            ddG = '_ddG'
+            csvfile_header = buildmodel_csvfile_header
+        elif Paths.DIR_AC.value in path_output_ac_or_bm_dir:
+            ddG = '_interaction_ddG'
+            csvfile_header = analysecomplex_csvfile_header
+        else:
+            print(
+                'The output directory path does not contain build_model or analyse_complex. If you want to read/write '
+                'Agadir-related csv output files, you need to complete the logic for it here in the run_write_1csvfile_.. '
+                'script')
+
+        path_output_fx_ddG_csvfile = os.path.join(path_output_ac_or_bm_dir, pdbname + ddG + Str.CSVEXT.value)
+
+        if not os.path.exists(path_output_fx_ddG_csvfile):
+            with open(path_output_fx_ddG_csvfile, 'w') as ddG_csv:
+                ddG_csv.write(csvfile_header + Str.NEWLN.value)
+        else:
+            with open(path_output_fx_ddG_csvfile, 'w') as ddG_csv:
+                if len(ddG_csv.readlines()) == 0:
+                    print('Single csv output file found but file is empty (not even a header). Header is being written now.')
+                    ddG_csv.write(csvfile_header + Str.NEWLN.value)
+                elif GUM._has_fx_csvfile_header(csvfile_header, ddG_csv.readlines()[0]):
+                    print('Detected header for build_model csv dumpfile in this csvfile. Is proceeding to append csv bm output '
+                          'data.')
+                elif GUM._has_fx_csvfile_header(csvfile_header, ddG_csv.readlines()[0]):
+                    print(
+                        'Detected header for analyse_complex csv dumpfile in this csvfile. Is proceeding to append csv ac output '
+                        'data.')
+                else:
+                    print('Not detected headers for either build_model or analyse_complex. There is a bug.')
+
+            with open(path_csvfile, 'r') as f:
+                for line in f.readlines():
+                    if GUM._is_at_header_line(csvfile_header, line):
+                        continue
+                    if GUM._is_at_data_line('PDB,', line):
+                        with open(path_output_fx_ddG_csvfile, 'a+') as csv_f:
+                            csv_f.write(line + Str.NEWLN.value)
+
+    @staticmethod
+    def _has_fx_csvfile_header(expected_header: str, actual_line: str):
+        return expected_header in actual_line
+
+    @staticmethod
+    def _is_at_header_line(expected_header: str, this_line: str):
+       return expected_header == this_line
+
+    @staticmethod
+    def _is_at_data_line(expected_data: str, this_line: str):
+        return expected_data in this_line
 
     @staticmethod
     def _build_path_file(path_root: str, filename: str, into_own_subdirs: bool):
