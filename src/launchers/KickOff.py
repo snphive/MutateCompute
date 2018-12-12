@@ -19,7 +19,6 @@ from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
 from src.enums.Conditions import Cond
-from src.tools.OutputsParser import Parser
 from src.FoldX import FoldX
 from src.Cluster import Cluster
 from src.database.DAL import DAL
@@ -215,7 +214,6 @@ if pack_compress_bm_outputs:
     for path_pdbfile in path_pdbfiles:
         pdbname = os.path.basename(path_pdbfile).split('.')[0]
         path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
-        # Parser().make_tarfile(path_files_to_pack_dir)
         GUM.make_tarfile(path_files_to_pack_dir)
 
 if pack_compress_ac_outputs:

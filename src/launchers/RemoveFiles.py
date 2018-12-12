@@ -8,14 +8,10 @@ program prematurely.
 import os
 import sys
 import glob
-from os import walk
 from src.enums.Paths import Paths
-from src.enums.Str import Str
 from src.enums.Conditions import Cond
 from src.Agadir import Agadir
-from src.tools.GeneralUtilityMethods import GUM
 from src.FoldX import FoldX
-from src.tools.OutputsParser import Parser
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 

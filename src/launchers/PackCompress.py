@@ -8,7 +8,7 @@ import sys
 import os
 import glob
 from src.enums.Paths import Paths
-from src.tools.OutputsParser import Parser
+from src.tools.GeneralUtilityMethods import GUM
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -45,4 +45,4 @@ path_files_to_pack_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname))
 5. Pack files in directory into tar.
 """
 for path_files_to_pack_dir in path_files_to_pack_dirs:
-    Parser().make_tarfile(path_files_to_pack_dir)
+    GUM.make_tarfile(path_files_to_pack_dir)
