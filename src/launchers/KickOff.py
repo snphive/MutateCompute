@@ -74,8 +74,8 @@ if not path_pdbfiles:
 5. Select specific mutants if you are only interested in these.
 BE SURE to set this empty list if you don't want any of the subsequent below to be for these mutants only.
 """
-# specific_fxmutants = ['AA101A']
-specific_fxmutants = []
+specific_fxmutants = ['AA101A']
+# specific_fxmutants = []
 
 """
 6. Get the fasta files you want to run mutate_fasta or agadir on.
@@ -96,6 +96,7 @@ main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfile
 """
 8. After computation completed, DELETE config files no longer needed.  
 """
+using_cluster = GUM.using_cluster()
 if operations[Str.OPER_RUN_FX_BM.value]:
     fx = FoldX()
     path_output_bm_pdb_fxmutant_dirs = []
@@ -109,11 +110,11 @@ if operations[Str.OPER_RUN_FX_BM.value]:
             bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
             if bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
                 fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
-                if GUM.using_cluster():
+                if using_cluster:
                     path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
                     Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
                                              python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
-                                            'run_remove_files_zeus.py' + Str.SPCE.value + path_output_bm_pdb_fxmutant_dir))
+                                             'run_remove_files_zeus.py' + Str.SPCE.value + path_output_bm_pdb_fxmutant_dir))
                     Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
                 else:
                     fx.rm_config_files(path_output_bm_pdb_fxmutant_dir)
@@ -122,7 +123,6 @@ if operations[Str.OPER_RUN_FX_BM.value]:
 
 if operations[Str.OPER_RUN_FX_AC.value]:
     fx = FoldX()
-    ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
     path_output_bm_pdb_fxmutant_dirs = []
     path_output_ac_pdb_fxmutant_dirs = []
     for path_pdbfile in path_pdbfiles:
@@ -136,11 +136,11 @@ if operations[Str.OPER_RUN_FX_AC.value]:
             ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
             if ac.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
                 fxmutantname = os.path.basename(path_output_ac_pdb_fxmutant_dir)
-                if GUM.using_cluster():
+                if using_cluster:
                     path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
                     Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
                                              python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
-                                            'run_remove_files_zeus.py' + Str.SPCE.value + path_output_ac_pdb_fxmutant_dir))
+                                             'run_remove_files_zeus.py' + Str.SPCE.value + path_output_ac_pdb_fxmutant_dir))
                     Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
                 else:
                     fx.rm_config_files(path_output_ac_pdb_fxmutant_dir)
@@ -215,13 +215,15 @@ if pack_compress_bm_outputs:
     for path_pdbfile in path_pdbfiles:
         pdbname = os.path.basename(path_pdbfile).split('.')[0]
         path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
-        Parser().make_tarfile(path_files_to_pack_dir)
+        # Parser().make_tarfile(path_files_to_pack_dir)
+        GUM.make_tarfile(path_files_to_pack_dir)
 
 if pack_compress_ac_outputs:
     for path_pdbfile in path_pdbfiles:
         pdbname = os.path.basename(path_pdbfile).split('.')[0]
         path_files_to_pack_dir = os.path.join(Paths.OUTPUT_AC, pdbname)
-        Parser().make_tarfile(path_files_to_pack_dir)
+        # Parser().make_tarfile(path_files_to_pack_dir)
+        GUM.make_tarfile(path_files_to_pack_dir)
 
 
 pydevd.stoptrace()
