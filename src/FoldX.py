@@ -440,16 +440,16 @@ class FoldX(object):
                 if self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
                     print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists.')
                     continue
-                pdbs_to_analyse = [pdbname + FoldX.Strs._1_012_SUFFIX_PDBS.value[0], ',', wt_pdbname +
-                                   FoldX.Strs._1_012_SUFFIX_PDBS.value[0]]
+                pdbs_to_analyse = [pdbname + FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[0], ',', wt_pdbname +
+                                   FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[0]]
                 num_of_repaired_pdbs = fx._get_num_of_repaired_pdbfiles(path_output_bm_pdb_fxmutant_dir)
                 for i in range(1, num_of_repaired_pdbs):
                     pdbs_to_analyse.append(',')
                     pdbs_to_analyse.append(pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs._1_012_SUFFIX_PDBS.value[i])
+                    pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
                     pdbs_to_analyse.append(',')
                     pdbs_to_analyse.append(wt_pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs._1_012_SUFFIX_PDBS.value[i])
+                    pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
                 pdbs_to_analyse = ''.join(pdbs_to_analyse)
                 fx.write_runscript_file(path_output_ac_pdb_fxmutant_dir, pdbs_to_analyse, self.conditions, action)
                 path_runscript_file = os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.RNSCRPT_TXT.value)
@@ -628,7 +628,7 @@ class FoldX(object):
         CMNDS_STAB_TXT = 'commands_stability' + Str.TXTEXT.value
         OPTNS_BM_TXT = 'options_buildmodel' + Str.TXTEXT.value
         OPTNS_STAB_TXT = 'options_stability' + Str.TXTEXT.value
-        _1_012_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
+        UNDRSCR1_012_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
         UNDRSCR1_ = '_1_'
         UNDRSCR1_0 = UNDRSCR1_ + '0'
         UNDRSCR1_0_PDB = UNDRSCR1_0 + Str.PDBEXT.value
