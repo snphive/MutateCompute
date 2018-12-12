@@ -16,8 +16,8 @@ from src.Agadir import Agadir
 from src.tools.GeneralUtilityMethods import GUM
 from src.FoldX import FoldX
 from src.tools.OutputsParser import Parser
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -56,6 +56,9 @@ specific_fxmutants = []
 5. This is the function encapsulting all calls to FoldX file removal methods. It is called in no.7 according to flags set in no.6
 (Note you need to define this function (before using it below) because it is a module-level function rather than an object or 
 class method).
+WARNING: Make sure you are not deleting pdb files from build_model output folders unless you are sure analyse_complex has 
+already been run for this pdb and mutants or that the pdb files have been copied over to the analyse_complex folders. Otherwise 
+you will need to rerun build_model just to get those pdb files back. 
 """
 def remove_config_pdb_log_and_fxoutfiles(path_output_ac_or_bm):
     """
@@ -69,11 +72,11 @@ def remove_config_pdb_log_and_fxoutfiles(path_output_ac_or_bm):
         else:
             path_output_ac_or_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(path_output_ac_or_bm, pdbname, '*'))
         for path_output_ac_or_bm_pdb_fxmutant_dir in path_output_ac_or_bm_pdb_fxmutant_dirs:
-            fx.remove_config_files(path_output_ac_or_bm_pdb_fxmutant_dir)
-            fx.remove_pdbfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
-            fx.remove_cluster_logfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
-            fx.remove_unnecessary_foldxfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
-            fx.AnalyseComplex(Cond.INCELL_MAML_FX.value).remove_all_sumry_except_1_0(path_output_ac_or_bm_pdb_fxmutant_dir)
+            fx.rm_config_files(path_output_ac_or_bm_pdb_fxmutant_dir)
+            fx.rm_pdbfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
+            fx.rm_logfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
+            fx.rm_unnecessary_fxoutfiles(path_output_ac_or_bm_pdb_fxmutant_dir)
+            fx.AnalyseComplex(Cond.INCELL_MAML_FX.value).rm_all_sumry_except_1_0(path_output_ac_or_bm_pdb_fxmutant_dir)
 
 
 """
@@ -100,4 +103,4 @@ if delete_from_agadir_outputs:
     agadir.remove_unwanted_agad_output_files(path_output_agadir_3dots_dir)
 
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
