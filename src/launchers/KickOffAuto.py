@@ -84,17 +84,15 @@ for i in range(29):
 
 # pydevd.stoptrace()
 
-"""
-THE FOLLOWING ARE ONLY NECESSARY IF YOU WANT TO RUN THE WHOLE THING FROM VALUES IN THE GLOBAL OPTIONS TEXT FILE.
-
 import natsort
 import time
-from src.Agadir import Agadir
-from src.Conditions import Cond
-from src.Cluster import Cluster
-from src.GeneralUtilityMethods import GUM
 import multiprocessing as mp
-
+from src.enums.Conditions import Cond
+from src.tools.GeneralUtilityMethods import GUM
+from src.Agadir import Agadir
+from src.Cluster import Cluster
+"""
+The 9 lines immediately below are only necessary if you want to run the programs via the global options file.
 path_repo_fastas = os.path.join(Paths.REPO_FASTAS, 'fastas_1000', str(startnum) + Str.DOTS3.value + str(endnum))
 globaloptions_lines = Main._read_global_options(Paths.CONFIG_GLOBAL_OPTIONS + '/global_options.txt')
 wanted_pdbfile_list = Main._build_filelist_for_analysis(globaloptions_lines, path_repo_pdbs)
@@ -104,21 +102,21 @@ mutant_aa_list = Main._determine_residues_to_mutate_to(globaloptions_lines)
 path_dst = Paths.INPUT
 path_wanted_pdbfile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_pdbs, path_dst, wanted_pdbfile_list)
 path_wanted_fastafile_list = GUM.copy_files_from_repo_to_input_dirs(path_repo_fastas, path_dst, wanted_fastafile_list)
+"""
 
 def run_agadir_on_1000_fastas():
-    path_output_mutants = os.path.join(Paths.OUTPUT, Paths.DIR_MUTANTS_FASTAS.value,
-str(startnum) + Str.DOTS3.value + str(endnum))
+    path_output_mutants = os.path.join(Paths.OUTPUT, Paths.DIR_MUTANTS_FASTAS.value, str(startnum) + Str.DOTS3.value + str(
+        endnum))
     path_to_fastas = path_output_mutants + '/**/*' + Str.FSTAEXT.value
     path_fastafile_list = natsort.natsorted(glob.glob(path_to_fastas, recursive=True))
     agadir = Agadir(Cond.INCELL_MAML.value)
     for path_fastafile in path_fastafile_list:
         time.sleep(1)
-        if use_cluster:
-            jobname = 'wr_' + path_fastafile.split('/')[-1]
+        if GUM.using_cluster():
+            jobname = Paths.PREFIX_WRITE.value + path_fastafile.split('/')[-1]
             path_to_script = os.path.join(Paths.SRC, 'run_write_1fastafile_per_fasta_from_multifastafile_zeus.py')
             Cluster.write_job_q_bash(jobname, path_job_q_dir=Paths.CONFIG_JOBQ,
-python_script_with_paths=path_to_script + Str.SPCE.value + path_fastafile)
+                                     python_script_with_paths=path_to_script + Str.SPCE.value + path_fastafile)
             Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
         else:
             GUM.write_1_fastafile_per_fasta_from_multifastafile(path_dst=Paths.INPUT, path_fastafile=path_fastafile)
-"""
