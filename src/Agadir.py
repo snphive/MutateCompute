@@ -90,7 +90,6 @@ class Agadir(object):
         #  data files are based on what agadir_config Options.txt file. It does not indicate justhexa.txt or wins_per_seq so
         #  just check for these anyway. If all are present, no need to re-compute it.
         if GUM.using_cluster():
-            # Cluster.wait_for_grid_engine_job_to_complete(Paths.PREFIX_AGADIR.value)
             path_agadir_exe = Paths.ZEUS_AGADIR_EXE.value + 'agadirwrapper'
             path_config_agad = Paths.SE_CONFIG_AGAD.value
         else:
@@ -102,8 +101,8 @@ class Agadir(object):
                 print(Str.PROBLNXCMD_MSG.value + cmd)
             path_agadir_exe = Paths.LOCAL_AGADIR_EXE.value + 'agadir_wrapper'
             path_config_agad = Paths.MC_CONFIG_AGAD.value
-        # cmd = Paths.AGADIR_EXE + agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + \
-        #       Paths.CONFIG_AGAD + '/Options.txt'
+        # cmd = os.path.join(Paths.AGADIR_EXE + agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value +
+        # Paths.CONFIG_AGAD, Agadir.Strs.OPTNS_TXT.value)
         cmd = path_agadir_exe + Str.SPCE.value + path_dst_fastafile + Str.SPCE.value + path_config_agad + '/Options.txt'
         # cmd = '/switchlab/group/tools/agadir_10042012/' + agadir_exe + Str.SPCE.value + path_dst_fastafile +
         # Str.SPCE.value + '/switchlab/group/shazib/SnpEffect/config/agadir_config/Options.txt'
@@ -207,5 +206,7 @@ class Agadir(object):
     class Strs(Enum):
         GLOB_RESD_OUT = 'PSX_globalresidue.out'
         JST_HEXA_TXT = 'justhexa.txt'
+        OPTNS_TXT = 'Options.txt'
+
 
 # pydevd.stoptrace()
