@@ -18,11 +18,8 @@ import os
 import glob
 from src.enums.Str import Str
 from src.enums.Paths import Paths
-from src.enums.DBServer import Server
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
-from src.database.DAL import DAL
-import mysql.connector
 # import pydevd
 # pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
@@ -148,9 +145,9 @@ class FoldX(object):
         pdbname = path_output_ac_or_bm_pdb_fxmutant_dir[-2]
         path_output_ac_or_bm_pdb_fxmutant_dir = '/'.join(path_output_ac_or_bm_pdb_fxmutant_dir)
         fx = FoldX()
-        files_to_delete = fx.Strs.BM_FILES_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else fx.Strs.AC_FILES_TO_DELETE.value
-        for file_to_delete in files_to_delete:
-            GUM.linux_remove_file(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, file_to_delete + '*' + pdbname + '*' +
+        prefixes_of_files_to_rm = fx.Strs.BM_FILES_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else fx.Strs.AC_FILES_TO_DELETE.value
+        for prefix_of_file_to_rm in prefixes_of_files_to_rm:
+            GUM.linux_remove_file(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, prefix_of_file_to_rm + '*' + pdbname + '*' +
                                                fx.Strs.FXOUTEXT.value))
 
     def rm_config_files(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
@@ -191,6 +188,48 @@ class FoldX(object):
         repaired_pdbs = glob.glob(os.path.join(path_output_pdb_fxmutant_dir, filename))
         return len(repaired_pdbs)
 
+    def has_already_removed_config_logs_fxoutfile(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+        """
+        :param path_output_ac_or_bm_pdb_fxmutant_dir:
+        :return:
+        """
+        has_no_files_to_rm = True
+        fx = FoldX()
+        has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                            fx.Strs.RNSCRPT_TXT.value))
+        has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                                    fx.Strs.ROTABASE_TXT.value))
+        has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                                    fx.Strs.CMNDS_BM_TXT.value))
+        has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                                    fx.Strs.CMNDS_STAB_TXT.value))
+        has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                                    fx.Strs.OPTNS_BM_TXT.value))
+        has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                                    fx.Strs.OPTNS_STAB_TXT.value))
+        has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                                    fx.Strs.INDIV_LST_TXT.value))
+        has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                                    fx.Strs.JOB_Q.value))
+
+        path_output_ac_or_bm_pdb_fxmutant_dir = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')
+        ac_or_bm = path_output_ac_or_bm_pdb_fxmutant_dir[-3]
+        pdbname = path_output_ac_or_bm_pdb_fxmutant_dir[-2]
+        fxmutantname = path_output_ac_or_bm_pdb_fxmutant_dir[-1]
+        path_output_ac_or_bm_pdb_fxmutant_dir = '/'.join(path_output_ac_or_bm_pdb_fxmutant_dir)
+        prefixes_of_files_to_rm = fx.Strs.BM_FILES_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else \
+            fx.Strs.AC_FILES_TO_DELETE.value
+        for prefix_of_file_to_rm in prefixes_of_files_to_rm:
+            path_fxout_files = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, prefix_of_file_to_rm + '*' +
+                                                      pdbname + '*' + fx.Strs.FXOUTEXT.value))
+            for path_fxout_file in path_fxout_files:
+                has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_fxout_file)
+        path_output_ac_or_bm_pdb_fxmutant_ologfiles = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                        '*_' + fxmutantname + Str.CLSTR_OUT_LOGEXT.value + '*'))
+        for path_ologfile in path_output_ac_or_bm_pdb_fxmutant_ologfiles:
+            has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_ologfile)
+        return has_no_files_to_rm
+
     class BuildModel(object):
 
         def __init__(self, cond: dict):
@@ -226,10 +265,12 @@ class FoldX(object):
             has_one_chain_only = GUM.get_num_of_chains(path_pdbfile) == 1
 
             for fxmutantname in fxmutantnames:
+                if fxmutantname[0] == fxmutantname[len(fxmutantname) - 1]:
+                    continue
                 path_output_bm_pdb_fxmutant_dir = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_BM.value, pdbname, fxmutantname)
                 if self.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
-                    print('BuildModel output data (Dif_BuildModel_RepairPDB_X.fxout) for this pdb (mutant) already exists in '
-                          'output folder.')
+                    print('BuildModel output (Average_BuildModel_RepairPDB_X.fxout) for ' + pdbname + '_' + fxmutantname +
+                          ' already exists in output folder')
                     continue
                 GUM.linux_copy_all_files_in_dir(path_src_dir=Paths.CONFIG_FX, path_dst_dir=path_output_bm_pdb_fxmutant_dir,
                                                 files_only=True)
