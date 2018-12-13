@@ -36,7 +36,7 @@ class GUM(object):
     # def __init__(self):
 
     @staticmethod
-    def make_tarfile(self, path_files_to_pack_dir: str):
+    def make_tarfile(path_files_to_pack_dir: str):
         """
         Recursively pack contents of specified directory to improve file transfer rates and reduce disk space usage.
         (The tar.gz was observed to reduce disk space usage about 5-fold.)
