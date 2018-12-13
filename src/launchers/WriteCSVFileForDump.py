@@ -2,7 +2,7 @@
 """
 Script for reading multiple csv output files for writing to a single csv file, (in order to facilitate mysql dumps).
 
-WriteCSVfileForDump.py can be run locally or on cluster.
+WriteCSVFileForDump.py can be run locally or on cluster.
 """
 import sys
 import os
@@ -70,3 +70,5 @@ for path_output_csvfile in path_output_csvfiles:
         Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
     else:
         GUM.write_1_csvfile_from_csv_per_mutants(path_output_csvfile, path_output_ac_or_bm_dir, pdbname)
+
+# pydevd.stoptrace()
