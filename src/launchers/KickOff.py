@@ -14,16 +14,16 @@ import os
 import glob
 import warnings
 from src.tools.GeneralUtilityMethods import GUM
-from src.Main import Main
 from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
 from src.enums.Conditions import Cond
+from src.database.DAL import DAL
+from src.Main import Main
 from src.FoldX import FoldX
 from src.Cluster import Cluster
-from src.database.DAL import DAL
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -73,8 +73,8 @@ if not path_pdbfiles:
 5. Select specific mutants if you are only interested in these.
 BE SURE to set this empty list if you don't want any of the subsequent below to be for these mutants only.
 """
-specific_fxmutants = ['AA101A']
-# specific_fxmutants = []
+# specific_fxmutants = ['AA101A', 'AA101C', 'AA101D', 'AA101E', 'AA101F']
+specific_fxmutants = []
 
 """
 6. Get the fasta files you want to run mutate_fasta or agadir on.
@@ -109,6 +109,10 @@ if operations[Str.OPER_RUN_FX_BM.value]:
             bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
             if bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
                 fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
+                if fx.has_already_removed_config_logs_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                    print('No configs, logs, or unnecessary fxoutfiles found in ' + pdbname + '_' + fxmutantname + '. Hence, '
+                          'nothing to delete.')
+                    continue
                 if using_cluster:
                     path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
                     Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
@@ -135,6 +139,9 @@ if operations[Str.OPER_RUN_FX_AC.value]:
             ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
             if ac.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
                 fxmutantname = os.path.basename(path_output_ac_pdb_fxmutant_dir)
+                if fx.has_already_removed_config_logs_fxoutfile(path_output_ac_pdb_fxmutant_dir):
+                    print('No configs, logs, or unnecessary fxoutfiles found in ' + pdbname + '_' + fxmutantname + '. Hence, '
+                          'nothing to delete.')
                 if using_cluster:
                     path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
                     Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
@@ -156,13 +163,14 @@ write_bm_to_csv = True
 write_bm_to_db = False
 write_ac_to_csv = False
 write_ac_to_db = False
-pack_compress_bm_outputs = True
+pack_compress_bm_outputs = False
 pack_compress_ac_outputs = False
 
 """
 10. Write results to csv files.  
 """
 path_output_bm_pdb_avg_csvfiles = []
+written_bm_to_csv = False
 if write_bm_to_csv:
     fx = FoldX()
     path_output_bm_pdb_fxmutant_dirs = []
@@ -176,7 +184,7 @@ if write_bm_to_csv:
             bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
             path_output_bm_pdb_avg_csvfile = bm.write_bm_avg_fxout_to_1csvfile_up_2dirlevels(path_output_bm_pdb_fxmutant_dir)
             path_output_bm_pdb_avg_csvfiles.append(path_output_bm_pdb_avg_csvfile)
-            GUM.linux_remove_dir(path_output_bm_pdb_fxmutant_dir)
+    written_bm_to_csv = True
 
 # NEED TO ESTABLISH WHETHER YOU SHOULD READ FROM BOTH THE WT AND MUTANT SUMMARY FILE AND TAKE THE DIFFERENCE.
 # NEED TO KNOW WHAT VALUES ARE SIGNIFICANT, E.G. ANYTHING < 0.01 KCAL/MOL SIGINIFICANT ??
@@ -195,6 +203,11 @@ if write_ac_to_csv:
             path_output_ac_pdb_sumry_csvfile = ac.write_ac_sumry_fxout_to_1csvfile_up_2dirlevels(path_output_ac_pdb_fxmutant_dir)
             path_output_ac_pdb_sumry_csvfiles.append(path_output_ac_pdb_sumry_csvfile)
             GUM.linux_remove_dir(path_output_ac_pdb_fxmutant_dir)
+            if written_bm_to_csv:
+                path_output_bm_pdb_fxmutant_dir = path_output_ac_pdb_fxmutant_dir.split('/')
+                path_output_bm_pdb_fxmutant_dir[-3] = Paths.DIR_BM.value
+                path_output_bm_pdb_fxmutant_dir = '/'.join(path_output_bm_pdb_fxmutant_dir)
+                GUM.linux_remove_dir(path_output_bm_pdb_fxmutant_dir)
 
 """
 11. Write results to database.  
@@ -220,8 +233,7 @@ if pack_compress_ac_outputs:
     for path_pdbfile in path_pdbfiles:
         pdbname = os.path.basename(path_pdbfile).split('.')[0]
         path_files_to_pack_dir = os.path.join(Paths.OUTPUT_AC, pdbname)
-        # Parser().make_tarfile(path_files_to_pack_dir)
         GUM.make_tarfile(path_files_to_pack_dir)
 
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
