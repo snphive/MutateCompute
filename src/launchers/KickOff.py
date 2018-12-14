@@ -22,8 +22,8 @@ from src.database.DAL import DAL
 from src.Main import Main
 from src.FoldX import FoldX
 from src.Cluster import Cluster
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -73,8 +73,13 @@ if not path_pdbfiles:
 5. Select specific mutants if you are only interested in these.
 BE SURE to set this empty list if you don't want any of the subsequent below to be for these mutants only.
 """
-# specific_fxmutants = ['AA101A', 'AA101C', 'AA101D', 'AA101E', 'AA101F']
-specific_fxmutants = []
+specific_fxmutants = ['YB956W', 'YB956Y']
+# specific_fxmutants = []
+for path_pdbfile in path_pdbfiles:
+    for specific_fxmutant in specific_fxmutants:
+        if not GUM.is_valid_fxmutant_for_pdb(path_pdbfile, specific_fxmutant):
+            raise ValueError('The specified mutant ' + specific_fxmutant + ' is not valid for this pdb: ' +
+                             os.path.basename(path_pdbfile))
 
 """
 6. Get the fasta files you want to run mutate_fasta or agadir on.
@@ -100,7 +105,7 @@ if operations[Str.OPER_RUN_FX_BM.value]:
     fx = FoldX()
     path_output_bm_pdb_fxmutant_dirs = []
     for path_pdbfile in path_pdbfiles:
-        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        pdbname = os.path.basename(path_pdbfile)
         for specific_fxmutant in specific_fxmutants:
             path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
         if not specific_fxmutants:
@@ -129,7 +134,7 @@ if operations[Str.OPER_RUN_FX_AC.value]:
     path_output_bm_pdb_fxmutant_dirs = []
     path_output_ac_pdb_fxmutant_dirs = []
     for path_pdbfile in path_pdbfiles:
-        pdbname = os.path.basename(path_pdbfile).split('.')[0]
+        pdbname = os.path.basename(path_pdbfile)
         for specific_fxmutant in specific_fxmutants:
             path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
             path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
@@ -159,7 +164,7 @@ if operations[Str.OPER_RUN_FX_AC.value]:
 """
 9. Choose which post-computation writing & file compressing to perform:
 """
-write_bm_to_csv = True
+write_bm_to_csv = False
 write_bm_to_db = False
 write_ac_to_csv = False
 write_ac_to_db = False
@@ -236,4 +241,4 @@ if pack_compress_ac_outputs:
         GUM.make_tarfile(path_files_to_pack_dir)
 
 
-# pydevd.stoptrace()
+pydevd.stoptrace()
