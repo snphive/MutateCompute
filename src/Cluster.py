@@ -133,8 +133,8 @@ class Cluster(object):
             else:
                 job_q.append('#$ -l h_vmem=' + str(memory_limit_GB) + 'G' + Str.NEWLN.value)
 
-        job_q.append('#$ -l h_rt=' + max_runtime_limit_hard + Str.NEWLN.value)
-        job_q.append('#$ -l s_rt=' + max_runtime_limit_soft + Str.NEWLN.value)
+        # job_q.append('#$ -l h_rt=' + max_runtime_limit_hard + Str.NEWLN.value)
+        # job_q.append('#$ -l s_rt=' + max_runtime_limit_soft + Str.NEWLN.value)
 
         if cluster_node != '':
             job_q.append('#$ -l hostname=' + cluster_node + Str.NEWLN.value)
@@ -148,9 +148,9 @@ class Cluster(object):
             job_q.append('#$ -cwd' + Str.NEWLN.value)
         job_q.append('source ~/.bash_profile' + Str.NEWLN.value)
 
-        if email_address != '':
-            job_q.append('#$ -m ea')
-            job_q.append('#S -M ' + email_address)
+        # if email_address != '':
+        #     job_q.append('#$ -m ea' + Str.NEWLN.value)
+        #     job_q.append('#S -M ' + email_address + Str.NEWLN.value)
         if using_runscript:
             job_q.append(Paths.ZEUS_FOLDX_EXE.value + Str.SPCE.value + Cluster.CLSTR.RNFL.value + Str.SPCE.value +
                          os.path.join(path_runscript_dir, Cluster.CLSTR.RNSCPT_TXT.value) + Str.NEWLN.value)
