@@ -58,9 +58,9 @@ def _extract_fxmutantname(filename: str):
 3. Read csv files and write to a single csvfile for mysql dump. 
 """
 for path_output_csvfile in path_output_csvfiles:
-    filename = os.path.basename(path_output_csvfile)
-    pdbname = _extract_pdbname(filename)
-    fxmutantname = _extract_fxmutantname(filename)
+    csvfilename = os.path.basename(path_output_csvfile)
+    pdbname = _extract_pdbname(csvfilename)
+    fxmutantname = _extract_fxmutantname(csvfilename)
     if using_cluster:
         path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
         Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
