@@ -20,8 +20,8 @@ from src.enums.Str import Str
 from src.enums.Paths import Paths
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -230,6 +230,53 @@ class FoldX(object):
             has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_ologfile)
         return has_no_files_to_rm
 
+    def write_to_csvfile_for_db_dump(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+        """
+
+        :param path_output_ac_or_bm_pdb_fxmutant_dir:
+        :return:
+        """
+        ddG = ''
+        buildmodel_csvfile_header = 'pdb,fxmutant,ddG'
+        analysecomplex_csvfile_header = 'pdb,fxmutant,interaction ddG'
+        csvfile_header = ''
+        fxout_prefix = ''
+        path_output_ac_or_bm = ''
+        if Paths.DIR_BM.value in path_output_ac_or_bm_pdb_fxmutant_dir:
+            ddG = '_ddG'
+            csvfile_header = buildmodel_csvfile_header
+            fxout_prefix = self.Strs.AVG_BMDL_.value
+            path_output_ac_or_bm = Paths.OUTPUT_BM
+        elif Paths.DIR_AC.value in path_output_ac_or_bm_pdb_fxmutant_dir:
+            ddG = '_interaction_ddG'
+            fxout_prefix = self.Strs.SMRY_AC_.value
+            csvfile_header = analysecomplex_csvfile_header
+            path_output_ac_or_bm = Paths.OUTPUT_AC
+        else:
+            print(
+                "The output directory path does not contain build_model or analyse_complex. If you are trying to read/write "
+                "Agadir-related files, you'll need to complete the logic for it here (in FoldX class)")
+        pdbname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-2]
+        fxmutantname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-1]
+        path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile = os.path.join(path_output_ac_or_bm, fxout_prefix + pdbname +
+                                                                       self.Strs.FXOUTEXT.value)
+        if not os.path.exists(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile):
+            print('Warning: ' + path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile + ' not found. Cannot find ddG value to write '
+                  'to csvfile.')
+        else:
+            path_output_fx_ddG_csvfile = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, pdbname + ddG + Str.CSVEXT.value)
+            if not os.path.exists(path_output_fx_ddG_csvfile):
+                with open(path_output_fx_ddG_csvfile, 'w') as ddG_csv:
+                    ddG_csv.write(csvfile_header + Str.NEWLN.value)
+            else:
+                with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile, 'r') as ddG_f:
+                 ddG_lines = ddG_f.readlines()
+                with open(path_output_fx_ddG_csvfile, 'a+') as csv_f:
+                    csv_f.write(pdbname + ',' + fxmutantname + ',')
+                    avg_ddG_values = ddG_lines[self.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value]
+                    avg_ddG_values = avg_ddG_values.split()
+                    csv_f.write(avg_ddG_values[self.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value])
+
     class BuildModel(object):
 
         def __init__(self, cond: dict):
@@ -238,8 +285,7 @@ class FoldX(object):
             """
             self.conditions = cond
 
-        def mutate_protein_structure(self, path_pdbfile: str, amino_acids: list, specific_fxmutants=None,
-                                     rm_xtra_files_after_each_pdb=False, write_to_csv_after_each_pdb=False):
+        def mutate_protein_structure(self, path_pdbfile: str, amino_acids: list, specific_fxmutants=None, write_to_csvfile=True):
             """
             Mutate all amino acids in this pdb to all listed amino acids using FoldX BuildModel.
             Note: individual_list needs to go in the same dir as runscript.txt.
@@ -248,9 +294,8 @@ class FoldX(object):
             :param amino_acids: Amino acids that proteins will be mutated to.
             :param specific_fxmutants: Specific mutants to perform BuildModel computation on. Remains empty if all mutations
             should be calculated (specified by amino_acids list).
-            :param rm_xtra_files_after_each_pdb: True to remove excess files (such as config files) from output folders for
             each mutant in this pdb.
-            :param write_to_csv_after_each_pdb: True to write ddG to csv file for each mutant in this pdb.
+            :param write_to_csvfile: True to write ddG to csv file for each mutant in this pdb.
             """
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
@@ -258,12 +303,15 @@ class FoldX(object):
             fx = FoldX()
             fxmutantnames = specific_fxmutants if specific_fxmutants else fx.make_fxmutantnames(amino_acids,
                                                                                                 pdbname_chain_startpos_fasta_dict)
+            for specific_fxmutant in specific_fxmutants:
+                if specific_fxmutant not in fxmutantnames:
+                    raise ValueError('The specified mutant ' + specific_fxmutant + ' that is in your specific_fxmutants list is '
+                                     ' not valid for this pdb!')
             action = fx.Strs.BM_ACTN.value + Str.HASH.value + ',' + fx.Strs.INDIV_LST_TXT.value
             path_runscript_dir = os.path.join(Paths.CONFIG_BMRUNSCRIPT, pdbname)
             fx.write_runscript_file(path_runscript_dir, pdbfile, self.conditions, action)
             path_runscript_file = os.path.join(path_runscript_dir, fx.Strs.RNSCRPT_TXT.value)
-            has_one_chain_only = GUM.get_num_of_chains(path_pdbfile) == 1
-
+            using_cluster = GUM.using_cluster()
             for fxmutantname in fxmutantnames:
                 if fxmutantname[0] == fxmutantname[len(fxmutantname) - 1]:
                     continue
@@ -278,7 +326,7 @@ class FoldX(object):
                 os.chdir(path_output_bm_pdb_fxmutant_dir)
                 path_files_to_copy = [path_runscript_file, path_pdbfile]
                 GUM.linux_copy_specified_files(path_src_files=path_files_to_copy, path_dst_dir=path_output_bm_pdb_fxmutant_dir)
-                if GUM.using_cluster():
+                if using_cluster:
                     path_jobq = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
                     Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_BM.value + fxmutantname, path_job_q_dir=path_jobq,
                                              using_runscript=True, path_runscript_dir=path_runscript_dir)
@@ -299,20 +347,9 @@ class FoldX(object):
                         subprocess.call(cmd, shell=True)
                     else:
                         raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
-                if has_one_chain_only:
-                    # BuildModel has no use for these mutant pdb files and because this pdb only has 1 chain, AnalyseComplex has
-                    # no use for them either. Hence, they can already be deleted, saving disk space (crucial for cluster).
-                    fx.rm_pdbfiles(path_output_bm_pdb_fxmutant_dir)
-            if rm_xtra_files_after_each_pdb:
-                missing_num = self.find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids)
-                if missing_num != 0:
-                    print('BuildModel computations not completed for this pdb: ' + pdbname + '. Number of missing computations: '
-                          + missing_num + '. Therefore will not proceed to removing extra files (such as config files etc)')
-            if write_to_csv_after_each_pdb:
-                missing_num = self.find_num_of_missing_avg_bm_fxoutfiles(path_pdbfile, amino_acids)
-                if missing_num != 0:
-                    print('BuildModel computations not completed for this pdb: ' + pdbname + '. Number of missing computations: '
-                          + missing_num + '. Therefore will not proceed to removing extra files (such as config files etc)')
+                if write_to_csvfile:
+                    fx.write_to_csvfile_for_db_dump(path_output_bm_pdb_fxmutant_dir)
+
 
         def has_already_generated_avg_bm_fxoutfile(self, path_output_bm_pdb_fxmutant_dir: str):
             """
@@ -425,8 +462,7 @@ class FoldX(object):
             """
             self.conditions = cond
 
-        def calculate_complex_energies(self, path_pdbfile: str, specific_fxmutants=None, rm_xtra_files_after_each_pdb=False,
-                                       write_to_csv_after_each_pdb=False):
+        def calculate_complex_energies(self, path_pdbfile: str, specific_fxmutants=None, write_to_csvfile=True):
             """
             Calculates interaction energies for a complex of protein chains for a specified pdb and list of amino acids.
             The repaired pdbs are read from each output_data/buildmodel/<pdbname>/<fxmutantname> folder.
@@ -521,6 +557,8 @@ class FoldX(object):
                         subprocess.call(cmd, shell=True)
                     else:
                         raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
+                if write_to_csvfile:
+                    fx.write_to_csvfile_for_db_dump(path_output_ac_pdb_fxmutant_dir)
 
         def has_already_generated_summary_ac_fxoutfile(self, path_output_ac_pdb_fxmutant_dir: str):
             """
