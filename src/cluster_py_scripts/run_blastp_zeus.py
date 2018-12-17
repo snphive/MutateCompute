@@ -39,7 +39,7 @@ for path_fastafile in path_input_fastafile_list:
         path_output_blastp_fastaname = GUM.os_makedirs(path_output_blastp, fastafile_name)
         os.chdir(path_output_blastp_fastaname)
         Cluster.run_job_q(path_job_q_dir=path_config_job)
-        Cluster.wait_for_grid_engine_job_to_complete(grid_engine_job_prefix=jobname)
+        Cluster.wait_for_grid_engine_job_to_complete(grid_engine_job_prefix_or_full_name=jobname)
         path_raw_blstp_xml = IdProt._write_raw_blast_xml(path_output, fastafile_name,
                                                          blastp_result=NCBIWWW.qblast(
                                                              program=Biopy.BlastParam.BLST_P.value,
