@@ -112,6 +112,24 @@ class GUM(object):
         return pdbname_chain_startpos_fastaseq_dict
 
     @staticmethod
+    def is_valid_fxmutant_for_pdb(path_pdbfile: str, fxmutantname: str):
+        pdbchains = GUM.extract_all_chains_from_pdb(path_pdbfile)
+        is_valid = fxmutantname[1] in pdbchains
+        if is_valid:
+            is_valid = False
+            residue_in_fxmutantname = fxmutantname[0]
+            protein_chain_in_fxmutantname = fxmutantname[1]
+            residue_num_in_fxmutantname = fxmutantname[2:-1]
+            with open(path_pdbfile) as f:
+                pdb_lines = f.readlines()
+                for pdb_line in pdb_lines:
+                    if 'ATOM' == pdb_line[0:4]:
+                        if residue_in_fxmutantname == AA.DICT_AA_3TO1.value[pdb_line[17:20]] and residue_num_in_fxmutantname\
+                                == pdb_line[22:26].strip(' ') and protein_chain_in_fxmutantname == pdb_line[21]:
+                            is_valid = True
+        return is_valid
+
+    @staticmethod
     def write_fastafile_to_name_chain_dir(pdbname_chain_fasta: dict, path_to_write_fastafile_root: str):
         """
         Write the fasta file (with >title) to a new subdirectory in the specified directory. The subdirectory has the
@@ -615,6 +633,13 @@ class GUM(object):
 
     @staticmethod
     def write_1_csvfile_from_csv_per_mutants(path_csvfile: str, path_output_ac_or_bm_dir: str, pdbname: str):
+        """
+
+        :param path_csvfile:
+        :param path_output_ac_or_bm_dir:
+        :param pdbname:
+        :return:
+        """
         ddG = ''
         buildmodel_csvfile_header = 'pdb,fxmutant,ddG'
         analysecomplex_csvfile_header = 'pdb,fxmutant,interaction ddG'
