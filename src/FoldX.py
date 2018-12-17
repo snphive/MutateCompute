@@ -20,8 +20,8 @@ from src.enums.Str import Str
 from src.enums.Paths import Paths
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -184,7 +184,7 @@ class FoldX(object):
         path_output_pdb_fxmutant_dir = path_output_pdb_fxmutant_dir.split('/')
         pdbname = path_output_pdb_fxmutant_dir[-2]
         path_output_pdb_fxmutant_dir = '/'.join(path_output_pdb_fxmutant_dir)
-        filename = pdbname + FoldX.Strs.UNDRSCR1_.value + '*' + Str.PDBEXT.value
+        filename = pdbname + FoldX.Strs.UNDRSCR1.value + '*' + Str.PDBEXT.value
         repaired_pdbs = glob.glob(os.path.join(path_output_pdb_fxmutant_dir, filename))
         return len(repaired_pdbs)
 
@@ -232,9 +232,9 @@ class FoldX(object):
 
     def write_to_csvfile_for_db_dump(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
-
-        :param path_output_ac_or_bm_pdb_fxmutant_dir:
-        :return:
+        Write ddG data from specified fxout output mutant folder to single csv file (intended for database dump).
+        :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path to pdb/fxmutant folder from where the ddG data is read.
+        :return: Absolute path to csv dumpfile which is the file that ddG data is written to.
         """
         ddG = ''
         buildmodel_csvfile_header = 'pdb,fxmutant,ddG'
@@ -242,6 +242,7 @@ class FoldX(object):
         csvfile_header = ''
         fxout_prefix = ''
         path_output_ac_or_bm = ''
+        path_output_ac_or_bm_ddG_csv_dumpfile = ''
         if Paths.DIR_BM.value in path_output_ac_or_bm_pdb_fxmutant_dir:
             ddG = '_ddG'
             csvfile_header = buildmodel_csvfile_header
@@ -268,14 +269,14 @@ class FoldX(object):
             if not os.path.exists(path_output_ac_or_bm_ddG_csv_dumpfile):
                 with open(path_output_ac_or_bm_ddG_csv_dumpfile, 'w') as ddG_csv:
                     ddG_csv.write(csvfile_header + Str.NEWLN.value)
-            else:
-                with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile, 'r') as ddG_f:
-                    ddG_lines = ddG_f.readlines()
-                with open(path_output_ac_or_bm_ddG_csv_dumpfile, 'a+') as csv_f:
-                    csv_f.write(pdbname + ',' + fxmutantname + ',')
-                    avg_ddG_values = ddG_lines[self.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value]
-                    avg_ddG_values = avg_ddG_values.split()
-                    csv_f.write(avg_ddG_values[self.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value])
+            with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile, 'r') as ddG_f:
+                ddG_lines = ddG_f.readlines()
+                avg_ddG_values = ddG_lines[self.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value]
+                avg_ddG_values = avg_ddG_values.split()
+                avg_ddG = avg_ddG_values[self.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value]
+            with open(path_output_ac_or_bm_ddG_csv_dumpfile, 'a+') as csv_f:
+                csv_f.write(pdbname + ',' + fxmutantname + ',' + avg_ddG + Str.NEWLN.value)
+        return path_output_ac_or_bm_ddG_csv_dumpfile
 
     class BuildModel(object):
 
@@ -723,7 +724,8 @@ class FoldX(object):
         OPTNS_BM_TXT = 'options_buildmodel' + Str.TXTEXT.value
         OPTNS_STAB_TXT = 'options_stability' + Str.TXTEXT.value
         UNDRSCR1_012_SUFFIX_PDBS = ['_1_0' + Str.PDBEXT.value, '_1_1' + Str.PDBEXT.value, '_1_2' + Str.PDBEXT.value]
-        UNDRSCR1_ = '_1_'
+        UNDRSCR1 = '_1'
+        UNDRSCR1_ = UNDRSCR1 + '_'
         UNDRSCR1_0 = UNDRSCR1_ + '0'
         UNDRSCR1_0_PDB = UNDRSCR1_0 + Str.PDBEXT.value
         UNDRSCR1_0_FXOUT = UNDRSCR1_0 + FXOUTEXT
