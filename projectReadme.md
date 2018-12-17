@@ -7,10 +7,17 @@ This includes
 ## Getting Started
 
 To run from Pycharm IDE, select Run/Run from toolbar.   
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
+See deployment for notes on how to deploy the project on the cluster.
 
 ### Prerequisites
 
+Below is a list of the main plugins and software installations (made via Pycharm|Preferences|Project Interpreter), however it 
+is far simpler to just use the virtual environment folder that is also on github. 
+It is very important though that the venv is not copied over to the cluster because the cluster currently has a copy of the 
+venv that has had a few libraries removed due to some conflict that seemed to be occuring between them and those on the 
+module-loaded Python binary on the cluster (which at this time is version 3.5.1).
+  
 The current project interpreter: Python 3.7.
 The current installed package dependencies are: 
 PyYAML 3.13
@@ -25,6 +32,7 @@ protobuf 3.6.1
 pydevd 1.4.0
 setuptools 40.6.2
 six 1.11.0
+
 
 ### Installing
 
@@ -100,7 +108,28 @@ Give an example
 
 ## Deployment
 
-Deployment is not applicable. 
+
+## Remote Debugging
+This is set up with pydevd. To run remote debugging for the cluster, Run|Edit Configurations|Python Remote Debug|RunPyRemote and 
+select Apply/Run. Instructions (which are shown on the configuration|remote debug window) are to include the pycharm-debug.egg 
+in the path, add the import and commands to the launcher you want to run: "import pydevd" and 
+"pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)" and "pydevd.stoptrace()" at the end of the
+ script. Enter "localhost" for Local host name and some random but otherwise unused port number, I use 51234. Enter path 
+ mappings as Local path: "/Users/u0120577/PycharmProjects/MutateCompute/src" and Remote path: 
+ "/switchlab/group/shazib/SnpEffect/src". I had checked the two boxes below ('Redirect output to console' and 'Suspend after 
+ connect'). Once these values are saved, the remote debugger can be run from the dropdown menu and green bug icon in top right 
+ of Pycharm.
+ If you want to also suspend execution in a class such as FoldX, you would need to add "import pydevd" and 
+"pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)" to the top of that class in addition to it
+ being in the launcher. Sometimes, I've noticed that Pycharm won't run the remote debugger for the launcher without also 
+ including the pydevd import in one of the classes in the src/ directory because the path mappings don't match up with the 
+ launchers which are in the subdirectory src/launchers/. However, this seems temperamental. 
+ 
+ NOTE: If running remote debugger with code that includes lots of remove file commands (e.g. remove_config_files), a stack
+ overflow or RecursionError occurs: e.g. "RecursionError: maximum recursion depth exceeded while calling a Python object". It 
+ does not occur if just running the remove files code without the remote debugger.  
+     
+
 
 ## Built With
 
