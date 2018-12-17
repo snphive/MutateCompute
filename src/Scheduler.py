@@ -71,11 +71,11 @@ class Scheduler(object):
                         write_fasta_per_mut = False
                         Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value,
                                                  python_script_with_paths=os.path.join(Paths.SE_SRC.value,
-                                                                                       'run_mutate_fasta_zeus.py') +
-                                                                          Str.SPCE.value + path_fastafile +
-                                                                          Str.SPCE.value + str(write_1_fasta_only) +
-                                                                          Str.SPCE.value + str(write_fasta_per_mut) +
-                                                                          Str.SPCE.value + path_output_fastas_3dots, queue='',
+                                                 'run_mutate_fasta_zeus.py') +
+                                                 Str.SPCE.value + path_fastafile +
+                                                 Str.SPCE.value + str(write_1_fasta_only) +
+                                                 Str.SPCE.value + str(write_fasta_per_mut) +
+                                                 Str.SPCE.value + path_output_fastas_3dots, queue='',
                                                  n_slots='', total_memory_GB='', memory_limit_GB='3', cluster_node='')
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_MUTFASTA_JOBQ.value)
 
@@ -89,8 +89,9 @@ class Scheduler(object):
                         jobname = Paths.PREFIX_AGADIR.value + path_fastafile.split('/')[-1]
                         Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value,
                                                  python_script_with_paths=os.path.join(Paths.SE_SRC.value,
-                        'run_agadir_on_multifastas_zeus.py' + Str.SPCE.value + path_fastafile + Str.SPCE.value +
-                                                                                       Paths.SE_OUTPUT.value))
+                                                 'run_agadir_on_multifastas_zeus.py' +
+                                                 Str.SPCE.value + path_fastafile +
+                                                 Str.SPCE.value + Paths.SE_OUTPUT.value))
                         Cluster.run_job_q(path_job_q_dir=Paths.SE_CONFIG_AGAD_JOBQ.value)
 
                     path_dst = GUM.make_path_agadir_3dots_filename_mutants_dirs(path_output, path_fastafile,
@@ -110,7 +111,7 @@ class Scheduler(object):
                         Scheduler._launch_thread(target=buildmodel.mutate_protein_structure,
                                                  args=[path_pdbfile, amino_acids, specific_fxmutants])
                     else:
-                        buildmodel.mutate_protein_structure(path_pdbfile, amino_acids, specific_fxmutants)
+                        buildmodel.mutate_protein_structure(path_pdbfile, amino_acids, specific_fxmutants, write_to_csvfile=True)
                 if operations[Scheduler.Strs.OPER_RUN_FX_AC.value]:
                     analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
@@ -123,8 +124,6 @@ class Scheduler(object):
                         Scheduler._launch_thread(target=repair.do_repair, args=path_pdbfile)
                     else:
                         repair.do_repair(path_pdbfile)
-
-
 
         # if path_pdbfiles:
         #     for path_pdbfile in path_pdbfiles:
