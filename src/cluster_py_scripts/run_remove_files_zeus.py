@@ -9,6 +9,8 @@ from src.enums.Str import Str
 from src.FoldX import FoldX
 from src.tools.GeneralUtilityMethods import GUM
 from src.enums.Conditions import Cond
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -19,7 +21,7 @@ __email__ = "shahinzibaee@hotmail.com"
 __status__ = "Development"
 
 path_output_ac_or_bm_pdb_fxmutant_dir = sys.argv[1]
-
+print(path_output_ac_or_bm_pdb_fxmutant_dir)
 """
 Delete files no longer needed from the output folders in order to reduce disk space usage (particularly important on the cluster).
 
