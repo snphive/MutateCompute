@@ -258,20 +258,20 @@ class FoldX(object):
                 "Agadir-related files, you'll need to complete the logic for it here (in FoldX class)")
         pdbname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-2]
         fxmutantname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-1]
-        path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile = os.path.join(path_output_ac_or_bm, fxout_prefix + pdbname +
-                                                                       self.Strs.FXOUTEXT.value)
+        path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, fxout_prefix +
+                                                                       pdbname + self.Strs.FXOUTEXT.value)
         if not os.path.exists(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile):
             print('Warning: ' + path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile + ' not found. Cannot find ddG value to write '
                   'to csvfile.')
         else:
-            path_output_fx_ddG_csvfile = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, pdbname + ddG + Str.CSVEXT.value)
-            if not os.path.exists(path_output_fx_ddG_csvfile):
-                with open(path_output_fx_ddG_csvfile, 'w') as ddG_csv:
+            path_output_ac_or_bm_ddG_csv_dumpfile = os.path.join(path_output_ac_or_bm, pdbname + ddG + Str.CSVEXT.value)
+            if not os.path.exists(path_output_ac_or_bm_ddG_csv_dumpfile):
+                with open(path_output_ac_or_bm_ddG_csv_dumpfile, 'w') as ddG_csv:
                     ddG_csv.write(csvfile_header + Str.NEWLN.value)
             else:
                 with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile, 'r') as ddG_f:
-                 ddG_lines = ddG_f.readlines()
-                with open(path_output_fx_ddG_csvfile, 'a+') as csv_f:
+                    ddG_lines = ddG_f.readlines()
+                with open(path_output_ac_or_bm_ddG_csv_dumpfile, 'a+') as csv_f:
                     csv_f.write(pdbname + ',' + fxmutantname + ',')
                     avg_ddG_values = ddG_lines[self.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value]
                     avg_ddG_values = avg_ddG_values.split()
