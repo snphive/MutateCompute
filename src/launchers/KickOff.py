@@ -18,7 +18,6 @@ from src.enums.Paths import Paths
 from src.enums.AminoAcids import AA
 from src.enums.Str import Str
 from src.enums.Conditions import Cond
-from src.database.DAL import DAL
 from src.Main import Main
 from src.FoldX import FoldX
 from src.Cluster import Cluster
@@ -71,7 +70,7 @@ if not path_pdbfiles:
                            category=RuntimeWarning, filename="KickOff", lineno=68)
 """
 5. Select specific mutants if you are only interested in these.
-BE SURE to set this empty list if you don't want any of the subsequent below to be for these mutants only.
+MAKE SURE TO SET THIS LIST TO EMPTY if you don't want any of the subsequent actions below to be for these mutants only.
 """
 specific_fxmutants = ['YB956W', 'YB956Y']
 # specific_fxmutants = []
@@ -160,85 +159,6 @@ if operations[Str.OPER_RUN_FX_AC.value]:
                     fx.rm_logfiles(path_output_ac_pdb_fxmutant_dir)
                     fx.rm_unnecessary_fxoutfiles(path_output_ac_pdb_fxmutant_dir)
                     ac.rm_all_sumry_except_1_0(path_output_ac_pdb_fxmutant_dir)
-
-"""
-9. Choose which post-computation writing & file compressing to perform:
-"""
-write_bm_to_csv = False
-write_bm_to_db = False
-write_ac_to_csv = False
-write_ac_to_db = False
-pack_compress_bm_outputs = False
-pack_compress_ac_outputs = False
-
-"""
-10. Write results to csv files.  
-"""
-path_output_bm_pdb_avg_csvfiles = []
-written_bm_to_csv = False
-if write_bm_to_csv:
-    fx = FoldX()
-    path_output_bm_pdb_fxmutant_dirs = []
-    for path_pdbfile in path_pdbfiles:
-        pdbname = os.path.basename(path_pdbfile).split('.')[0]
-        for specific_fxmutant in specific_fxmutants:
-            path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
-        if not specific_fxmutants:
-            path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
-        for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
-            bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
-            path_output_bm_pdb_avg_csvfile = bm.write_bm_avg_fxout_to_1csvfile_up_2dirlevels(path_output_bm_pdb_fxmutant_dir)
-            path_output_bm_pdb_avg_csvfiles.append(path_output_bm_pdb_avg_csvfile)
-    written_bm_to_csv = True
-
-# NEED TO ESTABLISH WHETHER YOU SHOULD READ FROM BOTH THE WT AND MUTANT SUMMARY FILE AND TAKE THE DIFFERENCE.
-# NEED TO KNOW WHAT VALUES ARE SIGNIFICANT, E.G. ANYTHING < 0.01 KCAL/MOL SIGINIFICANT ??
-path_output_ac_pdb_sumry_csvfiles = []
-if write_ac_to_csv:
-    fx = FoldX()
-    path_output_ac_pdb_fxmutant_dirs = []
-    for path_pdbfile in path_pdbfiles:
-        pdbname = os.path.basename(path_pdbfile).split('.')[0]
-        for specific_fxmutant in specific_fxmutants:
-            path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
-        if not specific_fxmutants:
-            path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
-        for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
-            ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
-            path_output_ac_pdb_sumry_csvfile = ac.write_ac_sumry_fxout_to_1csvfile_up_2dirlevels(path_output_ac_pdb_fxmutant_dir)
-            path_output_ac_pdb_sumry_csvfiles.append(path_output_ac_pdb_sumry_csvfile)
-            GUM.linux_remove_dir(path_output_ac_pdb_fxmutant_dir)
-            if written_bm_to_csv:
-                path_output_bm_pdb_fxmutant_dir = path_output_ac_pdb_fxmutant_dir.split('/')
-                path_output_bm_pdb_fxmutant_dir[-3] = Paths.DIR_BM.value
-                path_output_bm_pdb_fxmutant_dir = '/'.join(path_output_bm_pdb_fxmutant_dir)
-                GUM.linux_remove_dir(path_output_bm_pdb_fxmutant_dir)
-
-"""
-11. Write results to database.  
-"""
-if write_ac_to_db:
-    for path_output_ac_pdb_sumry_csvfile in path_output_bm_pdb_avg_csvfiles:
-        DAL().write_csv_to_db(path_output_ac_pdb_sumry_csvfile)
-
-if write_bm_to_db:
-    for path_output_bm_pdb_avg_csvfile in path_output_bm_pdb_avg_csvfiles:
-        DAL().write_csv_to_db(path_output_bm_pdb_avg_csvfile)
-
-"""
-12. Pack & compress results in to one tar per pdb (per algorithm), for improved transfer and storage.  
-"""
-if pack_compress_bm_outputs:
-    for path_pdbfile in path_pdbfiles:
-        pdbname = os.path.basename(path_pdbfile).split('.')[0]
-        path_files_to_pack_dir = os.path.join(Paths.OUTPUT_BM, pdbname)
-        GUM.make_tarfile(path_files_to_pack_dir)
-
-if pack_compress_ac_outputs:
-    for path_pdbfile in path_pdbfiles:
-        pdbname = os.path.basename(path_pdbfile).split('.')[0]
-        path_files_to_pack_dir = os.path.join(Paths.OUTPUT_AC, pdbname)
-        GUM.make_tarfile(path_files_to_pack_dir)
 
 
 pydevd.stoptrace()
