@@ -315,40 +315,47 @@ class FoldX(object):
                 if fxmutantname[0] == fxmutantname[len(fxmutantname) - 1]:
                     continue
                 path_output_bm_pdb_fxmutant_dir = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_BM.value, pdbname, fxmutantname)
-                if self.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
-                    print('BuildModel output (Average_BuildModel_RepairPDB_X.fxout) for ' + pdbname + '_' + fxmutantname +
-                          ' already exists in output folder')
-                    continue
-                GUM.linux_copy_all_files_in_dir(path_src_dir=Paths.CONFIG_FX, path_dst_dir=path_output_bm_pdb_fxmutant_dir,
-                                                files_only=True)
-                self._write_individual_list_for_mutant(path_dst_dir=path_output_bm_pdb_fxmutant_dir)
-                os.chdir(path_output_bm_pdb_fxmutant_dir)
-                path_files_to_copy = [path_runscript_file, path_pdbfile]
-                GUM.linux_copy_specified_files(path_src_files=path_files_to_copy, path_dst_dir=path_output_bm_pdb_fxmutant_dir)
-                if using_cluster:
-                    path_jobq = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
-                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_BM.value + fxmutantname, path_job_q_dir=path_jobq,
-                                             using_runscript=True, path_runscript_dir=path_runscript_dir)
-                    # path_jobq_file = os.path.join(path_jobq, Str.JOBQ.value)
-                    # GUM.linux_copy_specified_files(path_jobq_file, path_dst_dir=path_output_pdbname_mutant)
-                    if os.path.exists(path_runscript_file):
-                        Cluster.run_job_q(path_job_q_dir=path_jobq)
+                if not self.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                    GUM.linux_copy_all_files_in_dir(path_src_dir=Paths.CONFIG_FX, path_dst_dir=path_output_bm_pdb_fxmutant_dir,
+                                                    files_only=True)
+                    self._write_individual_list_for_mutant(path_dst_dir=path_output_bm_pdb_fxmutant_dir)
+                    os.chdir(path_output_bm_pdb_fxmutant_dir)
+                    path_files_to_copy = [path_runscript_file, path_pdbfile]
+                    GUM.linux_copy_specified_files(path_src_files=path_files_to_copy, path_dst_dir=path_output_bm_pdb_fxmutant_dir)
+                    if using_cluster:
+                        path_jobq = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
+                        jobname = Paths.PREFIX_FX_BM.value + fxmutantname
+                        Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=path_jobq, using_runscript=True,
+                                                 path_runscript_dir=path_runscript_dir)
+                        # path_jobq_file = os.path.join(path_jobq, Str.JOBQ.value)
+                        # GUM.linux_copy_specified_files(path_jobq_file, path_dst_dir=path_output_pdbname_mutant)
+                        if os.path.exists(path_runscript_file):
+                            Cluster.run_job_q(path_job_q_dir=path_jobq)
+                        else:
+                            raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
                     else:
-                        raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
+                        cmd = Str.CHMOD777.value + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
+                        try:
+                            subprocess.call(cmd, shell=True)
+                        except OSError:
+                            print(Str.PROBLNXCMD_MSG.value + cmd)
+                        cmd = Paths.FOLDX_EXE + Str.SPCE.value + fx.Strs.DSH_RUNFILE.value + Str.SPCE.value + path_runscript_file
+                        if os.path.exists(path_runscript_file):
+                            subprocess.call(cmd, shell=True)
+                        else:
+                            raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
+                # The following section can be run in a separate thread, subject to checking a list of completed jobs,
+                # For example, a producer/consumer model.
                 else:
-                    cmd = Str.CHMOD777.value + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
-                    try:
-                        subprocess.call(cmd, shell=True)
-                    except OSError:
-                        print(Str.PROBLNXCMD_MSG.value + cmd)
-                    cmd = Paths.FOLDX_EXE + Str.SPCE.value + fx.Strs.DSH_RUNFILE.value + Str.SPCE.value + path_runscript_file
-                    if os.path.exists(path_runscript_file):
-                        subprocess.call(cmd, shell=True)
-                    else:
-                        raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
+                    print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists for: ' + fxmutantname)
                 if write_to_csvfile:
+                    print('Writing values to csv dump file for: ' + pdbname + '_' + fxmutantname)
+                    while not self.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                        print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
+                              fxmutantname + '. Therefore cannot write to csv file just yet.')
+                        if using_cluster:
+                            Cluster.wait_for_grid_engine_job_to_complete(jobname)
                     fx.write_to_csvfile_for_db_dump(path_output_bm_pdb_fxmutant_dir)
-
 
         def has_already_generated_avg_bm_fxoutfile(self, path_output_bm_pdb_fxmutant_dir: str):
             """
@@ -475,6 +482,7 @@ class FoldX(object):
             pdbname = pdbfile.split('.')[0]
             wt_pdbname = FoldX.Strs.WT_.value + pdbname
             fx = FoldX()
+            using_cluster = GUM.using_cluster()
             path_output_bm_pdb_fxmutant_dirs = []
             if specific_fxmutants is not None:
                 for specific_fxmutant in specific_fxmutants:
@@ -488,11 +496,11 @@ class FoldX(object):
                 if not path_output_ac_pdb_fxmutant_dirs:
                     print('No AnalyseComplex output folders found for this pdb either. Try running BuildModel first.')
                 else:
-                    for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
-                        num_of_repaired_pdbs = fx._get_num_of_repaired_pdbfiles(path_output_ac_pdb_fxmutant_dir)
+                    for path_output_ac_pdb_fxmutant in path_output_ac_pdb_fxmutant_dirs:
+                        num_of_repaired_pdbs = fx._get_num_of_repaired_pdbfiles(path_output_ac_pdb_fxmutant)
                         if num_of_repaired_pdbs == 0:
                             print('Necessary repaired pdbs (with format _1_0.fxout) are not present in the AnalyseComplex output '
-                                  'folder either for: ' + path_output_ac_pdb_fxmutant_dir)
+                                  'folder either for: ' + path_output_ac_pdb_fxmutant)
 
             action = fx.Strs.AC_ACTN.value + Str.HASH.value
             # action += '0'  # According to FoldX manual (version3), write 0 for all possible interation in a complex.
@@ -502,8 +510,8 @@ class FoldX(object):
                 if has_one_chain_only:
                     print('Only one protein chain. No interactions to be quantified for this pdbfile.')
                     return
-                path_output_bm_pdb_fxmutant_repaired = os.path.join(path_output_bm_pdb_fxmutant_dir, pdbname + \
-                                                       fx.Strs.UNDRSCR1_0_PDB.value)
+                path_output_bm_pdb_fxmutant_repaired = os.path.join(path_output_bm_pdb_fxmutant_dir,
+                                                                    pdbname + fx.Strs.UNDRSCR1_0_PDB.value)
                 path_output_bm_pdb_fxmutant_wt_repaired = os.path.join(path_output_bm_pdb_fxmutant_dir, wt_pdbname +
                                                                        fx.Strs.UNDRSCR1_0_PDB.value)
                 if not os.path.exists(path_output_bm_pdb_fxmutant_repaired) or not os.path.exists(
@@ -512,53 +520,60 @@ class FoldX(object):
                           path_output_bm_pdb_fxmutant_dir + '. AnalyseComplex cannot be run for this pdb/mutation. Check '
                                                             'BuildModel has been run for this pdb/mutation.')
                     return
-                fxmutant_dir = os.path.basename(path_output_bm_pdb_fxmutant_dir)
-                path_output_ac_pdb_fxmutant_dir = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_AC.value, pdbname, fxmutant_dir)
-                if self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
-                    print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists.')
-                    continue
-                pdbs_to_analyse = [pdbname + FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[0], ',', wt_pdbname +
-                                   FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[0]]
-                num_of_repaired_pdbs = fx._get_num_of_repaired_pdbfiles(path_output_bm_pdb_fxmutant_dir)
-                for i in range(1, num_of_repaired_pdbs):
-                    pdbs_to_analyse.append(',')
-                    pdbs_to_analyse.append(pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
-                    pdbs_to_analyse.append(',')
-                    pdbs_to_analyse.append(wt_pdbname)
-                    pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
-                pdbs_to_analyse = ''.join(pdbs_to_analyse)
-                fx.write_runscript_file(path_output_ac_pdb_fxmutant_dir, pdbs_to_analyse, self.conditions, action)
-                path_runscript_file = os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.RNSCRPT_TXT.value)
-                GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_ac_pdb_fxmutant_dir, files_only=True)
-                os.chdir(path_output_ac_pdb_fxmutant_dir)
-                files_to_copy = pdbs_to_analyse.split(',')
-                path_files_to_copy = []
-                for file_to_copy in files_to_copy:
-                    path_files_to_copy.append(os.path.join(path_output_bm_pdb_fxmutant_dir, file_to_copy))
-                GUM.linux_copy_specified_files(path_files_to_copy, path_dst_dir=path_output_ac_pdb_fxmutant_dir)
-
-                if GUM.using_cluster():
-                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_AC.value + fxmutant_dir,
-                                             path_job_q_dir=path_output_ac_pdb_fxmutant_dir, using_runscript=True,
-                                             path_runscript_dir=path_output_ac_pdb_fxmutant_dir)
-                    if os.path.exists(path_runscript_file):
-                        Cluster.run_job_q(path_job_q_dir=path_output_ac_pdb_fxmutant_dir)
+                fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
+                path_output_ac_pdb_fxmutant = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_AC.value, pdbname, fxmutantname)
+                if not self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant):
+                    pdbs_to_analyse = [pdbname + FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[0], ',', wt_pdbname +
+                                       FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[0]]
+                    num_of_repaired_pdbs = fx._get_num_of_repaired_pdbfiles(path_output_bm_pdb_fxmutant_dir)
+                    for i in range(1, num_of_repaired_pdbs):
+                        pdbs_to_analyse.append(',')
+                        pdbs_to_analyse.append(pdbname)
+                        pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
+                        pdbs_to_analyse.append(',')
+                        pdbs_to_analyse.append(wt_pdbname)
+                        pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
+                    pdbs_to_analyse = ''.join(pdbs_to_analyse)
+                    fx.write_runscript_file(path_output_ac_pdb_fxmutant, pdbs_to_analyse, self.conditions, action)
+                    path_runscript_file = os.path.join(path_output_ac_pdb_fxmutant, fx.Strs.RNSCRPT_TXT.value)
+                    GUM.linux_copy_all_files_in_dir(Paths.CONFIG_FX, path_output_ac_pdb_fxmutant, files_only=True)
+                    os.chdir(path_output_ac_pdb_fxmutant)
+                    files_to_copy = pdbs_to_analyse.split(',')
+                    path_files_to_copy = []
+                    for file_to_copy in files_to_copy:
+                        path_files_to_copy.append(os.path.join(path_output_bm_pdb_fxmutant_dir, file_to_copy))
+                    GUM.linux_copy_specified_files(path_files_to_copy, path_dst_dir=path_output_ac_pdb_fxmutant)
+                    if using_cluster:
+                        jobname = Paths.PREFIX_FX_AC.value + fxmutantname
+                        Cluster.write_job_q_bash(jobname=jobname, path_job_q_dir=path_output_ac_pdb_fxmutant,
+                                                 using_runscript=True, path_runscript_dir=path_output_ac_pdb_fxmutant)
+                        if os.path.exists(path_runscript_file):
+                            Cluster.run_job_q(path_job_q_dir=path_output_ac_pdb_fxmutant)
+                        else:
+                            raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
                     else:
-                        raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
+                        cmd = Str.CHMOD777.value + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
+                        try:
+                            subprocess.call(cmd, shell=True)
+                        except OSError:
+                            print(Str.PROBLNXCMD_MSG.value + cmd)
+                        cmd = Paths.FOLDX_EXE + Str.SPCE.value + fx.Strs.DSH_RUNFILE.value + Str.SPCE.value + path_runscript_file
+                        if os.path.exists(path_runscript_file):
+                            subprocess.call(cmd, shell=True)
+                        else:
+                            raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
                 else:
-                    cmd = Str.CHMOD777.value + Str.SPCE.value + Paths.LOCAL_FOLDX_EXE.value
-                    try:
-                        subprocess.call(cmd, shell=True)
-                    except OSError:
-                        print(Str.PROBLNXCMD_MSG.value + cmd)
-                    cmd = Paths.FOLDX_EXE + Str.SPCE.value + fx.Strs.DSH_RUNFILE.value + Str.SPCE.value + path_runscript_file
-                    if os.path.exists(path_runscript_file):
-                        subprocess.call(cmd, shell=True)
-                    else:
-                        raise ValueError(fx.Strs.NO_RUNSCRPT_FILE_MSG.value)
+                    print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists for: ' + fxmutantname)
+                # The following section can be run in a separate thread, subject to checking a list of completed jobs,
+                # For example, a producer/consumer model.
                 if write_to_csvfile:
-                    fx.write_to_csvfile_for_db_dump(path_output_ac_pdb_fxmutant_dir)
+                    while not self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant):
+                        print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
+                              fxmutantname + '. Therefore cannot write to csv file just yet.')
+                    print('Writing values to csv dump file for: ' + pdbname + '_' + fxmutantname)
+                    if using_cluster:
+                        Cluster.wait_for_grid_engine_job_to_complete(jobname)
+                    fx.write_to_csvfile_for_db_dump(path_output_ac_pdb_fxmutant)
 
         def has_already_generated_summary_ac_fxoutfile(self, path_output_ac_pdb_fxmutant_dir: str):
             """
