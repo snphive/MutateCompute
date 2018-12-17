@@ -125,10 +125,15 @@ in the path, add the import and commands to the launcher you want to run: "impor
  including the pydevd import in one of the classes in the src/ directory because the path mappings don't match up with the 
  launchers which are in the subdirectory src/launchers/. However, this seems temperamental. 
  
- NOTE: If running remote debugger with code that includes lots of remove file commands (e.g. remove_config_files), a stack
- overflow or RecursionError occurs: e.g. "RecursionError: maximum recursion depth exceeded while calling a Python object". It 
- does not occur if just running the remove files code without the remote debugger.  
-     
+ NOTE: In a few special cases the code execution does not function fully when run on the remote debugger. Two such cases is 
+ described here:  
+ 1. If running remote debugger with code that includes lots of remove file commands (e.g. via GUM.linux_remove_files), a stack
+ overflow/RecursionError occurs and abrots the execution after a short time: e.g. "RecursionError: maximum recursion depth 
+ exceeded while calling a Python object". It does not occur if just running the remove files code without the remote debugger.  
+
+ 2. Running the cluser_py_script (run_remove_files_zeus.py) with the remote debugger caused an error that prevented that script
+ from running correctly. The cluster error logfile reads "Cannot locate localhost: 51234" and "Nonetype". This is not resolved
+ by adding the pydevd import line to the cluster python script.
 
 
 ## Built With
