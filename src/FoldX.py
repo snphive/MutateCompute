@@ -294,8 +294,7 @@ class FoldX(object):
             :param amino_acids: Amino acids that proteins will be mutated to.
             :param specific_fxmutants: Specific mutants to perform BuildModel computation on. Remains empty if all mutations
             should be calculated (specified by amino_acids list).
-            each mutant in this pdb.
-            :param write_to_csvfile: True to write ddG to csv file for each mutant in this pdb.
+            :param write_to_csvfile: True to write ddG to 1 csv dump file for all mutants in this pdb.
             """
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
@@ -470,6 +469,7 @@ class FoldX(object):
             :param specific_fxmutants: Given when only specific mutants should be computed (i.e. when some error/interruption has
             resulted in  a few mutants not being computed. There is no time wasted checking thousands of folders for output
             files when you only want to run a handful of mutants).
+            :param write_to_csvfile: True to write interaction ddG to 1 csv dump file for all mutants in this pdb.
             """
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
