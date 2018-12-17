@@ -194,9 +194,9 @@ class Cluster(object):
         subprocess.call(cmd, shell=True)
 
     @staticmethod
-    def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix: str):
+    def wait_for_grid_engine_job_to_complete(grid_engine_job_prefix_or_full_name: str):
         """
-        :param grid_engine_job_prefix: Typically two characters and underscore to be concatenated to a unique job
+        :param grid_engine_job_prefix_or_full_name: Typically two characters and underscore to be concatenated to a unique job
         identifier. The prefix is likely an abbreviation of the type of computation being performed, e.g. 'BM_pdb123'
         might be used for a FoldX BuildModel computation on a pdb file called 'pdb123'.
         """
@@ -204,8 +204,8 @@ class Cluster(object):
         check_qstat = subprocess.Popen(Cluster.CLSTR.QSTAT.value, stdout=subprocess.PIPE)
         output_qstat = check_qstat.stdout.read()
         # output_qstat = output_qstat.decode('utf-8')
-        while grid_engine_job_prefix.encode('utf-8') in output_qstat:
-            print('Waiting for all ' + grid_engine_job_prefix + ' to finish.')
+        while grid_engine_job_prefix_or_full_name.encode('utf-8') in output_qstat:
+            print('Waiting for ' + grid_engine_job_prefix_or_full_name + ' to finish.')
             time.sleep(10)
             check_qstat = subprocess.Popen(Cluster.CLSTR.QSTAT.value, stdout=subprocess.PIPE)
             output_qstat = check_qstat.stdout.read()
