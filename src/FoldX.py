@@ -20,8 +20,8 @@ from src.enums.Str import Str
 from src.enums.Paths import Paths
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
-# import pydevd
-# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+import pydevd
+pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -190,13 +190,13 @@ class FoldX(object):
 
     def has_already_removed_config_logs_fxoutfile(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
-        :param path_output_ac_or_bm_pdb_fxmutant_dir:
-        :return:
+        :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path to the folder of interest.
+        :return: True if unnecessary files are absent from specified location.
         """
         has_no_files_to_rm = True
         fx = FoldX()
         has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
-                                                                            fx.Strs.RNSCRPT_TXT.value))
+                                                                                    fx.Strs.RNSCRPT_TXT.value))
         has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
                                                                                     fx.Strs.ROTABASE_TXT.value))
         has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
@@ -225,7 +225,7 @@ class FoldX(object):
             for path_fxout_file in path_fxout_files:
                 has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_fxout_file)
         path_output_ac_or_bm_pdb_fxmutant_ologfiles = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
-                                                                        '*_' + fxmutantname + Str.CLSTR_OUT_LOGEXT.value + '*'))
+                                                                '*_' + fxmutantname + Str.CLSTR_OUT_LOGEXT.value + '*'))
         for path_ologfile in path_output_ac_or_bm_pdb_fxmutant_ologfiles:
             has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_ologfile)
         return has_no_files_to_rm
@@ -237,22 +237,30 @@ class FoldX(object):
         :return: Absolute path to csv dumpfile which is the file that ddG data is written to.
         """
         ddG = ''
-        buildmodel_csvfile_header = 'pdb,fxmutant,ddG'
-        analysecomplex_csvfile_header = 'pdb,fxmutant,interaction ddG'
         csvfile_header = ''
         fxout_prefix = ''
         path_output_ac_or_bm = ''
         path_output_ac_or_bm_ddG_csv_dumpfile = ''
+        is_writing_ddG = False
+        is_writing_interaction_ddG = False
+        ddG_lines_row_index = 0
+        ddG_value_cell_index = 0
         if Paths.DIR_BM.value in path_output_ac_or_bm_pdb_fxmutant_dir:
+            is_writing_ddG = True
             ddG = '_ddG'
-            csvfile_header = buildmodel_csvfile_header
+            csvfile_header = 'pdb,fxmutant,ddG'
             fxout_prefix = self.Strs.AVG_BMDL_.value
             path_output_ac_or_bm = Paths.OUTPUT_BM
+            ddG_lines_row_index = self.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value
+            ddG_value_cell_index = self.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value
         elif Paths.DIR_AC.value in path_output_ac_or_bm_pdb_fxmutant_dir:
+            is_writing_interaction_ddG = True
             ddG = '_interaction_ddG'
             fxout_prefix = self.Strs.SMRY_AC_.value
-            csvfile_header = analysecomplex_csvfile_header
+            csvfile_header = 'pdb,fxmutant,interaction ddG'
             path_output_ac_or_bm = Paths.OUTPUT_AC
+            ddG_lines_row_index = self.Strs.SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX.value
+            ddG_value_cell_index = self.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value
         else:
             print(
                 "The output directory path does not contain build_model or analyse_complex. If you are trying to read/write "
@@ -260,20 +268,39 @@ class FoldX(object):
         pdbname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-2]
         fxmutantname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-1]
         path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, fxout_prefix +
-                                                                       pdbname + self.Strs.FXOUTEXT.value)
+                                                                       pdbname + self.Strs.UNDRSCR1.value +
+                                                                       self.Strs.FXOUTEXT.value)
         if not os.path.exists(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile):
             print('Warning: ' + path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile + ' not found. Cannot find ddG value to write '
                   'to csvfile.')
         else:
-            path_output_ac_or_bm_ddG_csv_dumpfile = os.path.join(path_output_ac_or_bm, pdbname + ddG + Str.CSVEXT.value)
+            avg_ddG = 0
+            path_output_ac_or_bm_ddG_csv_dumpfile = os.path.join(path_output_ac_or_bm, pdbname + '_' + fxmutantname + ddG +
+                                                                 Str.CSVEXT.value)
             if not os.path.exists(path_output_ac_or_bm_ddG_csv_dumpfile):
                 with open(path_output_ac_or_bm_ddG_csv_dumpfile, 'w') as ddG_csv:
                     ddG_csv.write(csvfile_header + Str.NEWLN.value)
-            with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile, 'r') as ddG_f:
-                ddG_lines = ddG_f.readlines()
-                avg_ddG_values = ddG_lines[self.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value]
-                avg_ddG_values = avg_ddG_values.split()
-                avg_ddG = avg_ddG_values[self.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value]
+            if is_writing_interaction_ddG:
+                path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile_wt = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                        fxout_prefix + self.Strs.WT_.value + pdbname + self.Strs.UNDRSCR1.value
+                                                                                  + self.Strs.FXOUTEXT.value)
+                with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile, 'r') as ddG_f_mut:
+                    ddG_mut_lines = ddG_f_mut.readlines()
+                with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile_wt, 'r') as ddG_f_wt:
+                    ddG_wt_lines = ddG_f_wt.readlines()
+                    avg_ddG_mut_values = ddG_mut_lines[ddG_lines_row_index]
+                    avg_ddG_mut_values = avg_ddG_mut_values.split()
+                    avg_ddG_mut = float(avg_ddG_mut_values[ddG_value_cell_index])
+                    avg_ddG_wt_values = ddG_wt_lines[ddG_lines_row_index]
+                    avg_ddG_wt_values = avg_ddG_wt_values.split()
+                    avg_ddG_wt = float(avg_ddG_wt_values[ddG_value_cell_index])
+                    avg_ddG = str(avg_ddG_wt - avg_ddG_mut)
+            elif is_writing_ddG:
+                with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile, 'r') as ddG_f:
+                    ddG_lines = ddG_f.readlines()
+                    avg_ddG_values = ddG_lines[ddG_lines_row_index]
+                    avg_ddG_values = avg_ddG_values.split()
+                    avg_ddG = avg_ddG_values[ddG_value_cell_index]
             with open(path_output_ac_or_bm_ddG_csv_dumpfile, 'a+') as csv_f:
                 csv_f.write(pdbname + ',' + fxmutantname + ',' + avg_ddG + Str.NEWLN.value)
         return path_output_ac_or_bm_ddG_csv_dumpfile
@@ -355,6 +382,7 @@ class FoldX(object):
                         print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
                               fxmutantname + '. Therefore cannot write to csv file just yet.')
                         if using_cluster:
+                            jobname = Paths.PREFIX_FX_BM.value + fxmutantname
                             Cluster.wait_for_grid_engine_job_to_complete(jobname)
                     fx.write_to_csvfile_for_db_dump(path_output_bm_pdb_fxmutant_dir)
 
@@ -479,6 +507,7 @@ class FoldX(object):
             files when you only want to run a handful of mutants).
             :param write_to_csvfile: True to write interaction ddG to 1 csv dump file for all mutants in this pdb.
             """
+            jobname = ''
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
             wt_pdbname = FoldX.Strs.WT_.value + pdbname
@@ -487,12 +516,14 @@ class FoldX(object):
             path_output_bm_pdb_fxmutant_dirs = []
             if specific_fxmutants is not None:
                 for specific_fxmutant in specific_fxmutants:
+                    if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
+                        continue
                     path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
             else:
                 path_output_bm_pdb_fxmutant_dirs = sorted(glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*')))
-            if not path_output_bm_pdb_fxmutant_dirs:
-                print('No BuildModel output folders found for this pdb. AnalyseComplex requires repaired pdbs files for each '
-                      'mutant. Checking the AnalyseComplex mutant output folders for the necessary repaired pdbs .....')
+                if not path_output_bm_pdb_fxmutant_dirs:
+                    print('No BuildModel output folders found for this pdb. AnalyseComplex requires repaired pdbs files for each '
+                          'mutant. Checking the AnalyseComplex mutant output folders for the necessary repaired pdbs .....')
                 path_output_ac_pdb_fxmutant_dirs = sorted(glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*')))
                 if not path_output_ac_pdb_fxmutant_dirs:
                     print('No AnalyseComplex output folders found for this pdb either. Try running BuildModel first.')
@@ -511,29 +542,33 @@ class FoldX(object):
                 if has_one_chain_only:
                     print('Only one protein chain. No interactions to be quantified for this pdbfile.')
                     return
-                path_output_bm_pdb_fxmutant_repaired = os.path.join(path_output_bm_pdb_fxmutant_dir,
-                                                                    pdbname + fx.Strs.UNDRSCR1_0_PDB.value)
-                path_output_bm_pdb_fxmutant_wt_repaired = os.path.join(path_output_bm_pdb_fxmutant_dir, wt_pdbname +
-                                                                       fx.Strs.UNDRSCR1_0_PDB.value)
-                if not os.path.exists(path_output_bm_pdb_fxmutant_repaired) or not os.path.exists(
-                        path_output_bm_pdb_fxmutant_wt_repaired):
+                path_output_bm_pdb_fxmutant_repaired = glob.glob(os.path.join(path_output_bm_pdb_fxmutant_dir,
+                                                                              pdbname + fx.Strs.UNDRSCR1.value + '*' +
+                                                                              Str.PDBEXT.value))
+                path_output_bm_pdb_fxmutant_wt_repaired = glob.glob(os.path.join(path_output_bm_pdb_fxmutant_dir, wt_pdbname +
+                                                                                 fx.Strs.UNDRSCR1.value + '*' + Str.PDBEXT.value))
+                if not os.path.exists(path_output_bm_pdb_fxmutant_repaired[0]) or not os.path.exists(str(
+                        path_output_bm_pdb_fxmutant_wt_repaired[0])):
                     print('Repaired pdb files for this mutant cannot be found at the expected BuildModel output location: ' +
-                          path_output_bm_pdb_fxmutant_dir + '. AnalyseComplex cannot be run for this pdb/mutation. Check '
-                                                            'BuildModel has been run for this pdb/mutation.')
+                    path_output_bm_pdb_fxmutant_dir + '. AnalyseComplex cannot be run for this pdb/mutation. Check BuildModel '
+                                                      'has been run for this pdb/mutation.')
                     return
                 fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
                 path_output_ac_pdb_fxmutant = GUM.os_makedirs(Paths.OUTPUT, Paths.DIR_AC.value, pdbname, fxmutantname)
+                pdbs_to_analyse = []
                 if not self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant):
-                    pdbs_to_analyse = [pdbname + FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[0], ',', wt_pdbname +
-                                       FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[0]]
                     num_of_repaired_pdbs = fx._get_num_of_repaired_pdbfiles(path_output_bm_pdb_fxmutant_dir)
-                    for i in range(1, num_of_repaired_pdbs):
-                        pdbs_to_analyse.append(',')
-                        pdbs_to_analyse.append(pdbname)
-                        pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
-                        pdbs_to_analyse.append(',')
-                        pdbs_to_analyse.append(wt_pdbname)
-                        pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
+                    if num_of_repaired_pdbs == 1:
+                        pdbs_to_analyse = [pdbname + fx.Strs.UNDRSCR1.value + Str.PDBEXT.value, ',', wt_pdbname +
+                                           fx.Strs.UNDRSCR1.value + Str.PDBEXT.value]
+                    elif num_of_repaired_pdbs > 1:
+                        for i in range(1, num_of_repaired_pdbs):
+                            pdbs_to_analyse.append(',')
+                            pdbs_to_analyse.append(pdbname)
+                            pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
+                            pdbs_to_analyse.append(',')
+                            pdbs_to_analyse.append(wt_pdbname)
+                            pdbs_to_analyse.append(FoldX.Strs.UNDRSCR1_012_SUFFIX_PDBS.value[i])
                     pdbs_to_analyse = ''.join(pdbs_to_analyse)
                     fx.write_runscript_file(path_output_ac_pdb_fxmutant, pdbs_to_analyse, self.conditions, action)
                     path_runscript_file = os.path.join(path_output_ac_pdb_fxmutant, fx.Strs.RNSCRPT_TXT.value)
@@ -568,11 +603,19 @@ class FoldX(object):
                 # The following section can be run in a separate thread, subject to checking a list of completed jobs,
                 # For example, a producer/consumer model.
                 if write_to_csvfile:
+                    i = 0
                     while not self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant):
-                        print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
-                              fxmutantname + '. Therefore cannot write to csv file just yet.')
+                        print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
+                              fxmutantname + '. Therefore cannot write to csv file just yet... (waiting 10 seconds to try again)')
+                        i += 6
+                        if i > 10:
+                            raise ValueError('AnalyseComplex has failed to produce the required ' + fx.Strs.SMRY_AC_.value +
+                                             pdbname + fx.Strs.FXOUTEXT.value + ' file for: ' + fxmutantname + ' after 60 '
+                                             'seconds. Something is wrong, aborting with a ValueError. Perhaps check the '
+                                             'cluster logfiles??')
                     print('Writing values to csv dump file for: ' + pdbname + '_' + fxmutantname)
                     if using_cluster:
+                        jobname = Paths.PREFIX_FX_AC.value + fxmutantname
                         Cluster.wait_for_grid_engine_job_to_complete(jobname)
                     fx.write_to_csvfile_for_db_dump(path_output_ac_pdb_fxmutant)
 
@@ -586,8 +629,14 @@ class FoldX(object):
             pdbname = path_output_ac_pdb_fxmutant_dir[-2]
             path_output_ac_pdb_fxmutant_dir = '/'.join(path_output_ac_pdb_fxmutant_dir)
             fx = FoldX()
-            return os.path.exists(os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value + pdbname
-                                               + fx.Strs.UNDRSCR1_.value + '*' + fx.Strs.FXOUTEXT.value))
+            path_smry_ac_pdbname_1_fxout = glob.glob(os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value +
+                                                                  pdbname + fx.Strs.UNDRSCR1.value + '*' +
+                                                                  fx.Strs.FXOUTEXT.value))
+            path_smry_ac_wtpdbname_1_fxout = glob.glob(os.path.join(path_output_ac_pdb_fxmutant_dir, fx.Strs.SMRY_AC_.value +
+                                                                    fx.Strs.WT_.value + pdbname + fx.Strs.UNDRSCR1.value + '*'
+                                                                    + fx.Strs.FXOUTEXT.value))
+            return len(path_smry_ac_pdbname_1_fxout) > 0 and len(path_smry_ac_pdbname_1_fxout) == len(
+                path_smry_ac_wtpdbname_1_fxout)
 
         def find_num_of_missing_interaction_energies(self, path_pdbfile: str, amino_acids: list):
             """
