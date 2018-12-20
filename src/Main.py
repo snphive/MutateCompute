@@ -28,10 +28,12 @@ __status__ = "Development"
 class Main(object):
 
     def __init__(self, operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfiles: list,
-                 path_fastafiles: list, specific_fxmutants: list, amino_acids: list):
+                 path_fastafiles: list, specific_fxmutants: list, amino_acids: list,
+                 write_to_csv_dumpfile_after_each_mutant: bool):
         """
         All algorithmic analyses start from here. IdentifyProtein.py which runs Blast analyses is the only program that
         currently runs independently.
+        :param write_to_csv_dumpfile_after_each_mutant:
         :param operations: Operations flagged True to run, False to not run.
         :param use_multithread: True if program(s) should be spawned on separate threads/processes.
         :param path_input: Abs path to input root dir
@@ -39,6 +41,8 @@ class Main(object):
         :param path_pdbfiles: Abs path to repo of pdbfiles.
         :param path_fastafiles: Abs path to repo of fastafiles.
         :param amino_acids: All amino acids that mutation operations will mutate residues to.
+        :param write_to_csv_dumpfile_after_each_mutant: True to extract desired values to write to a single csv file (for
+        database dump).
         """
         if operations == {} or Main._all_ops_are_false(operations):
             raise ValueError("All options in 'operations' were either set to FALSE or some typographical error. "
@@ -47,7 +51,8 @@ class Main(object):
                 operations[Str.OPER_RUN_FX_RPR.value] or operations[Str.OPER_RUN_FX_BM.value] or \
                 operations[Str.OPER_RUN_FX_STAB.value] or operations[Str.OPER_RUN_FX_AC.value]:
             Scheduler.start(operations, use_multithread, path_input, path_output, path_pdbfiles, path_fastafiles,
-                            specific_fxmutants, amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False)
+                            specific_fxmutants, amino_acids, write_1_fasta_only=True, write_fasta_per_mut=False,
+                            write_to_csv_dumpfile_after_each_mutant=write_to_csv_dumpfile_after_each_mutant)
 
     @staticmethod
     def _all_ops_are_false(operations: dict):
