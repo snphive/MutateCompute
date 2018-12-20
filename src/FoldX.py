@@ -123,13 +123,15 @@ class FoldX(object):
 
         for path_output_ac_or_bm_pdb_fxmutant_elogfile in path_output_ac_or_bm_pdb_fxmutant_elogfiles:
             if os.stat(path_output_ac_or_bm_pdb_fxmutant_elogfile).st_size != 0:
-                with open(path_output_ac_or_bm_pdb_fxmutant_elogfile) as f:
+                with open(path_output_ac_or_bm_pdb_fxmutant_elogfile, 'r') as f:
                     path_output_ac_or_bm_pdb_fxmutant_elogfile = path_output_ac_or_bm_pdb_fxmutant_elogfile.split('/')
                     pdbname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-3]
                     fxmutantname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-2]
+                    path_output_ac_or_bm_pdb_fxmutant_elogfile = '/'.join(path_output_ac_or_bm_pdb_fxmutant_elogfile)
                     print('This error logfile is not 0 bytes in size (' + pdbname + ':' + fxmutantname + ')')
-                    print('The error logfile reads: ' + f.read())
-                    if f.read() == 'Could not connect to localhost: 51234\nNoneType':
+                    err_log_f = f.read()
+                    print('The error logfile reads: ' + err_log_f)
+                    if 'Could not connect to localhost' in err_log_f:
                         print('This message is a bug that only seems to occur when running the linux remove command while '
                               'Pycharm is using the pydevd remote debugger. Therefore it will now be deleted.')
                         GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
@@ -233,7 +235,10 @@ class FoldX(object):
             has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_fxout_file)
         path_output_ac_or_bm_pdb_fxmutant_ologfiles = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
                                                                 '*_' + fxmutantname + Str.CLSTR_OUT_LOGEXT.value + '*'))
-        has_no_files_to_rm = has_no_files_to_rm and not path_output_ac_or_bm_pdb_fxmutant_ologfiles
+        path_output_ac_or_bm_pdb_fxmutant_elogfiles = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
+                                                                '*_' + fxmutantname + Str.CLSTR_ERR_LOGEXT.value + '*'))
+        has_no_files_to_rm = has_no_files_to_rm and not path_output_ac_or_bm_pdb_fxmutant_ologfiles and not \
+            path_output_ac_or_bm_pdb_fxmutant_elogfiles
         return has_no_files_to_rm
 
     def write_to_csvfile_for_db_dump(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
