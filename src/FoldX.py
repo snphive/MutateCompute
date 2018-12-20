@@ -317,7 +317,7 @@ class FoldX(object):
             self.conditions = cond
 
         def mutate_protein_structure(self, path_pdbfile: str, amino_acids: list, specific_fxmutants=None,
-                                     write_to_csv_dumpfile=True):
+                                     write_to_csv_dumpfile_after_each_mutant=False):
             """
             Mutate all amino acids in this pdb to all listed amino acids using FoldX BuildModel.
             Note: individual_list needs to go in the same dir as runscript.txt.
@@ -326,7 +326,7 @@ class FoldX(object):
             :param amino_acids: Amino acids that proteins will be mutated to.
             :param specific_fxmutants: Specific mutants to perform BuildModel computation on. Remains empty if all mutations
             should be calculated (specified by amino_acids list).
-            :param write_to_csv_dumpfile: True to write ddG to 1 csv dump file for all mutants in this pdb.
+            :param write_to_csv_dumpfile_after_each_mutant: True to write ddG to 1 csv dump file for all mutants in this pdb.
             """
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
@@ -380,7 +380,7 @@ class FoldX(object):
                 # For example, a producer/consumer model.
                 else:
                     print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists for: ' + fxmutantname)
-                if write_to_csv_dumpfile:
+                if write_to_csv_dumpfile_after_each_mutant:
                     print('Writing values to csv dump file for: ' + pdbname + '_' + fxmutantname)
                     while not self.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
                         print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
@@ -502,7 +502,8 @@ class FoldX(object):
             """
             self.conditions = cond
 
-        def calculate_complex_energies(self, path_pdbfile: str, specific_fxmutants=None, write_to_csv_dumpfile=True):
+        def calculate_complex_energies(self, path_pdbfile: str, specific_fxmutants=None,
+                                       write_to_csv_dumpfile_after_each_mutant=False):
             """
             Calculates interaction energies for a complex of protein chains for a specified pdb and list of amino acids.
             The repaired pdbs are read from each output_data/buildmodel/<pdbname>/<fxmutantname> folder.
@@ -510,9 +511,8 @@ class FoldX(object):
             :param specific_fxmutants: Given when only specific mutants should be computed (i.e. when some error/interruption has
             resulted in  a few mutants not being computed. There is no time wasted checking thousands of folders for output
             files when you only want to run a handful of mutants).
-            :param write_to_csv_dumpfile: True to write interaction ddG to 1 csv dump file for all mutants in this pdb.
+            :param write_to_csv_dumpfile_after_each_mutant: True to write interaction ddG to 1 csv dump file for all mutants in this pdb.
             """
-            jobname = ''
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
             wt_pdbname = FoldX.Strs.WT_.value + pdbname
@@ -607,7 +607,7 @@ class FoldX(object):
                     print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists for: ' + fxmutantname)
                 # The following section can be run in a separate thread, subject to checking a list of completed jobs,
                 # For example, a producer/consumer model.
-                if write_to_csv_dumpfile:
+                if write_to_csv_dumpfile_after_each_mutant:
                     i = 0
                     while not self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant):
                         print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
