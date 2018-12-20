@@ -129,6 +129,10 @@ class FoldX(object):
                     fxmutantname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-2]
                     print('This error logfile is not 0 bytes in size (' + pdbname + ':' + fxmutantname + ')')
                     print('The error logfile reads: ' + f.read())
+                    if f.read() == 'Could not connect to localhost: 51234\nNoneType':
+                        print('This message is a bug that only seems to occur when running the linux remove command while '
+                              'Pycharm is using the pydevd remote debugger. Therefore it will now be deleted.')
+                        GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
             else:
                 GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
 
