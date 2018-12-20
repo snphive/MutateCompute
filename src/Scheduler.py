@@ -34,7 +34,7 @@ class Scheduler(object):
     @staticmethod
     def start(operations: dict, use_multithread: bool, path_input: str, path_output: str, path_pdbfiles: list,
               path_fastafiles: list, specific_fxmutants: list, amino_acids: list, write_1_fasta_only: bool,
-              write_fasta_per_mut: bool):
+              write_fasta_per_mut: bool, write_to_csv_dumpfile: bool):
         """
         Iterate through a list of fasta files or pdb files and perform Agadir, or Foldx computations as specified by 'operations'.
         :param operations: Each operation paired with True/False flag to indicate whether or not to perform the operation.
@@ -47,6 +47,7 @@ class Scheduler(object):
         :param amino_acids: Amino acids that mutation operations should use to mutate to.
         :param write_1_fasta_only: True to write any fasta output data to 1 fasta file, each separated by \n.
         :param write_fasta_per_mut: True to write any fasta output data as 1 fasta file per mutant. (Uses a lot of disk space).
+        :param write_to_csv_dumpfile: True to write ddG values from fxout files to one csv file (for database dump).
         """
         if path_fastafiles:
             if operations[Scheduler.Strs.OPER_RUN_MUT_FSTA.value]:
@@ -111,13 +112,15 @@ class Scheduler(object):
                         Scheduler._launch_thread(target=buildmodel.mutate_protein_structure,
                                                  args=[path_pdbfile, amino_acids, specific_fxmutants])
                     else:
-                        buildmodel.mutate_protein_structure(path_pdbfile, amino_acids, specific_fxmutants, write_to_csvfile=True)
+                        buildmodel.mutate_protein_structure(path_pdbfile, amino_acids, specific_fxmutants,
+                                                            write_to_csv_dumpfile=write_to_csv_dumpfile)
                 if operations[Scheduler.Strs.OPER_RUN_FX_AC.value]:
                     analysecomplex = FoldX().AnalyseComplex(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
                         Scheduler._launch_thread(target=analysecomplex.calculate_complex_energies, args=path_pdbfile)
                     else:
-                        analysecomplex.calculate_complex_energies(path_pdbfile, specific_fxmutants)
+                        analysecomplex.calculate_complex_energies(path_pdbfile, specific_fxmutants,
+                                                                  write_to_csv_dumpfile=write_to_csv_dumpfile)
                 if operations[Scheduler.Strs.OPER_RUN_FX_RPR.value]:
                     repair = FoldX().Repair(Cond.INCELL_MAML_FX.value)
                     if use_multithread:
