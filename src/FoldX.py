@@ -224,8 +224,8 @@ class FoldX(object):
         for prefix_of_file_to_rm in prefixes_of_files_to_rm:
             path_fxout_files.append(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, prefix_of_file_to_rm + pdbname +
                                                  fx.Strs.FXOUTEXT.value))
-            for path_fxout_file in path_fxout_files:
-                has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_fxout_file)
+        for path_fxout_file in path_fxout_files:
+            has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_fxout_file)
         path_output_ac_or_bm_pdb_fxmutant_ologfiles = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
                                                                 '*_' + fxmutantname + Str.CLSTR_OUT_LOGEXT.value + '*'))
         has_no_files_to_rm = has_no_files_to_rm and not path_output_ac_or_bm_pdb_fxmutant_ologfiles
