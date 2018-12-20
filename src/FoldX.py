@@ -239,17 +239,22 @@ class FoldX(object):
         ddG = ''
         csvfile_header = ''
         fxout_prefix = ''
+        fxout_suffix = ''
         path_output_ac_or_bm = ''
         path_output_ac_or_bm_ddG_csv_dumpfile = ''
         is_writing_ddG = False
         is_writing_interaction_ddG = False
         ddG_lines_row_index = 0
         ddG_value_cell_index = 0
+        pdbname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-2]
+        fxmutantname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-1]
+
         if Paths.DIR_BM.value in path_output_ac_or_bm_pdb_fxmutant_dir:
             is_writing_ddG = True
             ddG = '_ddG'
             csvfile_header = 'pdb,fxmutant,ddG'
             fxout_prefix = self.Strs.AVG_BMDL_.value
+            fxout_suffix = self.Strs.FXOUTEXT.value
             path_output_ac_or_bm = Paths.OUTPUT_BM
             ddG_lines_row_index = self.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value
             ddG_value_cell_index = self.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value
@@ -257,33 +262,31 @@ class FoldX(object):
             is_writing_interaction_ddG = True
             ddG = '_interaction_ddG'
             fxout_prefix = self.Strs.SMRY_AC_.value
+            fxout_suffix = self.Strs.UNDRSCR1.value + self.Strs.FXOUTEXT.value
             csvfile_header = 'pdb,fxmutant,interaction ddG'
             path_output_ac_or_bm = Paths.OUTPUT_AC
             ddG_lines_row_index = self.Strs.SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX.value
-            ddG_value_cell_index = self.Strs.SMRY_AC_FILE_INTER_ENERGY_CELL_INDEX.value
+            ddG_value_cell_index = self.Strs.SMRY_AC_FILE_INTpwdER_ENERGY_CELL_INDEX.value
         else:
             print(
                 "The output directory path does not contain build_model or analyse_complex. If you are trying to read/write "
                 "Agadir-related files, you'll need to complete the logic for it here (in FoldX class)")
-        pdbname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-2]
-        fxmutantname = path_output_ac_or_bm_pdb_fxmutant_dir.split('/')[-1]
         path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, fxout_prefix +
-                                                                       pdbname + self.Strs.UNDRSCR1.value +
-                                                                       self.Strs.FXOUTEXT.value)
+                                                                       pdbname + fxout_suffix)
         if not os.path.exists(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile):
             print('Warning: ' + path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile + ' not found. Cannot find ddG value to write '
                   'to csvfile.')
         else:
             avg_ddG = 0
-            path_output_ac_or_bm_ddG_csv_dumpfile = os.path.join(path_output_ac_or_bm, pdbname + '_' + fxmutantname + ddG +
-                                                                 Str.CSVEXT.value)
+            path_output_ac_or_bm_ddG_csv_dumpfile = os.path.join(path_output_ac_or_bm, pdbname + ddG + Str.CSVEXT.value)
             if not os.path.exists(path_output_ac_or_bm_ddG_csv_dumpfile):
                 with open(path_output_ac_or_bm_ddG_csv_dumpfile, 'w') as ddG_csv:
                     ddG_csv.write(csvfile_header + Str.NEWLN.value)
             if is_writing_interaction_ddG:
                 path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile_wt = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
-                                                        fxout_prefix + self.Strs.WT_.value + pdbname + self.Strs.UNDRSCR1.value
-                                                                                  + self.Strs.FXOUTEXT.value)
+                                                                                  fxout_prefix + self.Strs.WT_.value + pdbname +
+                                                                                  self.Strs.UNDRSCR1.value +
+                                                                                  self.Strs.FXOUTEXT.value)
                 with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile, 'r') as ddG_f_mut:
                     ddG_mut_lines = ddG_f_mut.readlines()
                 with open(path_output_ac_or_bm_pdb_fxmutant_ddG_fxoutfile_wt, 'r') as ddG_f_wt:
@@ -313,7 +316,8 @@ class FoldX(object):
             """
             self.conditions = cond
 
-        def mutate_protein_structure(self, path_pdbfile: str, amino_acids: list, specific_fxmutants=None, write_to_csvfile=True):
+        def mutate_protein_structure(self, path_pdbfile: str, amino_acids: list, specific_fxmutants=None,
+                                     write_to_csv_dumpfile=True):
             """
             Mutate all amino acids in this pdb to all listed amino acids using FoldX BuildModel.
             Note: individual_list needs to go in the same dir as runscript.txt.
@@ -322,7 +326,7 @@ class FoldX(object):
             :param amino_acids: Amino acids that proteins will be mutated to.
             :param specific_fxmutants: Specific mutants to perform BuildModel computation on. Remains empty if all mutations
             should be calculated (specified by amino_acids list).
-            :param write_to_csvfile: True to write ddG to 1 csv dump file for all mutants in this pdb.
+            :param write_to_csv_dumpfile: True to write ddG to 1 csv dump file for all mutants in this pdb.
             """
             pdbfile = path_pdbfile.split('/')[-1]
             pdbname = pdbfile.split('.')[0]
@@ -376,7 +380,7 @@ class FoldX(object):
                 # For example, a producer/consumer model.
                 else:
                     print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists for: ' + fxmutantname)
-                if write_to_csvfile:
+                if write_to_csv_dumpfile:
                     print('Writing values to csv dump file for: ' + pdbname + '_' + fxmutantname)
                     while not self.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
                         print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
@@ -439,11 +443,12 @@ class FoldX(object):
 
         def write_bm_avg_fxout_to_1csvfile_up_2dirlevels(self, path_output_bm_pdb_fxmutant_dir):
             """
-            Reads the Average_BuildModel_..fxout file and writes a csv file of the data lines only (excluding top 8 lines (
-            FoldX version and Consortium info, pdb name, output type..). The csv filename incorporates the pdbname and
-            mutation, so there is no longer the need for the extra pdb folder and the many fxmutant subfolders, hence it is
-            written two levels up, to /output_data/analyse_complex/. The fxmtuant directory is then deleted, saving about 20KB
-            per mutant.
+            Produces 1 csvfile per mutant with the average ddG value.
+            Produces 1 csvfile per mutant with the average ddG value.
+            Reads the Average_BuildModel_..fxout file and writes csv of data lines only (excluding top 8 lines (FoldX version
+            and Consortium info, pdb name, output type..). The csv filename incorporates the pdbname and mutation, so there is
+            no longer the need for the extra pdb folder and the many fxmutant subfolders, hence it is written two levels up,
+            to /output_data/analyse_complex/. (The fxmtuant directory could then be deleted, saving about 20 KB per mutant.)
             :param path_output_bm_pdb_fxmutant_dir: Absolute path for mutant directory holding Average_BuildModel_..fxout file.
             :return: New csv output file (with its absolute path).
             """
@@ -462,9 +467,9 @@ class FoldX(object):
             if not os.path.exists(path_output_bm_pdb_fxmutant_avg_fxoutfile):
                 if not os.path.exists(path_output_bm_avg_csvfile):
                     print('Warning: ' + path_output_bm_pdb_fxmutant_avg_fxoutfile + ' not found. But ' +
-                          path_output_bm_avg_csvfile + ' also not found. It seems the Average_BuildModel_ value for this '
-                                                           'mutant has not been calculated yet. Otherwise the data files have '
-                                                           'been transferred to a new location or lost.')
+                          path_output_bm_avg_csvfile + ' also not found. It seems the Average_BuildModel_ value for this mutant '
+                                                       'has not been calculated yet. Otherwise the data files have been '
+                                                       'transferred to a new location or lost.')
                     return ''
                 else:
                     print(path_output_bm_avg_csvfile + ' has already been written.')
@@ -497,7 +502,7 @@ class FoldX(object):
             """
             self.conditions = cond
 
-        def calculate_complex_energies(self, path_pdbfile: str, specific_fxmutants=None, write_to_csvfile=True):
+        def calculate_complex_energies(self, path_pdbfile: str, specific_fxmutants=None, write_to_csv_dumpfile=True):
             """
             Calculates interaction energies for a complex of protein chains for a specified pdb and list of amino acids.
             The repaired pdbs are read from each output_data/buildmodel/<pdbname>/<fxmutantname> folder.
@@ -505,7 +510,7 @@ class FoldX(object):
             :param specific_fxmutants: Given when only specific mutants should be computed (i.e. when some error/interruption has
             resulted in  a few mutants not being computed. There is no time wasted checking thousands of folders for output
             files when you only want to run a handful of mutants).
-            :param write_to_csvfile: True to write interaction ddG to 1 csv dump file for all mutants in this pdb.
+            :param write_to_csv_dumpfile: True to write interaction ddG to 1 csv dump file for all mutants in this pdb.
             """
             jobname = ''
             pdbfile = path_pdbfile.split('/')[-1]
@@ -602,7 +607,7 @@ class FoldX(object):
                     print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' already exists for: ' + fxmutantname)
                 # The following section can be run in a separate thread, subject to checking a list of completed jobs,
                 # For example, a producer/consumer model.
-                if write_to_csvfile:
+                if write_to_csv_dumpfile:
                     i = 0
                     while not self.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant):
                         print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
@@ -694,11 +699,12 @@ class FoldX(object):
 
         def write_ac_sumry_fxout_to_1csvfile_up_2dirlevels(self, path_output_ac_pdb_fxmutant_dir: str):
             """
-            Reads the Summary_AnalyseComplex_..fxout file and writes a csv file of the data lines only (excluding top 8
-            lines (FoldX version and Consortium info, pdb name, output type..). The csv filename incorporates the pdbname and
-            mutation, so there is no longer the need for the extra pdb folder and the many fxmutant subfolders, hence it is
-            written two levels up, to /output_data/analyse_complex/. The fxmtuant directory is then deleted, saving about 20KB
-            per mutant.
+            Produces 1 csvfile per mutant with the average ddG value.
+            Reads the Summary_AnalyseComplex_..fxout file and writes csv of data lines only (excluding top 8 lines (FoldX
+            version and Consortium info, pdb name, output type..). The csv filename incorporates the pdbname and mutation,
+            so there is no longer the need for the extra pdb folder and the many fxmutant subfolders, hence it is written two
+            levels up, to /output_data/analyse_complex/. (The fxmtuant directory could then be deleted, saving about 20KB
+            per mutant.)
             :param path_output_ac_pdb_fxmutant_dir: absolute path to mutant directory holding the
             Summary_AnalyseComplex_..fxout file.
             :return: New csv output file (with its absolute path)
@@ -801,4 +807,4 @@ class FoldX(object):
         SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX = 9
 
 
-# pydevd.stoptrace()
+pydevd.stoptrace()
