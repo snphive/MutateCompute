@@ -108,14 +108,15 @@ class FoldX(object):
 
     def rm_logfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
-        Remove all e.1234567 and o.1234567 cluster log files from specified output directory.
+        Remove all o. cluster log files from specified output directory. Remove all empty e. cluster log files. Any e. log
+        files that are not empty may be important so they are not deleted and the error message read and printed to console
+        from here.
         :param path_output_ac_or_bm_pdb_fxmutant_dir: Absolute path for log files to be deleted.
         """
         fxmutantname = os.path.basename(path_output_ac_or_bm_pdb_fxmutant_dir)
         path_output_ac_or_bm_pdb_fxmutant_ologfiles = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, '*_' + fxmutantname +
                                                                    Str.CLSTR_OUT_LOGEXT.value + '*')
         GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_ologfiles)
-
         path_output_ac_or_bm_pdb_fxmutant_elogfiles = os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, '*_' + fxmutantname +
                                                                    Str.CLSTR_ERR_LOGEXT.value + '*')
         path_output_ac_or_bm_pdb_fxmutant_elogfiles = glob.glob(path_output_ac_or_bm_pdb_fxmutant_elogfiles)
