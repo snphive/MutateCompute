@@ -2,7 +2,7 @@
 """
 Script for reading multiple csv output files for writing to a single csv file, (in order to facilitate mysql dumps).
 
-WriteCSVFileForDump.py can be run locally or on cluster.
+WriteCSVDumpFileFromCSVFiles.py can be run locally or on cluster.
 """
 import sys
 import os
@@ -65,7 +65,7 @@ for path_output_csvfile in path_output_csvfiles:
         path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
         Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
                                  python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
-                                 'run_write_1csvfile_from_csvPerMutantfiles_zeus.py' + Str.SPCE.value + path_output_csvfile +
+                                 'write_1csvfile_from_csvPerMutantfiles_zeus.py' + Str.SPCE.value + path_output_csvfile +
                                  Str.SPCE.value + path_output_ac_or_bm_dir + Str.SPCE.value + pdbname))
         Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
     else:
