@@ -113,18 +113,20 @@ class Paths(Enum):
             MC_SRC_ENUMS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_ENUMS)
             MC_SRC_LAUNCHERS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_LAUNCHERS)
             MC_SRC_TOOLS = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_TOOLS)
+            MC_SRC_CLSTR_DB = os.path.join(LOCAL_MUTATECOMPUTE, DIR_SRC, DIR_DB)
             LOCAL_INPUT = os.path.join(LOCAL_PYPROJ, DIR_INPUT)
             LOCAL_INPUT_FASTAS = os.path.join(LOCAL_INPUT, DIR_FASTAS)
             LOCAL_INPUT_PDBS = os.path.join(LOCAL_INPUT, DIR_PDBS)
             LOCAL_INPUT_29611_FASTAS_1000 = os.path.join(LOCAL_INPUT, DIR_29611_FASTAS_1000)
-            LOCAL_INPUT_MUTS_MULTIFASTAS_29611_1000 = os.path.join(LOCAL_INPUT, DIR_MUTANTS_MULTIFASTAS,
-                                                                   DIR_29611_FASTAS_1000)
+            LOCAL_INPUT_MUTS_MULTIFASTAS_29611_1000 = os.path.join(LOCAL_INPUT, DIR_MUTANTS_MULTIFASTAS, DIR_29611_FASTAS_1000)
             LOCAL_OUTPUT = os.path.join(LOCAL_PYPROJ, DIR_OUTPUT)
             LOCAL_OUTPUT_FASTAS = os.path.join(LOCAL_OUTPUT, DIR_FASTAS)
             LOCAL_OUTPUT_BLASTP = os.path.join(LOCAL_OUTPUT, DIR_BLASTP)
             LOCAL_OUTPUT_AGADIR = os.path.join(LOCAL_OUTPUT, DIR_AGADIR)
             LOCAL_OUTPUT_BM = os.path.join(LOCAL_OUTPUT, DIR_BM)
             LOCAL_OUTPUT_AC = os.path.join(LOCAL_OUTPUT, DIR_AC)
+
+
 
             # ABSOLUTE PATHS TO FASTA & PDB REPOSITORIES BUILT FROM LOCAL ROOT AND DIRECTORY NAMES
             MC_REPO_PDB_FASTA = paths_and_dictionaries['ROOT']['path_local_pdb_fasta_repository']
@@ -155,8 +157,7 @@ class Paths(Enum):
             SE_INPUT_FASTAS = os.path.join(SE_INPUT, DIR_FASTAS)
             SE_INPUT_PDBS = os.path.join(SE_INPUT, DIR_PDBS)
             SE_INPUT_29611_FASTAS_1000 = os.path.join(SE_INPUT, DIR_29611_FASTAS_1000)
-            SE_INPUT_MUTS_MULTIFASTAS_29611_1000 = os.path.join(SE_INPUT, DIR_MUTANTS_MULTIFASTAS,
-                                                                DIR_29611_FASTAS_1000)
+            SE_INPUT_MUTS_MULTIFASTAS_29611_1000 = os.path.join(SE_INPUT, DIR_MUTANTS_MULTIFASTAS, DIR_29611_FASTAS_1000)
             SE_OUTPUT = os.path.join(ZEUS_SNPEFFECT, DIR_OUTPUT)
             SE_OUTPUT_FASTAS = os.path.join(SE_OUTPUT, DIR_FASTAS)
             SE_OUTPUT_BLASTP = os.path.join(SE_OUTPUT, DIR_BLASTP)
@@ -184,8 +185,7 @@ class Paths(Enum):
         Paths.CONFIG_FX = Paths.SE_CONFIG_FX.value if use_cluster else Paths.MC_CONFIG_FX.value
         Paths.CONFIG_GLOBAL_OPTIONS = Paths.SE_CONFIG_GLOBAL_OPTIONS.value if use_cluster else \
             Paths.MC_CONFIG_GLOBAL_OPTIONS.value
-        Paths.CONFIG_ACRUNSCRIPT = Paths.SE_CONFIG_ACRUNSCRIPT.value if use_cluster else \
-            Paths.MC_CONFIG_ACRUNSCRIPT.value
+        Paths.CONFIG_ACRUNSCRIPT = Paths.SE_CONFIG_ACRUNSCRIPT.value if use_cluster else Paths.MC_CONFIG_ACRUNSCRIPT.value
         Paths.CONFIG_AC_JOBQ = Paths.SE_CONFIG_AC_JOBQ.value
         Paths.CONFIG_BLST_JOBQ = Paths.SE_CONFIG_BLST_JOBQ.value
         Paths.CONFIG_BMRUNSCRIPT = Paths.SE_CONFIG_BMRUNSCRIPT.value if use_cluster else \
@@ -212,7 +212,7 @@ class Paths(Enum):
         Paths.BASH = Paths.SE_BASH.value if use_cluster else Paths.MC_BASH.value
         Paths.SRC = Paths.SE_SRC.value if use_cluster else Paths.MC_SRC.value
         Paths.SRC_CLSTR_PYSCRPTS = Paths.SE_SRC_CLSTR_PYSCRPTS.value if use_cluster else Paths.MC_SRC_CLSTR_PYSCRPTS.value
-        Paths.SRC_DB = Paths.SE_SRC_DB.value if use_cluster else Paths.MC_SRC_CLSTR_DB.value
+        Paths.SRC_DB = Paths.SE_SRC_DB.value if use_cluster else Paths.MC_SRC_DB.value
         Paths.SRC_ENUMS = Paths.SE_SRC_ENUMS.value if use_cluster else Paths.MC_SRC_ENUMS.value
         Paths.SRC_LAUNCHERS = Paths.SE_SRC_LAUNCHERS.value if use_cluster else Paths.MC_SRC_LAUNCHERS.value
         Paths.SRC_TOOLS = Paths.SE_SRC_TOOLS.value if use_cluster else Paths.MC_SRC_TOOLS.value
