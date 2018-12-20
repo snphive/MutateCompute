@@ -54,6 +54,8 @@ class IdProt(object):
         # There are problems with using Biopython.Blast on the cluster that I have not yet solved. I may use the
         # blast module that is loaded on the cluster (v 2.5.0+) instead of via Biopython.
         if GUM.using_cluster():
+            # THE 18 OR SO LINES BELOW HERE ARE COMMENTED OUT BECAUSE BIOPYTHON BLAST DID NOT WORK ON THE CLUSTER AND I DON'T
+            # YET KNOW WHY.
             # for path_fastafile in path_input_fastafile_list:
             #     with open(path_fastafile) as fastafile_opened:
             #         fastafilename = path_fastafile.split('/')[-1].split('.')[0]
