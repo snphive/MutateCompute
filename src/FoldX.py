@@ -219,15 +219,15 @@ class FoldX(object):
         path_output_ac_or_bm_pdb_fxmutant_dir = '/'.join(path_output_ac_or_bm_pdb_fxmutant_dir)
         prefixes_of_files_to_rm = fx.Strs.BM_FILES_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else \
             fx.Strs.AC_FILES_TO_DELETE.value
+        path_fxout_files = []
         for prefix_of_file_to_rm in prefixes_of_files_to_rm:
-            path_fxout_files = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, prefix_of_file_to_rm + '*' +
-                                                      pdbname + '*' + fx.Strs.FXOUTEXT.value))
+            path_fxout_files.append(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, prefix_of_file_to_rm + pdbname +
+                                                 fx.Strs.FXOUTEXT.value))
             for path_fxout_file in path_fxout_files:
                 has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_fxout_file)
         path_output_ac_or_bm_pdb_fxmutant_ologfiles = glob.glob(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir,
                                                                 '*_' + fxmutantname + Str.CLSTR_OUT_LOGEXT.value + '*'))
-        for path_ologfile in path_output_ac_or_bm_pdb_fxmutant_ologfiles:
-            has_no_files_to_rm = has_no_files_to_rm and not os.path.exists(path_ologfile)
+        has_no_files_to_rm = has_no_files_to_rm and not path_output_ac_or_bm_pdb_fxmutant_ologfiles
         return has_no_files_to_rm
 
     def write_to_csvfile_for_db_dump(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
