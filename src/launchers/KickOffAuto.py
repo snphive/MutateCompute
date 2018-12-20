@@ -76,7 +76,7 @@ for i in range(29):
     Kick off the program(s) via the constructor or Main class.
     """
     main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles,
-                AA.LIST_ALL_20_AA.value)
+                AA.LIST_ALL_20_AA.value, write_to_csv_dumpfile_after_each_mutant=False)
     if i == 0:
         break
     startnum += 1000
@@ -114,7 +114,7 @@ def run_agadir_on_1000_fastas():
         time.sleep(1)
         if GUM.using_cluster():
             jobname = Paths.PREFIX_WRITE.value + path_fastafile.split('/')[-1]
-            path_to_script = os.path.join(Paths.SRC, 'run_write_1fastafile_per_fasta_from_multifastafile_zeus.py')
+            path_to_script = os.path.join(Paths.SRC, 'write_1fastafile_per_fasta_from_multifastafile_zeus.py')
             Cluster.write_job_q_bash(jobname, path_job_q_dir=Paths.CONFIG_JOBQ,
                                      python_script_with_paths=path_to_script + Str.SPCE.value + path_fastafile)
             Cluster.run_job_q(path_job_q_dir=Paths.CONFIG_JOBQ)
