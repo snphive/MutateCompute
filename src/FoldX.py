@@ -124,7 +124,7 @@ class FoldX(object):
         for path_output_ac_or_bm_pdb_fxmutant_elogfile in path_output_ac_or_bm_pdb_fxmutant_elogfiles:
             if os.stat(path_output_ac_or_bm_pdb_fxmutant_elogfile).st_size != 0:
                 with open(path_output_ac_or_bm_pdb_fxmutant_elogfile) as f:
-                    path_output_ac_or_bm_pdb_fxmutant_elogfile = path_output_ac_or_bm_pdb_fxmutant_elogfiles.split('/')
+                    path_output_ac_or_bm_pdb_fxmutant_elogfile = path_output_ac_or_bm_pdb_fxmutant_elogfile.split('/')
                     pdbname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-3]
                     fxmutantname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-2]
                     print('This error logfile is not 0 bytes in size (' + pdbname + ':' + fxmutantname + ')')
@@ -150,7 +150,8 @@ class FoldX(object):
         pdbname = path_output_ac_or_bm_pdb_fxmutant_dir[-2]
         path_output_ac_or_bm_pdb_fxmutant_dir = '/'.join(path_output_ac_or_bm_pdb_fxmutant_dir)
         fx = FoldX()
-        prefixes_of_files_to_rm = fx.Strs.BM_FILES_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else fx.Strs.AC_FILES_TO_DELETE.value
+        prefixes_of_files_to_rm = fx.Strs.BM_FILES_TO_DELETE.value if ac_or_bm == Paths.DIR_BM.value else  \
+            fx.Strs.AC_FILES_TO_DELETE.value
         for prefix_of_file_to_rm in prefixes_of_files_to_rm:
             GUM.linux_remove_file(os.path.join(path_output_ac_or_bm_pdb_fxmutant_dir, prefix_of_file_to_rm + '*' + pdbname + '*' +
                                                fx.Strs.FXOUTEXT.value))
