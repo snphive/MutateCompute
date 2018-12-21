@@ -21,8 +21,8 @@ from src.enums.Conditions import Cond
 from src.Main import Main
 from src.FoldX import FoldX
 from src.Cluster import Cluster
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -66,13 +66,13 @@ path_pdbfiles = []
 for pdbname in pdbnames:
     path_pdbfiles.append(os.path.join(Paths.INPUT_PDBS, pdbname + Str.PDBEXT.value))
 if not path_pdbfiles:
-    warnings.warn_explicit(message="No pdb files to process. Check paths are correct and check files are where you expect.",
+    warnings.warn_explicit(message="No pdb files to process. (No problem if that is what you expected).",
                            category=RuntimeWarning, filename="KickOff", lineno=68)
 """
 5. Select specific mutants if you are only interested in these.
 MAKE SURE TO SET THIS LIST TO EMPTY if you don't want any of the subsequent actions below to be for these mutants only.
 """
-# specific_fxmutants = ['YB956R', 'YB956S', 'YB956T', 'YB956V',  'YB956W']
+# specific_fxmutants = ['CA498L']
 specific_fxmutants = []
 for path_pdbfile in path_pdbfiles:
     for specific_fxmutant in specific_fxmutants:
@@ -88,25 +88,111 @@ path_fastafiles = []
 # path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/**/*.fasta', recursive=True))
 # path_fastafiles = sorted(glob.glob(path_input_fastas_dir + '/*.fasta'))
 if not path_fastafiles:
-    warnings.warn_explicit(message="No fasta files to process. Check paths are correct and check files are where you expect.",
+    warnings.warn_explicit(message="No fasta files to process. (No problem if that is what you expected).",
                            category=RuntimeWarning, filename="KickOff", lineno=84)
 """
 7. Kick off the program(s) via the constructor or Main class. (Decide whether to write to csv after each mutant or after all 
 mutant computations are completed.)
 """
+do_not_write_at_all = True
 write_to_csv_dumpfile_after_each_mutant = False
 write_to_csv_dumpfile_after_all_computations = False if write_to_csv_dumpfile_after_each_mutant else True
 
-main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles, specific_fxmutants,
-            AA.LIST_ALL_20_AA.value, write_to_csv_dumpfile_after_each_mutant)
+# main = Main(operations, use_multithread, Paths.INPUT, Paths.OUTPUT, path_pdbfiles, path_fastafiles, specific_fxmutants,
+#             AA.LIST_ALL_20_AA.value, write_to_csv_dumpfile_after_each_mutant)
 
 """
 8. After computation completed, WRITE to csv files.  
 """
-if write_to_csv_dumpfile_after_all_computations:
+if not do_not_write_at_all:
+    if write_to_csv_dumpfile_after_all_computations:
+        if operations[Str.OPER_RUN_FX_BM.value]:
+            fx = FoldX()
+            using_cluster = GUM.using_cluster()
+            path_output_bm_pdb_fxmutant_dirs = []
+            for path_pdbfile in path_pdbfiles:
+                pdbfile = os.path.basename(path_pdbfile)
+                pdbname = pdbfile.split('.')[0]
+                for specific_fxmutant in specific_fxmutants:
+                    if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
+                        print('Mutations to wild-type residues are currently not being performed, therefore the results directory '
+                              'should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
+                        continue
+                    path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
+                if not specific_fxmutants:
+                    path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
+                for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
+                    fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
+                    os.chdir(path_output_bm_pdb_fxmutant_dir)
+                    bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
+                    while not bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                        print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
+                              fxmutantname + '. Therefore cannot write to csv file just yet.')
+                        if using_cluster:
+                            jobname = Paths.PREFIX_FX_BM.value + fxmutantname
+                            Cluster.wait_for_grid_engine_job_to_complete(jobname)
+                    fx.write_to_csvfile_for_db_dump(path_output_bm_pdb_fxmutant_dir)
+                    if using_cluster:
+                        path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
+                        Cluster.write_job_q_bash(jobname=Paths.PREFIX_WRITE.value + fxmutantname, path_job_q_dir=path_jobq_dir,
+                                                 python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
+                                                 'write_csvdumpfile_from_fxout_zeus.py' + Str.SPCE.value +
+                                                  path_output_bm_pdb_fxmutant_dir))
+                        Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
+                    else:
+                        fx.write_to_csvfile_for_db_dump(path_output_bm_pdb_fxmutant_dir)
+
+    if write_to_csv_dumpfile_after_all_computations:
+        if operations[Str.OPER_RUN_FX_AC.value]:
+            fx = FoldX()
+            using_cluster = GUM.using_cluster()
+            path_output_ac_pdb_fxmutant_dirs = []
+            for path_pdbfile in path_pdbfiles:
+                pdbfile = os.path.basename(path_pdbfile)
+                pdbname = pdbfile.split('.')[0]
+                for specific_fxmutant in specific_fxmutants:
+                    if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
+                        print('Mutations to wild-type residues are currently not being performed, therefore the results directory '
+                              'should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
+                        continue
+                    path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
+                if not specific_fxmutants:
+                    path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_ac, pdbname, '*'))
+                for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
+                    fxmutantname = os.path.basename(path_output_ac_pdb_fxmutant_dir)
+                    os.chdir(path_output_ac_pdb_fxmutant_dir)
+                    ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
+                    while not ac.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
+                        print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
+                              fxmutantname + '. Therefore cannot write to csv file just yet.')
+                        if using_cluster:
+                            jobname = Paths.PREFIX_FX_AC.value + fxmutantname
+                            Cluster.wait_for_grid_engine_job_to_complete(jobname)
+                    fx.write_to_csvfile_for_db_dump(path_output_ac_pdb_fxmutant_dir)
+                    if using_cluster:
+                        path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_AC_JOBQ, pdbname, fxmutantname)
+                        Cluster.write_job_q_bash(jobname=Paths.PREFIX_WRITE.value + fxmutantname, path_job_q_dir=path_jobq_dir,
+                                                 python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
+                                                 'write_csvdumpfile_from_fxout_zeus.py' + Str.SPCE.value +
+                                                  path_output_ac_pdb_fxmutant_dir))
+                        Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
+                    else:
+                        fx.write_to_csvfile_for_db_dump(path_output_ac_pdb_fxmutant_dir)
+
+"""
+9. Decide whether to delete unwanted files at all:
+"""
+do_not_delete_at_all = False
+
+"""
+10.After computation completed, DELETE config files no longer needed.  
+"""
+if not do_not_delete_at_all:
+    # Seems to be some bug(s) with removing log files using cluster jobs. Therefore forcing it not to send remove jobs to
+    # cluster with flag use_cluster.
+    use_cluster = False
     if operations[Str.OPER_RUN_FX_BM.value]:
         fx = FoldX()
-        using_cluster = GUM.using_cluster()
         path_output_bm_pdb_fxmutant_dirs = []
         for path_pdbfile in path_pdbfiles:
             pdbfile = os.path.basename(path_pdbfile)
@@ -120,138 +206,62 @@ if write_to_csv_dumpfile_after_all_computations:
             if not specific_fxmutants:
                 path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
             for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
-                fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
                 os.chdir(path_output_bm_pdb_fxmutant_dir)
                 bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
-                while not bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
-                    print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
-                          fxmutantname + '. Therefore cannot write to csv file just yet.')
-                    if using_cluster:
-                        jobname = Paths.PREFIX_FX_BM.value + fxmutantname
-                        Cluster.wait_for_grid_engine_job_to_complete(jobname)
-                fx.write_to_csvfile_for_db_dump(path_output_bm_pdb_fxmutant_dir)
-                if using_cluster:
-                    path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
-                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_WRITE.value + fxmutantname, path_job_q_dir=path_jobq_dir,
-                                             python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
-                                             'write_csvdumpfile_from_fxout_zeus.py' + Str.SPCE.value +
-                                              path_output_bm_pdb_fxmutant_dir))
-                    Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
-                else:
-                    fx.write_to_csvfile_for_db_dump(path_output_bm_pdb_fxmutant_dir)
+                if bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                    fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
+                    if fx.has_already_removed_config_logs_fxoutfile(path_output_bm_pdb_fxmutant_dir):
+                        print('No configs, logs, or unnecessary fxoutfiles found in ' + str(pdbname) + '_' + fxmutantname +
+                              '. Hence, nothing to delete.')
+                        continue
+                    if use_cluster:
+                        path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
+                        Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
+                                                 python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
+                                                 'remove_files_zeus.py' + Str.SPCE.value + path_output_bm_pdb_fxmutant_dir))
+                        Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
+                    else:
+                        fx.rm_config_files(path_output_bm_pdb_fxmutant_dir)
+                        fx.rm_cluster_logfiles(path_output_bm_pdb_fxmutant_dir, rm_non_empty_err_files=True)
+                        fx.rm_unnecessary_fxoutfiles(path_output_bm_pdb_fxmutant_dir)
 
-if write_to_csv_dumpfile_after_all_computations:
     if operations[Str.OPER_RUN_FX_AC.value]:
         fx = FoldX()
-        using_cluster = GUM.using_cluster()
+        path_output_bm_pdb_fxmutant_dirs = []
         path_output_ac_pdb_fxmutant_dirs = []
         for path_pdbfile in path_pdbfiles:
             pdbfile = os.path.basename(path_pdbfile)
             pdbname = pdbfile.split('.')[0]
             for specific_fxmutant in specific_fxmutants:
                 if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
-                    print('Mutations to wild-type residues are currently not being performed, therefore the results directory '
-                          'should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
+                    print('Computations on for wild-type residues are currently not being performed, therefore the results '
+                          'directory should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
                     continue
+                path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
                 path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
             if not specific_fxmutants:
-                path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_ac, pdbname, '*'))
+                path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
             for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
-                fxmutantname = os.path.basename(path_output_ac_pdb_fxmutant_dir)
                 os.chdir(path_output_ac_pdb_fxmutant_dir)
                 ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
-                while not ac.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
-                    print(fx.Strs.SMRY_AC_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
-                          fxmutantname + '. Therefore cannot write to csv file just yet.')
-                    if using_cluster:
-                        jobname = Paths.PREFIX_FX_AC.value + fxmutantname
-                        Cluster.wait_for_grid_engine_job_to_complete(jobname)
-                fx.write_to_csvfile_for_db_dump(path_output_ac_pdb_fxmutant_dir)
-                if using_cluster:
-                    path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_AC_JOBQ, pdbname, fxmutantname)
-                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_WRITE.value + fxmutantname, path_job_q_dir=path_jobq_dir,
-                                             python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
-                                             'write_csvdumpfile_from_fxout_zeus.py' + Str.SPCE.value +
-                                              path_output_ac_pdb_fxmutant_dir))
-                    Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
-                else:
-                    fx.write_to_csvfile_for_db_dump(path_output_ac_pdb_fxmutant_dir)
-
-"""
-9. After computation completed, DELETE config files no longer needed.  
-"""
-using_cluster = GUM.using_cluster()
-if operations[Str.OPER_RUN_FX_BM.value]:
-    fx = FoldX()
-    path_output_bm_pdb_fxmutant_dirs = []
-    for path_pdbfile in path_pdbfiles:
-        pdbfile = os.path.basename(path_pdbfile)
-        pdbname = pdbfile.split('.')[0]
-        for specific_fxmutant in specific_fxmutants:
-            if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
-                print('Mutations to wild-type residues are currently not being performed, therefore the results directory '
-                      'should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
-                continue
-            path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
-        if not specific_fxmutants:
-            path_output_bm_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_BM, pdbname, '*'))
-        for path_output_bm_pdb_fxmutant_dir in path_output_bm_pdb_fxmutant_dirs:
-            os.chdir(path_output_bm_pdb_fxmutant_dir)
-            bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
-            if bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
-                fxmutantname = os.path.basename(path_output_bm_pdb_fxmutant_dir)
-                if fx.has_already_removed_config_logs_fxoutfile(path_output_bm_pdb_fxmutant_dir):
-                    print('No configs, logs, or unnecessary fxoutfiles found in ' + str(pdbname) + '_' + fxmutantname +
-                          '. Hence, nothing to delete.')
-                    continue
-                if using_cluster:
-                    path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
-                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
-                                             python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
-                                             'remove_files_zeus.py' + Str.SPCE.value + path_output_bm_pdb_fxmutant_dir))
-                    Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
-                else:
-                    fx.rm_config_files(path_output_bm_pdb_fxmutant_dir)
-                    fx.rm_logfiles(path_output_bm_pdb_fxmutant_dir)
-                    fx.rm_unnecessary_fxoutfiles(path_output_bm_pdb_fxmutant_dir)
-
-if operations[Str.OPER_RUN_FX_AC.value]:
-    fx = FoldX()
-    path_output_bm_pdb_fxmutant_dirs = []
-    path_output_ac_pdb_fxmutant_dirs = []
-    for path_pdbfile in path_pdbfiles:
-        pdbfile = os.path.basename(path_pdbfile)
-        pdbname = pdbfile.split('.')[0]
-        for specific_fxmutant in specific_fxmutants:
-            if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
-                print('Computations on for wild-type residues are currently not being performed, therefore the results '
-                      'directory should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
-                continue
-            path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
-            path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
-        if not specific_fxmutants:
-            path_output_ac_pdb_fxmutant_dirs = glob.glob(os.path.join(Paths.OUTPUT_AC, pdbname, '*'))
-        for path_output_ac_pdb_fxmutant_dir in path_output_ac_pdb_fxmutant_dirs:
-            os.chdir(path_output_ac_pdb_fxmutant_dir)
-            ac = fx.AnalyseComplex(Cond.INCELL_MAML_FX.value)
-            if ac.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
-                fxmutantname = os.path.basename(path_output_ac_pdb_fxmutant_dir)
-                if fx.has_already_removed_config_logs_fxoutfile(path_output_ac_pdb_fxmutant_dir):
-                    print('No configs, logs, or unnecessary fxoutfiles found in ' + str(pdbname) + '_' + fxmutantname +
-                          '. Hence, nothing to delete.')
-                if using_cluster:
-                    path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
-                    Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
-                                             python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
-                                             'remove_files_zeus.py' + Str.SPCE.value + path_output_ac_pdb_fxmutant_dir))
-                    Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
-                else:
-                    fx.rm_config_files(path_output_ac_pdb_fxmutant_dir)
-                    fx.rm_pdbfiles(os.path.join(Paths.OUTPUT_BM, pdbname, fxmutantname))
-                    fx.rm_pdbfiles(os.path.join(path_output_ac_pdb_fxmutant_dir))
-                    fx.rm_logfiles(path_output_ac_pdb_fxmutant_dir)
-                    fx.rm_unnecessary_fxoutfiles(path_output_ac_pdb_fxmutant_dir)
-                    ac.rm_all_sumry_except_1_0(path_output_ac_pdb_fxmutant_dir)
+                if ac.has_already_generated_summary_ac_fxoutfile(path_output_ac_pdb_fxmutant_dir):
+                    fxmutantname = os.path.basename(path_output_ac_pdb_fxmutant_dir)
+                    if fx.has_already_removed_config_logs_fxoutfile(path_output_ac_pdb_fxmutant_dir):
+                        print('No configs, logs, or unnecessary fxoutfiles found in ' + str(pdbname) + '_' + fxmutantname +
+                              '. Hence, nothing to delete.')
+                    if use_cluster:
+                        path_jobq_dir = GUM.os_makedirs(Paths.CONFIG_BM_JOBQ, pdbname, fxmutantname)
+                        Cluster.write_job_q_bash(jobname=Paths.PREFIX_FX_RM.value + fxmutantname, path_job_q_dir=path_jobq_dir,
+                                                 python_script_with_paths=os.path.join(Paths.SE_SRC_CLSTR_PYSCRPTS.value,
+                                                 'remove_files_zeus.py' + Str.SPCE.value + path_output_ac_pdb_fxmutant_dir))
+                        Cluster.run_job_q(path_job_q_dir=path_jobq_dir)
+                    else:
+                        fx.rm_config_files(path_output_ac_pdb_fxmutant_dir)
+                        fx.rm_pdbfiles(os.path.join(Paths.OUTPUT_BM, pdbname, fxmutantname))
+                        fx.rm_pdbfiles(os.path.join(path_output_ac_pdb_fxmutant_dir))
+                        fx.rm_cluster_logfiles(path_output_ac_pdb_fxmutant_dir, rm_non_empty_err_files=False)
+                        fx.rm_unnecessary_fxoutfiles(path_output_ac_pdb_fxmutant_dir)
+                        ac.rm_all_sumry_except_1_0(path_output_ac_pdb_fxmutant_dir)
 
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
