@@ -20,8 +20,8 @@ from src.enums.Str import Str
 from src.enums.Paths import Paths
 from src.tools.GeneralUtilityMethods import GUM
 from src.Cluster import Cluster
-import pydevd
-pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
+# import pydevd
+# pydevd.settrace('localhost', port=51234, stdoutToServer=True, stderrToServer=True)
 
 __author__ = "Shahin Zibaee"
 __copyright__ = "Copyright 2018, The Switch lab, KU Leuven"
@@ -106,7 +106,7 @@ class FoldX(object):
         for path_pdbfile in path_pdbfiles:
             GUM.linux_remove_file(path_pdbfile)
 
-    def rm_logfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
+    def rm_cluster_logfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str, rm_non_empty_err_files=False):
         """
         Remove all o. cluster log files from specified output directory. Remove all empty e. cluster log files. Any e. log
         files that are not empty may be important so they are not deleted and the error message read and printed to console
@@ -122,21 +122,24 @@ class FoldX(object):
         path_output_ac_or_bm_pdb_fxmutant_elogfiles = glob.glob(path_output_ac_or_bm_pdb_fxmutant_elogfiles)
 
         for path_output_ac_or_bm_pdb_fxmutant_elogfile in path_output_ac_or_bm_pdb_fxmutant_elogfiles:
-            if os.stat(path_output_ac_or_bm_pdb_fxmutant_elogfile).st_size != 0:
-                with open(path_output_ac_or_bm_pdb_fxmutant_elogfile, 'r') as f:
-                    path_output_ac_or_bm_pdb_fxmutant_elogfile = path_output_ac_or_bm_pdb_fxmutant_elogfile.split('/')
-                    pdbname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-3]
-                    fxmutantname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-2]
-                    path_output_ac_or_bm_pdb_fxmutant_elogfile = '/'.join(path_output_ac_or_bm_pdb_fxmutant_elogfile)
-                    print('This error logfile is not 0 bytes in size (' + pdbname + ':' + fxmutantname + ')')
-                    err_log_f = f.read()
-                    print('The error logfile reads: ' + err_log_f)
-                    if 'Could not connect to localhost' in err_log_f:
-                        print('This message is a bug that only seems to occur when running the linux remove command while '
-                              'Pycharm is using the pydevd remote debugger. Therefore it will now be deleted.')
-                        GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
-            else:
+            if rm_non_empty_err_files:
                 GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
+            else:
+                if os.stat(path_output_ac_or_bm_pdb_fxmutant_elogfile).st_size != 0:
+                    with open(path_output_ac_or_bm_pdb_fxmutant_elogfile, 'r') as f:
+                        path_output_ac_or_bm_pdb_fxmutant_elogfile = path_output_ac_or_bm_pdb_fxmutant_elogfile.split('/')
+                        pdbname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-3]
+                        fxmutantname = path_output_ac_or_bm_pdb_fxmutant_elogfile[-2]
+                        path_output_ac_or_bm_pdb_fxmutant_elogfile = '/'.join(path_output_ac_or_bm_pdb_fxmutant_elogfile)
+                        print('This error logfile is not 0 bytes in size (' + pdbname + ':' + fxmutantname + ')')
+                        err_log_f = f.read()
+                        print('The error logfile reads: ' + err_log_f)
+                        if 'Could not connect to localhost' in err_log_f:
+                            print('This message is a bug that only seems to occur when running the linux remove command while '
+                                  'Pycharm is using the pydevd remote debugger. Therefore it will now be deleted.')
+                            GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
+                else:
+                    GUM.linux_remove_file(path_output_ac_or_bm_pdb_fxmutant_elogfile)
 
     def rm_unnecessary_fxoutfiles(self, path_output_ac_or_bm_pdb_fxmutant_dir: str):
         """
@@ -266,7 +269,10 @@ class FoldX(object):
             csvfile_header = 'pdb,fxmutant,ddG'
             fxout_prefix = self.Strs.AVG_BMDL_.value
             fxout_suffix = self.Strs.FXOUTEXT.value
-            path_output_ac_or_bm = Paths.OUTPUT_BM
+            # path_output_ac_or_bm = Paths.OUTPUT_BM
+            # The path string OUTPUT_BM gives an AttributeError when run on the cluster (with Python 3.5.1). Hence I'm
+            # forced to replace it with the long-winded version, via a ternary operator.
+            path_output_ac_or_bm = Paths.SE_OUTPUT_BM.value if GUM.using_cluster() else Paths.LOCAL_OUTPUT_BM.value
             ddG_lines_row_index = self.Strs.AVG_BM_FILE_DDG_LINE_INDEX.value
             ddG_value_cell_index = self.Strs.AVG_BM_FILE_DDG_CELL_INDEX.value
         elif Paths.DIR_AC.value in path_output_ac_or_bm_pdb_fxmutant_dir:
@@ -818,4 +824,4 @@ class FoldX(object):
         SMRY_AC_FILE_INTER_ENERGY_LINE_INDEX = 9
 
 
-pydevd.stoptrace()
+# pydevd.stoptrace()
