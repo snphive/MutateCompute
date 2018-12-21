@@ -120,29 +120,26 @@ class Agadir(object):
         """
         # There are 3 types of calculations and xx algorithms which this can be applied to.
         # 1) Global total; 2) Window calculation; 3) Residue calculation.
-        Global means the sum of all the scores for the whole protein.
-        Residue means the score for each residue in the whole protein.
-        Window means .....
-        :param ntrm:
-        :param ctrm:
-        :param global_tot:
-        :param tango_wndw:
-        :param waltz_wndw:
-        :param limbo_wndw:
-        :param agadir_wndw:
-        :param csblnca_wndw:
-        :param complex_wndw:
-        :param repeat_wndw:
-        :param patent_tango_wndw:
-        :param tango_resid:
-        :param waltz_resid:
-        :param limbo_resid:
-        :param complex_resid:
-        :param agadir_resid:
-        :param csblnca_resid:
-        :param repeat_resid:
-        :param wndws_file_per_seq:
-        :param resid_file_per_seq:
+        :param ntrm: "C" for Carboxylated N-term or "N" for non-modified
+        :param ctrm: "A" for Amidated N-term or "N" for non-modified
+        :param global_tot: Sum of all scores from whichever Agadir algorithm is run.
+        :param tango_wndw: True for TANGO APR peptide windows that score above a threshold.
+        :param waltz_wndw: True for WALTZ peptide windows that score above a threshold.
+        :param limbo_wndw: True for LIMBO peptide windows that score above a threshold.
+        :param agadir_wndw: True for agadir peptide windows that score above a threshold.
+        :param csblnca_wndw: True for Casablanca peptide windows that score above a threshold.
+        :param complex_wndw: True for Complex peptide windows that score above a threshold.
+        :param repeat_wndw: True for Repeat peptide windows that score above a threshold.
+        :param patent_tango_wndw: True for Patent TANGO peptide windows that score above a threshold.
+        :param tango_resid: True for all TANGO APR scores shown per residue (i.e. for plots).
+        :param waltz_resid: True for all WALTZ scores shown per residue (i.e. for plots).
+        :param limbo_resid: True for all LIMBO scores shown per residue (i.e. for plots).
+        :param complex_resid: True for all Complex scores shown per residue (i.e. for plots).
+        :param agadir_resid: True for all agadir scores shown per residue (i.e. for plots).
+        :param csblnca_resid: True for all Casablanca scores shown per residue (i.e. for plots).
+        :param repeat_resid:  True for all Repeat scores shown per residue (i.e. for plots).
+        :param wndws_file_per_seq: True to produce results for windows as one file per sequence.
+        :param resid_file_per_seq: True to produce results for all scores per residue as one file per sequence.
         :return: Agadir options text file.
         """
         options = []
