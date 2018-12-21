@@ -1,4 +1,4 @@
-# Project Title
+# Mutate-Compute
 
 A collection of scripts and classes to run a family of algorithms (FoldX, Tango, Waltz, Limbo) on protein 
 structure files (pdb) and protein sequence files (FASTA).
