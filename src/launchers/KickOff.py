@@ -91,8 +91,8 @@ if not path_fastafiles:
     warnings.warn_explicit(message="No fasta files to process. (No problem if that is what you expected).",
                            category=RuntimeWarning, filename="KickOff", lineno=84)
 """
-7. Kick off the program(s) via the constructor or Main class. (Decide whether to write to csv after each mutant or after all 
-mutant computations are completed.)
+7. Kick off the program(s) via the constructor or Main class. (Decide whether to write to csv after each mutant or after
+all mutant computations are completed.)
 """
 do_not_write_at_all = True
 write_to_csv_dumpfile_after_each_mutant = False
@@ -115,8 +115,8 @@ if not do_not_write_at_all:
                 pdbname = pdbfile.split('.')[0]
                 for specific_fxmutant in specific_fxmutants:
                     if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
-                        print('Mutations to wild-type residues are currently not being performed, therefore the results directory '
-                              'should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
+                        print('Mutations to wild-type residues are currently not being performed, therefore the results'
+                              'directory should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
                         continue
                     path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
                 if not specific_fxmutants:
@@ -126,8 +126,9 @@ if not do_not_write_at_all:
                     os.chdir(path_output_bm_pdb_fxmutant_dir)
                     bm = fx.BuildModel(Cond.INCELL_MAML_FX.value)
                     while not bm.has_already_generated_avg_bm_fxoutfile(path_output_bm_pdb_fxmutant_dir):
-                        print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value + ' has not been created yet for ' +
-                              fxmutantname + '. Therefore cannot write to csv file just yet.')
+                        print(fx.Strs.AVG_BMDL_.value + pdbname + fx.Strs.FXOUTEXT.value +
+                              ' has not been created yet for ' + fxmutantname +
+                              '. Therefore cannot write to csv file just yet.')
                         if using_cluster:
                             jobname = Paths.PREFIX_FX_BM.value + fxmutantname
                             Cluster.wait_for_grid_engine_job_to_complete(jobname)
@@ -152,8 +153,8 @@ if not do_not_write_at_all:
                 pdbname = pdbfile.split('.')[0]
                 for specific_fxmutant in specific_fxmutants:
                     if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
-                        print('Mutations to wild-type residues are currently not being performed, therefore the results directory '
-                              'should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
+                        print('Mutations to wild-type residues are currently not being performed, therefore the results'
+                              'directory should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
                         continue
                     path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
                 if not specific_fxmutants:
@@ -188,8 +189,8 @@ do_not_delete_at_all = False
 10.After computation completed, DELETE config files no longer needed.  
 """
 if not do_not_delete_at_all:
-    # Seems to be some bug(s) with removing log files using cluster jobs. Therefore forcing it not to send remove jobs to
-    # cluster with flag use_cluster.
+    # Seems to be some bug(s) with removing log files using cluster jobs. Therefore forcing it not to send remove jobs
+    # to cluster with flag use_cluster.
     use_cluster = False
     if operations[Str.OPER_RUN_FX_BM.value]:
         fx = FoldX()
@@ -199,8 +200,8 @@ if not do_not_delete_at_all:
             pdbname = pdbfile.split('.')[0]
             for specific_fxmutant in specific_fxmutants:
                 if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
-                    print('Mutations to wild-type residues are currently not being performed, therefore the results directory '
-                          'should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
+                    print('Mutations to wild-type residues are currently not being performed, therefore the results'
+                          'directory should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
                     continue
                 path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
             if not specific_fxmutants:
@@ -234,8 +235,8 @@ if not do_not_delete_at_all:
             pdbname = pdbfile.split('.')[0]
             for specific_fxmutant in specific_fxmutants:
                 if specific_fxmutant[0] == specific_fxmutant[len(specific_fxmutant) - 1]:
-                    print('Computations on for wild-type residues are currently not being performed, therefore the results '
-                          'directory should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
+                    print('Computations on for wild-type residues are currently not being performed, therefore the '
+                          'results directory should not exist for this: ' + str(pdbname) + '_' + specific_fxmutant)
                     continue
                 path_output_bm_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_BM, pdbname, specific_fxmutant))
                 path_output_ac_pdb_fxmutant_dirs.append(os.path.join(Paths.OUTPUT_AC, pdbname, specific_fxmutant))
