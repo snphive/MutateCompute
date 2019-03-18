@@ -136,10 +136,6 @@ in the path, add the import and commands to the launcher you want to run: "impor
  by adding the pydevd import line to the cluster python script.
 
 
-## Built With
-
-No build management tools were used. No web frameworks were used. 
-
 ## Contributing
 
 I currently am not expecting any outside contributors for this project in its current form. However if this changes in the 
@@ -148,16 +144,12 @@ future I would likely refer to others pre-written guidelines such as read [CONTR
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
 ## Authors
 
 * **Shahin Zibaee** - *Informed and adapted from Python scripts written by Rob van der Kant* - [originalScriptsAtJan2018]
 (https://github.com/snphive/originalScriptsAtJan2018)
 
 ## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
