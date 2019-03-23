@@ -1,0 +1,10 @@
+biopython==1.73
+mysql-connector-python==8.0.15
+natsort==6.0.0
+numpy==1.16.2
+parse==1.11.1
+parse-type==0.4.2
+protobuf==3.7.0
+pydevd==1.5.1
+PyYAML==5.1
+six==1.12.0
