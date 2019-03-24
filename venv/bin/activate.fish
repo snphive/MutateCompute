@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/u0120577/PycharmProjects/MutateCompute/venv"
+set -gx VIRTUAL_ENV "/Users/shahinzibaee/PycharmProjects/MutateCompute/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
